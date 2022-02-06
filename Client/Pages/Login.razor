@@ -1,0 +1,156 @@
+﻿@page "/login"
+@layout UmotaWebApp.Client.Shared.EmptyLayout
+
+
+<div class="container-fluid h-100">
+    <div class="row justify-content-center align-items-center h-100">
+
+        <div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3">
+
+            <EditForm Model="@request" OnValidSubmit="LoginProcess">
+                <DataAnnotationsValidator />
+
+                <div class="form-group">
+                    <input @bind-value="request.Kod" class="form-control form-control-lg" type="text" placeholder="Kullanıcı Kodu" />
+                </div>
+
+                <div class="form-group">
+                    <input @bind-value="request.Sifre" class="form-control form-control-lg" type="password" placeholder="Şifre" />
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-info btn-block">Giriş</button>
+                </div>
+
+
+                <div class="form-group">
+                    <select class="form-control" @bind="selectedFirmaDonem">
+                        <option value="" selected>@selectBoxDesc</option>
+                        @if (firmalar != null)
+                        {
+                            @foreach (var item in firmalar)
+                            {
+                                <option value="@item.FirmaNo">@item.FirmaAdi @item.Aciklama</option>
+                            }
+                        }
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn btn-info btn-block" @onclick="SaveRedirect">Devam Et</button>
+                </div>
+
+            </EditForm>
+
+        </div>
+
+    </div>
+</div>
+
+
+@code {
+
+    [Inject]
+    HttpClient client { get; set; }
+
+    [Inject]
+    ModalManager modalManager { get; set; }
+
+    [Inject]
+    NavigationManager navManager { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorage { get; set; }
+
+    [Inject]
+    AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    private SisKullaniciLoginRequestDto request = new SisKullaniciLoginRequestDto();
+    private List<SisFirmaFirmaDonemDto> firmalar = null;
+    private string selectedFirmaDonem = "";
+    private string selectBoxDesc = "Yükleniyor...";
+
+    private async Task LoadFirmaDonem()
+    {
+        var result = await client.GetFromJsonAsync<ServiceResponse<List<SisFirmaFirmaDonemDto>>>("api/firma/list");
+
+        if (result != null && result.Success)
+        {
+            firmalar = result.Value;
+            selectBoxDesc = "Lütfen firma-dönem seçiniz";
+        }
+        else
+        {
+            await modalManager.ShowMessageAsync("Hata", "Firma Dönem bilgisi çekilemedi");
+        }
+    }
+
+    private void SaveRedirect()
+    {
+        navManager.NavigateTo("/");
+    }
+
+
+    private async Task LoginProcess()
+    {
+        var httpReqResponse = await client.PostAsJsonAsync("api/kullanici/login", request);
+
+        if (httpReqResponse.IsSuccessStatusCode)
+        {
+            var res = await httpReqResponse.Content.ReadFromJsonAsync<ServiceResponse<SisKullaniciLoginResponseDto>>();
+
+            if (res.Success)
+            {
+                await LocalStorage.SetItemAsync<string>("token", res.Value.ApiToken);
+                await LocalStorage.SetItemAsync<string>("kullanicikodu", res.Value.KullaniciDto.KullaniciKodu);
+                await LocalStorage.SetItemAsync<string>("firmaNo", selectedFirmaDonem);
+                await LocalStorage.SetItemAsync<List<SisFirmaDonemYetkiDto>>("firmadonemyetki", res.Value.KullaniciFirmaDonemYetkiListesi);
+
+                (AuthenticationStateProvider as AuthStateProvider).NotifyUserLogin(res.Value.KullaniciDto.KullaniciKodu);
+
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", res.Value.ApiToken);
+
+                //navManager.NavigateTo("/");
+
+                var result = await client.GetFromJsonAsync<ServiceResponse<List<SisFirmaFirmaDonemDto>>>("api/firma/list");
+
+                if (result != null && result.Success)
+                {
+                    if (res.Value.KullaniciFirmaDonemYetkiListesi == null)
+                    {
+                        await modalManager.ShowMessageAsync("Hata", "Firma dönem yetkiniz bulunmamaktadır.");
+                        return;
+                    }
+
+                    var firma_no = res.Value.KullaniciFirmaDonemYetkiListesi.Where(i => i.Tur == 1).FirstOrDefault();
+
+                    if (firma_no == null)
+                    {
+                        await modalManager.ShowMessageAsync("Hata", "Firma dönem yetkiniz bulunmamaktadır.");
+
+                    }
+                    else
+                    {
+                        firmalar = result.Value;
+                        firmalar = firmalar.Where(i => i.FirmaNo == firma_no.Donemref.Value.ToString()).ToList();
+
+                        selectBoxDesc = "Lütfen firma-dönem seçiniz";
+                    }
+
+                }
+                else
+                {
+                    await modalManager.ShowMessageAsync("Hata", "Firma Dönem bilgisi çekilemedi");
+                }
+            }
+            else
+            {
+                await modalManager.ShowMessageAsync("Hata", res.Message);
+            }
+        }
+
+    }
+
+
+}

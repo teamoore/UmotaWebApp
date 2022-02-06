@@ -1,0 +1,22 @@
+﻿@page "/r_carilistef"
+
+<h1>Cari Kartlar</h1>
+
+@code {
+
+    [Inject]
+    IModalService modalService { get; set; }
+
+    private int currentCount = 0;
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+
+    private void Tikla()
+    {
+        modalService.Show<ShowMessagePopupComponent>("Merhaba Dünya");
+    }
+}

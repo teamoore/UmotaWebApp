@@ -1,0 +1,117 @@
+﻿<div class="top-row pl-4 navbar navbar-dark">
+    <a class="navbar-brand" href="">UmotaWebApp</a>
+    <button class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    @if (menuList == null)
+    {
+        <p><em>Yükleniyor....</em></p>
+    }
+    else
+    {
+        <ul class="nav flex-column">
+            @foreach (var mn in menuList)
+            {
+                @if (mn.ParentId == 0)
+                {
+                    <li class="nav-item px-3">
+                        <NavLink class="nav-link" href="#" @onclick="()=>GetIsClicked(mn)">
+                            <span aria-hidden="true"></span>@mn.MenuTanimi
+                        </NavLink>
+                        <ul class="nav flex-column">
+                            @foreach (var mn1 in menuList)
+                            {
+                                @if (mn.MenuId == mn1.ParentId)
+                                {
+                                    @if (expandSubNav && mn.MenuId == clickedMenu)
+                                    {
+                                        <li class="nav-item px-3" style="font-size: 0.7rem !important;">
+                                            <NavLink class="nav-link" href="@mn1.MenuDfm" @onclick="()=>GetIsClicked(mn1)">
+                                                <span aria-hidden="true"></span>@mn1.MenuTanimi
+                                            </NavLink>
+                                        </li>
+                                    }
+                                }
+                            }
+                        </ul>
+                    </li>
+                }
+            }
+        </ul>
+    }
+</div>
+
+
+
+@code {
+
+    [Inject]
+    HttpClient client { get; set; }
+
+    private List<string> readyPageList = null;
+    private IEnumerable<int> readyMenuIds = null;
+
+    private bool collapseNavMenu = true;
+    private bool expandMenu;
+    private string NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private bool expandSubNav;
+    private int clickedMenu = 0;
+    private bool hasPageName = true;
+    private int prevClickedMenu = 0;
+
+    private List<SisMenuDto> menuList = null;
+
+    public void GetIsClicked(SisMenuDto mn)
+    {
+        clickedMenu = mn.MenuId;
+        if (prevClickedMenu != clickedMenu)
+        {
+            expandSubNav = false;
+            if (mn.MenuTanimi != "")
+            {
+                hasPageName = true;
+            }
+            else
+            {
+                expandSubNav = !expandSubNav;
+                hasPageName = false;
+            }
+        }
+        else
+        {
+            expandSubNav = !expandSubNav;
+        }
+
+        prevClickedMenu = clickedMenu;
+    }
+
+    private void ToggleNavMenu()
+    {
+        if (hasPageName)
+        {
+            collapseNavMenu = !collapseNavMenu;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        readyPageList = new List<string>();
+        readyPageList.AddRange(new[] { "stek_listef", "r_carilistef", "kullanici_tanimlarif" });
+        readyMenuIds = new int[3] { 77, 96,93 };
+
+
+        var result = await client.GetFromJsonAsync<ServiceResponse<List<SisMenuDto>>>("api/menu/list");
+
+        if (result != null && result.Success)
+        {
+            menuList = result.Value;
+        }
+
+        menuList = menuList.Where(i => readyPageList.Contains(i.MenuDfm) || readyMenuIds.Contains(i.MenuId)).ToList();
+    }
+
+}
