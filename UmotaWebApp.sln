@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.810.15
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmotaWebApp.Client", "..\Client\UmotaWebApp.Client.csproj", "{996678A4-7251-4726-8430-36C841AA06B5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmotaWebApp.Server", "..\Server\UmotaWebApp.Server.csproj", "{A6482F20-3854-4740-B911-C4EB462F902C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmotaWebApp.Shared", "..\Shared\UmotaWebApp.Shared.csproj", "{C53C9B1D-BDAF-4E04-810B-AEAB7E1919D8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmotaWebApp.Server.Data", "..\Server.Data\UmotaWebApp.Server.Data.csproj", "{60D6C850-EF3F-4A3B-B592-3BC035B17352}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{996678A4-7251-4726-8430-36C841AA06B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{996678A4-7251-4726-8430-36C841AA06B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{996678A4-7251-4726-8430-36C841AA06B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{996678A4-7251-4726-8430-36C841AA06B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6482F20-3854-4740-B911-C4EB462F902C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6482F20-3854-4740-B911-C4EB462F902C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6482F20-3854-4740-B911-C4EB462F902C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6482F20-3854-4740-B911-C4EB462F902C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C53C9B1D-BDAF-4E04-810B-AEAB7E1919D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C53C9B1D-BDAF-4E04-810B-AEAB7E1919D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C53C9B1D-BDAF-4E04-810B-AEAB7E1919D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C53C9B1D-BDAF-4E04-810B-AEAB7E1919D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60D6C850-EF3F-4A3B-B592-3BC035B17352}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60D6C850-EF3F-4A3B-B592-3BC035B17352}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60D6C850-EF3F-4A3B-B592-3BC035B17352}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60D6C850-EF3F-4A3B-B592-3BC035B17352}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C4CB7756-A0A0-4C91-9CF5-49D1D5DA0E4D}
+	EndGlobalSection
+EndGlobal
