@@ -37,6 +37,7 @@ namespace UmotaWebApp.Server
             services.AddScoped<ISisKullaniciService, SisKullaniciService>();
             services.AddScoped<ISisFirmaService, SisFirmaService>();
             services.AddScoped<ISisMenuService, SisMenuService>();
+            services.AddScoped<ICariKartService, CariKartService>();
 
             services.AddDbContext<UmotaMasterDbContext>(config =>
             {

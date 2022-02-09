@@ -6,51 +6,34 @@ using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Extensions
 {
- 
-        public static class ConfigureMappingExtension
+
+    public static class ConfigureMappingExtension
+    {
+        public static IServiceCollection ConfigureMapping(this IServiceCollection service)
         {
-            public static IServiceCollection ConfigureMapping(this IServiceCollection service)
-            {
-                var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new MappingProfile()); });
+            var mappingConfig = new MapperConfiguration(mc => { mc.AddProfile(new MappingProfile()); });
 
-                IMapper mapper = mappingConfig.CreateMapper();
+            IMapper mapper = mappingConfig.CreateMapper();
 
-                service.AddSingleton(mapper);
+            service.AddSingleton(mapper);
 
-                return service;
-            }
+            return service;
         }
+    }
 
-        public class MappingProfile : Profile
+    public class MappingProfile : Profile
+    {
+        public MappingProfile()
         {
-            public MappingProfile()
-            {
-                AllowNullDestinationValues = true;
-                AllowNullCollections = true;
+            AllowNullDestinationValues = true;
+            AllowNullCollections = true;
 
-                CreateMap<SisKullanici, SisKullaniciDto>().ReverseMap();
-                CreateMap<SisMenuler, SisMenuDto>().ReverseMap();
-                CreateMap<SisFirmaDonemYetki, SisFirmaDonemYetkiDto>().ReverseMap();
-
-            /*
-                CreateMap<Sites, SitesDto>()
-                    .ForMember(x => x.Description, y => y.MapFrom(z => z.Name + " " + z.Address));
-
-                CreateMap<SitesDto, Sites>();
-
-                CreateMap<Blocks, BlocksDto>()
-                    .ForMember(x => x.BlockName, y => y.MapFrom(z => z.Name + " " + z.Code));
-
-                CreateMap<BlocksDto, Blocks>()
-                    .ForMember(x => x.Name, y => y.MapFrom(z => z.BlockName));
-
-                CreateMap<Apartments, ApartmentDto>()
-                    .ReverseMap();
-
-                CreateMap<ApartmentDto, Apartments>();
-            */
+            CreateMap<SisKullanici, SisKullaniciDto>().ReverseMap();
+            CreateMap<SisMenuler, SisMenuDto>().ReverseMap();
+            CreateMap<SisFirmaDonemYetki, SisFirmaDonemYetkiDto>().ReverseMap();
+            CreateMap<CariKart, CariKartDto>().ReverseMap();
 
         }
-        }
-    
+    }
+
 }
