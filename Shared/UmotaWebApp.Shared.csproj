@@ -13,7 +13,6 @@
     <None Remove="CustomException\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ModelDto\" />
     <Folder Include="ServiceResponses\" />
     <Folder Include="CustomException\" />
   </ItemGroup>
