@@ -33,8 +33,6 @@
     <None Remove="Microsoft.AspNetCore.Authentication.JwtBearer" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Services\" />
-    <Folder Include="Services\Infrastructure\" />
     <Folder Include="Services\Extensions\" />
   </ItemGroup>
 </Project>
