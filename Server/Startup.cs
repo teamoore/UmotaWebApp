@@ -43,6 +43,11 @@ namespace UmotaWebApp.Server
                 config.UseSqlServer(Configuration.GetConnectionString("masterDb"));
             });
 
+            services.AddDbContext<UmotaCompanyDbContext>(config =>
+            {
+                config.UseSqlServer(Configuration.GetConnectionString("companyDb"));
+            });
+
             services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
