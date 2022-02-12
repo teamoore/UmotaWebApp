@@ -35,7 +35,6 @@ namespace UmotaWebApp.Client.Utils
 
             Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenStr);
 
-
             return new AuthenticationState(cp);
         }
 
