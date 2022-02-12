@@ -1,0 +1,51 @@
+﻿@page "/r_carilistef_ekle"
+@page "/r_carilistef/Edit/{ref:int}"
+
+<EditForm Model="cariModel" OnValidSubmit="ValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-row">
+        <div class="form-group col">
+            <label>Kodu</label>
+            <InputText @bind-Value="cariModel.Kodu" class="form-control" />
+        </div>
+
+        <div class="form-group col">
+            <label>Adı</label>
+            <InputText @bind-Value="cariModel.Adi" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Kaydet" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="goBackCariList" />
+    </div>
+
+</EditForm>
+
+
+
+@code
+{ 
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    CariKartDto cariModel = new CariKartDto();
+
+    public async Task ValidSubmit()
+    {
+        await ModalManager.ShowMessageAsync("Mesaj", "Deneme");
+    }
+
+    void goBackCariList()
+    {
+        navigation.NavigateTo("/r_carilistef");
+    }
+}
