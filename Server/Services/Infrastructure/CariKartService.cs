@@ -31,5 +31,13 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             return results;
         }
+
+        public async Task<CariKartDto> SaveCariKart(CariKartDto cari)
+        {
+            var cariKart = Mapper.Map<CariKart>(cari);
+            await Db.CariKarts.AddAsync(cariKart);
+            await Db.SaveChangesAsync();
+            return Mapper.Map<CariKartDto>(cariKart);
+        }
     }
 }

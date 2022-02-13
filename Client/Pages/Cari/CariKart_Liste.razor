@@ -3,32 +3,52 @@
 <h1>Cari Kartlar</h1>
 
 <div>
-    <button class="btn btn-primary" @onclick="(() => ModalManager.ModalService.Show<Cari_Ekle>())">Yeni Ekle</button>
+    <button class="btn btn-primary" @onclick="(() => ModalManager.ModalService.Show<CariKartEkle>())">Yeni Ekle</button>
 </div>
-<table class="table table-hover table-sm">
-    <thead>
-        <tr>
-            <th scope="col">Ref</th>
-            <th scope="col">Kodu</th>
-            <th scope="col">Adı</th>
-
-        </tr>
-    </thead>
-    <tbody>
-        @if (cariler != null)
-        {
+<div class="table-responsive" style="overflow-x: auto;max-width:1200px;">
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th scope="col">Ref</th>
+                <th scope="col">Kodu</th>
+                <th scope="col">Adı</th>
+                <th scope="col">Adı 2</th>
+                <th scope="col">Adres 1</th>
+                <th scope="col">Adres 2</th>
+                <th scope="col">İLçe</th>
+                <th scope="col">İl</th>
+                <th scope="col">Ülke</th>
+                <th scope="col">Telefon 1</th>
+                <th scope="col">Telefon 2</th>
+                <th scope="col">Vergi No</th>
+                <th scope="col">Vergi Dairesi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (cariler != null)
+            {
 @foreach (var item in cariler)
 {
 <tr>
     <td>@item.Logref</td>
     <td>@item.Kodu</td>
     <td>@item.Adi</td>
+    <td>@item.Adi2</td>
+    <td>@item.Adres1</td>
+    <td>@item.Adres2</td>
+    <td>@item.Ilce</td>
+    <td>@item.Ulke</td>
+    <td>@item.Il</td>
+    <td>@item.Tel1</td>
+    <td>@item.Tel2</td>
+    <td>@item.Vdno</td>
+    <td>@item.Vdadi</td>
+</tr>}}
 
-</tr>
-}}
+        </tbody>
+    </table>
 
-    </tbody>
-</table>
+</div>
 
 
 @code
@@ -53,5 +73,6 @@
     private async Task LoadCariler()
     {
         cariler = await httpClient.GetServiceResponseAsync<List<CariKartDto>>("/api/carikart/list");
+        cariler = cariler.OrderByDescending(i => i.Insdate).ToList();
     } 
 }

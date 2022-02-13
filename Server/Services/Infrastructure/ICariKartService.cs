@@ -9,5 +9,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     public interface ICariKartService
     {
         public Task<List<CariKartDto>> GetCariKartDtos();
+        public Task<CariKartDto> SaveCariKart(CariKartDto cari);
     }
 }

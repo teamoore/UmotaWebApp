@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace UmotaWebApp.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CariKartController : ControllerBase
     {
         public ILogger<CariKartController> Logger { get; }
@@ -39,6 +41,26 @@ namespace UmotaWebApp.Server.Controllers
                 Logger.Log(LogLevel.Error, ex.Message);
 
                 var e = new ServiceResponse<List<CariKartDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("save")]
+        public async Task<ServiceResponse<CariKartDto>> CariKartKaydet(CariKartDto cari)
+        {
+            try
+            {
+                return new ServiceResponse<CariKartDto>
+                {
+                    Value = await CariKartService.SaveCariKart(cari)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<CariKartDto>();
                 e.SetException(ex);
                 return e;
             }

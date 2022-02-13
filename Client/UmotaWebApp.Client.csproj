@@ -34,7 +34,4 @@
     <None Remove="Microsoft.AspNetCore.Components.Authorization" />
     <None Remove="Utils\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Utils\" />
-  </ItemGroup>
 </Project>

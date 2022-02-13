@@ -1,0 +1,75 @@
+﻿@page "/r_carilistef_ekle"
+
+<EditForm Model="cariModel" OnValidSubmit="ValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form">
+        <div class="form-group">
+            <label>Ref</label>
+            <InputNumber @bind-Value="cariModel.Logref" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>Kodu</label>
+            <InputText @bind-Value="cariModel.Kodu" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>Adı</label>
+            <InputText @bind-Value="cariModel.Adi" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Kaydet" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="goBackCariList" />
+    </div>
+
+</EditForm>
+
+
+
+@code
+{
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    CariKartDto cariModel = new CariKartDto();
+
+    public async Task Kaydet()
+    {
+        try
+        {
+            cariModel.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            cariModel.Insdate = DateTime.Now;
+
+            cariModel = await httpClient.PostGetServiceResponseAsync<CariKartDto, CariKartDto>("/api/carikart/save", cariModel);
+
+            goBackCariList();
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+        }
+    }
+
+    public async Task ValidSubmit()
+    {
+        await Kaydet();
+    }
+
+    void goBackCariList()
+    {
+        navigation.NavigateTo("/r_carilistef",forceLoad : true);
+    }
+}
