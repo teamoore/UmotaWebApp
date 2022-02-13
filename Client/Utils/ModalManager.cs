@@ -32,10 +32,12 @@ namespace UmotaWebApp.Client.Utils
 
         }
 
-        public async Task<bool> ShowConfirmationAsync(string Title, string Message)
+        public async Task<bool> ShowConfirmationAsync(string Title, string Message, string YesText, string CancelText)
         {
             ModalParameters parameters = new ModalParameters();
             parameters.Add("message", Message);
+            parameters.Add("YesText", YesText);
+            parameters.Add("CancelText", CancelText);
 
             var modalRef = ModalService.Show<ConfirmationPopupComponent>(Title, parameters);
             var mResult = await modalRef.Result;

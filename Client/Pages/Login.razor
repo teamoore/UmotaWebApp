@@ -102,10 +102,10 @@
 
             if (res.Success)
             {
-                await LocalStorage.SetItemAsync<string>("token", res.Value.ApiToken.Replace("\"",""));
-                await LocalStorage.SetItemAsync<string>("kullanicikodu", res.Value.KullaniciDto.KullaniciKodu);
-                await LocalStorage.SetItemAsync<string>("firmaNo", selectedFirmaDonem);
-                await LocalStorage.SetItemAsync<List<SisFirmaDonemYetkiDto>>("firmadonemyetki", res.Value.KullaniciFirmaDonemYetkiListesi);
+                await LocalStorage.SetItemAsync<string>(Consts.Token, res.Value.ApiToken.Replace("\"",""));
+                await LocalStorage.SetItemAsync<string>(Consts.KullaniciKodu, res.Value.KullaniciDto.KullaniciKodu);
+                await LocalStorage.SetItemAsync<string>(Consts.FirmaDonem, selectedFirmaDonem);
+                await LocalStorage.SetItemAsync<List<SisFirmaDonemYetkiDto>>(Consts.FirmaDonemYetki, res.Value.KullaniciFirmaDonemYetkiListesi);
 
                 (AuthenticationStateProvider as AuthStateProvider).NotifyUserLogin(res.Value.KullaniciDto.KullaniciKodu);
 

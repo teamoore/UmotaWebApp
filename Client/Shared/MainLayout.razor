@@ -7,7 +7,8 @@
 
     <div class="main">
         <div class="top-row px-4">
-            <a href="http://blazor.net" target="_blank" class="ml-md-auto">@loginStr</a>
+            <button type="button" class="btn btn-primary" @onclick="ShowKullaniciKart">@loginStr</button>
+            <button type="button" class="btn btn-warning" @onclick="NavigateToExit">Çıkış</button>
         </div>
 
         <div class="content px-4">
@@ -29,6 +30,14 @@
     [Inject]
     NavigationManager NavigationManager { get; set; }
 
+    [Inject]
+    ModalManager modalManager { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+ 
+
     protected async override Task OnInitializedAsync()
     {
         var authState = await AuthState;
@@ -36,10 +45,40 @@
         if (authState.User.Identity.IsAuthenticated)
         {
             loginStr = await localStorage.GetItemAsStringAsync("kullanicikodu");
+            loginStr = loginStr.Replace("\"", "");
         }
         else
         {
             NavigationManager.NavigateTo("login");
         }
     }
-}
+
+    public async Task NavigateToExit()
+    {
+        var exitConfirmed = await modalManager.ShowConfirmationAsync("Çıkış", "Uygulamadan çıkmak üzeresiniz. Emin misiniz ?", "Çıkış Yap", "İptal");
+
+        if (exitConfirmed)
+        {
+            await localStorage.RemoveItemAsync(Consts.KullaniciKodu);
+            await localStorage.RemoveItemAsync(Consts.FirmaDonem);
+            await localStorage.RemoveItemAsync(Consts.FirmaDonemYetki);
+            await localStorage.RemoveItemAsync(Consts.Token);
+
+            NavigationManager.NavigateTo("login");
+        }
+
+    }
+
+    public async Task ShowKullaniciKart()
+    {
+        var kod = await localStorage.GetItemAsync<string>(Consts.KullaniciKodu);
+        
+        var kullanici = await httpClient.GetServiceResponseAsync<SisKullaniciDto>("/api/kullanici/GetByKod?kod=" + kod);
+
+        if (kullanici != null)
+        {
+            string bilgi = string.Format("{0}, E-Mail : {1}, Yetki Kodu : {2} Son Giriş Tarihi : {3}",
+                kullanici.KullaniciAdi, kullanici.MailAdres, kullanici.KullaniciYetkiKodu, kullanici.SonGirisTarihi.Value);
+            await modalManager.ShowMessageAsync("Kullanıcı Bilgi", bilgi);
+        }
+    } }
