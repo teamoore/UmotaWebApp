@@ -14,7 +14,6 @@ namespace UmotaWebApp.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class CariKartController : ControllerBase
     {
         public ILogger<CariKartController> Logger { get; }
@@ -46,6 +45,26 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpGet("getByKod")]
+        public async Task<ServiceResponse<CariKartDto>> CariKartGetir(string kod)
+        {
+            try
+            {
+                return new ServiceResponse<CariKartDto>()
+                {
+                    Value = await CariKartService.GetCariKartByKod(kod)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<CariKartDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
         [HttpPost("save")]
         public async Task<ServiceResponse<CariKartDto>> CariKartKaydet(CariKartDto cari)
         {
@@ -54,6 +73,26 @@ namespace UmotaWebApp.Server.Controllers
                 return new ServiceResponse<CariKartDto>
                 {
                     Value = await CariKartService.SaveCariKart(cari)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<CariKartDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("update")]
+        public async Task<ServiceResponse<CariKartDto>> CariKartGuncelle(CariKartDto cari)
+        {
+            try
+            {
+                return new ServiceResponse<CariKartDto>
+                {
+                    Value = await CariKartService.UpdateCariKart(cari)
                 };
             }
             catch (ApiException ex)

@@ -36,7 +36,7 @@
     [Inject]
     HttpClient httpClient { get; set; }
 
- 
+
 
     protected async override Task OnInitializedAsync()
     {
@@ -71,8 +71,9 @@
 
     public async Task ShowKullaniciKart()
     {
-        var kod = await localStorage.GetItemAsync<string>(Consts.KullaniciKodu);
-        
+        var kod = await localStorage.GetItemAsStringAsync(Consts.KullaniciKodu);
+        kod = kod.Replace("'", "");
+
         var kullanici = await httpClient.GetServiceResponseAsync<SisKullaniciDto>("/api/kullanici/GetByKod?kod=" + kod);
 
         if (kullanici != null)
