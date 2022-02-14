@@ -14,7 +14,6 @@ namespace UmotaWebApp.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class KullaniciController : ControllerBase
     {
         public ILogger<KullaniciController> Logger { get; }

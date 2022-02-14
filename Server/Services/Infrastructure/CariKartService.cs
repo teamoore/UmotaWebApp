@@ -39,5 +39,25 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             await Db.SaveChangesAsync();
             return Mapper.Map<CariKartDto>(cariKart);
         }
+
+        public async Task<CariKartDto> GetCariKartByKod(string kod)
+        {
+            IQueryable<CariKartDto> qry = Db.CariKarts.Where(i => i.Kodu == kod)
+                .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider);
+
+            return await qry.SingleOrDefaultAsync();
+        }
+
+        public async Task<CariKartDto> UpdateCariKart(CariKartDto cari)
+        {
+            var cariKart = await Db.CariKarts.Where(x => x.Kodu == cari.Kodu).SingleOrDefaultAsync();
+            if (cariKart == null)
+                throw new Exception("Cari kart bulunamadı");
+
+            Mapper.Map(cari, cariKart);
+            await Db.SaveChangesAsync();
+
+            return Mapper.Map<CariKartDto>(cariKart);
+        }
     }
 }
