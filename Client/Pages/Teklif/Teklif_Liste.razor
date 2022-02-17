@@ -1,0 +1,76 @@
+﻿@page "/stek_listef"
+
+<h1>Teklifler</h1>
+
+<div>
+    <button class="btn btn-primary btn-sm">Yeni Teklif</button>
+</div>
+<hr />
+
+<div class="table-responsive" style="overflow-x: auto;max-width:1200px;font-size:small">
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Teklif No</th>
+                <th scope="col">Cari</th>
+                <th scope="col">Cari Kodu</th>
+                <th scope="col">Personel Adı</th>
+                <th scope="col">Teslim Şekli</th>
+                <th scope="col">Teslim Tarihi</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            @if (teklifler != null)
+            {
+                @foreach (var item in teklifler)
+                {
+                    <tr>
+                        <td>
+                            <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="" OnClick="(() => TeklifDetay(item.Logref))"></CustomEditButtonComponent>
+                        </td>
+                        <td>@item.Logref</td>
+                        <td>@item.Teklifno</td>
+                        <td>@item.LcariAdi</td>
+                        <td>@item.LcariKodu</td>
+                        <td>@item.Lpersoneladi</td>
+                        <td>@item.TeslimSekli</td>
+                        <td>@item.TeslimTarihi</td>
+                    </tr>
+}}
+
+        </tbody>
+    </table>
+
+</div>
+
+@code {
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    public List<TeklifDto> teklifler { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTeklifler();
+    }
+
+    private async Task LoadTeklifler()
+    {
+        teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>("/api/teklif/list");
+        teklifler = teklifler.OrderByDescending(i => i.Insdate).ToList();
+    }
+
+    public void TeklifDetay(int logref)
+    {
+        navigation.NavigateTo("/stek_listef_detay/" + logref.ToString());
+    }
+}
