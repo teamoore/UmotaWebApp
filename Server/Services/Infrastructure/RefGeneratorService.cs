@@ -20,10 +20,12 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             _sql = sql;
         }
 
-        public async Task<string> GenerateRowRef(string table)
+        public async Task<string> GenerateRowRef(string table, string keyField)
         {
-            var result = await _sql.QueryFirstAsync<string>("select dbo.GenerateNewCode(isnull((select max(kodu) from " + table + "),'00000')) as value"
-                , commandType: CommandType.Text);
+            var result = await _sql.QueryFirstAsync<string>("select dbo.GenerateNewCode(isnull((select max("+
+                keyField
+                +") from " + table + "),'00000')) as value"
+                , commandType: CommandType.Text); 
             return result;
         }
     }

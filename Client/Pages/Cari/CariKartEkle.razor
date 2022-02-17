@@ -46,6 +46,11 @@
 
     CariKartDto cariModel = new CariKartDto();
 
+    protected override async Task OnInitializedAsync()
+    {
+        await CariKartRefUret();
+    }
+
     public async Task Kaydet()
     {
         try
@@ -70,6 +75,29 @@
 
     void goBackCariList()
     {
-        navigation.NavigateTo("/r_carilistef",forceLoad : true);
+        navigation.NavigateTo("/r_carilistef", forceLoad: true);
+    }
+
+    public async Task CariKartRefUret()
+    {
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=cari_kart&keyField=kodu");
+            if (string.IsNullOrEmpty(result) == false)
+            {
+                cariModel.Kodu = result;
+            }
+
+            var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=cari_kart&keyField=logref");
+            if (string.IsNullOrEmpty(result) == false)
+            {
+                cariModel.Logref = Convert.ToInt32(result2);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", "Kod üretilemedi");
+        }
+
     }
 }

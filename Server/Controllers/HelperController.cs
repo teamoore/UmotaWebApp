@@ -22,7 +22,7 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("GenerateRef")]
-        public async Task<ServiceResponse<string>> GetRowRefNumber(string table)
+        public async Task<ServiceResponse<string>> GetRowRefNumber(string table, string keyField)
         {
             try
             {
@@ -31,7 +31,7 @@ namespace UmotaWebApp.Server.Controllers
 
                 return new ServiceResponse<string>()
                 {
-                    Value = await RefService.GenerateRowRef(table)
+                    Value = await RefService.GenerateRowRef(table, keyField)
                 };
             }
             catch (ApiExcetion ex)

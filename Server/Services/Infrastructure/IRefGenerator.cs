@@ -7,6 +7,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 {
     public interface IRefGenerator
     {
-        public Task<string> GenerateRowRef(string table);
+        public Task<string> GenerateRowRef(string table, string keyField);
     }
 }
