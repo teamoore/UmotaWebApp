@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using UmotaWebApp.Server.Extensions;
 
 namespace UmotaWebApp.Server
 {
@@ -34,10 +35,13 @@ namespace UmotaWebApp.Server
             services.AddRazorPages();
 
             services.ConfigureMapping();
+
+            services.AddDbConnection();
             services.AddScoped<ISisKullaniciService, SisKullaniciService>();
             services.AddScoped<ISisFirmaService, SisFirmaService>();
             services.AddScoped<ISisMenuService, SisMenuService>();
             services.AddScoped<ICariKartService, CariKartService>();
+            services.AddScoped<IRefGenerator, RefGeneratorService>();
 
             services.AddDbContext<UmotaMasterDbContext>(config =>
             {
