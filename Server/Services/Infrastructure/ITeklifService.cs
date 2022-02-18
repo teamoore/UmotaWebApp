@@ -11,5 +11,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     {
         public Task<List<TeklifDto>> GetTeklifDtos();
         public Task<TeklifDto> GetTeklifByRef(int logref);
+        public Task<TeklifDto> SaveTeklif(TeklifDto teklifDto);
     }
 }

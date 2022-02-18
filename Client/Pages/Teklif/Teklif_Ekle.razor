@@ -1,6 +1,6 @@
 ﻿@page "/stek_listef_ekle"
 
-<EditForm Model="teklif" OnValidSubmit="ValidSubmit">
+<EditForm Model="teklif">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -16,7 +16,7 @@
         </div>
 
         <div class="form-group">
- 
+            <label>Cari</label>
             <div class="row">
                 <div class="col">
                     <InputText @bind-Value="teklif.LcariKodu" class="form-control" disabled="true" placeholder="Cari Kodu" />
@@ -36,7 +36,7 @@
     </div>
 
     <div class="form-group">
-        <SaveButtonComponent Caption="Kaydet" />
+        <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
         <CancelButtonComponent Caption="Vazgeç" OnClick="goBackTeklifList" />
     </div>
 
@@ -66,8 +66,26 @@
         await TeklifNoUret();
     }
 
-    public void ValidSubmit()
-    { }
+    public async Task ValidSubmit()
+    {
+        try
+        {
+            teklif.Insdate = DateTime.Now;
+            teklif.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklif.Tarih = teklif.Tarih.HasValue ? teklif.Tarih : DateTime.Now;
+            teklif.Saat = teklif.Saat.HasValue ? teklif.Saat : DateTime.Now;
+
+            var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifDto>("/api/teklif/save", teklif);
+
+            navigation.NavigateTo("/stek_listef");
+
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
 
     public async Task TeklifNoUret()
     {

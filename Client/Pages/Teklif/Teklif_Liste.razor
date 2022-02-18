@@ -39,12 +39,12 @@
                             <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="" OnClick="(() => TeklifDetay(item.Logref))"></CustomEditButtonComponent>
                         </td>
                         <td>@item.Teklifno</td>
-                        <td>@item.Tarih.Value.ToString("dd.MM.yyyy")  @item.Saat.Value.ToString("HH:mm")</td>
+                        <td>@(item.Tarih.HasValue ? item.Tarih.Value.ToString("dd.MM.yyyy") : "-")</td>
                         <td>@item.LcariAdi</td>
                         <td>@item.LcariKodu</td>
                         <td>@item.Lpersoneladi</td>
                         <td>@item.TeslimSekli</td>
-                        <td>@item.TeslimTarihi.Value.ToString("dd.MM.yyyy")</td>
+                        <td>@(item.TeslimTarihi.HasValue ? item.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "-")</td>
                         <td>@(item.Dovizkuru.HasValue ? item.Dovizkuru.Value.ToString("0.##") : "-")</td>
                         <td>@(item.Tutar.HasValue ? item.Tutar.Value.ToString("0.##") : "-")</td>
                         <td>@(item.Tutartl.HasValue ? item.Tutartl.Value.ToString("0.##") : "-")</td>

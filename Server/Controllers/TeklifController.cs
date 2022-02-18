@@ -42,5 +42,25 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("save")]
+        public async Task<ServiceResponse<TeklifDto>> SaveTeklif(TeklifDto teklif)
+        {
+            try
+            {
+                return new ServiceResponse<TeklifDto>()
+                {
+                    Value = await TeklifService.SaveTeklif(teklif)
+                };
+            }
+            catch (ApiExcetion ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<TeklifDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

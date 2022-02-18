@@ -26,13 +26,21 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<TeklifDto> GetTeklifByRef(int logref)
         {
-           return await Db.Teklifs.Where(i => i.Logref == logref)
-                .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
+            return await Db.Teklifs.Where(i => i.Logref == logref)
+                 .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
         }
 
         public async Task<List<TeklifDto>> GetTeklifDtos()
         {
             return await Db.Teklifs.ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).ToListAsync();
+        }
+
+        public async Task<TeklifDto> SaveTeklif(TeklifDto teklifDto)
+        {
+            var teklif = Mapper.Map<Teklif>(teklifDto);
+            await Db.Teklifs.AddAsync(teklif);
+            await Db.SaveChangesAsync();
+            return Mapper.Map<TeklifDto>(teklif);
         }
     }
 }
