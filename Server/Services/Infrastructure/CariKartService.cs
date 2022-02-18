@@ -59,5 +59,16 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             return Mapper.Map<CariKartDto>(cariKart);
         }
+
+        public async Task<List<CariKartDto>> SearchCariKarts(CariKartDto cari)
+        {
+            var results = await Db.CariKarts.Where(x => 
+                    x.Adi.Contains(cari.Adi)
+                    || x.Adi2.Contains(cari.Adi)
+                    || x.Adres1.Contains(cari.Adi))
+                .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider).ToListAsync();
+
+            return results;
+        }
     }
 }

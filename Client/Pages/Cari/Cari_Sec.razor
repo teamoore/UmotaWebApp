@@ -1,0 +1,134 @@
+﻿@page "/cari_sec"
+
+<div class="card">
+    <div class="card-header d-flex align-items-center h-75">
+        Cari Seçim Ekranı
+    </div>
+    <div class="card-body">
+        <EditForm Model="cari" OnValidSubmit="CariBul">
+            <div class="form">
+
+
+                <div class="form-group">
+                    <label>Teklif No</label>
+                    <InputText @bind-Value="cari.Adi" class="form-control" />
+                </div>
+
+
+            </div>
+
+            <div class="form-group">
+                <SaveButtonComponent Caption="Bul" />
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@if (string.IsNullOrEmpty(ResultText) == false)
+{
+    <div class="alert alert-warning" role="alert">
+        @ResultText
+    </div>
+}
+
+<div class="table-responsive" style="overflow-x: auto;max-height:400px;font-size:small">
+    <table class="table table-hover table-sm">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Ref</th>
+                <th scope="col">Kodu</th>
+                <th scope="col">Adı</th>
+                <th scope="col">Adı 2</th>
+                <th scope="col">Adres 1</th>
+                <th scope="col">Adres 2</th>
+                <th scope="col">İLçe</th>
+                <th scope="col">İl</th>
+                <th scope="col">Ülke</th>
+                <th scope="col">Telefon 1</th>
+                <th scope="col">Telefon 2</th>
+                <th scope="col">Vergi No</th>
+                <th scope="col">Vergi Dairesi</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (cariler != null)
+            {
+                @foreach (var item in cariler)
+                {
+                    <tr>
+                        <td>
+                            <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="Seç" OnClick="(() => CariSec(item.Kodu))"></CustomEditButtonComponent>
+                        </td>
+                        <td>@item.Logref</td>
+                        <td>@item.Kodu</td>
+                        <td>@item.Adi</td>
+                        <td>@item.Adi2</td>
+                        <td>@item.Adres1</td>
+                        <td>@item.Adres2</td>
+                        <td>@item.Ilce</td>
+                        <td>@item.Ulke</td>
+                        <td>@item.Il</td>
+                        <td>@item.Tel1</td>
+                        <td>@item.Tel2</td>
+                        <td>@item.Vdno</td>
+                        <td>@item.Vdadi</td>
+                    </tr>
+                }}
+
+        </tbody>
+    </table>
+
+</div>
+
+
+
+@code
+{
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    public List<CariKartDto> cariler { get; set; }
+
+    public CariKartDto cari = new CariKartDto();
+
+    public string ResultText { get; set; }
+
+    private async Task LoadCariler()
+    {
+        cariler = await httpClient.GetServiceResponseAsync<List<CariKartDto>>("/api/carikart/list");
+        cariler = cariler.OrderByDescending(i => i.Insdate).ToList();
+    }
+
+    public async Task CariBul()
+    {
+        ResultText = string.Empty;
+        cariler = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartDto>("/api/carikart/search", cari);
+
+        if (cariler.Count == 0)
+        {
+            ResultText = string.Format(@"'{0}' aradığınız cari bulunamadı",cari.Adi);
+        }
+    }
+
+    public async Task CariSec(string kod)
+    {
+        var cari = await httpClient.GetServiceResponseAsync<CariKartDto>("/api/carikart/getByKod?kod=" + kod);
+        if (cari != null)
+        {
+            modalParameters = new ModalParameters();
+            modalParameters.Add("secim", cari);
+            await ModalInstance.CloseAsync(ModalResult.Ok<CariKartDto>(cari));
+        }
+    }
+
+}
+

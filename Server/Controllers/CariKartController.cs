@@ -104,5 +104,26 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+
+        [HttpPost("search")]
+        public async Task<ServiceResponse<List<CariKartDto>>> CariKartAra(CariKartDto cari)
+        {
+            try
+            {
+                return new ServiceResponse<List<CariKartDto>>()
+                {
+                    Value = await CariKartService.SearchCariKarts(cari)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<CariKartDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

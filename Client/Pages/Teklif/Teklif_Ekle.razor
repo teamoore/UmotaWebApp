@@ -1,0 +1,109 @@
+﻿@page "/stek_listef_ekle"
+
+<EditForm Model="teklif" OnValidSubmit="ValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form">
+        <div class="form-group">
+            <label>Ref</label>
+            <InputNumber @bind-Value="teklif.Logref" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>Teklif No</label>
+            <InputText @bind-Value="teklif.Teklifno" class="form-control" />
+        </div>
+
+        <div class="form-group">
+ 
+            <div class="row">
+                <div class="col">
+                    <InputText @bind-Value="teklif.LcariKodu" class="form-control" disabled="true" placeholder="Cari Kodu" />
+                </div>
+                <div class="col">
+                    <InputText @bind-Value="teklif.LcariAdi" class="form-control" disabled="true" placeholder="Cari Adı" />
+                </div>
+                <div class="col">  
+                    <SaveButtonComponent Caption="Cari Listesi" OnClick="CariListesiAc" />
+                </div>
+            </div>
+
+        </div>
+
+        
+
+    </div>
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Kaydet" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="goBackTeklifList" />
+    </div>
+
+</EditForm>
+
+
+@code {
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    TeklifDto teklif = new TeklifDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await TeklifNoUret();
+    }
+
+    public void ValidSubmit()
+    { }
+
+    public async Task TeklifNoUret()
+    {
+        var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklif&keyField=teklifno");
+        if (string.IsNullOrEmpty(result) == false)
+        {
+            teklif.Teklifno = result;
+        }
+
+        var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklif&keyField=logref");
+        if (string.IsNullOrEmpty(result) == false)
+        {
+            teklif.Logref = Convert.ToInt32(result2);
+        }
+    }
+
+    public void goBackTeklifList()
+    {
+        navigation.NavigateTo("/stek_listef");
+    }
+
+    public async Task CariListesiAc()
+    {
+        var cariForm = modal.Show<Cari.Cari_Sec>();
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (CariKartDto)result.Data;
+                teklif.LcariAdi = cariSecim.Adi;
+                teklif.LcariKodu = cariSecim.Kodu;
+                teklif.Cariref = cariSecim.Logref;
+            }
+
+        }
+    }
+}
