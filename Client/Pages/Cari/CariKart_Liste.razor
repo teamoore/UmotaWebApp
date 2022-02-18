@@ -1,6 +1,29 @@
 ﻿@page "/r_carilistef"
 
-<h1>Cari Kartlar</h1>
+<h3>Cari Kartlar</h3>
+<div class="card">
+    <div class="card-header d-flex align-items-center h-75">
+        Cari Kart Arama
+    </div>
+    <div class="card-body">
+        <EditForm Model="cariArama">
+            <div class="form">
+
+
+                <div class="form-group">
+                    <label>Cari Adı</label>
+                    <InputText @bind-Value="cariArama.Adi" class="form-control" />
+                </div>
+
+
+            </div>
+
+            <div class="form-group">
+                <SaveButtonComponent Caption="Bul" @onclick="CariBul" />
+            </div>
+        </EditForm>
+    </div>
+</div>
 
 <div>
     <button class="btn btn-primary" @onclick="(() => ModalManager.ModalService.Show<CariKartEkle>())">Yeni Ekle</button>
@@ -30,26 +53,27 @@
         <tbody>
             @if (cariler != null)
             {
-@foreach (var item in cariler)
-{
-<tr>
-    <td>
-        <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="" OnClick="(() => CariKartGuncelle(item.Kodu))"></CustomEditButtonComponent>
-    </td>
-    <td>@item.Logref</td>
-    <td>@item.Kodu</td>
-    <td>@item.Adi</td>
-    <td>@item.Adi2</td>
-    <td>@item.Adres1</td>
-    <td>@item.Adres2</td>
-    <td>@item.Ilce</td>
-    <td>@item.Ulke</td>
-    <td>@item.Il</td>
-    <td>@item.Tel1</td>
-    <td>@item.Tel2</td>
-    <td>@item.Vdno</td>
-    <td>@item.Vdadi</td>
-</tr>}}
+                @foreach (var item in cariler)
+                {
+                    <tr>
+                        <td>
+                            <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="" OnClick="(() => CariKartGuncelle(item.Kodu))"></CustomEditButtonComponent>
+                        </td>
+                        <td>@item.Logref</td>
+                        <td>@item.Kodu</td>
+                        <td>@item.Adi</td>
+                        <td>@item.Adi2</td>
+                        <td>@item.Adres1</td>
+                        <td>@item.Adres2</td>
+                        <td>@item.Ilce</td>
+                        <td>@item.Ulke</td>
+                        <td>@item.Il</td>
+                        <td>@item.Tel1</td>
+                        <td>@item.Tel2</td>
+                        <td>@item.Vdno</td>
+                        <td>@item.Vdadi</td>
+                    </tr>
+}}
 
         </tbody>
     </table>
@@ -58,7 +82,7 @@
 
 
 @code
-{ 
+{
 
     [Inject]
     ModalManager ModalManager { get; set; }
@@ -70,6 +94,8 @@
     HttpClient httpClient { get; set; }
 
     public List<CariKartDto> cariler { get; set; }
+
+    public CariKartDto cariArama = new CariKartDto();
 
     protected override async Task OnInitializedAsync()
     {
@@ -85,5 +111,11 @@
     public void CariKartGuncelle(string kod)
     {
         navigation.NavigateTo("/r_carilistef_guncelle/" + kod);
+    }
+
+    public async Task CariBul()
+    {
+        var result = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartDto>("/api/carikart/search", cariArama);
+        cariler = result;
     }
 }
