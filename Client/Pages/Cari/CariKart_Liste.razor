@@ -1,34 +1,27 @@
 ﻿@page "/r_carilistef"
 
-<h3>Cari Kartlar</h3>
-<div class="card">
-    <div class="card-header d-flex align-items-center h-75">
-        Cari Kart Arama
-    </div>
-    <div class="card-body">
-        <EditForm Model="cariArama">
-            <div class="form">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Cari Kartlar</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-
-                <div class="form-group">
-                    <label>Cari Adı</label>
-                    <InputText @bind-Value="cariArama.Adi" class="form-control" />
-                </div>
-
-
-            </div>
-
-            <div class="form-group">
-                <SaveButtonComponent Caption="Bul" @onclick="CariBul" />
-            </div>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <button class="btn btn-primary" @onclick="(() => ModalManager.ModalService.Show<CariKartEkle>())">Yeni Ekle</button>
+            </li>
+        </ul>
+        <EditForm Model="cariArama" class="form-inline my-2 my-lg-0">
+            
+                <InputText @bind-Value="cariArama.Adi" class="form-control mr-sm-2"  />
+                <SaveButtonComponent Caption="Bul" @onclick="CariSearchHeader" />
+            
         </EditForm>
+            
     </div>
-</div>
+</nav>
 
-<div>
-    <button class="btn btn-primary" @onclick="(() => ModalManager.ModalService.Show<CariKartEkle>())">Yeni Ekle</button>
-</div>
-<hr />
 
 <div class="table-responsive" style="overflow-x: auto;max-width:1200px;font-size:small">
     <table class="table table-hover table-sm">
@@ -73,7 +66,7 @@
                         <td>@item.Vdno</td>
                         <td>@item.Vdadi</td>
                     </tr>
-}}
+                }}
 
         </tbody>
     </table>
@@ -97,10 +90,10 @@
 
     public CariKartDto cariArama = new CariKartDto();
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadCariler();
-    }
+    //protected override async Task OnInitializedAsync()
+    //{
+    //    await LoadCariler();
+    //}
 
     private async Task LoadCariler()
     {
@@ -113,9 +106,10 @@
         navigation.NavigateTo("/r_carilistef_guncelle/" + kod);
     }
 
-    public async Task CariBul()
+    public async Task CariSearchHeader()
     {
         var result = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartDto>("/api/carikart/search", cariArama);
         cariler = result;
+    
     }
 }
