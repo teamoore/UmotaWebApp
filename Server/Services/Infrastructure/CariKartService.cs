@@ -62,10 +62,15 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<List<CariKartDto>> SearchCariKarts(CariKartDto cari)
         {
+            var word = cari.Adi.ToLower();
             var results = await Db.CariKarts.Where(x => 
-                    x.Adi.Contains(cari.Adi)
-                    || x.Adi2.Contains(cari.Adi)
-                    || x.Adres1.Contains(cari.Adi))
+                    x.Adi.ToLower().Contains(word)
+                    || x.Adi2.ToLower().Contains(word)
+                    || x.Adres1.ToLower().Contains(word)
+                    || x.Adres2.ToLower().Contains(word)
+                    || x.Ilce.Contains(word)
+                    || x.Web.Contains(word)
+                    || x.Kodu.Contains(word))
                 .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider).ToListAsync();
 
             return results;

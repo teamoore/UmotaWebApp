@@ -1,0 +1,50 @@
+﻿<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">@header.HeaderText</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <button class="btn btn-secondary" @onclick="AddNewClicked">Yeni Ekle</button>
+            </li>
+        </ul>
+        <EditForm Model="header" class="form-inline my-2 my-lg-0">
+
+            <InputText @bind-Value="header.SearchText" class="form-control mr-sm-2" />
+            <SaveButtonComponent Caption="Bul" @onclick="SearchClicked" />
+
+        </EditForm>
+
+    </div>
+</nav>
+
+@code {
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+
+    [Parameter]
+    public HeaderBarSearch header { get; set; }
+
+    [Parameter]
+    public EventCallback onDoneButtonClicked { get; set; }
+
+    [Parameter]
+    public EventCallback onAddNewButtonClicked { get; set; }
+
+    protected async Task SearchClicked()
+    {
+        await onDoneButtonClicked.InvokeAsync();
+    }
+
+    protected async Task AddNewClicked()
+    {
+        await onAddNewButtonClicked.InvokeAsync();
+    }
+
+
+
+}

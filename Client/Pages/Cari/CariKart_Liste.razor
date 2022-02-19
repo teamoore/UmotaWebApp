@@ -1,26 +1,6 @@
 ﻿@page "/r_carilistef"
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Cari Kartlar</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <button class="btn btn-primary" @onclick="(() => ModalManager.ModalService.Show<CariKartEkle>())">Yeni Ekle</button>
-            </li>
-        </ul>
-        <EditForm Model="cariArama" class="form-inline my-2 my-lg-0">
-            
-                <InputText @bind-Value="cariArama.Adi" class="form-control mr-sm-2"  />
-                <SaveButtonComponent Caption="Bul" @onclick="CariSearchHeader" />
-            
-        </EditForm>
-            
-    </div>
-</nav>
+<HeaderSearchBar header="header" onAddNewButtonClicked="CreateCariKart" onDoneButtonClicked="HeaderSearch"></HeaderSearchBar>
 
 
 <div class="table-responsive" style="overflow-x: auto;max-width:1200px;font-size:small">
@@ -86,14 +66,29 @@
     [Inject]
     HttpClient httpClient { get; set; }
 
+    public HeaderBarSearch header = new HeaderBarSearch();
+
     public List<CariKartDto> cariler { get; set; }
 
-    public CariKartDto cariArama = new CariKartDto();
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Cari Kartlar";
+        return Task.CompletedTask;
+    }
 
-    //protected override async Task OnInitializedAsync()
-    //{
-    //    await LoadCariler();
-    //}
+    public async Task HeaderSearch()
+    {
+        var cariAramaObj = new CariKartDto();
+        cariAramaObj.Adi = header.SearchText;
+
+        var result = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartDto>("/api/carikart/search", cariAramaObj);
+        cariler = result;
+
+        if (cariler == null || cariler.Count == 0)
+        {
+            await ModalManager.ShowMessageAsync("Arama", string.Format("{0} için sonuç bulunamadı",cariAramaObj.Adi));
+        }
+    }
 
     private async Task LoadCariler()
     {
@@ -106,10 +101,9 @@
         navigation.NavigateTo("/r_carilistef_guncelle/" + kod);
     }
 
-    public async Task CariSearchHeader()
+    public void CreateCariKart()
     {
-        var result = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartDto>("/api/carikart/search", cariArama);
-        cariler = result;
-    
+        ModalManager.ModalService.Show<CariKartEkle>();
     }
+
 }
