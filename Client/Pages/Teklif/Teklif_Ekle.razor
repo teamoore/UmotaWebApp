@@ -77,12 +77,11 @@
 
             var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifDto>("/api/teklif/save", teklif);
 
-            navigation.NavigateTo("/teklif_malzeme_guncelle/" + result.Logref);
+            navigation.NavigateTo("/stek_listef_detay/" + result.Logref);
 
         }
         catch (Exception)
         {
-
             throw;
         }
     }
