@@ -1,11 +1,6 @@
 ﻿@page "/stek_listef"
 
-<h1>Teklifler</h1>
-
-<div>
-    <button class="btn btn-primary btn-sm" @onclick="YeniTeklif">Yeni Teklif</button>
-</div>
-<hr />
+<HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif" onDoneButtonClicked="TeklifAra"></HeaderSearchBar>
 
 <div class="table-responsive" style="overflow-x: auto;max-width:1200px;font-size:x-small">
     <table class="table table-hover table-sm">
@@ -74,8 +69,11 @@
 
     public List<TeklifDto> teklifler { get; set; }
 
+    public HeaderBarSearch header = new HeaderBarSearch();
+
     protected override async Task OnInitializedAsync()
     {
+        header.HeaderText = "Teklif Listesi";
         await LoadTeklifler();
     }
 
@@ -93,5 +91,21 @@
     public void YeniTeklif()
     {
         navigation.NavigateTo("/stek_listef_ekle");
+    }
+
+    private async Task TeklifAra()
+    {
+        var teklifSearch = new TeklifDto();
+        teklifSearch.Aciklama1 = header.SearchText;
+
+        var result = await httpClient.PostGetServiceResponseAsync<List<TeklifDto>, TeklifDto>("/api/teklif/search", teklifSearch);
+        if (result == null || result.Count == 0)
+        {
+            await ModalManager.ShowMessageAsync("Arama", "Aradığınız kritere göre teklif bulunamadı.\n Lütfen detaylı aramayı seçiniz");
+            return;
+        }
+
+        teklifler = result;
+
     }
 }

@@ -42,5 +42,23 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             await Db.SaveChangesAsync();
             return Mapper.Map<TeklifDto>(teklif);
         }
+
+        public async Task<List<TeklifDto>> SearchTeklif(TeklifDto teklif)
+        {
+            var word = teklif.Aciklama1.ToLower();
+
+            return await Db.Teklifs.Where(x => x.Aciklama1.ToLower().Contains(word)
+            || x.Aciklama2.ToLower().Contains(word)
+            || x.Aciklama3.ToLower().Contains(word)
+            || x.Aciklama3.ToLower().Contains(word)
+            || x.Aciklama4.ToLower().Contains(word)
+            || x.Teklifno.ToLower().Contains(word)
+            || x.Tbelgeno.ToLower().Contains(word)
+            || x.Lpersoneladi.ToLower().Contains(word)
+            || x.LcariAdi.ToLower().Contains(word)
+            || x.LcariKodu.ToLower().Contains(word))
+                .OrderByDescending(x => x.Tarih)
+                .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).ToListAsync();
+        }
     }
 }
