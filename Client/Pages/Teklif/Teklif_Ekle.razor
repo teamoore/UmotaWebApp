@@ -19,10 +19,10 @@
             <label>Cari</label>
             <div class="row">
                 <div class="col">
-                    <InputText @bind-Value="teklif.LcariKodu" class="form-control" disabled="true" placeholder="Cari Kodu" />
+                    <InputText @bind-Value="teklif.LcariKodu" class="form-control" placeholder="Cari Kodu" />
                 </div>
                 <div class="col">
-                    <InputText @bind-Value="teklif.LcariAdi" class="form-control" disabled="true" placeholder="Cari Adı" />
+                    <InputText @bind-Value="teklif.LcariAdi" class="form-control" placeholder="Cari Adı" />
                 </div>
                 <div class="col">  
                     <SaveButtonComponent Caption="Cari Listesi" OnClick="CariListesiAc" />
@@ -77,7 +77,7 @@
 
             var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifDto>("/api/teklif/save", teklif);
 
-            navigation.NavigateTo("/stek_listef");
+            navigation.NavigateTo("/teklif_malzeme_guncelle/" + result.Logref);
 
         }
         catch (Exception)
