@@ -15,9 +15,9 @@ namespace UmotaWebApp.Server.Controllers
     public class TeklifController : ControllerBase
     {
         public ILogger<TeklifController> Logger { get; }
-        public ITeklifService TeklifService { get; set; }
+        public ITeklifServiceService TeklifService { get; set; }
 
-        public TeklifController(ILogger<TeklifController> logger, ITeklifService teklifService)
+        public TeklifController(ILogger<TeklifController> logger, ITeklifServiceService teklifService)
         {
             Logger = logger;
             TeklifService = teklifService;

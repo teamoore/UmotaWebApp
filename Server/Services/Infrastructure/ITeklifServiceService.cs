@@ -7,7 +7,7 @@ using UmotaWebApp.Shared.ServiceResponses;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
-    public interface ITeklifService
+    public interface ITeklifServiceService
     {
         public Task<List<TeklifDto>> GetTeklifDtos();
         public Task<TeklifDto> GetTeklifByRef(int logref);

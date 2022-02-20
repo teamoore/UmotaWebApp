@@ -33,6 +33,8 @@ namespace UmotaWebApp.Server.Services.Extensions
             CreateMap<SisFirmaDonemYetki, SisFirmaDonemYetkiDto>().ReverseMap();
             CreateMap<CariKart, CariKartDto>().ReverseMap();
             CreateMap<Teklif, TeklifDto>().ReverseMap();
+            CreateMap<MalzKart, MalzemeKartDto>().ReverseMap();
+            CreateMap<Teklifdetay, TeklifDetayDto>().ReverseMap();
         }
     }
 

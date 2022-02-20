@@ -11,7 +11,7 @@ using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
-    public class TeklifService : ITeklifService
+    public class TeklifService : ITeklifServiceService
     {
         public IMapper Mapper { get; }
         public UmotaCompanyDbContext Db { get; }
