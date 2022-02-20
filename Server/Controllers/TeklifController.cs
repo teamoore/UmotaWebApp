@@ -82,5 +82,25 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpGet("get")]
+        public async Task<ServiceResponse<TeklifDto>> GetTeklif(int logref)
+        {
+            try
+            {
+                return new ServiceResponse<TeklifDto>()
+                {
+                    Value = await TeklifService.GetTeklifByRef(logref)
+                };
+            }
+            catch (ApiExcetion ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<TeklifDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

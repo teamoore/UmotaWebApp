@@ -1,8 +1,41 @@
 ﻿@page "/stek_listef_detay/{logref:int}"
- 
-<h3>Teklif_Malzeme_Guncelle</h3>
+
+<HeaderSearchBar header="header" ShowSearchSection="false" ShowButtons="false"></HeaderSearchBar>
+
 
 @code {
     [Parameter]
     public int logref { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        var teklif = await httpClient.GetServiceResponseAsync<TeklifDto>("/api/teklif/get?logref=" + logref);
+        if (teklif != null)
+        {
+            var str = string.Format("Teklif No: {0} Belge No: {1}", teklif.Teklifno, teklif.Tbelgeno);
+            header.HeaderText = str;
+        }
+    }
 }
