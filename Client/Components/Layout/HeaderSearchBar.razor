@@ -5,17 +5,25 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <button class="btn btn-secondary" @onclick="AddNewClicked">Yeni Ekle</button>
-            </li>
-        </ul>
-        <EditForm Model="header" class="form-inline my-2 my-lg-0">
+        @if (ShowButtons)
+        {
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <button class="btn btn-secondary" @onclick="AddNewClicked">Yeni Ekle</button>
+                </li>
+            </ul>
+        }
 
-            <InputText @bind-Value="header.SearchText" class="form-control mr-sm-2" />
-            <SaveButtonComponent Caption="Bul" @onclick="SearchClicked" />
+        @if (ShowSearchSection)
+        {
+            <EditForm Model="header" class="form-inline my-2 my-lg-0">
 
-        </EditForm>
+                <InputText @bind-Value="header.SearchText" class="form-control mr-sm-2" />
+                <SaveButtonComponent Caption="Bul" @onclick="SearchClicked" />
+
+            </EditForm>
+
+        }
 
     </div>
 </nav>
@@ -30,10 +38,17 @@
     public HeaderBarSearch header { get; set; }
 
     [Parameter]
+    public bool ShowSearchSection { get; set; }
+
+    [Parameter]
+    public bool ShowButtons { get; set; }
+
+    [Parameter]
     public EventCallback onDoneButtonClicked { get; set; }
 
     [Parameter]
     public EventCallback onAddNewButtonClicked { get; set; }
+
 
     protected async Task SearchClicked()
     {

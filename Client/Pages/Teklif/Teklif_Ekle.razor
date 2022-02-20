@@ -1,39 +1,89 @@
 ﻿@page "/stek_listef_ekle"
 
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+
 <EditForm Model="teklif">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="form">
-        <div class="form-group">
-            <label>Ref</label>
-            <InputNumber @bind-Value="teklif.Logref" class="form-control" />
-        </div>
+    <div class="mt-6">
+        <div class="form">
+            <div class="form-group">
 
-        <div class="form-group">
-            <label>Teklif No</label>
-            <InputText @bind-Value="teklif.Teklifno" class="form-control" />
-        </div>
+                <div class="row">
+                    <div class="col-4">
+                        <label>Ref</label>
+                        <InputNumber @bind-Value="teklif.Logref" class="form-control" />
+                    </div>
+                    <div class="col-4">
+                        <label>Teklif No</label>
+                        <InputText @bind-Value="teklif.Teklifno" class="form-control" />
+                    </div>
+                    <div class="col-4">
+                        <label>Belge No</label>
+                        <InputText @bind-Value="teklif.Tbelgeno" class="form-control" />
+                    </div>
+                </div>
 
-        <div class="form-group">
-            <label>Cari</label>
-            <div class="row">
-                <div class="col">
-                    <InputText @bind-Value="teklif.LcariKodu" class="form-control" placeholder="Cari Kodu" />
+            </div>
+
+            <div class="form-group">
+                <label>Cari</label>
+                <div class="row">
+                    <div class="col">
+                        <InputText @bind-Value="teklif.LcariKodu" class="form-control" placeholder="Cari Kodu" />
+                    </div>
+                    <div class="col">
+                        <InputText @bind-Value="teklif.LcariAdi" class="form-control" placeholder="Cari Adı" />
+                    </div>
+                    <div class="col">
+                        <SaveButtonComponent Caption="Cari Listesi" OnClick="CariListesiAc" />
+                    </div>
                 </div>
-                <div class="col">
-                    <InputText @bind-Value="teklif.LcariAdi" class="form-control" placeholder="Cari Adı" />
+
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-4">
+                        <label>Teklif Tarihi</label>
+                        <InputDate @bind-Value="teklif.Tarih" class="form-control"></InputDate>
+                    </div>
+                    <div class="col-4">
+                        <label>Teslim Tarihi</label>
+                        <InputDate @bind-Value="teklif.TeslimTarihi" class="form-control"></InputDate>
+                    </div>
                 </div>
-                <div class="col">  
-                    <SaveButtonComponent Caption="Cari Listesi" OnClick="CariListesiAc" />
+
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-4">
+                        <label>Proje Adı</label>
+                        <InputText @bind-Value="teklif.Proje" class="form-control"></InputText>
+                    </div>
+                    <div class="col-4">
+                        <label>İlgili Kişi</label>
+                        <InputText @bind-Value="teklif.IlgiliAdi" class="form-control"></InputText>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-8">
+                        <label>Açıklama</label>
+                        <InputTextArea @bind-Value="teklif.Aciklama1" class="form-control"></InputTextArea>
+                    </div>
                 </div>
             </div>
 
         </div>
-
-        
-
     </div>
+
 
     <div class="form-group">
         <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
@@ -61,8 +111,11 @@
 
     TeklifDto teklif = new TeklifDto();
 
+    public HeaderBarSearch header = new HeaderBarSearch();
+
     protected override async Task OnInitializedAsync()
     {
+        header.HeaderText = "Teklif Oluştur";
         await TeklifNoUret();
     }
 
