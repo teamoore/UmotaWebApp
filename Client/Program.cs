@@ -11,6 +11,7 @@ using Blazored.Modal;
 using Blazored.LocalStorage;
 using UmotaWebApp.Client.Utils;
 using Microsoft.AspNetCore.Components.Authorization;
+using MudBlazor.Services;
 
 namespace UmotaWebApp.Client
 {
@@ -29,6 +30,7 @@ namespace UmotaWebApp.Client
             builder.Services.AddAuthorizationCore();
 
             builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
+            builder.Services.AddMudServices();
 
             await builder.Build().RunAsync();
         }
