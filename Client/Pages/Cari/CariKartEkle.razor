@@ -36,6 +36,9 @@
     ModalManager ModalManager { get; set; }
 
     [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
     NavigationManager navigation { get; set; }
 
     [Inject]
@@ -59,6 +62,8 @@
             cariModel.Insdate = DateTime.Now;
 
             cariModel = await httpClient.PostGetServiceResponseAsync<CariKartDto, CariKartDto>("/api/carikart/save", cariModel);
+
+            Snackbar.Add("Cari kart eklendi");
 
             goBackCariList();
         }

@@ -12,6 +12,7 @@ using Blazored.LocalStorage;
 using UmotaWebApp.Client.Utils;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
+using MudBlazor;
 
 namespace UmotaWebApp.Client
 {
@@ -30,7 +31,18 @@ namespace UmotaWebApp.Client
             builder.Services.AddAuthorizationCore();
 
             builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
-            builder.Services.AddMudServices();
+            builder.Services.AddMudServices(config =>
+            {
+                config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
+
+                config.SnackbarConfiguration.PreventDuplicates = false;
+                config.SnackbarConfiguration.NewestOnTop = false;
+                config.SnackbarConfiguration.ShowCloseIcon = true;
+                config.SnackbarConfiguration.VisibleStateDuration = 10000;
+                config.SnackbarConfiguration.HideTransitionDuration = 500;
+                config.SnackbarConfiguration.ShowTransitionDuration = 500;
+                config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+            });
 
             await builder.Build().RunAsync();
         }
