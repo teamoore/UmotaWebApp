@@ -15,9 +15,9 @@ namespace UmotaWebApp.Server.Controllers
     public class TeklifController : ControllerBase
     {
         public ILogger<TeklifController> Logger { get; }
-        public ITeklifServiceService TeklifService { get; set; }
+        public ITeklifService TeklifService { get; set; }
 
-        public TeklifController(ILogger<TeklifController> logger, ITeklifServiceService teklifService)
+        public TeklifController(ILogger<TeklifController> logger, ITeklifService teklifService)
         {
             Logger = logger;
             TeklifService = teklifService;
@@ -91,6 +91,26 @@ namespace UmotaWebApp.Server.Controllers
                 return new ServiceResponse<TeklifDto>()
                 {
                     Value = await TeklifService.GetTeklifByRef(logref)
+                };
+            }
+            catch (ApiExcetion ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<TeklifDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("update")]
+        public async Task<ServiceResponse<TeklifDto>> UpdateTeklifDetay(TeklifDto teklifDto)
+        {
+            try
+            {
+                return new ServiceResponse<TeklifDto>()
+                {
+                    Value = await TeklifService.UpdateTeklif(teklifDto)
                 };
             }
             catch (ApiExcetion ex)

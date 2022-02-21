@@ -1,7 +1,22 @@
 ﻿@page "/stek_listef_detay/{logref:int}"
 
-<HeaderSearchBar header="header" ShowSearchSection="false" ShowButtons="false"></HeaderSearchBar>
+<div class="card" style="width: 100%;">
+    <div class="card-body">
+        <h5 class="card-title">Teklif Numarası : @teklif.Teklifno</h5>
+        <h6 class="card-subtitle mb-2 text-muted">
+            Teklif Tarihi : @(teklif.Tarih.HasValue ? teklif.Tarih.Value.ToString("dd.MM.yyyy") : "")
+            / Teslim Tarihi : @(teklif.TeslimTarihi.HasValue ? teklif.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "")
+        </h6>
+        <p class="card-text">
+            <strong>Proje Adı:</strong> @teklif.Proje
+            <strong>İlgili Kişi:</strong> @teklif.IlgiliAdi
+            <strong>Açıklama :</strong> @teklif.Aciklama1
+        </p>
 
+        <button class="btn btn-primary" @onclick="Duzenle"><i class="fa fa-edit"></i> Düzenle</button>
+        <button class="btn btn-primary" @onclick="Duzenle"><i class="fa fa-plus"></i> Malzeme Ekle</button>
+    </div>
+</div>
 
 @code {
     [Parameter]
@@ -9,6 +24,7 @@
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
 
     [Inject]
     ModalManager ModalManager { get; set; }
@@ -22,7 +38,7 @@
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
-    public HeaderBarSearch header = new HeaderBarSearch();
+    public TeklifDto teklif = new TeklifDto();
 
     protected override async Task OnInitializedAsync()
     {
@@ -31,11 +47,24 @@
 
     private async Task LoadData()
     {
-        var teklif = await httpClient.GetServiceResponseAsync<TeklifDto>("/api/teklif/get?logref=" + logref);
-        if (teklif != null)
+        var result = await httpClient.GetServiceResponseAsync<TeklifDto>("/api/teklif/get?logref=" + logref);
+        if (result != null)
         {
-            var str = string.Format("Teklif No: {0} Belge No: {1}", teklif.Teklifno, teklif.Tbelgeno);
-            header.HeaderText = str;
+            teklif = result;
         }
+    }
+
+    public async Task Duzenle()
+    {
+
+        modalParameters = new ModalParameters();
+        modalParameters.Add("logRef", logref);
+
+        var duzenleForm = modal.Show<TeklifEkleGuncelleComponent>("Teklif Güncelle", parameters: modalParameters);
+
+        var result = await duzenleForm.Result;
+
+        await LoadData();
+
     }
 }

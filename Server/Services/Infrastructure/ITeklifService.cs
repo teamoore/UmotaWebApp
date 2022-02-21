@@ -7,11 +7,12 @@ using UmotaWebApp.Shared.ServiceResponses;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
-    public interface ITeklifServiceService
+    public interface ITeklifService
     {
         public Task<List<TeklifDto>> GetTeklifDtos();
         public Task<TeklifDto> GetTeklifByRef(int logref);
         public Task<TeklifDto> SaveTeklif(TeklifDto teklifDto);
+        public Task<TeklifDto> UpdateTeklif(TeklifDto teklifDto);
         public Task<List<TeklifDto>> SearchTeklif(TeklifDto teklif);
     }
 }

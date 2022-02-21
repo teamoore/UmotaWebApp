@@ -62,5 +62,45 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("save")]
+        public async Task<ServiceResponse<TeklifDetayDto>> SaveTeklifDetay(TeklifDetayDto teklifDetayDto)
+        {
+            try
+            {
+                return new ServiceResponse<TeklifDetayDto>()
+                {
+                    Value = await TeklifDetayService.SaveTeklifDetay(teklifDetayDto)
+                };
+            }
+            catch (ApiExcetion ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<TeklifDetayDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("update")]
+        public async Task<ServiceResponse<TeklifDetayDto>> UpdateTeklifDetay(TeklifDetayDto teklifDetayDto)
+        {
+            try
+            {
+                return new ServiceResponse<TeklifDetayDto>()
+                {
+                    Value = await TeklifDetayService.UpdateTeklifDetay(teklifDetayDto)
+                };
+            }
+            catch (ApiExcetion ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<TeklifDetayDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

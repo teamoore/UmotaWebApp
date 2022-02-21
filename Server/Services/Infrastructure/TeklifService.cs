@@ -7,11 +7,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Data.Models;
+using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
-    public class TeklifService : ITeklifServiceService
+    public class TeklifService : ITeklifService
     {
         public IMapper Mapper { get; }
         public UmotaCompanyDbContext Db { get; }
@@ -59,6 +60,18 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             || x.LcariKodu.ToLower().Contains(word))
                 .OrderByDescending(x => x.Tarih)
                 .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).ToListAsync();
+        }
+
+        public async Task<TeklifDto> UpdateTeklif(TeklifDto teklifDto)
+        {
+            var teklifRow = await Db.Teklifs.Where(x => x.Logref == teklifDto.Logref).SingleOrDefaultAsync();
+            if (teklifRow == null)
+                throw new ApiException("Teklif Detayı bulunamadı");
+
+            Mapper.Map(teklifDto, teklifRow);
+            await Db.SaveChangesAsync();
+
+            return Mapper.Map<TeklifDto>(teklifRow);
         }
     }
 }

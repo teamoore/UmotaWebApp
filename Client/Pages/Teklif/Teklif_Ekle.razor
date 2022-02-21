@@ -2,157 +2,20 @@
 
 <HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
 
-
-<EditForm Model="teklif">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-
-    <div class="mt-6">
-        <div class="form">
-            <div class="form-group">
-
-                <div class="row">
-                    <div class="col-4">
-                        <label>Ref</label>
-                        <InputNumber @bind-Value="teklif.Logref" class="form-control" />
-                    </div>
-                    <div class="col-4">
-                        <label>Teklif No</label>
-                        <InputText @bind-Value="teklif.Teklifno" class="form-control" />
-                    </div>
-                    <div class="col-4">
-                        <label>Belge No</label>
-                        <InputText @bind-Value="teklif.Tbelgeno" class="form-control" />
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="form-group">
-                <label>Cari</label>
-                <div class="row">
-                    <div class="col">
-                        <InputText @bind-Value="teklif.LcariKodu" class="form-control" placeholder="Cari Kodu" />
-                    </div>
-                    <div class="col">
-                        <InputText @bind-Value="teklif.LcariAdi" class="form-control" placeholder="Cari Adı" />
-                    </div>
-                    <div class="col">
-                        <SaveButtonComponent Caption="Cari Listesi" OnClick="CariListesiAc" />
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-4">
-                        <label>Teklif Tarihi</label>
-                        <InputDate @bind-Value="teklif.Tarih" class="form-control"></InputDate>
-                    </div>
-                    <div class="col-4">
-                        <label>Teslim Tarihi</label>
-                        <InputDate @bind-Value="teklif.TeslimTarihi" class="form-control"></InputDate>
-                    </div>
-                </div>
-
-            </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-4">
-                        <label>Proje Adı</label>
-                        <InputText @bind-Value="teklif.Proje" class="form-control"></InputText>
-                    </div>
-                    <div class="col-4">
-                        <label>İlgili Kişi</label>
-                        <InputText @bind-Value="teklif.IlgiliAdi" class="form-control"></InputText>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-8">
-                        <label>Açıklama</label>
-                        <InputTextArea @bind-Value="teklif.Aciklama1" class="form-control"></InputTextArea>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-
-    <div class="form-group">
-        <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
-        <CancelButtonComponent Caption="Vazgeç" OnClick="goBackTeklifList" />
-    </div>
-
-</EditForm>
+<TeklifEkleGuncelleComponent OnVazgecClicked="goBackTeklifList"></TeklifEkleGuncelleComponent>
 
 
 @code {
-    [CascadingParameter] IModalService modal { get; set; }
-    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
-
-    [Inject]
-    ModalManager ModalManager { get; set; }
 
     [Inject]
     NavigationManager navigation { get; set; }
 
-    [Inject]
-    HttpClient httpClient { get; set; }
-
-    [Inject]
-    ILocalStorageService LocalStorageService { get; set; }
-
-    TeklifDto teklif = new TeklifDto();
-
     public HeaderBarSearch header = new HeaderBarSearch();
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
         header.HeaderText = "Teklif Oluştur";
-        await TeklifNoUret();
-    }
-
-    public async Task ValidSubmit()
-    {
-        try
-        {
-            teklif.Insdate = DateTime.Now;
-            teklif.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            teklif.Tarih = teklif.Tarih.HasValue ? teklif.Tarih : DateTime.Now;
-            teklif.Saat = teklif.Saat.HasValue ? teklif.Saat : DateTime.Now;
-
-            var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifDto>("/api/teklif/save", teklif);
-
-            navigation.NavigateTo("/stek_listef_detay/" + result.Logref);
-
-        }
-        catch (Exception)
-        {
-            throw;
-        }
-    }
-
-    public async Task TeklifNoUret()
-    {
-        var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklif&keyField=teklifno");
-        if (string.IsNullOrEmpty(result) == false)
-        {
-            teklif.Teklifno = result;
-        }
-
-        var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklif&keyField=logref");
-        if (string.IsNullOrEmpty(result) == false)
-        {
-            teklif.Logref = Convert.ToInt32(result2);
-        }
-
+        return Task.CompletedTask;
     }
 
     public void goBackTeklifList()
@@ -160,21 +23,5 @@
         navigation.NavigateTo("/stek_listef");
     }
 
-    public async Task CariListesiAc()
-    {
-        var cariForm = modal.Show<Cari.Cari_Sec>();
-        var result = await cariForm.Result;
 
-        if (!result.Cancelled)
-        {
-            if (result.Data != null)
-            {
-                var cariSecim = (CariKartDto)result.Data;
-                teklif.LcariAdi = cariSecim.Adi;
-                teklif.LcariKodu = cariSecim.Kodu;
-                teklif.Cariref = cariSecim.Logref;
-            }
-
-        }
-    }
 }
