@@ -59,5 +59,21 @@ namespace UmotaWebApp.Shared.ModelDto
         public string Upduser { get; set; }
         public DateTime? Upddate { get; set; }
         public byte? Trcode { get; set; }
+
+        public string TarihFormatted
+        {
+            get
+            {
+                return this.Tarih.HasValue ? this.Tarih.Value.ToString("dd.MM.yyyy") : "-";
+            }
+        }
+
+        public string TeslimTarihiFormatted
+        {
+            get
+            {
+                return this.TeslimTarihi.HasValue ? this.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "-";
+            }
+        }
     }
 }

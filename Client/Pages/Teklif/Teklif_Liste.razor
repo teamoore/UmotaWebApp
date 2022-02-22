@@ -4,59 +4,29 @@
                  ShowButtons="true"
                  onDoneButtonClicked="TeklifAra" ShowSearchSection="true"></HeaderSearchBar>
 
-<div class="table-responsive" style="overflow-x: auto;max-width:1200px;font-size:x-small">
-    <table class="table table-hover table-sm">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Teklif No</th>
-                <th scope="col">Tarih</th>
-                <th scope="col">Cari</th>
-                <th scope="col">Cari Kodu</th>
-                <th scope="col">Personel Adı</th>
-                <th scope="col">Teslim Şekli</th>
-                <th scope="col">Teslim Tarihi</th>
-                <th scope="col">Döviz Kuru</th>
-                <th scope="col">Tutar</th>
-                <th scope="col">Tutar TL</th>
-                <th scope="col">Tutar RD</th>
-                <th scope="col">Tutar Matrah</th>
-                <th scope="col">Tutar Matrah TL</th>
-                <th scope="col">Tutar Matrah RD</th>
-                <th scope="col">Durum</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (teklifler != null)
-            {
-                @foreach (var item in teklifler)
-                {
-                    <tr>
-                        <td>
-                            <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="" OnClick="(() => TeklifDetay(item.Logref))"></CustomEditButtonComponent>
-                        </td>
-                        <td>@item.Teklifno</td>
-                        <td>@(item.Tarih.HasValue ? item.Tarih.Value.ToString("dd.MM.yyyy") : "-")</td>
-                        <td>@item.LcariAdi</td>
-                        <td>@item.LcariKodu</td>
-                        <td>@item.Lpersoneladi</td>
-                        <td>@item.TeslimSekli</td>
-                        <td>@(item.TeslimTarihi.HasValue ? item.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "-")</td>
-                        <td>@(item.Dovizkuru.HasValue ? item.Dovizkuru.Value.ToString("0.##") : "-")</td>
-                        <td>@(item.Tutar.HasValue ? item.Tutar.Value.ToString("0.##") : "-")</td>
-                        <td>@(item.Tutartl.HasValue ? item.Tutartl.Value.ToString("0.##") : "-")</td>
-                        <td>@(item.Tutarrd.HasValue ? item.Tutarrd.Value.ToString("0.##") : "-")</td>
-                        <td>@(item.Tutarmatrah.HasValue ? item.Tutarmatrah.Value.ToString("0.##") : "-")</td>
-                        <td>@(item.Tutarmatrahtl.HasValue ? item.Tutarmatrahtl.Value.ToString("0.##") : "-")</td>
-                        <td>@(item.Tutarmatrahrd.HasValue ? item.Tutarmatrahrd.Value.ToString("0.##") : "-")</td>
-                        <td>@item.Duruminfo</td>
-                    </tr>
-                }}
+<MudDataGrid MultiSelection="true" Items="@teklifler" Dense="true" Sortable="true" Filterable="true" QuickFilter="@_quickFilter">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Teklif Listesi</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Teklif Ara" Adornment="Adornment.Start" Immediate="true"
+                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <Columns>
+        <Column T="TeklifDto" Field="Teklifno" Title="Teklif No" Sortable="false" Filterable="false" />
+        <Column T="TeklifDto" Field="Duruminfo" Title="Durum" CellStyleFunc="@_cellStyleFunc" />
+        <Column T="TeklifDto" Field="TarihFormatted" Title="Teklif Tarihi" />
+        <Column T="TeklifDto" Field="TeslimTarihiFormatted" Title="Teslim Tarihi" />
+        <Column T="TeklifDto" Field="LcariAdi" SortBy="@_sortBy" Title="Cari" />
+        <Column T="TeklifDto" Field="LcariKodu" Title="Cari Kodu" />
+        <Column T="TeklifDto" Field="Lpersoneladi" Title="İlgili Kişi" />
+        <Column T="TeklifDto" Field="TeslimSekli" Title="Teslim Şekli" />
 
-        </tbody>
-    </table>
 
-</div>
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="TeklifDto" />
+    </PagerContent>
+</MudDataGrid>
 
 @code {
 
@@ -72,6 +42,58 @@
     public List<TeklifDto> teklifler { get; set; }
 
     public HeaderBarSearch header = new HeaderBarSearch();
+
+    private string _searchString;
+    private bool _sortNameByLength;
+
+    // custom sort by name length
+    private Func<TeklifDto, object> _sortBy => x =>
+    {
+        if (_sortNameByLength)
+            return x.LcariAdi.Length;
+        else
+            return x.LcariAdi;
+    };
+    // quick filter - filter gobally across multiple columns with the same input
+    private Func<TeklifDto, bool> _quickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+
+        if (x.Proje.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (x.IlgiliAdi.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if ($"{x.Teklifno} {x.Tbelgeno} {x.Lfirma}".Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    };
+
+    private Func<TeklifDto, string> _cellStyleFunc => x =>
+    {
+        string style = "";
+
+        if (x.Duruminfo == "Müşteri Onayı Bekliyor")
+            style += "background-color:#8CED8C";
+
+        else if (x.Duruminfo == "Müşteri Siparişi İptal Etti")
+            style += "background-color:#E5BDE5";
+
+        else if (x.Duruminfo == "Müşteri Teklifi İptal Etti")
+            style += "background-color:#EACE5D";
+
+        else if (x.Duruminfo == "Teklif Hazırlanıyor")
+            style += "background-color:#F1F165";
+
+        else if (x.Duruminfo == "Kesin Sipariş Logoya Aktarıldı")
+            style += "background-color:#357C3C";
+        
+
+        return style;
+    };
 
     protected override async Task OnInitializedAsync()
     {
