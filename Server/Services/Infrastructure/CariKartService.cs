@@ -27,7 +27,10 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<List<CariKartDto>> GetCariKartDtos()
         {
-            var results = await Db.CariKarts.ProjectTo<CariKartDto>(Mapper.ConfigurationProvider).ToListAsync();
+            var results = await Db.CariKarts
+                .Take(100)
+                .OrderByDescending(x => x.Insdate)
+                .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider).ToListAsync();
 
             return results;
         }
