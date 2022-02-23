@@ -45,6 +45,7 @@ namespace UmotaWebApp.Server
             services.AddScoped<ITeklifService, TeklifService>();
             services.AddScoped<ITeklifDetayService, TeklifDetayService>();
             services.AddScoped<IMalzemeKartService, MalzemeKartService>();
+            services.AddScoped<IPersonelService, PersonelService>();
 
             services.AddDbContext<UmotaMasterDbContext>(config =>
             {

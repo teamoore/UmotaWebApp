@@ -28,5 +28,20 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 , commandType: CommandType.Text); 
             return result;
         }
+
+        public async Task<int> RefNoAl(string tablename)
+        {
+            var p = new DynamicParameters();
+            p.Add("@tablename", tablename);
+            //p.Add("@b", dbType: DbType.Int32, direction: ParameterDirection.Output);
+            p.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+            await _sql.ExecuteAsync("RefNoAl", p, commandType: CommandType.StoredProcedure);
+
+            //int b = p.Get<int>("@b");
+            int c = p.Get<int>("@ReturnValue");
+
+            return c;
+        }
     }
 }

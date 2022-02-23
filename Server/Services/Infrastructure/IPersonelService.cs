@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
-    public interface IRefGenerator
+    public interface IPersonelService
     {
-        public Task<string> GenerateRowRef(string table, string keyField);
-        public Task<int> RefNoAl(string tablename);
+        public Task<IEnumerable<PersonelDto>> GetPersonelList();
     }
 }

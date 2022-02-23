@@ -7,17 +7,14 @@
             <div class="form-group">
 
                 <div class="row">
-                    <div class="col-4">
-                        <label>Ref</label>
-                        <InputNumber @bind-Value="teklif.Logref" class="form-control" />
-                    </div>
-                    <div class="col-4">
+
+                    <div class="col-md-4">
                         <label>Teklif No</label>
                         <InputText @bind-Value="teklif.Teklifno" class="form-control" />
                     </div>
-                    <div class="col-4">
-                        <label>Belge No</label>
-                        <InputText @bind-Value="teklif.Tbelgeno" class="form-control" />
+                    <div class="col-md-4">
+                        <label>Teklif Tarihi</label>
+                        <InputDate @bind-Value="teklif.Tarih" class="form-control"></InputDate>
                     </div>
                 </div>
 
@@ -26,14 +23,14 @@
             <div class="form-group">
                 <label>Cari</label>
                 <div class="row">
-                    <div class="col">
+                    <div class="col-md-2">
                         <InputText @bind-Value="teklif.LcariKodu" class="form-control" placeholder="Cari Kodu" />
                     </div>
-                    <div class="col">
+                    <div class="col-md-6">
                         <InputText @bind-Value="teklif.LcariAdi" class="form-control" placeholder="Cari Adı" />
                     </div>
-                    <div class="col">
-                        <SaveButtonComponent Caption="Cari Listesi" OnClick="CariListesiAc" />
+                    <div class="col-md-2">
+                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Primary">Cari Seç</MudButton>
                     </div>
                 </div>
 
@@ -41,11 +38,20 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-4">
-                        <label>Teklif Tarihi</label>
-                        <InputDate @bind-Value="teklif.Tarih" class="form-control"></InputDate>
+                    <div class="col-md-4">
+                        <label>Teslim Şekli</label>
+                        <InputSelect @bind-Value="teklif.TeslimSekli" class="form-control">
+                            @if (TeslimSekliListesi != null)
+                            {
+                                @foreach (var item in TeslimSekliListesi)
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            }
+                        </InputSelect>
                     </div>
-                    <div class="col-4">
+
+                    <div class="col-md-4">
                         <label>Teslim Tarihi</label>
                         <InputDate @bind-Value="teklif.TeslimTarihi" class="form-control"></InputDate>
                     </div>
@@ -55,12 +61,22 @@
 
             <div class="form-group">
                 <div class="row">
+                    
                     <div class="col-4">
-                        <label>Proje Adı</label>
-                        <InputText @bind-Value="teklif.Proje" class="form-control"></InputText>
+                        <label>Satış Temsilcisi</label>
+                        
+                        <InputSelect @bind-Value="teklif.Lpersonelref" class="form-control">
+                            @if (PersonelListesi != null)
+                            {
+                                @foreach (var item in PersonelListesi)
+                                {
+                                    <option value="@item.LOGICALREF">@item.DEFINITION_</option>
+                                }
+                            }
+                        </InputSelect>
                     </div>
                     <div class="col-4">
-                        <label>İlgili Kişi</label>
+                        <label>Firma Yetkilisi</label>
                         <InputText @bind-Value="teklif.IlgiliAdi" class="form-control"></InputText>
                     </div>
 
@@ -69,7 +85,11 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-8">
+                    <div class="col-md-4">
+                        <label>Proje Adı</label>
+                        <InputText @bind-Value="teklif.Proje" class="form-control"></InputText>
+                    </div>
+                    <div class="col-md-4">
                         <label>Açıklama</label>
                         <InputTextArea @bind-Value="teklif.Aciklama1" class="form-control"></InputTextArea>
                     </div>
@@ -116,6 +136,10 @@
 
     TeklifDto teklif = new TeklifDto();
 
+    public List<string> TeslimSekliListesi { get; set; }
+
+    public List<PersonelDto> PersonelListesi { get; set; }
+
     protected override async Task OnParametersSetAsync()
     {
         IsUpdate = logRef.HasValue;
@@ -126,6 +150,18 @@
         }
 
         await TeklifNoUret();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!IsUpdate)
+        {
+            teklif.Tarih = DateTime.Now;
+        }
+
+        await TeslimListesiCek();
+        await PersonelListesiCek();
+
     }
 
     public async Task GetTeklif()
@@ -200,6 +236,9 @@
             teklif.Tarih = teklif.Tarih.HasValue ? teklif.Tarih : DateTime.Now;
             teklif.Saat = teklif.Saat.HasValue ? teklif.Saat : DateTime.Now;
 
+            await TeklifNoUret();
+            await LogRefUret();
+
             var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifDto>("/api/teklif/save", teklif);
 
             Snackbar.Add("Teklif güncellendi");
@@ -226,12 +265,49 @@
             teklif.Teklifno = result;
         }
 
-        var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklif&keyField=logref");
-        if (string.IsNullOrEmpty(result) == false)
-        {
-            teklif.Logref = Convert.ToInt32(result2);
-        }
 
+
+    }
+
+    public async Task LogRefUret()
+    {
+        var result2 = await httpClient.GetServiceResponseAsync<int>("/api/helper/RefNoAl?tablename=teklif");
+        teklif.Logref = result2;
+        
+    }
+
+    public async Task TeslimListesiCek()
+    {
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<List<string>>("/api/helper/GetTeslimSekliList");
+            if (result != null)
+            {
+                TeslimSekliListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    public async Task PersonelListesiCek()
+    {
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<List<PersonelDto>>("/api/helper/GetPersonelList");
+            if (result != null)
+            {
+                PersonelListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
     }
 
 }

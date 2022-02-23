@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
+using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ServiceResponses;
 
 namespace UmotaWebApp.Server.Controllers
@@ -15,10 +16,12 @@ namespace UmotaWebApp.Server.Controllers
     {
         private readonly IRefGenerator RefService;
         private readonly ILogger<HelperController> Logger;
-        public HelperController(IRefGenerator refGenerator, ILogger<HelperController> logger)
+        private readonly IPersonelService PersonelService;
+        public HelperController(IRefGenerator refGenerator, ILogger<HelperController> logger, IPersonelService personelService)
         {
             RefService = refGenerator;
             Logger = logger;
+            PersonelService = personelService;
         }
 
         [HttpGet("GenerateRef")]
@@ -43,5 +46,78 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpGet("GetTeslimSekliList")]
+        public Task<ServiceResponse<List<string>>> GetTeslimSekliList()
+        {
+            try
+            {
+                var list = new List<string>();
+                list.Add("ŞİRKETİMİZ DEPO TESLİM");
+                list.Add("MÜŞTERİ ADRESİNE TESLİM");
+                list.Add("KARGO ALICI ÖDEMELİ");
+                list.Add("İHRACAT");
+
+                var result = new ServiceResponse<List<string>>()
+                {
+                    Value = list
+                };
+
+                return Task.FromResult(result);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<string>>();
+                e.SetException(ex);
+                return Task.FromResult(e);
+            }
+        }
+
+
+        [HttpGet("GetPersonelList")]
+        public async Task<ServiceResponse<IEnumerable<PersonelDto>>> GetPersonelList()
+        {
+            try
+            {
+                return new ServiceResponse<IEnumerable<PersonelDto>>()
+                {
+                    Value = await PersonelService.GetPersonelList()
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<IEnumerable<PersonelDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("RefNoAl")]
+        public async Task<ServiceResponse<int>> RefNoAl(string tablename)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(tablename))
+                    throw new ApiExcetion("tablo adı boş geldi.Ref üretilemedi !");
+
+                return new ServiceResponse<int>()
+                {
+                    Value = await RefService.RefNoAl(tablename)
+                };
+            }
+            catch (ApiExcetion ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
     }
 }

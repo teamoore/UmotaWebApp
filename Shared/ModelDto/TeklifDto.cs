@@ -60,6 +60,8 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? Upddate { get; set; }
         public byte? Trcode { get; set; }
 
+        public string PersonelAdi { get; set; }
+
         public string TarihFormatted
         {
             get

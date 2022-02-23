@@ -3,22 +3,36 @@
 <div class="card" style="width: 100%;">
     <div class="card-body">
         <h5 class="card-title">Teklif Numarası : @teklif.Teklifno</h5>
-        <h6 class="card-subtitle mb-2 text-muted">
-            Teklif Tarihi : @(teklif.Tarih.HasValue ? teklif.Tarih.Value.ToString("dd.MM.yyyy") : "")
-            / Teslim Tarihi : @(teklif.TeslimTarihi.HasValue ? teklif.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "")
-        </h6>
-        <p class="card-text">
-            <strong>Proje Adı:</strong> @teklif.Proje
-            <strong>İlgili Kişi:</strong> @teklif.IlgiliAdi
-            <strong>Açıklama :</strong> @teklif.Aciklama1
-        </p>
-        <p class="card-text">
-            <strong>Teklif Tutar :</strong> @(teklif.Tutar.HasValue ? teklif.Tutar.Value : "0")
-            <strong>Miktar : </strong> @(_miktar.HasValue ? _miktar.Value : 0)
-        </p>
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="card-subtitle mb-2 text-muted">
+                    Teklif Tarihi : @(teklif.Tarih.HasValue ? teklif.Tarih.Value.ToString("dd.MM.yyyy") : "")
+                    / Teslim Tarihi : @(teklif.TeslimTarihi.HasValue ? teklif.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "")
+                </h6>
+                <p class="card-text">
+                    <strong>Proje Adı:</strong> @teklif.Proje
+                    <strong>İlgili Kişi:</strong> @teklif.IlgiliAdi
+                    <strong>Açıklama :</strong> @teklif.Aciklama1
+                </p>
 
-        <button class="btn btn-primary" @onclick="Duzenle"><i class="fa fa-edit"></i> Düzenle</button>
-        <button class="btn btn-primary" @onclick="TeklifDetayEkle"><i class="fa fa-plus"></i> Malzeme Ekle</button>
+            </div>
+            <div class="col-md-6">
+                <p class="card-text">
+                    <strong>Teklif Tutar :</strong> @(teklif.Tutar.HasValue ? teklif.Tutar.Value : "0")
+                    <strong>Miktar : </strong> @(_miktar.HasValue ? _miktar.Value : 0)
+                </p>
+
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-4">
+                <button class="btn btn-primary" @onclick="Duzenle"><i class="fa fa-edit"></i> Düzenle</button>
+                <button class="btn btn-primary" @onclick="TeklifDetayEkle"><i class="fa fa-plus"></i> Malzeme Ekle</button>
+            </div>
+        </div>
+
+        
     </div>
 </div>
 
