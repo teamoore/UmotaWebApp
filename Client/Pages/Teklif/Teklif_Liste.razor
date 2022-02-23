@@ -4,29 +4,44 @@
                  ShowButtons="true"
                  onDoneButtonClicked="TeklifAra" ShowSearchSection="true"></HeaderSearchBar>
 
-<MudDataGrid MultiSelection="true" Items="@teklifler" Dense="true" Sortable="true" Filterable="true" QuickFilter="@_quickFilter">
+
+<MudTable Items="@teklifler" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<TeklifDto,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Teklif Listesi</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Teklif Ara" Adornment="Adornment.Start" Immediate="true"
-                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
-    <Columns>
-        <Column T="TeklifDto" Field="Teklifno" Title="Teklif No" Sortable="false" Filterable="false" />
-        <Column T="TeklifDto" Field="Duruminfo" Title="Durum" CellStyleFunc="@_cellStyleFunc" />
-        <Column T="TeklifDto" Field="TarihFormatted" Title="Teklif Tarihi" />
-        <Column T="TeklifDto" Field="TeslimTarihiFormatted" Title="Teslim Tarihi" />
-        <Column T="TeklifDto" Field="LcariAdi" SortBy="@_sortBy" Title="Cari" />
-        <Column T="TeklifDto" Field="LcariKodu" Title="Cari Kodu" />
-        <Column T="TeklifDto" Field="Lpersoneladi" Title="İlgili Kişi" />
-        <Column T="TeklifDto" Field="TeslimSekli" Title="Teslim Şekli" />
-
-
-    </Columns>
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>Teklif No</MudTh>
+        <MudTh>Proje Adı</MudTh>
+        <MudTh>Durum</MudTh>
+        <MudTh>Tarih</MudTh>
+        <MudTh>Teslim Tarihi</MudTh>
+        <MudTh>Cari</MudTh>
+        <MudTh>Cari Kodu</MudTh>
+        <MudTh>İlgili Kişi</MudTh>
+        <MudTh>Teslim Şekli</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="" OnClick="(() => TeklifDetay(context.Logref))"></CustomEditButtonComponent>
+        </MudTd>
+        <MudTd DataLabel="Teklif No">@context.Teklifno</MudTd>
+        <MudTd DataLabel="Proje">@context.Proje</MudTd>
+        <MudTd DataLabel="Durum">@context.Duruminfo</MudTd>
+        <MudTd DataLabel="Tarih">@context.TarihFormatted</MudTd>
+        <MudTd DataLabel="Teslim Tarihi">@context.TeslimTarihiFormatted</MudTd>
+        <MudTd DataLabel="Cari">@context.LcariAdi</MudTd>
+        <MudTd DataLabel="Cari Kodu">@context.LcariKodu</MudTd>
+        <MudTd DataLabel="İlgili Kişi">@context.Lpersoneladi</MudTd>
+        <MudTd DataLabel="Teslim Şekli">@context.TeslimSekli</MudTd>
+    </RowTemplate>
     <PagerContent>
-        <MudDataGridPager T="TeklifDto" />
+        <MudTablePager />
     </PagerContent>
-</MudDataGrid>
+</MudTable>
+
 
 @code {
 
@@ -43,57 +58,25 @@
 
     public HeaderBarSearch header = new HeaderBarSearch();
 
-    private string _searchString;
+    private string _searchString = "";
     private bool _sortNameByLength;
 
-    // custom sort by name length
-    private Func<TeklifDto, object> _sortBy => x =>
+    private bool FilterFunc1(TeklifDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(TeklifDto element, string searchString)
     {
-        if (_sortNameByLength)
-            return x.LcariAdi.Length;
-        else
-            return x.LcariAdi;
-    };
-    // quick filter - filter gobally across multiple columns with the same input
-    private Func<TeklifDto, bool> _quickFilter => x =>
-    {
-        if (string.IsNullOrWhiteSpace(_searchString))
+        if (string.IsNullOrWhiteSpace(searchString))
             return true;
-
-        if (x.Proje.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Proje != null && element.Proje.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-
-        if (x.IlgiliAdi.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.LcariAdi != null && element.LcariAdi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-
-        if ($"{x.Teklifno} {x.Tbelgeno} {x.Lfirma}".Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Teklifno != null && element.LcariKodu != null && element.TeslimTarihiFormatted != null
+            && $"{element.Teklifno} {element.LcariKodu} {element.TeslimTarihiFormatted}".Contains(searchString))
             return true;
-
         return false;
-    };
+    }
 
-    private Func<TeklifDto, string> _cellStyleFunc => x =>
-    {
-        string style = "";
-
-        if (x.Duruminfo == "Müşteri Onayı Bekliyor")
-            style += "background-color:#8CED8C";
-
-        else if (x.Duruminfo == "Müşteri Siparişi İptal Etti")
-            style += "background-color:#E5BDE5";
-
-        else if (x.Duruminfo == "Müşteri Teklifi İptal Etti")
-            style += "background-color:#EACE5D";
-
-        else if (x.Duruminfo == "Teklif Hazırlanıyor")
-            style += "background-color:#F1F165";
-
-        else if (x.Duruminfo == "Kesin Sipariş Logoya Aktarıldı")
-            style += "background-color:#357C3C";
-        
-
-        return style;
-    };
 
     protected override async Task OnInitializedAsync()
     {

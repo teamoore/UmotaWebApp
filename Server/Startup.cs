@@ -44,6 +44,7 @@ namespace UmotaWebApp.Server
             services.AddScoped<IRefGenerator, RefGeneratorService>();
             services.AddScoped<ITeklifService, TeklifService>();
             services.AddScoped<ITeklifDetayService, TeklifDetayService>();
+            services.AddScoped<IMalzemeKartService, MalzemeKartService>();
 
             services.AddDbContext<UmotaMasterDbContext>(config =>
             {

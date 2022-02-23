@@ -1,0 +1,97 @@
+﻿@page "/malzeme_sec"
+
+
+<MudTable Items="@malzemeKarts" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeKartDto,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Malzeme Kart Listesi</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>Kodu</MudTh>
+        <MudTh>Adı</MudTh>
+        <MudTh>Menşei</MudTh>
+        <MudTh>Özel Kod</MudTh>
+        <MudTh>Alış Fiyatı</MudTh>
+        <MudTh>Satış Fiyatı</MudTh>
+        
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="" OnClick="(() => MalzemeKartSec(context.Logref))"></CustomEditButtonComponent>
+        </MudTd>
+        <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
+        <MudTd DataLabel="Adı">@context.Adi</MudTd>
+        <MudTd DataLabel="Menşei">@context.Mensei</MudTd>
+        <MudTd DataLabel="Özel Kod">@context.Ozelkod</MudTd>
+        <MudTd DataLabel="Alış Fiyatı">@context.Alfiyat</MudTd>
+        <MudTd DataLabel="Satış Fiyatı">@context.Satfiyat</MudTd>        
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+
+@code
+{
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    public List<MalzemeKartDto> malzemeKarts { get; set; }
+
+    public MalzemeKartDto malzemeKart = new MalzemeKartDto();
+
+    public string ResultText { get; set; }
+
+    private string _searchString = "";
+    private bool _sortNameByLength;
+
+    private bool FilterFunc1(MalzemeKartDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(MalzemeKartDto element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Kodu != null && element.Kodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Adi != null && element.Adi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Ozelkod != null && element.Mensei != null
+            && $"{element.Ozelkod} {element.Mensei} ".Contains(searchString))
+            return true;
+        return false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMalzemeKartList();
+    }
+
+    private async Task LoadMalzemeKartList()
+    {
+        malzemeKarts = await httpClient.GetServiceResponseAsync<List<MalzemeKartDto>>("/api/malzemekart/list");
+    }
+
+
+    public async Task MalzemeKartSec(int logref)
+    {
+        var mkart = await httpClient.GetServiceResponseAsync<MalzemeKartDto>("/api/malzemekart/get?logref=" + logref);
+        if (mkart != null)
+        {
+            modalParameters = new ModalParameters();
+            modalParameters.Add("secim", mkart);
+            await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(mkart));
+        }
+    }
+
+}

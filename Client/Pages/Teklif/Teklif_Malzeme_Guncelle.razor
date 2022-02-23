@@ -14,7 +14,7 @@
         </p>
 
         <button class="btn btn-primary" @onclick="Duzenle"><i class="fa fa-edit"></i> Düzenle</button>
-        <button class="btn btn-primary" @onclick="Duzenle"><i class="fa fa-plus"></i> Malzeme Ekle</button>
+        <button class="btn btn-primary" @onclick="MalzemeKartListesiAc"><i class="fa fa-plus"></i> Malzeme Ekle</button>
     </div>
 </div>
 
@@ -37,6 +37,9 @@
 
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
 
     public TeklifDto teklif = new TeklifDto();
 
@@ -66,5 +69,22 @@
 
         await LoadData();
 
+    }
+
+    public async Task MalzemeKartListesiAc()
+    {
+        var malzKartForm = modal.Show<Pages.Malzeme.Malzeme_Sec>();
+        var result = await malzKartForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var secim = (MalzemeKartDto)result.Data;
+
+                Snackbar.Add("Malzeme Kartı eklendi : " + secim.Adi);
+            }
+
+        }
     }
 }
