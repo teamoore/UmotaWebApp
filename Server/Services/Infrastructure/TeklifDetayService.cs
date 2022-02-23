@@ -52,11 +52,43 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<TeklifDetayDto> SaveTeklifDetay(TeklifDetayDto teklifDetayDto)
         {
+            teklifDetayDto = await CalculateTeklifDetay(teklifDetayDto);
+
             var teklifDetayRow = Mapper.Map<Teklifdetay>(teklifDetayDto);
             await Db.Teklifdetays.AddAsync(teklifDetayRow);
             await Db.SaveChangesAsync();
 
+            await CalculateTeklif(teklifDetayDto.Teklifref.Value);
+
             return Mapper.Map<TeklifDetayDto>(teklifDetayRow);
+        }
+
+        private async Task<TeklifDetayDto> CalculateTeklifDetay(TeklifDetayDto td)
+        {
+            td.Tutar = td.Miktar * td.Fiyat;
+            return await Task.FromResult(td);
+        }
+
+        private async Task CalculateTeklif(int teklifRef)
+        {
+            var teklifDetayList = await Db.Teklifdetays.Where(x => x.Teklifref == teklifRef).ToListAsync();
+            var toplamTutar = new double();
+            var toplamTutarTL = new double();
+
+            foreach (var item in teklifDetayList)
+            {
+                if (item.Miktar.HasValue && item.Fiyat.HasValue)
+                    toplamTutar = toplamTutar + (item.Miktar.Value * item.Fiyat.Value);
+                if (item.Miktar.HasValue && item.Fiyattl.HasValue)
+                    toplamTutarTL = toplamTutarTL + (item.Miktar.Value * item.Fiyattl.Value);
+            }
+
+            var teklif = await Db.Teklifs.Where(x => x.Logref == teklifRef).SingleOrDefaultAsync();
+
+            teklif.Tutar = toplamTutar;
+            teklif.Tutartl = toplamTutarTL;
+
+            await Db.SaveChangesAsync();
         }
     }
 }

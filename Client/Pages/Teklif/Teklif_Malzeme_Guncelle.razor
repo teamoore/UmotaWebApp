@@ -12,11 +12,48 @@
             <strong>İlgili Kişi:</strong> @teklif.IlgiliAdi
             <strong>Açıklama :</strong> @teklif.Aciklama1
         </p>
+        <p class="card-text">
+            <strong>Teklif Tutar :</strong> @(teklif.Tutar.HasValue ? teklif.Tutar.Value : "0")
+            <strong>Miktar : </strong> @(_miktar.HasValue ? _miktar.Value : 0)
+        </p>
 
         <button class="btn btn-primary" @onclick="Duzenle"><i class="fa fa-edit"></i> Düzenle</button>
-        <button class="btn btn-primary" @onclick="MalzemeKartListesiAc"><i class="fa fa-plus"></i> Malzeme Ekle</button>
+        <button class="btn btn-primary" @onclick="TeklifDetayEkle"><i class="fa fa-plus"></i> Malzeme Ekle</button>
     </div>
 </div>
+
+
+<MudTable Items="@teklifDetayList" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Teklif Detay Listesi</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Teklif Detay Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Çizim Kodu</MudTh>
+        <MudTh>Stok Kodu</MudTh>
+        <MudTh>Stok Adı</MudTh>
+        <MudTh>Miktar</MudTh>
+        <MudTh>Birim Fiyat</MudTh>
+        <MudTh>Tutar</MudTh>
+
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Çizim Kodu">@context.Cizimkodu</MudTd>
+        <MudTd DataLabel="Stok Kodu">@context.LstokKodu</MudTd>
+        <MudTd DataLabel="Stok Adı">@context.LstokAdi</MudTd>
+        <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
+        <MudTd DataLabel="Birim Fiyat">@context.Fiyat</MudTd>
+        <MudTd DataLabel="Tutar">@context.Tutar</MudTd>
+
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+
+
 
 @code {
     [Parameter]
@@ -43,12 +80,45 @@
 
     public TeklifDto teklif = new TeklifDto();
 
-    protected override async Task OnInitializedAsync()
+    public List<TeklifDetayDto> teklifDetayList { get; set; }
+
+    private string _searchString = "";
+    private bool _sortNameByLength;
+
+    private double? _miktar = 0;
+
+    private bool FilterFunc1(TeklifDetayDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(TeklifDetayDto element, string searchString)
     {
-        await LoadData();
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.LstokAdi != null && element.LstokAdi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.LstokKodu != null && element.LstokKodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+
+        return false;
     }
 
-    private async Task LoadData()
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTeklifData();
+        await LoadTeklifDetayData();
+    }
+
+    private async Task LoadTeklifDetayData()
+    {
+        var result = await httpClient.GetServiceResponseAsync<List<TeklifDetayDto>>("/api/teklifdetay/list?teklifRef=" + logref);
+        if (result != null)
+        {
+            teklifDetayList = result.OrderByDescending(x => x.Insdate).ToList();
+            _miktar = teklifDetayList.Sum(x => x.Miktar);
+        }
+    }
+
+    private async Task LoadTeklifData()
     {
         var result = await httpClient.GetServiceResponseAsync<TeklifDto>("/api/teklif/get?logref=" + logref);
         if (result != null)
@@ -67,22 +137,28 @@
 
         var result = await duzenleForm.Result;
 
-        await LoadData();
+        await LoadTeklifData();
 
     }
 
-    public async Task MalzemeKartListesiAc()
+    public async Task TeklifDetayEkle()
     {
-        var malzKartForm = modal.Show<Pages.Malzeme.Malzeme_Sec>();
+        modalParameters = new ModalParameters();
+        modalParameters.Add("teklifRef", logref);
+
+        var malzKartForm = modal.Show<TeklifDetayEkleGuncelleComponent>("Teklif Detay", parameters: modalParameters);
         var result = await malzKartForm.Result;
 
         if (!result.Cancelled)
         {
             if (result.Data != null)
             {
-                var secim = (MalzemeKartDto)result.Data;
+                var secim = (TeklifDetayDto)result.Data;
 
-                Snackbar.Add("Malzeme Kartı eklendi : " + secim.Adi);
+                Snackbar.Add("Malzeme Kartı eklendi : " + secim.LstokAdi);
+
+                await LoadTeklifData();
+                await LoadTeklifDetayData();
             }
 
         }

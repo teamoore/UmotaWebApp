@@ -1,0 +1,185 @@
+﻿
+<EditForm Model="teklifDetay">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mt-6">
+        <div class="form">
+            <div class="form-group">
+
+                <div class="row">
+                    <div class="col-4">
+                        <label>Ref</label>
+                        <InputNumber @bind-Value="teklifDetay.Logref" class="form-control" />
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <label>Malzeme Kart Bilgisi</label>
+                <div class="row">
+                    <div class="col">
+                        <InputNumber @bind-Value="teklifDetay.Miktar" class="form-control" placeholder="Miktar" />
+                    </div>
+                    <div class="col">
+                        <InputText @bind-Value="teklifDetay.LstokAdi" class="form-control" placeholder="Stok Adı" />
+                    </div>
+                    <div class="col">
+                        <InputText @bind-Value="teklifDetay.LstokKodu" class="form-control" placeholder="Stok Kodu" />
+                    </div>
+                    <div class="col">
+                        <SaveButtonComponent Caption="Malzeme Listesi" OnClick="MalzemeListesiAc" />
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+
+</EditForm>
+
+@code {
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Parameter]
+    public int? logRef { get; set; }
+
+    [Parameter]
+    public int? teklifRef { get; set; }
+
+    [Parameter]
+    public EventCallback OnVazgecClicked { get; set; }
+
+    public bool IsUpdate { get; set; }
+
+    TeklifDetayDto teklifDetay = new TeklifDetayDto();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        IsUpdate = logRef.HasValue;
+        if (IsUpdate)
+        {
+            await GetTeklifDetay();
+            return;
+        }
+
+        await LogRefUret();
+    }
+
+    public async Task GetTeklifDetay()
+    {
+        await Task.CompletedTask;
+    }
+
+    public async Task LogRefUret()
+    {
+
+        var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklifdetay&keyField=logref");
+        if (string.IsNullOrEmpty(result2) == false)
+        {
+            teklifDetay.Logref = Convert.ToInt32(result2);
+        }
+
+    }
+
+    public async Task MalzemeListesiAc()
+    {
+        var form = modal.Show<Pages.Malzeme.Malzeme_Sec>();
+        var result = await form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var mkart = (MalzemeKartDto)result.Data;
+                teklifDetay.LstokAdi = mkart.Adi;
+                teklifDetay.LstokKodu = mkart.Kodu;
+                teklifDetay.Fiyat = mkart.Satfiyat;
+                teklifDetay.Fiyattl = mkart.Satfiyat;
+            }
+
+        }
+    }
+
+    public async Task ValidSubmit()
+    {
+        if (IsUpdate)
+            await UpdateTeklifDetay();
+        else
+            await SaveTeklifDetay();
+
+        modalParameters = new ModalParameters();
+        modalParameters.Add("teklifDetay", teklifDetay);
+        await ModalInstance.CloseAsync(ModalResult.Ok<TeklifDetayDto>(teklifDetay));
+    }
+
+    private async Task UpdateTeklifDetay()
+    {
+        try
+        {
+            teklifDetay.Upddate = DateTime.Now;
+            teklifDetay.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.PostGetServiceResponseAsync<TeklifDetayDto, TeklifDetayDto>("/api/teklifdetay/update", teklifDetay);
+
+            Snackbar.Add("Teklif güncellendi");
+
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+        }
+    }
+
+    private async Task SaveTeklifDetay()
+    {
+        try
+        {
+            teklifDetay.Insdate = DateTime.Now;
+            teklifDetay.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklifDetay.Teklifref = teklifRef;
+
+            var result = await httpClient.PostGetServiceResponseAsync<TeklifDetayDto, TeklifDetayDto>("/api/teklifdetay/save", teklifDetay);
+
+            Snackbar.Add("Teklif güncellendi");
+
+            await ModalInstance.CloseAsync(ModalResult.Ok<TeklifDetayDto>(teklifDetay));
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public async Task Vazgec()
+    {
+        await OnVazgecClicked.InvokeAsync();
+    }
+}
