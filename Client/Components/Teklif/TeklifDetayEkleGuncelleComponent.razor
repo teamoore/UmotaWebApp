@@ -25,8 +25,7 @@
                 <label>Malzeme Kart Bilgisi</label>
                 <div class="row">
                     <div class="col-md-3">
-                        <label>Miktar</label>
-                        <InputNumber @bind-Value="teklifDetay.Miktar" class="form-control" placeholder="Miktar" />
+                        <MudNumericField @bind-Value="teklifDetay.Miktar" Label="Miktar" Variant="Variant.Text" Min="0" Max="1000" />
                     </div>
                     <div class="col-md-3">
                         <label>Stok Adı</label>

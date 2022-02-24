@@ -5,7 +5,7 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Malzeme Kart Listesi</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="_searchStringMalzeme" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
@@ -15,24 +15,29 @@
         <MudTh>Özel Kod</MudTh>
         <MudTh>Alış Fiyatı</MudTh>
         <MudTh>Satış Fiyatı</MudTh>
-        
+
     </HeaderContent>
     <RowTemplate>
-        <MudTd>            
-            <MudFab Color="Color.Transparent" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => MalzemeKartSec(context.Logref))"/>
+        <MudTd>
+            <MudFab Color="Color.Transparent" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => MalzemeKartSec(context.Logref))" />
         </MudTd>
         <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
         <MudTd DataLabel="Adı">@context.Adi</MudTd>
         <MudTd DataLabel="Menşei">@context.Mensei</MudTd>
         <MudTd DataLabel="Özel Kod">@context.Ozelkod</MudTd>
         <MudTd DataLabel="Alış Fiyatı">@context.Alfiyat</MudTd>
-        <MudTd DataLabel="Satış Fiyatı">@context.Satfiyat</MudTd>        
+        <MudTd DataLabel="Satış Fiyatı">@context.Satfiyat</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
     </PagerContent>
 </MudTable>
 
+
+@if (_searchStarted)
+{
+    <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+}
 
 @code
 {
@@ -53,10 +58,11 @@
 
     public string ResultText { get; set; }
 
-    private string _searchString = "";
+    private string _searchStringMalzeme = "";
     private bool _sortNameByLength;
+    private bool _searchStarted = false;
 
-    private bool FilterFunc1(MalzemeKartDto element) => FilterFunc(element, _searchString);
+    private bool FilterFunc1(MalzemeKartDto element) => FilterFunc(element, _searchStringMalzeme);
 
     private bool FilterFunc(MalzemeKartDto element, string searchString)
     {
@@ -79,7 +85,9 @@
 
     private async Task LoadMalzemeKartList()
     {
+        _searchStarted = true;
         malzemeKarts = await httpClient.GetServiceResponseAsync<List<MalzemeKartDto>>("/api/malzemekart/list");
+        _searchStarted = false;
     }
 
 
