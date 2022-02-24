@@ -28,6 +28,7 @@ namespace UmotaWebApp.Client
             builder.Services.AddBlazoredModal();
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddScoped<ModalManager>();
+            builder.Services.AddScoped<Helper>();
             builder.Services.AddAuthorizationCore();
 
             builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();

@@ -5,36 +5,43 @@
 
     <div class="mt-6">
         <div class="form">
-            <div class="form-group">
-
-                <div class="row">
-                    <div class="col-4">
-                        <label>Ref</label>
-                        <InputNumber @bind-Value="teklifDetay.Logref" class="form-control" />
-                    </div>
-                </div>
-
-            </div>
 
             <div class="form-group">
                 <label>Malzeme Kart Bilgisi</label>
                 <div class="row">
-                    <div class="col">
+                    <div class="col-md-3">
+                        <label>Miktar</label>
                         <InputNumber @bind-Value="teklifDetay.Miktar" class="form-control" placeholder="Miktar" />
                     </div>
-                    <div class="col">
+                    <div class="col-md-3">
+                        <label>Stok Adı</label>
                         <InputText @bind-Value="teklifDetay.LstokAdi" class="form-control" placeholder="Stok Adı" />
                     </div>
-                    <div class="col">
+                    <div class="col-md-3">
+                        <label>Stok Kodu</label>
                         <InputText @bind-Value="teklifDetay.LstokKodu" class="form-control" placeholder="Stok Kodu" />
                     </div>
-                    <div class="col">
-                        <SaveButtonComponent Caption="Malzeme Listesi" OnClick="MalzemeListesiAc" />
+                    <div class="col-md-3">
+                        <label>Malzeme Listesi</label>
+                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage" OnClick="MalzemeListesiAc" Color="Color.Primary">Malzemeler</MudButton>
                     </div>
                 </div>
 
             </div>
 
+            @if (teklifDetay.Fiyat.HasValue)
+            {
+                <div class="card" style="width: 100%;">
+                    <div class="card-body">
+                        <h5 class="card-title">@teklifDetay.LstokAdi (@teklifDetay.LstokKodu)</h5>
+                        <p>
+                            <strong>Malzeme Satış Fiyatı :</strong> @teklifDetay.Fiyat
+                        <strong>Toplam Tutar :</strong>@(teklifDetay.Fiyat * teklifDetay.Miktar)
+                        </p>
+                    </div>
+                </div>
+
+            }
 
         </div>
     </div>
@@ -91,6 +98,7 @@
         }
 
         await LogRefUret();
+        teklifDetay.Miktar = 1;
     }
 
     public async Task GetTeklifDetay()

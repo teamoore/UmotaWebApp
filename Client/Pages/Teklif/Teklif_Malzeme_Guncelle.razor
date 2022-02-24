@@ -10,15 +10,19 @@
                     / Teslim Tarihi : @(teklif.TeslimTarihi.HasValue ? teklif.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "")
                 </h6>
                 <p class="card-text">
-                    <strong>Proje Adı:</strong> @teklif.Proje
+                    <strong>Firma:</strong> @teklif.LcariAdi <br />
+                    <strong>Proje Adı:</strong> @teklif.Proje <br />
                     <strong>İlgili Kişi:</strong> @teklif.IlgiliAdi
+                    <br />
                     <strong>Açıklama :</strong> @teklif.Aciklama1
                 </p>
 
             </div>
             <div class="col-md-6">
                 <p class="card-text">
+                    
                     <strong>Teklif Tutar :</strong> @(teklif.Tutar.HasValue ? teklif.Tutar.Value : "0")
+                    <br />
                     <strong>Miktar : </strong> @(_miktar.HasValue ? _miktar.Value : 0)
                 </p>
 
@@ -44,6 +48,7 @@
         <MudTextField @bind-Value="_searchString" Placeholder="Teklif Detay Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
+        <MudTh>#</MudTh>
         <MudTh>Çizim Kodu</MudTh>
         <MudTh>Stok Kodu</MudTh>
         <MudTh>Stok Adı</MudTh>
@@ -53,6 +58,10 @@
 
     </HeaderContent>
     <RowTemplate>
+        <MudTd>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" />
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" />
+        </MudTd>
         <MudTd DataLabel="Çizim Kodu">@context.Cizimkodu</MudTd>
         <MudTd DataLabel="Stok Kodu">@context.LstokKodu</MudTd>
         <MudTd DataLabel="Stok Adı">@context.LstokAdi</MudTd>

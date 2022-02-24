@@ -43,6 +43,7 @@
                         <InputSelect @bind-Value="teklif.TeslimSekli" class="form-control">
                             @if (TeslimSekliListesi != null)
                             {
+                                <option value="-1">Teslim Şekli Seçiniz</option>
                                 @foreach (var item in TeslimSekliListesi)
                                 {
                                     <option value="@item">@item</option>
@@ -68,6 +69,7 @@
                         <InputSelect @bind-Value="teklif.Lpersonelref" class="form-control">
                             @if (PersonelListesi != null)
                             {
+                                <option value="-1">Personel Seçiniz</option>
                                 @foreach (var item in PersonelListesi)
                                 {
                                     <option value="@item.LOGICALREF">@item.DEFINITION_</option>
@@ -125,6 +127,9 @@
 
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    Helper helper { get; set; }
 
     [Parameter]
     public int? logRef { get; set; }
@@ -258,22 +263,13 @@
     }
 
     public async Task TeklifNoUret()
-    {
-        var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklif&keyField=teklifno");
-        if (string.IsNullOrEmpty(result) == false)
-        {
-            teklif.Teklifno = result;
-        }
-
-
-
+    {        
+        teklif.Teklifno = await helper.GenerateRowRef("teklif", "teklifno");        
     }
 
     public async Task LogRefUret()
     {
-        var result2 = await httpClient.GetServiceResponseAsync<int>("/api/helper/RefNoAl?tablename=teklif");
-        teklif.Logref = result2;
-        
+        teklif.Logref = await helper.GenerateRefNumber("teklif");
     }
 
     public async Task TeslimListesiCek()
