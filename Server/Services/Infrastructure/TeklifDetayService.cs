@@ -90,5 +90,27 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             await Db.SaveChangesAsync();
         }
+
+        public async Task<bool> DeleteTeklifDetay(int logref)
+        {
+            var row = await Db.Teklifdetays.Where(x => x.Logref == logref)
+                            .FirstOrDefaultAsync();
+            if (row == null)
+                throw new Exception("Silinecek teklif detayı bulunamadı");
+
+            var teklifRef = row.Teklifref;
+
+            Db.Teklifdetays.Attach(row);
+            Db.Teklifdetays.Remove(row);
+            await Db.SaveChangesAsync();
+
+            if (!teklifRef.HasValue)
+                throw new Exception("Teklif detayı silinirken hata oluştu");
+
+            // teklif detayı silindikten sonra teklif tutarı güncelle
+            await CalculateTeklif(teklifRef.Value);
+
+            return true;
+        }
     }
 }

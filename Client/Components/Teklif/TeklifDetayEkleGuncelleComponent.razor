@@ -7,6 +7,21 @@
         <div class="form">
 
             <div class="form-group">
+
+                @if (teklifDetay.Fiyat.HasValue)
+                {
+                    <div class="card" style="width: 100%;">
+                        <div class="card-body">
+                            <h5 class="card-title">@teklifDetay.LstokAdi (@teklifDetay.LstokKodu)</h5>
+                            <p>
+                                <strong>Malzeme Satış Fiyatı :</strong> @teklifDetay.Fiyat
+                                <strong>Toplam Tutar :</strong>@(teklifDetay.Fiyat * teklifDetay.Miktar)
+                            </p>
+                        </div>
+                    </div>
+
+                }
+
                 <label>Malzeme Kart Bilgisi</label>
                 <div class="row">
                     <div class="col-md-3">
@@ -29,19 +44,7 @@
 
             </div>
 
-            @if (teklifDetay.Fiyat.HasValue)
-            {
-                <div class="card" style="width: 100%;">
-                    <div class="card-body">
-                        <h5 class="card-title">@teklifDetay.LstokAdi (@teklifDetay.LstokKodu)</h5>
-                        <p>
-                            <strong>Malzeme Satış Fiyatı :</strong> @teklifDetay.Fiyat
-                        <strong>Toplam Tutar :</strong>@(teklifDetay.Fiyat * teklifDetay.Miktar)
-                        </p>
-                    </div>
-                </div>
-
-            }
+           
 
         </div>
     </div>
@@ -119,7 +122,10 @@
 
     public async Task MalzemeListesiAc()
     {
-        var form = modal.Show<Pages.Malzeme.Malzeme_Sec>();
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var form = modal.Show<Pages.Malzeme.Malzeme_Sec>("Malzeme", opt);
         var result = await form.Result;
 
         if (!result.Cancelled)

@@ -59,7 +59,7 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" />
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
             <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" />
         </MudTd>
         <MudTd DataLabel="Çizim Kodu">@context.Cizimkodu</MudTd>
@@ -184,6 +184,27 @@
                 await LoadTeklifDetayData();
             }
 
+        }
+    }
+
+    public async Task DeleteTeklifDetay(int logref)
+    {
+        try
+        {
+            var modalRes = await ModalManager.ShowConfirmationAsync("Teklif Detay Silinecek!", "Teklif Detayını silmek istediğinizden emin misiniz?","Evet","Hayır");
+            if (!modalRes)
+                return;
+
+            var delete = await httpClient.GetServiceResponseAsync<bool>("/api/teklifdetay/delete?logref=" + logref);
+
+            Snackbar.Add("Teklif detayı silindi");
+
+            await LoadTeklifDetayData();
+            await LoadTeklifData();
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
         }
     }
 }
