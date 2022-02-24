@@ -1,28 +1,26 @@
 ﻿@page "/cari_sec"
 
-<div class="card">
-    <div class="card-header d-flex align-items-center h-75">
-        Cari Seçim Ekranı
-    </div>
-    <div class="card-body">
-        <EditForm Model="cari" OnValidSubmit="CariBul">
-            <div class="form">
 
+<EditForm Model="cari">
+    <div class="form">
 
-                <div class="form-group">
-                    <label>Cari Ara</label>
+        <div class="form-group">
+
+            <div class="row">
+                <div class="col-md-4">
                     <InputText @bind-Value="cari.Adi" class="form-control" />
                 </div>
-
-
+                <div class="col-md-8">
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage"
+                               OnClick="CariBul" Color="Color.Primary">Cari Bul</MudButton>
+                </div>
             </div>
 
-            <div class="form-group">
-                <SaveButtonComponent Caption="Bul" />
-            </div>
-        </EditForm>
+        </div>
+
     </div>
-</div>
+</EditForm>
+
 
 @if (string.IsNullOrEmpty(ResultText) == false)
 {
@@ -31,57 +29,39 @@
     </div>
 }
 
-<div class="table-responsive" style="overflow-x: auto;max-height:400px;font-size:small">
-    <table class="table table-hover table-sm">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Ref</th>
-                <th scope="col">Kodu</th>
-                <th scope="col">Adı</th>
-                <th scope="col">Adı 2</th>
-                <th scope="col">Adres 1</th>
-                <th scope="col">Adres 2</th>
-                <th scope="col">İLçe</th>
-                <th scope="col">İl</th>
-                <th scope="col">Ülke</th>
-                <th scope="col">Telefon 1</th>
-                <th scope="col">Telefon 2</th>
-                <th scope="col">Vergi No</th>
-                <th scope="col">Vergi Dairesi</th>
-            </tr>
-        </thead>
-        <tbody>
-            @if (cariler != null)
-            {
-                @foreach (var item in cariler)
-                {
-                    <tr>
-                        <td>
-                            <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="Seç" OnClick="(() => CariSec(item.Kodu))"></CustomEditButtonComponent>
-                        </td>
-                        <td>@item.Logref</td>
-                        <td>@item.Kodu</td>
-                        <td>@item.Adi</td>
-                        <td>@item.Adi2</td>
-                        <td>@item.Adres1</td>
-                        <td>@item.Adres2</td>
-                        <td>@item.Ilce</td>
-                        <td>@item.Ulke</td>
-                        <td>@item.Il</td>
-                        <td>@item.Tel1</td>
-                        <td>@item.Tel2</td>
-                        <td>@item.Vdno</td>
-                        <td>@item.Vdadi</td>
-                    </tr>
-                }}
+@if (_searchStarted)
+{
+    <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+}
 
-        </tbody>
-    </table>
+<MudTable Items="@cariler" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<CariKartDto,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Cari Listesi</MudText>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>Kodu</MudTh>
+        <MudTh>Adı</MudTh>
+        <MudTh>İlçe</MudTh>
+        <MudTh>İl</MudTh>
 
-</div>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudFab Color="Color.Transparent" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => CariSec(context.Kodu))" />
+        </MudTd>
+        <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
+        <MudTd DataLabel="Adı">@context.Adi</MudTd>
+        <MudTd DataLabel="İlçe">@context.Ilce</MudTd>
+        <MudTd DataLabel="Şehir">@context.Il</MudTd>
 
-
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
 
 @code
 {
@@ -100,6 +80,26 @@
 
     public CariKartDto cari = new CariKartDto();
 
+    private string _searchString = "";
+    private bool _sortNameByLength;
+    private bool _searchStarted = false;
+
+    private bool FilterFunc1(CariKartDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(CariKartDto element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Kodu != null && element.Kodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Adi != null && element.Adi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Ozelkod != null
+            && $"{element.Ozelkod}".Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
     public string ResultText { get; set; }
 
     private async Task LoadCariler()
@@ -110,13 +110,15 @@
 
     public async Task CariBul()
     {
+        _searchStarted = true;
         ResultText = string.Empty;
         cariler = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartDto>("/api/carikart/search", cari);
 
         if (cariler.Count == 0)
         {
-            ResultText = string.Format(@"'{0}' aradığınız cari bulunamadı",cari.Adi);
+            ResultText = string.Format(@"'{0}' aradığınız cari bulunamadı", cari.Adi);
         }
+        _searchStarted = false;
     }
 
     public async Task CariSec(string kod)

@@ -62,10 +62,10 @@
 
             <div class="form-group">
                 <div class="row">
-                    
+
                     <div class="col-4">
                         <label>Satış Temsilcisi</label>
-                        
+
                         <InputSelect @bind-Value="teklif.Lpersonelref" class="form-control">
                             @if (PersonelListesi != null)
                             {
@@ -87,17 +87,21 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-8">
                         <label>Proje Adı</label>
                         <InputText @bind-Value="teklif.Proje" class="form-control"></InputText>
                     </div>
-                    <div class="col-md-4">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
                         <label>Açıklama</label>
                         <InputTextArea @bind-Value="teklif.Aciklama1" class="form-control"></InputTextArea>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -196,7 +200,10 @@
 
     public async Task CariListesiAc()
     {
-        var cariForm = modal.Show<Pages.Cari.Cari_Sec>();
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seçim",opt);
         var result = await cariForm.Result;
 
         if (!result.Cancelled)
