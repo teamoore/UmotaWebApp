@@ -96,6 +96,66 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpGet("GetOdemePlaniList")]
+        public async Task<ServiceResponse<IEnumerable<OdemePlaniDto>>> GetOdemePlaniList()
+        {
+            try
+            {
+                return new ServiceResponse<IEnumerable<OdemePlaniDto>>()
+                {
+                    Value = await RefService.GetOdemePlaniList()
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<IEnumerable<OdemePlaniDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("GetDovizList")]
+        public async Task<ServiceResponse<IEnumerable<DovizDto>>> GetDovizList()
+        {
+            try
+            {
+                return new ServiceResponse<IEnumerable<DovizDto>>()
+                {
+                    Value = await RefService.GetDovizList()
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<IEnumerable<DovizDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("GetSabitDetayList")]
+        public async Task<ServiceResponse<IEnumerable<SisSabitlerDetayDto>>> GetSabitDetayList(int tip)
+        {
+            try
+            {
+                return new ServiceResponse<IEnumerable<SisSabitlerDetayDto>>()
+                {
+                    Value = await RefService.GetSabitDetayList(tip)
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<IEnumerable<SisSabitlerDetayDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
         [HttpGet("RefNoAl")]
         public async Task<ServiceResponse<int>> RefNoAl(string tablename)
         {

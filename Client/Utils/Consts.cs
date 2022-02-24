@@ -13,6 +13,12 @@ namespace UmotaWebApp.Client.Utils
         public const string Token = "token";
     }
 
+    public class SabitTip
+    {
+        public const int DovizKodlari = 1;
+        public const int TeklifDurumu = 10;
+    }
+
     public static class ExtensionHelpers
     {
         public static string ClearCharacters(this string str)

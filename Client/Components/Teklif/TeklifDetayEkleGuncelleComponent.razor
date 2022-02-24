@@ -6,35 +6,59 @@
     <div class="mt-6">
         <div class="form">
             <div class="form-group">
-
                 <div class="row">
-                    <div class="col-4">
-                        <label>Ref</label>
-                        <InputNumber @bind-Value="teklifDetay.Logref" class="form-control" />
+                    <div class="col-md-4">
+                        <label>Çizim Kodu</label>
+                        <InputText @bind-Value="teklifDetay.Cizimkodu" class="form-control" placeholder="Stok Kodu" />
                     </div>
                 </div>
-
             </div>
 
             <div class="form-group">
-                <label>Malzeme Kart Bilgisi</label>
                 <div class="row">
-                    <div class="col">
-                        <InputNumber @bind-Value="teklifDetay.Miktar" class="form-control" placeholder="Miktar" />
-                    </div>
-                    <div class="col">
-                        <InputText @bind-Value="teklifDetay.LstokAdi" class="form-control" placeholder="Stok Adı" />
-                    </div>
-                    <div class="col">
+                    <div class="col-md-4">
+                        <label>Malzeme Kodu</label>
                         <InputText @bind-Value="teklifDetay.LstokKodu" class="form-control" placeholder="Stok Kodu" />
                     </div>
-                    <div class="col">
-                        <SaveButtonComponent Caption="Malzeme Listesi" OnClick="MalzemeListesiAc" />
+                    <div class="col-md-6">
+                        <label>Malzeme Tanımı</label>
+                        <InputText @bind-Value="teklifDetay.LstokAdi" class="form-control" placeholder="Stok Adı" />
+                    </div>
+                    <div class="col-md-2">
+                        <SaveButtonComponent Caption="Malzeme Bul" OnClick="MalzemeListesiAc" />
                     </div>
                 </div>
-
             </div>
 
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Mitar</label>
+                        <InputNumber @bind-Value="teklifDetay.Miktar" class="form-control" placeholder="Miktar" />
+                    </div>
+                    <div class="col-md-2">
+                        <label>Fiyat</label>
+                        <InputNumber @bind-Value="teklifDetay.Fiyat" class="form-control" placeholder="Fiyat" />
+                    </div>
+                    <div class="col-md-2">
+                        <label>Döviz</label>
+                        <InputSelect @bind-Value="teklifDetay.Dovizref" class="form-control">
+                            @if (DovizListesi != null)
+                            {
+                                @foreach (var item in DovizListesi)
+                                {
+                                    <option value="@item.CURTYPE">@item.CURCODE</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label>Tutar</label>
+                        <InputNumber @bind-Value="teklifDetay.Tutar" class="form-control" placeholder="Tutar" />
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
@@ -81,6 +105,8 @@
 
     TeklifDetayDto teklifDetay = new TeklifDetayDto();
 
+    public List<DovizDto> DovizListesi { get; set; }
+
     protected override async Task OnParametersSetAsync()
     {
         IsUpdate = logRef.HasValue;
@@ -90,7 +116,7 @@
             return;
         }
 
-        await LogRefUret();
+        await DovizListesiGetir();
     }
 
     public async Task GetTeklifDetay()
@@ -107,6 +133,23 @@
             teklifDetay.Logref = Convert.ToInt32(result2);
         }
 
+    }
+
+    public async Task DovizListesiGetir()
+    {
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<List<DovizDto>>("/api/helper/GetDovizList");
+            if (result != null)
+            {
+                DovizListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
     }
 
     public async Task MalzemeListesiAc()
@@ -162,6 +205,7 @@
     {
         try
         {
+            await LogRefUret();
             teklifDetay.Insdate = DateTime.Now;
             teklifDetay.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklifDetay.Teklifref = teklifRef;

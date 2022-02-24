@@ -39,6 +39,27 @@
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-4">
+                        <label>Firma Yetkilisi</label>
+                        <InputText @bind-Value="teklif.IlgiliAdi" class="form-control"></InputText>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Satış Temsilcisi</label>
+                        <InputSelect @bind-Value="teklif.Lpersonelref" class="form-control">
+                            @if (PersonelListesi != null)
+                            {
+                                @foreach (var item in PersonelListesi)
+                                {
+                                    <option value="@item.LOGICALREF">@item.DEFINITION_</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
                         <label>Teslim Şekli</label>
                         <InputSelect @bind-Value="teklif.TeslimSekli" class="form-control">
                             @if (TeslimSekliListesi != null)
@@ -61,35 +82,29 @@
 
             <div class="form-group">
                 <div class="row">
-                    
-                    <div class="col-4">
-                        <label>Satış Temsilcisi</label>
-                        
-                        <InputSelect @bind-Value="teklif.Lpersonelref" class="form-control">
-                            @if (PersonelListesi != null)
+                    <div class="col-md-4">
+                        <label>Ödeme Planı</label>
+
+                        <InputSelect @bind-Value="teklif.LodemePlani" class="form-control">
+                            @if (OdemePlaniListesi != null)
                             {
-                                @foreach (var item in PersonelListesi)
+                                @foreach (var item in OdemePlaniListesi)
                                 {
                                     <option value="@item.LOGICALREF">@item.DEFINITION_</option>
                                 }
                             }
                         </InputSelect>
                     </div>
-                    <div class="col-4">
-                        <label>Firma Yetkilisi</label>
-                        <InputText @bind-Value="teklif.IlgiliAdi" class="form-control"></InputText>
+                    <div class="col-md-4">
+                        <label>Proje Adı</label>
+                        <InputText @bind-Value="teklif.Proje" class="form-control"></InputText>
                     </div>
-
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-4">
-                        <label>Proje Adı</label>
-                        <InputText @bind-Value="teklif.Proje" class="form-control"></InputText>
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-8">
                         <label>Açıklama</label>
                         <InputTextArea @bind-Value="teklif.Aciklama1" class="form-control"></InputTextArea>
                     </div>
@@ -140,6 +155,8 @@
 
     public List<PersonelDto> PersonelListesi { get; set; }
 
+    public List<OdemePlaniDto> OdemePlaniListesi { get; set; }
+
     protected override async Task OnParametersSetAsync()
     {
         IsUpdate = logRef.HasValue;
@@ -161,6 +178,7 @@
 
         await TeslimListesiCek();
         await PersonelListesiCek();
+        await OdemePlaniCek();
 
     }
 
@@ -273,7 +291,7 @@
     {
         var result2 = await httpClient.GetServiceResponseAsync<int>("/api/helper/RefNoAl?tablename=teklif");
         teklif.Logref = result2;
-        
+
     }
 
     public async Task TeslimListesiCek()
@@ -310,4 +328,20 @@
         }
     }
 
+    public async Task OdemePlaniCek()
+    {
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<List<OdemePlaniDto>>("/api/helper/GetOdemePlaniList");
+            if (result != null)
+            {
+                OdemePlaniListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
 }
