@@ -25,7 +25,10 @@
                         <InputText @bind-Value="teklifDetay.LstokAdi" class="form-control" placeholder="Stok Adı" />
                     </div>
                     <div class="col-md-2">
-                        <SaveButtonComponent Caption="Malzeme Bul" OnClick="MalzemeListesiAc" />
+                        <label>Malzemeler</label>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" 
+                                   OnClick="MalzemeListesiAc"
+                                   Color="Color.Info" Size="Size.Medium">Bul</MudButton>
                     </div>
                 </div>
             </div>
@@ -224,6 +227,6 @@
 
     public async Task Vazgec()
     {
-        await OnVazgecClicked.InvokeAsync();
+        await ModalInstance.CloseAsync();
     }
 }

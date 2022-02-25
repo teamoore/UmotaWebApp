@@ -55,11 +55,11 @@
         <MudTh>Miktar</MudTh>
         <MudTh>Birim Fiyat</MudTh>
         <MudTh>Tutar</MudTh>
+        <MudTh>#</MudTh>
 
     </HeaderContent>
     <RowTemplate>
-        <MudTd>
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
+        <MudTd>            
             <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" />
         </MudTd>
         <MudTd DataLabel="Çizim Kodu">@context.Cizimkodu</MudTd>
@@ -68,7 +68,9 @@
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
         <MudTd DataLabel="Birim Fiyat">@context.Fiyat</MudTd>
         <MudTd DataLabel="Tutar">@context.Tutar</MudTd>
-
+        <MudTd>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
+        </MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
@@ -155,6 +157,8 @@
 
         modalParameters = new ModalParameters();
         modalParameters.Add("logRef", logref);
+        modalParameters.Add(nameof(TeklifEkleGuncelleComponent.OnVazgecClicked),
+            EventCallback.Factory.Create(this, Kapat));
 
         var duzenleForm = modal.Show<TeklifEkleGuncelleComponent>("Teklif Güncelle", parameters: modalParameters);
 
@@ -162,6 +166,11 @@
 
         await LoadTeklifData();
 
+    }
+
+    private async Task Kapat()
+    {
+        await ModalInstance.CloseAsync();
     }
 
     public async Task TeklifDetayEkle()

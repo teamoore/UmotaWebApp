@@ -24,13 +24,16 @@
                 <label>Cari</label>
                 <div class="row">
                     <div class="col-md-2">
+                        <label>Cari Kodu</label>
                         <InputText @bind-Value="teklif.LcariKodu" class="form-control" placeholder="Cari Kodu" />
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label>Cari Adı</label>
                         <InputText @bind-Value="teklif.LcariAdi" class="form-control" placeholder="Cari Adı" />
                     </div>
                     <div class="col-md-2">
-                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Primary">Cari Seç</MudButton>
+                        <label>Cari Seçim</label>
+                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Primary">Cari</MudButton>
                     </div>
                 </div>
 
