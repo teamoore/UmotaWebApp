@@ -139,7 +139,7 @@
     {
         try
         {
-            var result = await httpClient.GetServiceResponseAsync<List<DovizDto>>("/api/helper/GetDovizList");
+            var result = await httpClient.GetServiceResponseAsync<List<DovizDto>>("/api/helper/GetDovizList?logofirmno=1");
             if (result != null)
             {
                 DovizListesi = result;

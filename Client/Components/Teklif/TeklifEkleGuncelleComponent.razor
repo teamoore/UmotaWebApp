@@ -315,7 +315,7 @@
     {
         try
         {
-            var result = await httpClient.GetServiceResponseAsync<List<PersonelDto>>("/api/helper/GetPersonelList");
+            var result = await httpClient.GetServiceResponseAsync<List<PersonelDto>>("/api/helper/GetPersonelList?logofirmno=1");
             if (result != null)
             {
                 PersonelListesi = result;
@@ -332,7 +332,7 @@
     {
         try
         {
-            var result = await httpClient.GetServiceResponseAsync<List<OdemePlaniDto>>("/api/helper/GetOdemePlaniList");
+            var result = await httpClient.GetServiceResponseAsync<List<OdemePlaniDto>>("/api/helper/GetOdemePlaniList?logofirmno=1");
             if (result != null)
             {
                 OdemePlaniListesi = result;

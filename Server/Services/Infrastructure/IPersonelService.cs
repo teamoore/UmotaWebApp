@@ -8,6 +8,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 {
     public interface IPersonelService
     {
-        public Task<IEnumerable<PersonelDto>> GetPersonelList();
+        public Task<IEnumerable<PersonelDto>> GetPersonelList(int logofirmno);
     }
 }

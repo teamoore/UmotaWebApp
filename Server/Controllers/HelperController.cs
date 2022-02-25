@@ -17,6 +17,8 @@ namespace UmotaWebApp.Server.Controllers
         private readonly IRefGenerator RefService;
         private readonly ILogger<HelperController> Logger;
         private readonly IPersonelService PersonelService;
+        
+
         public HelperController(IRefGenerator refGenerator, ILogger<HelperController> logger, IPersonelService personelService)
         {
             RefService = refGenerator;
@@ -77,13 +79,13 @@ namespace UmotaWebApp.Server.Controllers
 
 
         [HttpGet("GetPersonelList")]
-        public async Task<ServiceResponse<IEnumerable<PersonelDto>>> GetPersonelList()
+        public async Task<ServiceResponse<IEnumerable<PersonelDto>>> GetPersonelList(int logofirmno)
         {
             try
             {
                 return new ServiceResponse<IEnumerable<PersonelDto>>()
                 {
-                    Value = await PersonelService.GetPersonelList()
+                    Value = await PersonelService.GetPersonelList(logofirmno)
                 };
             }
             catch (Exception ex)
@@ -97,13 +99,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("GetOdemePlaniList")]
-        public async Task<ServiceResponse<IEnumerable<OdemePlaniDto>>> GetOdemePlaniList()
+        public async Task<ServiceResponse<IEnumerable<OdemePlaniDto>>> GetOdemePlaniList(int logofirmno)
         {
             try
             {
                 return new ServiceResponse<IEnumerable<OdemePlaniDto>>()
                 {
-                    Value = await RefService.GetOdemePlaniList()
+                    Value = await RefService.GetOdemePlaniList(logofirmno)
                 };
             }
             catch (Exception ex)
@@ -117,13 +119,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("GetDovizList")]
-        public async Task<ServiceResponse<IEnumerable<DovizDto>>> GetDovizList()
+        public async Task<ServiceResponse<IEnumerable<DovizDto>>> GetDovizList(int logofirmno)
         {
             try
             {
                 return new ServiceResponse<IEnumerable<DovizDto>>()
                 {
-                    Value = await RefService.GetDovizList()
+                    Value = await RefService.GetDovizList(logofirmno)
                 };
             }
             catch (Exception ex)

@@ -15,10 +15,12 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     public class RefGeneratorService : IRefGenerator
     {
         private readonly DbConnection _sql;
+        public IConfiguration Configuration { get; }
 
-        public RefGeneratorService(DbConnection sql)
+        public RefGeneratorService(DbConnection sql, IConfiguration configuration)
         {
             _sql = sql;
+            Configuration = configuration;
         }
 
         public async Task<string> GenerateRowRef(string table, string keyField)
@@ -44,17 +46,25 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             return c;
         }
-        public async Task<IEnumerable<OdemePlaniDto>> GetOdemePlaniList()
+        public async Task<IEnumerable<OdemePlaniDto>> GetOdemePlaniList(int logofirmno)
         {
+            string LogoDbName = Configuration["LogoDbName"];
+            string LogoFirmaNo = logofirmno.ToString("000");
+            string sqlstring = "SELECT  LOGICALREF,  CODE,  DEFINITION_ from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_PAYPLANS] with(nolock) where ACTIVE=0";
+
             IEnumerable<OdemePlaniDto> dbResponse;
-            dbResponse = await _sql.QueryAsync<OdemePlaniDto>("SELECT  LOGICALREF,  CODE,  DEFINITION_ from [dbo].[LV_PAYPLANS]", commandType: CommandType.Text);
+            dbResponse = await _sql.QueryAsync<OdemePlaniDto>(sqlstring, commandType: CommandType.Text);
             return dbResponse;
         }
 
-        public async Task<IEnumerable<DovizDto>> GetDovizList()
+        public async Task<IEnumerable<DovizDto>> GetDovizList(int logofirmno)
         {
+            string LogoDbName = Configuration["LogoDbName"];
+            string LogoFirmaNo = logofirmno.ToString("000");
+            string sqlstring = "SELECT  LOGICALREF, FIRMNR , CURTYPE, CURCODE , CURNAME from " + LogoDbName + ".[dbo].[L_CURRENCYLIST] with(nolock) WHERE CURTYPE IN(0,1,20,160,17,53) and FIRMNR = " + LogoFirmaNo + " order by CURCODE";
+
             IEnumerable<DovizDto> dbResponse;
-            dbResponse = await _sql.QueryAsync<DovizDto>("SELECT  LOGICALREF, FIRMNR , CURTYPE, CURCODE , CURNAME from [dbo].[LV_CURRENCYLIST]", commandType: CommandType.Text);
+            dbResponse = await _sql.QueryAsync<DovizDto>(sqlstring, commandType: CommandType.Text);
             return dbResponse;
         }
 
