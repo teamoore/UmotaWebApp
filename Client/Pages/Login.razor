@@ -30,7 +30,7 @@
                         {
                             @foreach (var item in firmalar)
                             {
-                                <option value="@item.FirmaNo">@item.FirmaAdi @item.Aciklama</option>
+                                <option value="@item.FirmaNo">@item.Aciklama</option>
                             }
                         }
 
@@ -67,17 +67,19 @@
     AuthenticationStateProvider AuthenticationStateProvider { get; set; }
 
     private SisKullaniciLoginRequestDto request = new SisKullaniciLoginRequestDto();
-    private List<SisFirmaFirmaDonemDto> firmalar = null;
+    private List<SisFirmaDonemDto> firmalar = null;
     private string selectedFirmaDonem = "";
     private string selectBoxDesc = "Yükleniyor...";
 
     private async Task LoadFirmaDonem()
     {
-        var result = await client.GetFromJsonAsync<ServiceResponse<List<SisFirmaFirmaDonemDto>>>("api/firma/list");
+        //var result = await client.GetFromJsonAsync<ServiceResponse<List<SisFirmaFirmaDonemDto>>>("api/firma/list");
 
-        if (result != null && result.Success)
+        var result = await client.GetServiceResponseAsync<List<SisFirmaDonemDto>>("/api/FirmaDonem/List?kullanici_kodu=" + request.Kod);
+
+        if (result != null)
         {
-            firmalar = result.Value;
+            firmalar = result;
             selectBoxDesc = "Lütfen firma-dönem seçiniz";
         }
         else
@@ -102,47 +104,25 @@
 
             if (res.Success)
             {
+                await LoadFirmaDonem();
+
+                if (firmalar == null)
+                {
+                    await modalManager.ShowMessageAsync("Hata", "Giriş yetkiniz bulunmamaktadır");
+                    return;
+                }
+
                 await LocalStorage.SetItemAsync<string>(Consts.Token, res.Value.ApiToken.Replace("\"",""));
                 await LocalStorage.SetItemAsync<string>(Consts.KullaniciKodu, res.Value.KullaniciDto.KullaniciKodu);
                 await LocalStorage.SetItemAsync<string>(Consts.FirmaDonem, selectedFirmaDonem);
-                await LocalStorage.SetItemAsync<List<SisFirmaDonemYetkiDto>>(Consts.FirmaDonemYetki, res.Value.KullaniciFirmaDonemYetkiListesi);
+                //await LocalStorage.SetItemAsync<List<SisFirmaDonemYetkiDto>>(Consts.FirmaDonemYetki, res.Value.KullaniciFirmaDonemYetkiListesi);
 
                 (AuthenticationStateProvider as AuthStateProvider).NotifyUserLogin(res.Value.KullaniciDto.KullaniciKodu);
 
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", res.Value.ApiToken.Replace("\"",""));
 
-                //navManager.NavigateTo("/");
+                navManager.NavigateTo("/");
 
-                var result = await client.GetFromJsonAsync<ServiceResponse<List<SisFirmaFirmaDonemDto>>>("api/firma/list");
-
-                if (result != null && result.Success)
-                {
-                    if (res.Value.KullaniciFirmaDonemYetkiListesi == null)
-                    {
-                        await modalManager.ShowMessageAsync("Hata", "Firma dönem yetkiniz bulunmamaktadır.");
-                        return;
-                    }
-
-                    var firma_no = res.Value.KullaniciFirmaDonemYetkiListesi.Where(i => i.Tur == 1).FirstOrDefault();
-
-                    if (firma_no == null)
-                    {
-                        await modalManager.ShowMessageAsync("Hata", "Firma dönem yetkiniz bulunmamaktadır.");
-
-                    }
-                    else
-                    {
-                        firmalar = result.Value;
-                        firmalar = firmalar.Where(i => i.FirmaNo == firma_no.Donemref.Value.ToString()).ToList();
-
-                        selectBoxDesc = "Lütfen firma-dönem seçiniz";
-                    }
-
-                }
-                else
-                {
-                    await modalManager.ShowMessageAsync("Hata", "Firma Dönem bilgisi çekilemedi");
-                }
             }
             else
             {

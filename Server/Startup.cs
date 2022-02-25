@@ -37,6 +37,7 @@ namespace UmotaWebApp.Server
             services.ConfigureMapping();
 
             services.AddDbConnection();
+
             services.AddScoped<ISisKullaniciService, SisKullaniciService>();
             services.AddScoped<ISisFirmaService, SisFirmaService>();
             services.AddScoped<ISisMenuService, SisMenuService>();
@@ -46,6 +47,7 @@ namespace UmotaWebApp.Server
             services.AddScoped<ITeklifDetayService, TeklifDetayService>();
             services.AddScoped<IMalzemeKartService, MalzemeKartService>();
             services.AddScoped<IPersonelService, PersonelService>();
+            services.AddScoped<ISisFirmaDonemService, SisFirmaDonemService>();
 
             services.AddDbContext<UmotaMasterDbContext>(config =>
             {
