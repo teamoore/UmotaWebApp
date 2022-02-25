@@ -39,11 +39,31 @@
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-4">
+                        <label>Firma Yetkilisi</label>
+                        <InputText @bind-Value="teklif.IlgiliAdi" class="form-control"></InputText>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Satış Temsilcisi</label>
+                        <InputSelect @bind-Value="teklif.Lpersonelref" class="form-control">
+                            @if (PersonelListesi != null)
+                            {
+                                @foreach (var item in PersonelListesi)
+                                {
+                                    <option value="@item.LOGICALREF">@item.DEFINITION_</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
                         <label>Teslim Şekli</label>
                         <InputSelect @bind-Value="teklif.TeslimSekli" class="form-control">
                             @if (TeslimSekliListesi != null)
                             {
-                                <option value="-1">Teslim Şekli Seçiniz</option>
                                 @foreach (var item in TeslimSekliListesi)
                                 {
                                     <option value="@item">@item</option>
@@ -62,32 +82,20 @@
 
             <div class="form-group">
                 <div class="row">
+                    <div class="col-md-4">
+                        <label>Ödeme Planı</label>
 
-                    <div class="col-4">
-                        <label>Satış Temsilcisi</label>
-
-                        <InputSelect @bind-Value="teklif.Lpersonelref" class="form-control">
-                            @if (PersonelListesi != null)
+                        <InputSelect @bind-Value="teklif.LodemePlani" class="form-control">
+                            @if (OdemePlaniListesi != null)
                             {
-                                <option value="-1">Personel Seçiniz</option>
-                                @foreach (var item in PersonelListesi)
+                                @foreach (var item in OdemePlaniListesi)
                                 {
                                     <option value="@item.LOGICALREF">@item.DEFINITION_</option>
                                 }
                             }
                         </InputSelect>
                     </div>
-                    <div class="col-4">
-                        <label>Firma Yetkilisi</label>
-                        <InputText @bind-Value="teklif.IlgiliAdi" class="form-control"></InputText>
-                    </div>
-
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-4">
                         <label>Proje Adı</label>
                         <InputText @bind-Value="teklif.Proje" class="form-control"></InputText>
                     </div>
@@ -102,6 +110,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -132,9 +141,6 @@
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
-    [Inject]
-    Helper helper { get; set; }
-
     [Parameter]
     public int? logRef { get; set; }
 
@@ -148,6 +154,8 @@
     public List<string> TeslimSekliListesi { get; set; }
 
     public List<PersonelDto> PersonelListesi { get; set; }
+
+    public List<OdemePlaniDto> OdemePlaniListesi { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -170,6 +178,7 @@
 
         await TeslimListesiCek();
         await PersonelListesiCek();
+        await OdemePlaniCek();
 
     }
 
@@ -200,10 +209,7 @@
 
     public async Task CariListesiAc()
     {
-        var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
-        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seçim",opt);
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>();
         var result = await cariForm.Result;
 
         if (!result.Cancelled)
@@ -270,13 +276,22 @@
     }
 
     public async Task TeklifNoUret()
-    {        
-        teklif.Teklifno = await helper.GenerateRowRef("teklif", "teklifno");        
+    {
+        var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklif&keyField=teklifno");
+        if (string.IsNullOrEmpty(result) == false)
+        {
+            teklif.Teklifno = result;
+        }
+
+
+
     }
 
     public async Task LogRefUret()
     {
-        teklif.Logref = await helper.GenerateRefNumber("teklif");
+        var result2 = await httpClient.GetServiceResponseAsync<int>("/api/helper/RefNoAl?tablename=teklif");
+        teklif.Logref = result2;
+
     }
 
     public async Task TeslimListesiCek()
@@ -300,7 +315,7 @@
     {
         try
         {
-            var result = await httpClient.GetServiceResponseAsync<List<PersonelDto>>("/api/helper/GetPersonelList");
+            var result = await httpClient.GetServiceResponseAsync<List<PersonelDto>>("/api/helper/GetPersonelList?logofirmno=1");
             if (result != null)
             {
                 PersonelListesi = result;
@@ -313,4 +328,20 @@
         }
     }
 
+    public async Task OdemePlaniCek()
+    {
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<List<OdemePlaniDto>>("/api/helper/GetOdemePlaniList?logofirmno=1");
+            if (result != null)
+            {
+                OdemePlaniListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
 }
