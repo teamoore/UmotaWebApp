@@ -256,20 +256,28 @@
             teklif.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklif.Tarih = teklif.Tarih.HasValue ? teklif.Tarih : DateTime.Now;
             teklif.Saat = teklif.Saat.HasValue ? teklif.Saat : DateTime.Now;
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
 
             await TeklifNoUret();
             await LogRefUret();
 
-            var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifDto>("/api/teklif/save", teklif);
+            var request = new TeklifSaveRequestDto();
+            request.Teklif = teklif;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifSaveRequestDto>(UrlHelper.TeklifKaydet, request);
 
             Snackbar.Add("Teklif güncellendi");
 
             navigation.NavigateTo("/stek_listef_detay/" + result.Logref);
 
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Blazored.LocalStorage;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -9,9 +10,11 @@ namespace UmotaWebApp.Client.Utils
     public class Helper
     {
         private readonly HttpClient httpClient;
-        public Helper(HttpClient httpClient)
+        private readonly ILocalStorageService localStorageService;
+        public Helper(HttpClient httpClient, ILocalStorageService localStorageService)
         {
             this.httpClient = httpClient;
+            this.localStorageService = localStorageService;
         }
 
         public async Task<string> GenerateRowRef(string tableName, string keyField)

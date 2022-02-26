@@ -1,12 +1,17 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Data.Models;
+using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 
@@ -17,12 +22,14 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public IMapper Mapper { get; }
         public UmotaCompanyDbContext Db { get; }
         public IConfiguration Configuration { get; }
+        private readonly DbConnection _sql;
 
-        public TeklifService(IMapper mapper, UmotaCompanyDbContext db, IConfiguration configuration)
+        public TeklifService(IMapper mapper, UmotaCompanyDbContext db, IConfiguration configuration, DbConnection sql)
         {
             Mapper = mapper;
             Db = db;
             Configuration = configuration;
+            _sql = sql;
         }
 
         public async Task<TeklifDto> GetTeklifByRef(int logref)
@@ -31,21 +38,46 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                  .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
         }
 
-        public async Task<List<TeklifDto>> GetTeklifDtos()
+        public async Task<List<TeklifDto>> GetTeklifDtos(string firmaId)
         {
-            return await Db.Teklifs.ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).ToListAsync();
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            {
+                db.Open();
+
+                var sql = "select top 100 * from " + Configuration.GetUmotaObjectName("teklif",firmaId:firmaId) + " order by insdate desc";
+
+                var result = await db.QueryAsync<TeklifDto>(sql, commandType: CommandType.Text);
+
+                db.Close();
+
+                return result.ToList();
+
+            }
+
         }
 
-        public async Task<TeklifDto> SaveTeklif(TeklifDto teklifDto)
+        public async Task<TeklifDto> SaveTeklif(TeklifSaveRequestDto request)
         {
-            var teklif = Mapper.Map<Teklif>(teklifDto);
-            await Db.Teklifs.AddAsync(teklif);
-            await Db.SaveChangesAsync();
-            return Mapper.Map<TeklifDto>(teklif);
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var teklif = Mapper.Map<Teklif>(request.Teklif);
+                await dbContext.Teklifs.AddAsync(teklif);
+                await dbContext.SaveChangesAsync();
+                return Mapper.Map<TeklifDto>(teklif);
+            }
+
+
         }
 
         public async Task<List<TeklifDto>> SearchTeklif(TeklifDto teklif)
         {
+            
             var word = teklif.Aciklama1.ToLower();
 
             return await Db.Teklifs.Where(x => x.Aciklama1.ToLower().Contains(word)
