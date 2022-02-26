@@ -28,6 +28,8 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">Umota v.0.1</MudText>
         <MudSpacer />
+        <MudButton Variant="Variant.Filled" Color="Color.Success">@_selectedFirma</MudButton>
+        <MudText Typo="Typo.h5" Class="ml-3">&nbsp;</MudText>
         <MudAvatar Color="Color.Success">@_avatarName</MudAvatar>
         <MudIconButton Icon="@Icons.Material.Filled.Logout" OnClick="NavigateToExit"></MudIconButton>
         <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
@@ -66,6 +68,7 @@
     bool _drawerOpen = true;
 
     string _avatarName = "";
+    string _selectedFirma = "";
 
     void DrawerToggle()
     {
@@ -83,6 +86,10 @@
             loginStr = loginStr.Replace("\"", "");
 
             _avatarName = loginStr.ToUpper().Substring(0, 1);
+
+            var selectedFirmaDonem = await localStorage.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            _selectedFirma = selectedFirmaDonem.aciklama;
         }
         else
         {

@@ -174,11 +174,11 @@
             teklif.Tarih = DateTime.Now;
         }
 
-        await GetTeklif();
-
         await TeslimListesiCek();
         await PersonelListesiCek();
         await OdemePlaniCek();
+
+        await GetTeklif();
 
     }
 
@@ -186,6 +186,9 @@
     {
         try
         {
+            if (logRef.HasValue == false)
+                return;
+
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
             if (selectedFirmaDonem == null)
