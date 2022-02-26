@@ -108,7 +108,16 @@
         var teklifSearch = new TeklifDto();
         teklifSearch.Aciklama1 = header.SearchText;
 
-        var result = await httpClient.PostGetServiceResponseAsync<List<TeklifDto>, TeklifDto>("/api/teklif/search", teklifSearch);
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        var request = new TeklifRequestDto();
+        request.Teklif = teklifSearch;
+        request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+        var result = await httpClient.PostGetServiceResponseAsync<List<TeklifDto>, TeklifRequestDto>(UrlHelper.TeklifAra, request);
         if (result == null || result.Count == 0)
         {
             await ModalManager.ShowMessageAsync("Arama", "Aradığınız kritere göre teklif bulunamadı.\n Lütfen detaylı aramayı seçiniz");

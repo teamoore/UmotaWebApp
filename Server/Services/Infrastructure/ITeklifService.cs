@@ -10,9 +10,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     public interface ITeklifService
     {
         public Task<List<TeklifDto>> GetTeklifDtos(string firmaId);
-        public Task<TeklifDto> GetTeklifByRef(int logref);
-        public Task<TeklifDto> SaveTeklif(TeklifSaveRequestDto request);
-        public Task<TeklifDto> UpdateTeklif(TeklifDto teklifDto);
-        public Task<List<TeklifDto>> SearchTeklif(TeklifDto teklif);
+        public Task<TeklifDto> GetTeklifByRef(int logref, string firmaId);
+        public Task<TeklifDto> SaveTeklif(TeklifRequestDto request);
+        public Task<TeklifDto> UpdateTeklif(TeklifRequestDto request);
+        public Task<List<TeklifDto>> SearchTeklif(TeklifRequestDto request);
     }
 }

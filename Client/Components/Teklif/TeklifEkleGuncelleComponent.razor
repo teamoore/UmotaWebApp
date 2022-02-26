@@ -189,16 +189,20 @@
     {
         try
         {
-            var result = await httpClient.GetServiceResponseAsync<TeklifDto>("/api/teklif/get?logref=" + logRef);
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<TeklifDto>(UrlHelper.TeklifGetir +"?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no);
             if (result != null)
             {
                 teklif = result;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
         }
     }
 
@@ -235,7 +239,16 @@
             teklif.Upddate = DateTime.Now;
             teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
-            var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifDto>("/api/teklif/update", teklif);
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new TeklifRequestDto();
+            request.Teklif = teklif;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifRequestDto>(UrlHelper.TeklifGuncelle, request);
 
             Snackbar.Add("Teklif güncellendi");
 
@@ -264,11 +277,11 @@
             await TeklifNoUret();
             await LogRefUret();
 
-            var request = new TeklifSaveRequestDto();
+            var request = new TeklifRequestDto();
             request.Teklif = teklif;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
-            var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifSaveRequestDto>(UrlHelper.TeklifKaydet, request);
+            var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifRequestDto>(UrlHelper.TeklifKaydet, request);
 
             Snackbar.Add("Teklif güncellendi");
 

@@ -145,7 +145,12 @@
 
     private async Task LoadTeklifData()
     {
-        var result = await httpClient.GetServiceResponseAsync<TeklifDto>("/api/teklif/get?logref=" + logref);
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        var result = await httpClient.GetServiceResponseAsync<TeklifDto>(UrlHelper.TeklifGetir + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no);
         if (result != null)
         {
             teklif = result;

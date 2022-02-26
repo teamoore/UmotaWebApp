@@ -20,22 +20,30 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     public class TeklifService : ITeklifService
     {
         public IMapper Mapper { get; }
-        public UmotaCompanyDbContext Db { get; }
         public IConfiguration Configuration { get; }
         private readonly DbConnection _sql;
 
-        public TeklifService(IMapper mapper, UmotaCompanyDbContext db, IConfiguration configuration, DbConnection sql)
+        public TeklifService(IMapper mapper, IConfiguration configuration, DbConnection sql)
         {
             Mapper = mapper;
-            Db = db;
             Configuration = configuration;
             _sql = sql;
         }
 
-        public async Task<TeklifDto> GetTeklifByRef(int logref)
+        public async Task<TeklifDto> GetTeklifByRef(int logref, string firma_id)
         {
-            return await Db.Teklifs.Where(i => i.Logref == logref)
-                 .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
+            if (string.IsNullOrEmpty(firma_id))
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firma_id);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                return await dbContext.Teklifs.Where(i => i.Logref == logref)
+                    .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
+            }
         }
 
         public async Task<List<TeklifDto>> GetTeklifDtos(string firmaId)
@@ -56,11 +64,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         }
 
-        public async Task<TeklifDto> SaveTeklif(TeklifSaveRequestDto request)
+        public async Task<TeklifDto> SaveTeklif(TeklifRequestDto request)
         {
-
             var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
-
             var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
 
@@ -71,39 +77,58 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 await dbContext.SaveChangesAsync();
                 return Mapper.Map<TeklifDto>(teklif);
             }
+        }
+
+        public async Task<List<TeklifDto>> SearchTeklif(TeklifRequestDto request)
+        {
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var word = request.Teklif.Aciklama1.ToLower();
+
+                return await dbContext.Teklifs.Where(x => x.Aciklama1.ToLower().Contains(word)
+                || x.Aciklama2.ToLower().Contains(word)
+                || x.Aciklama3.ToLower().Contains(word)
+                || x.Aciklama3.ToLower().Contains(word)
+                || x.Aciklama4.ToLower().Contains(word)
+                || x.Teklifno.ToLower().Contains(word)
+                || x.Tbelgeno.ToLower().Contains(word)
+                || x.Lpersoneladi.ToLower().Contains(word)
+                || x.LcariAdi.ToLower().Contains(word)
+                || x.LcariKodu.ToLower().Contains(word)
+                || x.Proje.ToLower().Contains(word)
+                || x.IlgiliAdi.ToLower().Contains(word))
+                    .OrderByDescending(x => x.Tarih)
+                    .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).ToListAsync();
+            }
 
 
         }
 
-        public async Task<List<TeklifDto>> SearchTeklif(TeklifDto teklif)
+        public async Task<TeklifDto> UpdateTeklif(TeklifRequestDto request)
         {
-            
-            var word = teklif.Aciklama1.ToLower();
 
-            return await Db.Teklifs.Where(x => x.Aciklama1.ToLower().Contains(word)
-            || x.Aciklama2.ToLower().Contains(word)
-            || x.Aciklama3.ToLower().Contains(word)
-            || x.Aciklama3.ToLower().Contains(word)
-            || x.Aciklama4.ToLower().Contains(word)
-            || x.Teklifno.ToLower().Contains(word)
-            || x.Tbelgeno.ToLower().Contains(word)
-            || x.Lpersoneladi.ToLower().Contains(word)
-            || x.LcariAdi.ToLower().Contains(word)
-            || x.LcariKodu.ToLower().Contains(word))
-                .OrderByDescending(x => x.Tarih)
-                .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).ToListAsync();
-        }
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
 
-        public async Task<TeklifDto> UpdateTeklif(TeklifDto teklifDto)
-        {
-            var teklifRow = await Db.Teklifs.Where(x => x.Logref == teklifDto.Logref).SingleOrDefaultAsync();
-            if (teklifRow == null)
-                throw new ApiException("Teklif Detayı bulunamadı");
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var teklifRow = await dbContext.Teklifs.Where(x => x.Logref == request.Teklif.Logref).SingleOrDefaultAsync();
+                if (teklifRow == null)
+                    throw new ApiException("Teklif Detayı bulunamadı");
 
-            Mapper.Map(teklifDto, teklifRow);
-            await Db.SaveChangesAsync();
+                Mapper.Map(request.Teklif, teklifRow);
+                await dbContext.SaveChangesAsync();
 
-            return Mapper.Map<TeklifDto>(teklifRow);
+                return Mapper.Map<TeklifDto>(teklifRow);
+            }
+
+
         }
     }
 }

@@ -44,7 +44,7 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("search")]
-        public async Task<ServiceResponse<List<TeklifDto>>> SearchTeklifList(TeklifDto teklif)
+        public async Task<ServiceResponse<List<TeklifDto>>> SearchTeklifList(TeklifRequestDto teklif)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("save")]
-        public async Task<ServiceResponse<TeklifDto>> SaveTeklif(TeklifSaveRequestDto request)
+        public async Task<ServiceResponse<TeklifDto>> SaveTeklif(TeklifRequestDto request)
         {
             try
             {
@@ -84,13 +84,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("get")]
-        public async Task<ServiceResponse<TeklifDto>> GetTeklif(int logref)
+        public async Task<ServiceResponse<TeklifDto>> GetTeklif(int logref, string firmaId)
         {
             try
             {
                 return new ServiceResponse<TeklifDto>()
                 {
-                    Value = await TeklifService.GetTeklifByRef(logref)
+                    Value = await TeklifService.GetTeklifByRef(logref, firmaId)
                 };
             }
             catch (ApiExcetion ex)
@@ -104,13 +104,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("update")]
-        public async Task<ServiceResponse<TeklifDto>> UpdateTeklifDetay(TeklifDto teklifDto)
+        public async Task<ServiceResponse<TeklifDto>> UpdateTeklifDetay(TeklifRequestDto request)
         {
             try
             {
                 return new ServiceResponse<TeklifDto>()
                 {
-                    Value = await TeklifService.UpdateTeklif(teklifDto)
+                    Value = await TeklifService.UpdateTeklif(request)
                 };
             }
             catch (ApiExcetion ex)

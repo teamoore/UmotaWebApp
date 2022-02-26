@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UmotaWebApp.Shared.ModelDto
 {
-    public class TeklifSaveRequestDto
+    public class TeklifRequestDto
     {
         public TeklifDto Teklif { get; set; }
         public short FirmaId { get; set; }
