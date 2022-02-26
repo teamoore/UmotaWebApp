@@ -7,6 +7,7 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
+using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
@@ -24,15 +25,16 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<List<SisFirmaDonemDto>> GetSisFirmaDonem(string kullanici)
         {
-
-            using (SqlConnection db = new SqlConnection(Configuration.GetConnectionString("masterDb")))
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
             {
                 db.Open();
                 
                 var p = new DynamicParameters();
                 p.Add("@kullanici_kodu", kullanici);
 
-                var result = await db.QueryAsync<SisFirmaDonemDto>("GetKullaniciFirmaDonemYetkisiByKullaniciKodu", p, commandType: CommandType.StoredProcedure);
+                var sql = Configuration.GetUmotaObjectName("GetKullaniciFirmaDonemYetkisiByKullaniciKodu");
+                
+                var result = await db.QueryAsync<SisFirmaDonemDto>(sql,p, commandType: CommandType.StoredProcedure);
 
                 db.Close();
 

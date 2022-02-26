@@ -10,36 +10,55 @@
             <EditForm Model="@request" OnValidSubmit="LoginProcess">
                 <DataAnnotationsValidator />
 
-                <div class="form-group">
-                    <input @bind-value="request.Kod" class="form-control form-control-lg" type="text" placeholder="Kullanıcı Kodu" />
-                </div>
+                @if (_firstStep)
+                {
+                    
+                    <div class="form-group">
+                        <input @bind-value="request.Kod" class="form-control form-control-lg" type="text" placeholder="Kullanıcı Kodu" />
+                    </div>
 
-                <div class="form-group">
-                    <input @bind-value="request.Sifre" class="form-control form-control-lg" type="password" placeholder="Şifre" />
-                </div>
+                    <div class="form-group">
+                        <input @bind-value="request.Sifre" class="form-control form-control-lg" type="password" placeholder="Şifre" />
+                    </div>
 
-                <div class="form-group">
-                    <button class="btn btn-info btn-block">Giriş</button>
-                </div>
+                    <div class="form-group">
+                        <button class="btn btn-info btn-block">Giriş</button>
+                    </div>
 
+                }
 
-                <div class="form-group">
-                    <select class="form-control" @bind="selectedFirmaDonem">
-                        <option value="" selected>@selectBoxDesc</option>
-                        @if (firmalar != null)
-                        {
-                            @foreach (var item in firmalar)
+                @if (_showProgress)
+                {
+                    <div class="form-group">
+                        <div class="row">
+                            <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+                        </div>
+                    </div>
+                    
+                }
+
+                @if (_secondStep)
+                {
+                    <div class="form-group">
+                        <select class="form-control" @bind="selectedFirmaDonem">
+                            <option value="-1" selected>@selectBoxDesc</option>
+                            @if (firmalar != null)
                             {
-                                <option value="@item.FirmaNo">@item.Aciklama</option>
+                                @foreach (var item in firmalar)
+                                {
+                                    <option value="@item.logref">@item.aciklama</option>
+                                }
                             }
-                        }
 
-                    </select>
-                </div>
+                        </select>
+                    </div>
 
-                <div class="form-group">
-                    <button class="btn btn-info btn-block" @onclick="SaveRedirect">Devam Et</button>
-                </div>
+                    <div class="form-group">
+                        <button class="btn btn-info btn-block" @onclick="SaveRedirect">Devam Et</button>
+                    </div>
+
+                }
+
 
             </EditForm>
 
@@ -68,66 +87,107 @@
 
     private SisKullaniciLoginRequestDto request = new SisKullaniciLoginRequestDto();
     private List<SisFirmaDonemDto> firmalar = null;
-    private string selectedFirmaDonem = "";
+    private int selectedFirmaDonem = -1;
+
     private string selectBoxDesc = "Yükleniyor...";
+
+    private SisKullaniciLoginResponseDto response { get; set; }
+
+    private bool _firstStep = true;
+    private bool _secondStep = false;
+    private bool _showProgress = false;
 
     private async Task LoadFirmaDonem()
     {
-        //var result = await client.GetFromJsonAsync<ServiceResponse<List<SisFirmaFirmaDonemDto>>>("api/firma/list");
-
-        var result = await client.GetServiceResponseAsync<List<SisFirmaDonemDto>>("/api/FirmaDonem/List?kullanici_kodu=" + request.Kod);
-
-        if (result != null)
+        try
         {
-            firmalar = result;
-            selectBoxDesc = "Lütfen firma-dönem seçiniz";
+            var result = await client.GetServiceResponseAsync<List<SisFirmaDonemDto>>("/api/FirmaDonem/List?kullanici_kodu=" + request.Kod);
+
+            if (result != null)
+            {
+                firmalar = result;
+                selectBoxDesc = "Lütfen firma-dönem seçiniz";
+            }
+            else
+            {
+                await modalManager.ShowMessageAsync("Hata", "Firma Dönem bilgisi çekilemedi");
+            }
         }
-        else
+        catch (Exception ex)
         {
-            await modalManager.ShowMessageAsync("Hata", "Firma Dönem bilgisi çekilemedi");
+            await modalManager.ShowMessageAsync("Hata", ex.Message);
         }
     }
 
-    private void SaveRedirect()
+    private async Task SaveRedirect()
     {
-        navManager.NavigateTo("/");
+        try
+        {
+            if (selectedFirmaDonem == -1)
+            {
+                await modalManager.ShowMessageAsync("Hata", "Firma Seçmeniz Gerekmektedir.");
+                return;
+            }
+
+            await LocalStorage.SetItemAsync<string>(Consts.Token, response.ApiToken.Replace("\"", ""));
+            await LocalStorage.SetItemAsync<string>(Consts.KullaniciKodu, response.KullaniciDto.KullaniciKodu);
+
+            var firma = firmalar.Where(x => x.logref == selectedFirmaDonem).SingleOrDefault();
+
+            await LocalStorage.SetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem, firma);
+
+            (AuthenticationStateProvider as AuthStateProvider).NotifyUserLogin(response.KullaniciDto.KullaniciKodu);
+
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", response.ApiToken.Replace("\"", ""));
+
+            navManager.NavigateTo("/");
+        }
+        catch (Exception ex)
+        {
+            await modalManager.ShowMessageAsync("Hata", ex.Message);
+        }
+
     }
 
 
     private async Task LoginProcess()
     {
-        var httpReqResponse = await client.PostAsJsonAsync("api/kullanici/login", request);
-
-        if (httpReqResponse.IsSuccessStatusCode)
+        try
         {
-            var res = await httpReqResponse.Content.ReadFromJsonAsync<ServiceResponse<SisKullaniciLoginResponseDto>>();
+            _showProgress = true;
 
-            if (res.Success)
+            var httpReqResponse = await client.PostAsJsonAsync(UrlHelper.Login, request);
+
+            if (httpReqResponse.IsSuccessStatusCode)
             {
-                await LoadFirmaDonem();
+                var res = await httpReqResponse.Content.ReadFromJsonAsync<ServiceResponse<SisKullaniciLoginResponseDto>>();
 
-                if (firmalar == null)
+                if (res.Success)
                 {
-                    await modalManager.ShowMessageAsync("Hata", "Giriş yetkiniz bulunmamaktadır");
-                    return;
+
+                    response = res.Value;
+
+                    await LoadFirmaDonem();
+
+                    if (firmalar == null)
+                    {
+                        await modalManager.ShowMessageAsync("Hata", "Giriş yetkiniz bulunmamaktadır");
+                        return;
+                    }
+
+                    _showProgress = false;
+                    _firstStep = false;
+                    _secondStep = true;
                 }
-
-                await LocalStorage.SetItemAsync<string>(Consts.Token, res.Value.ApiToken.Replace("\"",""));
-                await LocalStorage.SetItemAsync<string>(Consts.KullaniciKodu, res.Value.KullaniciDto.KullaniciKodu);
-                await LocalStorage.SetItemAsync<string>(Consts.FirmaDonem, selectedFirmaDonem);
-                //await LocalStorage.SetItemAsync<List<SisFirmaDonemYetkiDto>>(Consts.FirmaDonemYetki, res.Value.KullaniciFirmaDonemYetkiListesi);
-
-                (AuthenticationStateProvider as AuthStateProvider).NotifyUserLogin(res.Value.KullaniciDto.KullaniciKodu);
-
-                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", res.Value.ApiToken.Replace("\"",""));
-
-                navManager.NavigateTo("/");
-
+                else
+                {
+                    await modalManager.ShowMessageAsync("Hata", res.Message);
+                }
             }
-            else
-            {
-                await modalManager.ShowMessageAsync("Hata", res.Message);
-            }
+        }
+        catch (Exception ex)
+        {
+            await modalManager.ShowMessageAsync("Hata", ex.Message);
         }
 
     }

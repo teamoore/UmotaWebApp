@@ -51,7 +51,7 @@ namespace UmotaWebApp.Server
 
             services.AddDbContext<UmotaMasterDbContext>(config =>
             {
-                config.UseSqlServer(Configuration.GetConnectionString("masterDb"));
+                config.UseSqlServer(Configuration.GetUmotaConnectionString());
             });
 
             services.AddDbContext<UmotaCompanyDbContext>(config =>

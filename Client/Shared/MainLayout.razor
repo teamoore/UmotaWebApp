@@ -28,7 +28,10 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">Umota v.0.1</MudText>
         <MudSpacer />
+        <MudAvatar Color="Color.Success">@_avatarName</MudAvatar>
+        <MudIconButton Icon="@Icons.Material.Filled.Logout" OnClick="NavigateToExit"></MudIconButton>
         <MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />
+
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu2 />
@@ -62,6 +65,8 @@
 
     bool _drawerOpen = true;
 
+    string _avatarName = "";
+
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
@@ -76,6 +81,8 @@
         {
             loginStr = await localStorage.GetItemAsStringAsync("kullanicikodu");
             loginStr = loginStr.Replace("\"", "");
+
+            _avatarName = loginStr.ToUpper().Substring(0, 1);
         }
         else
         {
