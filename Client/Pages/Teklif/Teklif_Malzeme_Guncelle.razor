@@ -135,41 +135,67 @@
 
     private async Task LoadTeklifDetayData()
     {
-        var result = await httpClient.GetServiceResponseAsync<List<TeklifDetayDto>>("/api/teklifdetay/list?teklifRef=" + logref);
-        if (result != null)
+        try
         {
-            teklifDetayList = result.OrderByDescending(x => x.Insdate).ToList();
-            _miktar = teklifDetayList.Sum(x => x.Miktar);
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            var result = await httpClient.GetServiceResponseAsync<List<TeklifDetayDto>>("/api/teklifdetay/list?teklifRef=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+            if (result != null)
+            {
+                teklifDetayList = result.OrderByDescending(x => x.Insdate).ToList();
+                _miktar = teklifDetayList.Sum(x => x.Miktar);
+            }
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
         }
     }
 
     private async Task LoadTeklifData()
     {
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-        if (selectedFirmaDonem == null)
-            throw new Exception("Firma Dönem Seçili değil");
-
-        var result = await httpClient.GetServiceResponseAsync<TeklifDto>(UrlHelper.TeklifGetir + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no);
-        if (result != null)
+        try
         {
-            teklif = result;
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<TeklifDto>(UrlHelper.TeklifGetir + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no);
+            if (result != null)
+            {
+                teklif = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
         }
     }
 
     public async Task Duzenle()
     {
 
-        modalParameters = new ModalParameters();
-        modalParameters.Add("logRef", logref);
-        modalParameters.Add(nameof(TeklifEkleGuncelleComponent.OnVazgecClicked),
-            EventCallback.Factory.Create(this, Kapat));
+        try
+        {
+            modalParameters = new ModalParameters();
+            modalParameters.Add("logRef", logref);
+            modalParameters.Add(nameof(TeklifEkleGuncelleComponent.OnVazgecClicked),
+                EventCallback.Factory.Create(this, Kapat));
 
-        var duzenleForm = modal.Show<TeklifEkleGuncelleComponent>("Teklif Güncelle", parameters: modalParameters);
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
 
-        var result = await duzenleForm.Result;
+            var duzenleForm = modal.Show<TeklifEkleGuncelleComponent>("Teklif Güncelle", parameters: modalParameters, options: opt);
 
-        await LoadTeklifData();
+            var result = await duzenleForm.Result;
+
+            await LoadTeklifData();
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+        }
 
     }
 
@@ -180,24 +206,31 @@
 
     public async Task TeklifDetayEkle()
     {
-        modalParameters = new ModalParameters();
-        modalParameters.Add("teklifRef", logref);
-
-        var malzKartForm = modal.Show<TeklifDetayEkleGuncelleComponent>("Teklif Detay", parameters: modalParameters);
-        var result = await malzKartForm.Result;
-
-        if (!result.Cancelled)
+        try
         {
-            if (result.Data != null)
+            modalParameters = new ModalParameters();
+            modalParameters.Add("teklifRef", logref);
+
+            var malzKartForm = modal.Show<TeklifDetayEkleGuncelleComponent>("Teklif Detay", parameters: modalParameters);
+            var result = await malzKartForm.Result;
+
+            if (!result.Cancelled)
             {
-                var secim = (TeklifDetayDto)result.Data;
+                if (result.Data != null)
+                {
+                    var secim = (TeklifDetayDto)result.Data;
 
-                Snackbar.Add("Malzeme Kartı eklendi : " + secim.LstokAdi);
+                    Snackbar.Add("Malzeme Kartı eklendi : " + secim.LstokAdi);
 
-                await LoadTeklifData();
-                await LoadTeklifDetayData();
+                    await LoadTeklifData();
+                    await LoadTeklifDetayData();
+                }
+
             }
-
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
         }
     }
 
@@ -209,7 +242,10 @@
             if (!modalRes)
                 return;
 
-            var delete = await httpClient.GetServiceResponseAsync<bool>("/api/teklifdetay/delete?logref=" + logref);
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+
+            var delete = await httpClient.GetServiceResponseAsync<bool>("/api/teklifdetay/delete?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
             Snackbar.Add("Teklif detayı silindi");
 

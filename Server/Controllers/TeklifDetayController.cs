@@ -24,13 +24,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<ServiceResponse<List<TeklifDetayDto>>> GetTeklifList(int teklifRef)
+        public async Task<ServiceResponse<List<TeklifDetayDto>>> GetTeklifList(int teklifRef, string firmaId)
         {
             try
             {
                 return new ServiceResponse<List<TeklifDetayDto>>()
                 {
-                    Value = await TeklifDetayService.GetTeklifDetays(teklifRef)
+                    Value = await TeklifDetayService.GetTeklifDetays(teklifRef, firmaId)
                 };
             }
             catch (ApiExcetion ex)
@@ -44,13 +44,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("get")]
-        public async Task<ServiceResponse<TeklifDetayDto>> GetTeklifDetay(int logref)
+        public async Task<ServiceResponse<TeklifDetayDto>> GetTeklifDetay(int logref, string firmaId)
         {
             try
             {
                 return new ServiceResponse<TeklifDetayDto>()
                 {
-                    Value = await TeklifDetayService.GetTeklifDetay(logref)
+                    Value = await TeklifDetayService.GetTeklifDetay(logref, firmaId)
                 };
             }
             catch (ApiExcetion ex)
@@ -64,13 +64,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("save")]
-        public async Task<ServiceResponse<TeklifDetayDto>> SaveTeklifDetay(TeklifDetayDto teklifDetayDto)
+        public async Task<ServiceResponse<TeklifDetayDto>> SaveTeklifDetay(TeklifDetayRequestDto request)
         {
             try
             {
                 return new ServiceResponse<TeklifDetayDto>()
                 {
-                    Value = await TeklifDetayService.SaveTeklifDetay(teklifDetayDto)
+                    Value = await TeklifDetayService.SaveTeklifDetay(request)
                 };
             }
             catch (ApiExcetion ex)
@@ -84,13 +84,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("update")]
-        public async Task<ServiceResponse<TeklifDetayDto>> UpdateTeklifDetay(TeklifDetayDto teklifDetayDto)
+        public async Task<ServiceResponse<TeklifDetayDto>> UpdateTeklifDetay(TeklifDetayRequestDto request)
         {
             try
             {
                 return new ServiceResponse<TeklifDetayDto>()
                 {
-                    Value = await TeklifDetayService.UpdateTeklifDetay(teklifDetayDto)
+                    Value = await TeklifDetayService.UpdateTeklifDetay(request)
                 };
             }
             catch (ApiExcetion ex)
@@ -104,13 +104,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("delete")]
-        public async Task<ServiceResponse<bool>> DeleteTeklifDetay(int logref)
+        public async Task<ServiceResponse<bool>> DeleteTeklifDetay(int logref, string firmaId)
         {
             try
             {
                 return new ServiceResponse<bool>()
                 {
-                    Value = await TeklifDetayService.DeleteTeklifDetay(logref)
+                    Value = await TeklifDetayService.DeleteTeklifDetay(logref, firmaId)
                 };
             }
             catch (ApiExcetion ex)

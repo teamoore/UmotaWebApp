@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Data.Models;
+using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 
@@ -15,52 +16,89 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     public class TeklifDetayService : ITeklifDetayService
     {
         public IMapper Mapper { get; }
-        public UmotaCompanyDbContext Db { get; }
         public IConfiguration Configuration { get; }
 
-        public TeklifDetayService(IMapper mapper, UmotaCompanyDbContext db, IConfiguration configuration)
+        public TeklifDetayService(IMapper mapper,IConfiguration configuration)
         {
-            Mapper = mapper;
-            Db = db;
+            Mapper = mapper;            
             Configuration = configuration;
         }
 
-        public async Task<TeklifDetayDto> GetTeklifDetay(int logref)
+        public async Task<TeklifDetayDto> GetTeklifDetay(int logref, string firmaId)
         {
-            return await Db.Teklifdetays.Where(x => x.Logref == logref)
-                .ProjectTo<TeklifDetayDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                return await dbContext.Teklifdetays.Where(x => x.Logref == logref)
+                        .ProjectTo<TeklifDetayDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
+            }
         }
 
-        public async Task<List<TeklifDetayDto>> GetTeklifDetays(int teklifRef)
+        public async Task<List<TeklifDetayDto>> GetTeklifDetays(int teklifRef, string firmaId)
         {
-            return await Db.Teklifdetays.Where(x => x.Teklifref.Value == teklifRef)
-                .ProjectTo<TeklifDetayDto>(Mapper.ConfigurationProvider).ToListAsync();
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                return await dbContext.Teklifdetays.Where(x => x.Teklifref.Value == teklifRef)
+                        .ProjectTo<TeklifDetayDto>(Mapper.ConfigurationProvider).ToListAsync();
+            }
         }
 
-        public async Task<TeklifDetayDto> UpdateTeklifDetay(TeklifDetayDto teklifDetayDto)
-        {
-            var teklifDetayRow = await Db.Teklifdetays.Where(x => x.Logref == teklifDetayDto.Logref).SingleOrDefaultAsync();
-            if (teklifDetayRow == null)
-                throw new ApiException("Teklif Detayı bulunamadı");
+        public async Task<TeklifDetayDto> UpdateTeklifDetay(TeklifDetayRequestDto request)
+        {            
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
 
-            Mapper.Map(teklifDetayDto, teklifDetayRow);
-            await Db.SaveChangesAsync();
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var teklifDetayRow = await dbContext.Teklifdetays.Where(x => x.Logref == request.TeklifDetay.Logref).SingleOrDefaultAsync();
+                if (teklifDetayRow == null)
+                    throw new ApiException("Teklif Detayı bulunamadı");
 
-            return Mapper.Map<TeklifDetayDto>(teklifDetayRow);
+                Mapper.Map(request.TeklifDetay, teklifDetayRow);
+                await dbContext.SaveChangesAsync();
+
+                return Mapper.Map<TeklifDetayDto>(teklifDetayRow);
+            }
+
+
 
         }
 
-        public async Task<TeklifDetayDto> SaveTeklifDetay(TeklifDetayDto teklifDetayDto)
+        public async Task<TeklifDetayDto> SaveTeklifDetay(TeklifDetayRequestDto request)
         {
-            teklifDetayDto = await CalculateTeklifDetay(teklifDetayDto);
 
-            var teklifDetayRow = Mapper.Map<Teklifdetay>(teklifDetayDto);
-            await Db.Teklifdetays.AddAsync(teklifDetayRow);
-            await Db.SaveChangesAsync();
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
 
-            await CalculateTeklif(teklifDetayDto.Teklifref.Value);
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                request.TeklifDetay = await CalculateTeklifDetay(request.TeklifDetay);
 
-            return Mapper.Map<TeklifDetayDto>(teklifDetayRow);
+                var teklifDetayRow = Mapper.Map<Teklifdetay>(request.TeklifDetay);
+                await dbContext.Teklifdetays.AddAsync(teklifDetayRow);
+                await dbContext.SaveChangesAsync();
+
+                await CalculateTeklif(request.TeklifDetay.Teklifref.Value, request.FirmaId.ToString());
+
+                return Mapper.Map<TeklifDetayDto>(teklifDetayRow);
+            }
+
+
         }
 
         private async Task<TeklifDetayDto> CalculateTeklifDetay(TeklifDetayDto td)
@@ -69,48 +107,73 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             return await Task.FromResult(td);
         }
 
-        private async Task CalculateTeklif(int teklifRef)
+        private async Task CalculateTeklif(int teklifRef, string firmaId)
         {
-            var teklifDetayList = await Db.Teklifdetays.Where(x => x.Teklifref == teklifRef).ToListAsync();
-            var toplamTutar = new double();
-            var toplamTutarTL = new double();
 
-            foreach (var item in teklifDetayList)
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                if (item.Miktar.HasValue && item.Fiyat.HasValue)
-                    toplamTutar = toplamTutar + (item.Miktar.Value * item.Fiyat.Value);
-                if (item.Miktar.HasValue && item.Fiyattl.HasValue)
-                    toplamTutarTL = toplamTutarTL + (item.Miktar.Value * item.Fiyattl.Value);
+                var teklifDetayList = await dbContext.Teklifdetays.Where(x => x.Teklifref == teklifRef).ToListAsync();
+                var toplamTutar = new double();
+                var toplamTutarTL = new double();
+
+                foreach (var item in teklifDetayList)
+                {
+                    if (item.Miktar.HasValue && item.Fiyat.HasValue)
+                        toplamTutar = toplamTutar + (item.Miktar.Value * item.Fiyat.Value);
+                    if (item.Miktar.HasValue && item.Fiyattl.HasValue)
+                        toplamTutarTL = toplamTutarTL + (item.Miktar.Value * item.Fiyattl.Value);
+                }
+
+                var teklif = await dbContext.Teklifs.Where(x => x.Logref == teklifRef).SingleOrDefaultAsync();
+
+                teklif.Tutar = toplamTutar;
+                teklif.Tutartl = toplamTutarTL;
+
+                await dbContext.SaveChangesAsync();
             }
 
-            var teklif = await Db.Teklifs.Where(x => x.Logref == teklifRef).SingleOrDefaultAsync();
 
-            teklif.Tutar = toplamTutar;
-            teklif.Tutartl = toplamTutarTL;
-
-            await Db.SaveChangesAsync();
         }
 
-        public async Task<bool> DeleteTeklifDetay(int logref)
+        public async Task<bool> DeleteTeklifDetay(int logref, string firmaId)
         {
-            var row = await Db.Teklifdetays.Where(x => x.Logref == logref)
-                            .FirstOrDefaultAsync();
-            if (row == null)
-                throw new Exception("Silinecek teklif detayı bulunamadı");
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
 
-            var teklifRef = row.Teklifref;
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
 
-            Db.Teklifdetays.Attach(row);
-            Db.Teklifdetays.Remove(row);
-            await Db.SaveChangesAsync();
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var row = await dbContext.Teklifdetays.Where(x => x.Logref == logref)
+                .FirstOrDefaultAsync();
+                if (row == null)
+                    throw new Exception("Silinecek teklif detayı bulunamadı");
 
-            if (!teklifRef.HasValue)
-                throw new Exception("Teklif detayı silinirken hata oluştu");
+                var teklifRef = row.Teklifref;
 
-            // teklif detayı silindikten sonra teklif tutarı güncelle
-            await CalculateTeklif(teklifRef.Value);
+                dbContext.Teklifdetays.Attach(row);
+                dbContext.Teklifdetays.Remove(row);
+                await dbContext.SaveChangesAsync();
 
-            return true;
+                if (!teklifRef.HasValue)
+                    throw new Exception("Teklif detayı silinirken hata oluştu");
+
+                // teklif detayı silindikten sonra teklif tutarı güncelle
+                await CalculateTeklif(teklifRef.Value, firmaId);
+
+                return true;
+            }
+
+
         }
     }
 }

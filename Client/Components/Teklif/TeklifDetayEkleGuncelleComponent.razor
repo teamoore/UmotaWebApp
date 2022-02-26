@@ -3,7 +3,7 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="mt-6">
+    <div class="mt-12">
         <div class="form">
             <div class="form-group">
                 <div class="row">
@@ -193,7 +193,13 @@
             teklifDetay.Upddate = DateTime.Now;
             teklifDetay.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
-            var result = await httpClient.PostGetServiceResponseAsync<TeklifDetayDto, TeklifDetayDto>("/api/teklifdetay/update", teklifDetay);
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            var request = new TeklifDetayRequestDto();
+            request.TeklifDetay = teklifDetay;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<TeklifDetayDto, TeklifDetayRequestDto>("/api/teklifdetay/update", request);
 
             Snackbar.Add("Teklif güncellendi");
 
@@ -213,15 +219,21 @@
             teklifDetay.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklifDetay.Teklifref = teklifRef;
 
-            var result = await httpClient.PostGetServiceResponseAsync<TeklifDetayDto, TeklifDetayDto>("/api/teklifdetay/save", teklifDetay);
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            var request = new TeklifDetayRequestDto();
+            request.TeklifDetay = teklifDetay;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<TeklifDetayDto, TeklifDetayRequestDto>("/api/teklifdetay/save", request);
 
             Snackbar.Add("Teklif güncellendi");
 
             await ModalInstance.CloseAsync(ModalResult.Ok<TeklifDetayDto>(teklifDetay));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
         }
     }
 

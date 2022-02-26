@@ -2,7 +2,7 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="mt-6">
+    <div class="mt-12">
         <div class="form">
             <div class="form-group">
 
@@ -163,13 +163,8 @@
     protected override async Task OnParametersSetAsync()
     {
         IsUpdate = logRef.HasValue;
-        if (IsUpdate)
-        {
-            await GetTeklif();
-            return;
-        }
-
-        await TeklifNoUret();
+        if (!IsUpdate)
+            await TeklifNoUret();
     }
 
     protected override async Task OnInitializedAsync()
@@ -178,6 +173,8 @@
         {
             teklif.Tarih = DateTime.Now;
         }
+
+        await GetTeklif();
 
         await TeslimListesiCek();
         await PersonelListesiCek();

@@ -9,7 +9,7 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Teklif Listesi</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="_searchString" Placeholder="Teklif Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
@@ -75,7 +75,7 @@
         if (element.LcariAdi != null && element.LcariAdi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if (element.Teklifno != null && element.LcariKodu != null && element.TeslimTarihiFormatted != null
-            && $"{element.Teklifno} {element.LcariKodu} {element.TeslimTarihiFormatted}".Contains(searchString))
+            && $"{element.Teklifno} {element.LcariKodu} {element.TeslimTarihiFormatted} {element.TeslimSekli}".Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }
