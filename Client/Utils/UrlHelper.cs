@@ -15,5 +15,6 @@ namespace UmotaWebApp.Client.Utils
         public const string TeklifGetir = "/api/teklif/get";
         public const string MalzemeKartAra = "/api/malzemekart/search";
         public const string MalzemeKartGetir = "/api/malzemekart/get";
+        public const string TeklifDetayGetir = "/api/teklifdetay/get";
     }
 }

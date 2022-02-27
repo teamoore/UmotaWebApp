@@ -41,7 +41,7 @@
                     </div>
                     <div class="col-md-2">
                         <label>Fiyat</label>
-                        <InputNumber @bind-Value="teklifDetay.Fiyat" class="form-control" placeholder="Fiyat" />
+                        <InputNumber @bind-Value="teklifDetay.Fiyat" class="form-control" placeholder="Fiyat" disabled/>
                     </div>
                     <div class="col-md-2">
                         <label>Döviz</label>
@@ -124,7 +124,19 @@
 
     public async Task GetTeklifDetay()
     {
-        await Task.CompletedTask;
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma dönem seçilmedi");
+
+            teklifDetay = await httpClient.GetServiceResponseAsync<TeklifDetayDto>(UrlHelper.TeklifDetayGetir + "?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
     }
 
     public async Task LogRefUret()
@@ -157,7 +169,10 @@
 
     public async Task MalzemeListesiAc()
     {
-        var form = modal.Show<Pages.Malzeme.Malzeme_Sec>();
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var form = modal.Show<Pages.Malzeme.Malzeme_Sec>("Malzeme Seç",options: opt);
         var result = await form.Result;
 
         if (!result.Cancelled)

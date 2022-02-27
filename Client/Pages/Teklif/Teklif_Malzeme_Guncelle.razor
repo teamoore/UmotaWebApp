@@ -60,7 +60,7 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>            
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" />
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" @onclick="(() => TeklifDetayGuncelle(context.Logref))"/>
         </MudTd>
         <MudTd DataLabel="Çizim Kodu">@context.Cizimkodu</MudTd>
         <MudTd DataLabel="Stok Kodu">@context.LstokKodu</MudTd>
@@ -231,6 +231,37 @@
         catch (Exception ex)
         {
             await ModalManager.ShowMessageAsync("Hata", ex.Message);
+        }
+    }
+
+    public async Task TeklifDetayGuncelle(int logref)
+    {
+        try
+        {
+            modalParameters = new ModalParameters();
+            modalParameters.Add("logRef", logref);
+
+            var malzKartForm = modal.Show<TeklifDetayEkleGuncelleComponent>("Teklif Detay", parameters: modalParameters);
+            var result = await malzKartForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    var secim = (TeklifDetayDto)result.Data;
+
+                    Snackbar.Add("Malzeme Kartı güncellendi : " + secim.LstokAdi);
+
+                    await LoadTeklifData();
+                    await LoadTeklifDetayData();
+                }
+
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
         }
     }
 
