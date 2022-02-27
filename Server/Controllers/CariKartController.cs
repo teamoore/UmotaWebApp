@@ -26,13 +26,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<ServiceResponse<List<CariKartDto>>> CariKartListele()
+        public async Task<ServiceResponse<List<CariKartDto>>> CariKartListele(string firmaId)
         {
             try
             {
                 return new ServiceResponse<List<CariKartDto>>()
                 {
-                    Value = await CariKartService.GetCariKartDtos()
+                    Value = await CariKartService.GetCariKartDtos(firmaId)
                 };
             }
             catch (ApiException ex)
@@ -46,13 +46,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("getByKod")]
-        public async Task<ServiceResponse<CariKartDto>> CariKartGetir(string kod)
+        public async Task<ServiceResponse<CariKartDto>> CariKartGetir(string kod, string firmaId)
         {
             try
             {
                 return new ServiceResponse<CariKartDto>()
                 {
-                    Value = await CariKartService.GetCariKartByKod(kod)
+                    Value = await CariKartService.GetCariKartByKod(kod, firmaId)
                 };
             }
             catch (ApiException ex)
@@ -66,13 +66,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("save")]
-        public async Task<ServiceResponse<CariKartDto>> CariKartKaydet(CariKartDto cari)
+        public async Task<ServiceResponse<CariKartDto>> CariKartKaydet(CariKartRequestDto request)
         {
             try
             {
                 return new ServiceResponse<CariKartDto>
                 {
-                    Value = await CariKartService.SaveCariKart(cari)
+                    Value = await CariKartService.SaveCariKart(request)
                 };
             }
             catch (ApiException ex)
@@ -86,13 +86,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("update")]
-        public async Task<ServiceResponse<CariKartDto>> CariKartGuncelle(CariKartDto cari)
+        public async Task<ServiceResponse<CariKartDto>> CariKartGuncelle(CariKartRequestDto request)
         {
             try
             {
                 return new ServiceResponse<CariKartDto>
                 {
-                    Value = await CariKartService.UpdateCariKart(cari)
+                    Value = await CariKartService.UpdateCariKart(request)
                 };
             }
             catch (ApiException ex)
@@ -107,13 +107,13 @@ namespace UmotaWebApp.Server.Controllers
 
 
         [HttpPost("search")]
-        public async Task<ServiceResponse<List<CariKartDto>>> CariKartAra(CariKartDto cari)
+        public async Task<ServiceResponse<List<CariKartDto>>> CariKartAra(CariKartRequestDto request)
         {
             try
             {
                 return new ServiceResponse<List<CariKartDto>>()
                 {
-                    Value = await CariKartService.SearchCariKarts(cari)
+                    Value = await CariKartService.SearchCariKarts(request)
                 };
             }
             catch (ApiException ex)

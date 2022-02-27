@@ -16,5 +16,9 @@ namespace UmotaWebApp.Client.Utils
         public const string MalzemeKartAra = "/api/malzemekart/search";
         public const string MalzemeKartGetir = "/api/malzemekart/get";
         public const string TeklifDetayGetir = "/api/teklifdetay/get";
+        public const string CariKartAra = "/api/carikart/search";
+        public const string CariKartGetir = "/api/carikart/getByKod";
+        public const string CariKartListesi = "/api/carikart/list";
+        public const string CariKartKaydet = "/api/carikart/save";
     }
 }

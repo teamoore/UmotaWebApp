@@ -23,10 +23,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             Configuration = configuration;
         }
 
- 
-
- 
-
         public async Task<MalzemeKartDto> GetMalzemeKart(int logref, string firmaId)
         {
             if (string.IsNullOrEmpty(firmaId))

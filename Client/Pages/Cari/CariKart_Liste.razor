@@ -38,6 +38,9 @@
     [Inject]
     HttpClient httpClient { get; set; }
 
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
     public HeaderBarSearch header = new HeaderBarSearch();
 
     public List<CariKartDto> cariler = new List<CariKartDto>();
@@ -78,22 +81,50 @@
 
     public async Task HeaderSearch()
     {
-        var cariAramaObj = new CariKartDto();
-        cariAramaObj.Adi = header.SearchText;
-
-        var result = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartDto>("/api/carikart/search", cariAramaObj);
-        cariler = result;
-
-        if (cariler == null || cariler.Count == 0)
+        try
         {
-            await ModalManager.ShowMessageAsync("Arama", string.Format("{0} için sonuç bulunamadı",cariAramaObj.Adi));
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma dönem seçilmedi");
+
+
+            var cariAramaObj = new CariKartDto();
+            cariAramaObj.Adi = header.SearchText;
+
+            var request = new CariKartRequestDto();
+            request.CariKart = cariAramaObj;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartRequestDto>(UrlHelper.CariKartAra, request);
+            cariler = result;
+
+            if (cariler == null || cariler.Count == 0)
+            {
+                await ModalManager.ShowMessageAsync("Arama", string.Format("{0} için sonuç bulunamadı", cariAramaObj.Adi));
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
         }
     }
 
     private async Task LoadCariler()
     {
-        cariler = await httpClient.GetServiceResponseAsync<List<CariKartDto>>("/api/carikart/list");
-        cariler = cariler.OrderByDescending(i => i.Insdate).ToList();
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma dönem seçilmedi");
+
+            cariler = await httpClient.GetServiceResponseAsync<List<CariKartDto>>(UrlHelper.CariKartListesi + "?firmaId=" + selectedFirmaDonem.firma_no.Value);
+            cariler = cariler.OrderByDescending(i => i.Insdate).ToList();
+        }
+        catch (Exception)
+        {
+            throw;
+        }
     }
 
     public void CariKartGuncelle(string kod)
@@ -103,7 +134,7 @@
 
     public void CreateCariKart()
     {
-        ModalManager.ModalService.Show<CariKartEkle>();
+        navigation.NavigateTo("/r_carilistef_ekle");
     }
 
 }

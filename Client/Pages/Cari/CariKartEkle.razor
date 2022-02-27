@@ -61,11 +61,19 @@
             cariModel.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             cariModel.Insdate = DateTime.Now;
 
-            cariModel = await httpClient.PostGetServiceResponseAsync<CariKartDto, CariKartDto>("/api/carikart/save", cariModel);
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma dönem seçilmedi");
+
+            var request = new CariKartRequestDto();
+            request.CariKart = cariModel;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            cariModel = await httpClient.PostGetServiceResponseAsync<CariKartDto, CariKartRequestDto>(UrlHelper.CariKartKaydet, request);
 
             Snackbar.Add("Cari kart eklendi");
 
-            goBackCariList();
+            navigation.NavigateTo("/r_carilistef");
         }
         catch (Exception ex)
         {
