@@ -27,7 +27,7 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("GenerateRef")]
-        public async Task<ServiceResponse<string>> GetRowRefNumber(string table, string keyField)
+        public async Task<ServiceResponse<string>> GetRowRefNumber(string table, string keyField, string firmaId)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace UmotaWebApp.Server.Controllers
 
                 return new ServiceResponse<string>()
                 {
-                    Value = await RefService.GenerateRowRef(table, keyField)
+                    Value = await RefService.GenerateRowRef(table, keyField, firmaId)
                 };
             }
             catch (ApiExcetion ex)
@@ -159,7 +159,7 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("RefNoAl")]
-        public async Task<ServiceResponse<int>> RefNoAl(string tablename)
+        public async Task<ServiceResponse<int>> RefNoAl(string tablename, string firmaId)
         {
             try
             {
@@ -168,7 +168,7 @@ namespace UmotaWebApp.Server.Controllers
 
                 return new ServiceResponse<int>()
                 {
-                    Value = await RefService.RefNoAl(tablename)
+                    Value = await RefService.RefNoAl(tablename, firmaId)
                 };
             }
             catch (ApiExcetion ex)

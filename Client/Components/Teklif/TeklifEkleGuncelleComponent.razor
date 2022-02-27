@@ -33,7 +33,7 @@
                     </div>
                     <div class="col-md-2">
                         <label>Cari Seçim</label>
-                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Primary">Cari</MudButton>
+                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Primary">Cari Bul</MudButton>
                     </div>
                 </div>
 
@@ -301,7 +301,11 @@
 
     public async Task TeklifNoUret()
     {
-        var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklif&keyField=teklifno");
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma dönem seçilmedi");
+
+        var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklif&keyField=teklifno&firmaId=" + selectedFirmaDonem.firma_no.Value);
         if (string.IsNullOrEmpty(result) == false)
         {
             teklif.Teklifno = result;
@@ -313,7 +317,12 @@
 
     public async Task LogRefUret()
     {
-        var result2 = await httpClient.GetServiceResponseAsync<int>("/api/helper/RefNoAl?tablename=teklif");
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        var result2 = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=teklif&firmaId=" + selectedFirmaDonem.firma_no.Value);
         teklif.Logref = result2;
 
     }

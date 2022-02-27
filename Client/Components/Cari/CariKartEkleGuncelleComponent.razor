@@ -234,11 +234,16 @@
 
         try
         {
-            var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=cari_kart&keyField=kodu");
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=cari_kart&keyField=kodu&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
             cariModel.Kodu = result;
 
-            var result2 = await httpClient.GetServiceResponseAsync<int>("/api/helper/RefNoAl?tablename=cari_kart");
+            var result2 = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=cari_kart&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
             cariModel.Logref = result2;
         }

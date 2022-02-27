@@ -17,15 +17,15 @@ namespace UmotaWebApp.Client.Utils
             this.localStorageService = localStorageService;
         }
 
-        public async Task<string> GenerateRowRef(string tableName, string keyField)
+        public async Task<string> GenerateRowRef(string tableName, string keyField, string firmaId)
         {
-            var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table="+ tableName +"&keyField=" + keyField);
+            var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table="+ tableName +"&keyField=" + keyField + "&firmaId=" + firmaId);
             return result2;
         }
 
-        public async Task<int> GenerateRefNumber(string tableName)
+        public async Task<int> GenerateRefNumber(string tableName, string firmaId)
         {
-            var result2 = await httpClient.GetServiceResponseAsync<int>("/api/helper/RefNoAl?tablename=" + tableName);
+            var result2 = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=" + tableName + "&firmaId=" + firmaId);
             return result2;
         }
 

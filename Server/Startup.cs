@@ -54,11 +54,6 @@ namespace UmotaWebApp.Server
                 config.UseSqlServer(Configuration.GetUmotaConnectionString());
             });
 
-            services.AddDbContext<UmotaCompanyDbContext>(config =>
-            {
-                config.UseSqlServer(Configuration.GetConnectionString("companyDb"));
-            });
-
 
             services.AddAuthentication(opt =>
             {

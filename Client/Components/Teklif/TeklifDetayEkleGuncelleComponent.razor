@@ -141,8 +141,12 @@
 
     public async Task LogRefUret()
     {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma dönem seçilmedi");
 
-        var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklifdetay&keyField=logref");
+
+        var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklifdetay&keyField=logref&firmaId=" + selectedFirmaDonem.firma_no.Value);
         if (string.IsNullOrEmpty(result2) == false)
         {
             teklifDetay.Logref = Convert.ToInt32(result2);
