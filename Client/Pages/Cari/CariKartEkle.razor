@@ -1,116 +1,24 @@
 ﻿@page "/r_carilistef_ekle"
 
-<EditForm Model="cariModel" OnValidSubmit="ValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
 
-    <div class="form">
-        <div class="form-group">
-            <label>Ref</label>
-            <InputNumber @bind-Value="cariModel.Logref" class="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label>Kodu</label>
-            <InputText @bind-Value="cariModel.Kodu" class="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label>Adı</label>
-            <InputText @bind-Value="cariModel.Adi" class="form-control" />
-        </div>
-    </div>
-
-    <div class="form-group">
-        <SaveButtonComponent Caption="Kaydet" />
-        <CancelButtonComponent Caption="Vazgeç" OnClick="goBackCariList" />
-    </div>
-
-</EditForm>
-
-
+<CariKartEkleGuncelleComponent></CariKartEkleGuncelleComponent>
 
 @code
 {
     [Inject]
-    ModalManager ModalManager { get; set; }
-
-    [Inject]
-    ISnackbar Snackbar { get; set; }
-
-    [Inject]
     NavigationManager navigation { get; set; }
 
-    [Inject]
-    HttpClient httpClient { get; set; }
+    public HeaderBarSearch header = new HeaderBarSearch();
 
-    [Inject]
-    ILocalStorageService LocalStorageService { get; set; }
-
-    CariKartDto cariModel = new CariKartDto();
-
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
-        await CariKartRefUret();
+        header.HeaderText = "Cari Kart Oluştur";
+        return Task.CompletedTask;
     }
 
-    public async Task Kaydet()
-    {
-        try
-        {
-            cariModel.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            cariModel.Insdate = DateTime.Now;
-
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma dönem seçilmedi");
-
-            var request = new CariKartRequestDto();
-            request.CariKart = cariModel;
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
-
-            cariModel = await httpClient.PostGetServiceResponseAsync<CariKartDto, CariKartRequestDto>(UrlHelper.CariKartKaydet, request);
-
-            Snackbar.Add("Cari kart eklendi");
-
-            navigation.NavigateTo("/r_carilistef");
-        }
-        catch (Exception ex)
-        {
-            await ModalManager.ShowMessageAsync("Hata", ex.Message);
-        }
-    }
-
-    public async Task ValidSubmit()
-    {
-        await Kaydet();
-    }
-
-    void goBackCariList()
+    public void goBack()
     {
         navigation.NavigateTo("/r_carilistef");
-    }
-
-    public async Task CariKartRefUret()
-    {
-        try
-        {
-            var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=cari_kart&keyField=kodu");
-            if (string.IsNullOrEmpty(result) == false)
-            {
-                cariModel.Kodu = result;
-            }
-
-            var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=cari_kart&keyField=logref");
-            if (string.IsNullOrEmpty(result) == false)
-            {
-                cariModel.Logref = Convert.ToInt32(result2);
-            }
-        }
-        catch (Exception ex)
-        {
-            await ModalManager.ShowMessageAsync("Hata", "Kod üretilemedi");
-        }
-
     }
 }

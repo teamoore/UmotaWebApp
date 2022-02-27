@@ -220,7 +220,7 @@
                 {
                     var secim = (TeklifDetayDto)result.Data;
 
-                    Snackbar.Add("Malzeme Kartı eklendi : " + secim.LstokAdi);
+                    Snackbar.Add("Malzeme Kartı eklendi : " + secim.LstokAdi, severity: Severity.Success);
 
                     await LoadTeklifData();
                     await LoadTeklifDetayData();
@@ -230,7 +230,7 @@
         }
         catch (Exception ex)
         {
-            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+            Snackbar.Add(ex.Message, Severity.Error);
         }
     }
 

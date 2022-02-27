@@ -250,14 +250,14 @@
 
             var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifRequestDto>(UrlHelper.TeklifGuncelle, request);
 
-            Snackbar.Add("Teklif güncellendi");
+            Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
 
             navigation.NavigateTo("/stek_listef_detay/" + result.Logref);
 
         }
         catch (Exception ex)
         {
-            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+            Snackbar.Add(ex.Message, severity: Severity.Error);
         }
     }
 
@@ -283,14 +283,14 @@
 
             var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifRequestDto>(UrlHelper.TeklifKaydet, request);
 
-            Snackbar.Add("Teklif güncellendi");
+            Snackbar.Add("Teklif güncellendi", severity:Severity.Success);
 
             navigation.NavigateTo("/stek_listef_detay/" + result.Logref);
 
         }
         catch (Exception ex)
         {
-            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+            Snackbar.Add(ex.Message, severity: Severity.Error);
         }
     }
 

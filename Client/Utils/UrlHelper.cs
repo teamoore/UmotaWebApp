@@ -20,5 +20,6 @@ namespace UmotaWebApp.Client.Utils
         public const string CariKartGetir = "/api/carikart/getByKod";
         public const string CariKartListesi = "/api/carikart/list";
         public const string CariKartKaydet = "/api/carikart/save";
+        public const string CariKartGuncelle = "/api/carikart/update";
     }
 }

@@ -1,0 +1,251 @@
+﻿
+<EditForm Model="cariModel" OnValidSubmit="ValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mt-5">
+
+        <div class="form">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Ref</label>
+                        <InputNumber @bind-Value="cariModel.Logref" class="form-control" disabled/>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Kodu</label>
+                        <InputText @bind-Value="cariModel.Kodu" class="form-control" disabled/>
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="form-group">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Adı</label>
+                        <InputText @bind-Value="cariModel.Adi" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Adı 2</label>
+                        <InputText @bind-Value="cariModel.Adi2" class="form-control" />
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="form-group">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>İlçe</label>
+                        <InputText @bind-Value="cariModel.Ilce" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Şehir</label>
+                        <InputText @bind-Value="cariModel.Il" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Ülke</label>
+                        <InputText @bind-Value="cariModel.Ulke" class="form-control" />
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Telefon 1</label>
+                        <InputText @bind-Value="cariModel.Tel1" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Telefon 2</label>
+                        <InputText @bind-Value="cariModel.Tel2" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Fax</label>
+                        <InputText @bind-Value="cariModel.Faks" class="form-control" />
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>E-Posta</label>
+                        <InputText @bind-Value="cariModel.Mail" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Web Sitesi</label>
+                        <InputText @bind-Value="cariModel.Web" class="form-control" />
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Özel Kod</label>
+                        <InputText @bind-Value="cariModel.Ozelkod" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Özel Kod 2</label>
+                        <InputText @bind-Value="cariModel.Ozelkod2" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Özel Kod 3</label>
+                        <InputText @bind-Value="cariModel.Ozelkod3" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Özel Kod 4</label>
+                        <InputText @bind-Value="cariModel.Ozelkod4" class="form-control" />
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Kaydet" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="goBackCariList" />
+    </div>
+
+</EditForm>
+
+
+
+@code
+{
+    [Parameter]
+    public string CariKartRef { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    CariKartDto cariModel = new CariKartDto();
+
+    private bool isUpdate = false;
+
+    public async Task CariKartGetir()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            cariModel = await httpClient.GetServiceResponseAsync<CariKartDto>(UrlHelper.CariKartGetir + "?kod=" + CariKartRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task Kaydet()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            cariModel.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            cariModel.Insdate = DateTime.Now;
+
+            var request = new CariKartRequestDto();
+            request.CariKart = cariModel;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            if (isUpdate)
+            {
+                cariModel = await httpClient.PostGetServiceResponseAsync<CariKartDto, CariKartRequestDto>(UrlHelper.CariKartGuncelle, request);
+                Snackbar.Add("Cari kart güncellendi", severity: Severity.Success);
+            }
+            else
+            {
+                cariModel = await httpClient.PostGetServiceResponseAsync<CariKartDto, CariKartRequestDto>(UrlHelper.CariKartKaydet, request);
+                Snackbar.Add("Cari kart eklendi", severity: Severity.Success);
+            }
+
+            goBackCariList();
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+        }
+    }
+
+    public async Task ValidSubmit()
+    {
+        await Kaydet();
+    }
+
+    void goBackCariList()
+    {
+        navigation.NavigateTo("/r_carilistef");
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        isUpdate = !string.IsNullOrEmpty(CariKartRef);
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if(isUpdate)
+        {
+            await CariKartGetir();
+            return;
+        }
+
+        await NoUret();
+    }
+
+    public async Task NoUret()
+    {
+
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=cari_kart&keyField=kodu");
+
+            cariModel.Kodu = result;
+
+            var result2 = await httpClient.GetServiceResponseAsync<int>("/api/helper/RefNoAl?tablename=cari_kart");
+
+            cariModel.Logref = result2;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+}
