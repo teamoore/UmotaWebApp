@@ -187,7 +187,9 @@
         }
         catch (Exception ex)
         {
+            _showProgress = false;
             await modalManager.ShowMessageAsync("Hata", ex.Message);
+
         }
 
     }

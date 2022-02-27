@@ -14,12 +14,10 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 {
     public class SisFirmaDonemService : ISisFirmaDonemService
     {
-        private readonly DbConnection _sql;
         public IConfiguration Configuration { get; }
 
-        public SisFirmaDonemService(DbConnection sql, IConfiguration configuration)
+        public SisFirmaDonemService(IConfiguration configuration)
         {
-            _sql = sql;
             Configuration = configuration;
         }
 
