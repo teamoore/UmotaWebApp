@@ -1,5 +1,25 @@
 ﻿@page "/malzeme_sec"
 
+<EditForm Model="malzemeKart" OnInvalidSubmit="MalzemeBul">
+    <div class="form">
+
+        <div class="form-group">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <InputText @bind-Value="malzemeKart.Adi" class="form-control" />
+                </div>
+                <div class="col-md-8">
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage"
+                               OnClick="MalzemeBul" Color="Color.Primary">Malzeme Bul</MudButton>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</EditForm>
+
 
 <MudTable Items="@malzemeKarts" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeKartDto,bool>(FilterFunc1)">
     <ToolBarContent>
@@ -45,12 +65,17 @@
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
     [CascadingParameter] ModalParameters modalParameters { get; set; }
 
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
 
     [Inject]
     NavigationManager navigation { get; set; }
 
     [Inject]
     HttpClient httpClient { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
 
     public List<MalzemeKartDto> malzemeKarts { get; set; }
 
@@ -78,10 +103,7 @@
         return false;
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadMalzemeKartList();
-    }
+
 
     private async Task LoadMalzemeKartList()
     {
@@ -93,12 +115,51 @@
 
     public async Task MalzemeKartSec(int logref)
     {
-        var mkart = await httpClient.GetServiceResponseAsync<MalzemeKartDto>("/api/malzemekart/get?logref=" + logref);
-        if (mkart != null)
+        try
         {
-            modalParameters = new ModalParameters();
-            modalParameters.Add("secim", mkart);
-            await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(mkart));
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            var request = new MalzemeKartRequestDto();
+            request.MalzemeKart = malzemeKart;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var mkart = await httpClient.GetServiceResponseAsync<MalzemeKartDto>(UrlHelper.MalzemeKartGetir + "?logref=" + logref + "&firmaId=" + request.FirmaId);
+
+            if (mkart != null)
+            {
+                modalParameters = new ModalParameters();
+                modalParameters.Add("secim", mkart);
+                await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(mkart));
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task MalzemeBul()
+    {
+        try
+        {
+            _searchStarted = true;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            var request = new MalzemeKartRequestDto();
+            request.MalzemeKart = malzemeKart;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            malzemeKarts = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _searchStarted = false;
         }
     }
 

@@ -23,14 +23,14 @@ namespace UmotaWebApp.Server.Controllers
             MalzemeKartService = malzemeKartService;
         }
 
-        [HttpGet("list")]
-        public async Task<ServiceResponse<List<MalzemeKartDto>>> GetMalzemeKartList()
+        [HttpPost("search")]
+        public async Task<ServiceResponse<List<MalzemeKartDto>>> GetMalzemeKartSearchList(MalzemeKartRequestDto request)
         {
             try
             {
                 return new ServiceResponse<List<MalzemeKartDto>>()
                 {
-                    Value = await MalzemeKartService.GetMalzemeKartList()
+                    Value = await MalzemeKartService.SearchMalzemeKart(request)
                 };
             }
             catch (ApiExcetion ex)
@@ -44,13 +44,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("get")]
-        public async Task<ServiceResponse<MalzemeKartDto>> GetTeklifDetay(int logref)
+        public async Task<ServiceResponse<MalzemeKartDto>> GetTeklifDetay(int logref, string firmaId)
         {
             try
             {
                 return new ServiceResponse<MalzemeKartDto>()
                 {
-                    Value = await MalzemeKartService.GetMalzemeKart(logref)
+                    Value = await MalzemeKartService.GetMalzemeKart(logref,firmaId)
                 };
             }
             catch (ApiExcetion ex)

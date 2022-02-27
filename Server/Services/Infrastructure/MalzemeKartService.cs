@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Data.Models;
+using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
@@ -24,15 +25,43 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             Configuration = configuration;
         }
 
-        public async Task<MalzemeKartDto> GetMalzemeKart(int logref)
+ 
+
+ 
+
+        public async Task<MalzemeKartDto> GetMalzemeKart(int logref, string firmaId)
         {
-            return await Db.MalzKarts.Where(i => i.Logref == logref)
-                .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                return await dbContext.MalzKarts.Where(i => i.Logref == logref)
+                        .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
+            }
         }
 
-        public async Task<List<MalzemeKartDto>> GetMalzemeKartList()
+        public async Task<List<MalzemeKartDto>> SearchMalzemeKart(MalzemeKartRequestDto request)
         {
-            return await Db.MalzKarts.ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            var word = request.MalzemeKart.Adi.ToLower();
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                return await dbContext.MalzKarts.Where(x => x.Adi.ToLower().Contains(word)
+                || x.Marka.ToLower().Contains(word)
+                || x.Logokodu.ToLower().Contains(word)
+                || x.Ozelkod.ToLower().Contains(word))
+                    .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
+            }
         }
     }
 }

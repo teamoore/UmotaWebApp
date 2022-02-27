@@ -8,7 +8,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 {
     public interface IMalzemeKartService
     {
-        public Task<List<MalzemeKartDto>> GetMalzemeKartList();
-        public Task<MalzemeKartDto> GetMalzemeKart(int logref);
+        public Task<MalzemeKartDto> GetMalzemeKart(int logref, string firmaId);
+        public Task<List<MalzemeKartDto>> SearchMalzemeKart(MalzemeKartRequestDto request);
     }
 }
