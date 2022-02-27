@@ -15,13 +15,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     public class MalzemeKartService : IMalzemeKartService
     {
         public IMapper Mapper { get; }
-        public UmotaCompanyDbContext Db { get; }
         public IConfiguration Configuration { get; }
 
-        public MalzemeKartService(IMapper mapper, UmotaCompanyDbContext db, IConfiguration configuration)
+        public MalzemeKartService(IMapper mapper, IConfiguration configuration)
         {
             Mapper = mapper;
-            Db = db;
             Configuration = configuration;
         }
 
