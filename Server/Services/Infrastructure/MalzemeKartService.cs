@@ -2,10 +2,13 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Data.SqlClient;
+using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Data;
 using UmotaWebApp.Server.Data.Models;
 using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.ModelDto;
@@ -57,5 +60,69 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
             }
         }
+        public async Task<IEnumerable<MalzemeFiyatDto>>MalzemeFiyatGetir(MalzemeFiyatRequestDto request)
+        {
+            IEnumerable<MalzemeFiyatDto> res;
+
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            {
+                string LogoDbName = Configuration["LogoDbName"];
+                string LogoFirmaNo = request.LogoFirmaNo.ToString("000");
+                string TblPRCLIST = "LG_" + LogoFirmaNo + "_PRCLIST";
+                string TblUNITSETL = "LG_" + LogoFirmaNo + "_UNITSETL";
+                string TblCURRENCYLIST = "L_CURRENCYLIST";
+
+                string sqlstring = "SELECT TOP 1 A.CARDREF MalzemeRef, A.PRICE Fiyat, A.CURRENCY DovizRef, B.CURCODE DovizKodu" +
+                    ", C.LOGICALREF FiyatBirimRef, C.CODE FiyatBirimKodu, C.UNITSETREF FiyatBirimSetiRef, A.INCVAT KdvDahil" +
+                    " from " + LogoDbName + ".[dbo]." + TblPRCLIST + " A with(nolock) " +
+                    " left join " + LogoDbName + ".[dbo]." + TblCURRENCYLIST + " B WITH(NOLOCK) ON A.CURRENCY = B.CURTYPE AND B.FIRMNR = " + request.LogoFirmaNo +
+                    " left join " + LogoDbName + ".[dbo]." + TblUNITSETL + " C WITH(NOLOCK) ON  A.UOMREF = C.LOGICALREF" +
+
+                " WHERE A.PTYPE = 2 AND A.ACTIVE = 0" +
+                    " AND A.CARDREF = " + request.MalzemeRef +
+                    " AND C.CODE = '" + request.BirimKodu + "'" +
+                    " AND @TARIH BETWEEN A.BEGDATE AND A.ENDDATE ";
+
+                // Cari ve Para Birime Göre
+                string sqlstring2 = " AND A.CLIENTCODE = '" + request.CariKodu + "'" +
+                    " AND A.CURRENCY = " + request.DovizRef +
+                    " order by A.LOGICALREF DESC";
+
+                var p = new DynamicParameters();
+                p.Add("@TARIH", value: request.Tarih, dbType: DbType.DateTime);
+
+                res = await db.QueryAsync<MalzemeFiyatDto>(sqlstring+ sqlstring2, p, commandType: CommandType.Text);
+
+                // Bulamazsa Cari ve Tüm Para Birime Göre
+                if (res == null || !res.Any())
+                {
+                    sqlstring2 = " AND A.CLIENTCODE = '" + request.CariKodu + "'" +
+                        " order by A.LOGICALREF DESC";
+
+                    res = await db.QueryAsync<MalzemeFiyatDto>(sqlstring + sqlstring2, p, commandType: CommandType.Text);
+
+                }
+
+                // Bulamazsa Carisiz ve Para Birime Göre
+                if (res == null || !res.Any())
+                {
+                    sqlstring2 = " AND A.CURRENCY = " + request.DovizRef +
+                        " order by A.CLIENTCODE ASC, A.LOGICALREF DESC";
+
+                    res = await db.QueryAsync<MalzemeFiyatDto>(sqlstring + sqlstring2, p, commandType: CommandType.Text);
+                }
+
+                // Bulamazsa Carisiz ve Tüm Para Birime Göre
+                if (res == null || !res.Any())
+                {
+                    sqlstring2 = " order by A.CLIENTCODE ASC, A.LOGICALREF DESC";
+
+                    res = await db.QueryAsync<MalzemeFiyatDto>(sqlstring + sqlstring2, p, commandType: CommandType.Text);
+                }
+            }
+
+            return res;
+        }
+
     }
 }
