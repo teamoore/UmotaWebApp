@@ -17,29 +17,64 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         private readonly DbConnection _sql;
         public IConfiguration Configuration { get; }
 
+        List<string> sisTableNames = new List<string>(new[]
+        {
+             "sis_firma"
+            ,"sis_firma_donem"
+            ,"sis_firma_donem_yetki"
+            ,"sis_kullanici"
+            ,"sis_kullanici_haklari"
+            ,"sis_kullanici_yetki_kodlari"
+            ,"sis_menu_profil"
+            ,"sis_menu_profil_haklari"
+            ,"sis_menuler"
+            ,"sis_sabitler"
+            ,"sis_sabitler_detay"
+            ,"sis_yetki_kodlari"
+        });
         public RefGeneratorService(DbConnection sql, IConfiguration configuration)
         {
             _sql = sql;
             Configuration = configuration;
         }
+        public async Task<string> GetTableName(string tablename, int firmano)
+        {
+            var result = "";
+            string AppDbName = Configuration["AppDbName"];
+            string strfirmano = firmano.ToString("000");
+
+            if (sisTableNames.Contains(tablename))
+            {
+                result = AppDbName + ".dbo." + tablename;
+            }
+            else
+            {
+                result = AppDbName + "_" + strfirmano + ".dbo." + tablename;
+            }
+
+            return result;
+        }
 
         public async Task<string> GenerateRowRef(string table, string keyField)
         {
-            var result = await _sql.QueryFirstAsync<string>("select dbo.GenerateNewCode(isnull((select max("+
+            string procname = await GetTableName("GenerateNewCode", 1);
+            string tablename = await GetTableName(table, 1);
+            var result = await _sql.QueryFirstAsync<string>("select "+ procname + "(isnull((select max("+
                 keyField
-                +") from " + table + "),'00000')) as value"
+                +") from " + tablename + "),'00000')) as value"
                 , commandType: CommandType.Text); 
             return result;
         }
 
         public async Task<int> RefNoAl(string tablename)
         {
+            string procname = await GetTableName("RefNoAl", 1);
             var p = new DynamicParameters();
             p.Add("@tablename", tablename);
             //p.Add("@b", dbType: DbType.Int32, direction: ParameterDirection.Output);
             p.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
-            await _sql.ExecuteAsync("RefNoAl", p, commandType: CommandType.StoredProcedure);
+            await _sql.ExecuteAsync(procname, p, commandType: CommandType.StoredProcedure);
 
             //int b = p.Get<int>("@b");
             int c = p.Get<int>("@ReturnValue");
@@ -70,7 +105,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<IEnumerable<SisSabitlerDetayDto>> GetSabitDetayList(int tip)
         {
-            string sqlstring = string.Format("SELECT [sabit_detay_id],[tip],[kodu],[ikodu],[adi],[yabanci_adi],[siralama],[ozel_kod1],[ozel_kod2],[ozel_kod3],[ozel_kod4],[ozel_kod5],[ozel_kod6],[ozel_kod7],[ozel_kod8],[ozel_kod9],[ozel_kod10],[ozel_kod11],[ozel_kod12],[izin],[renk1],[renk2] FROM [UmotaUnoPazar].[dbo].[sis_sabitler_detay] where tip = {0}", tip);
+            string AppDbName = Configuration["AppDbName"];
+            string sqlstring = string.Format("SELECT [sabit_detay_id],[tip],[kodu],[ikodu],[adi],[yabanci_adi],[siralama],[ozel_kod1],[ozel_kod2],[ozel_kod3],[ozel_kod4],[ozel_kod5],[ozel_kod6],[ozel_kod7],[ozel_kod8],[ozel_kod9],[ozel_kod10],[ozel_kod11],[ozel_kod12],[izin],[renk1],[renk2] FROM ["+ AppDbName + "].[dbo].[sis_sabitler_detay] where tip = {0}", tip);
             IEnumerable<SisSabitlerDetayDto> dbResponse;
             dbResponse = await _sql.QueryAsync<SisSabitlerDetayDto>(sqlstring, commandType: CommandType.Text);
             return dbResponse;
