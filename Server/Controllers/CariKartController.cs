@@ -14,6 +14,7 @@ namespace UmotaWebApp.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CariKartController : ControllerBase
     {
         public ILogger<CariKartController> Logger { get; }

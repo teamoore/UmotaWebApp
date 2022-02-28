@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace UmotaWebApp.Server.Controllers
 {
     [Route("api/[Controller]")]
     [ApiController]
+    [Authorize]
     public class TeklifDetayController : ControllerBase
     {
         public ILogger<TeklifDetayController> Logger { get; }
