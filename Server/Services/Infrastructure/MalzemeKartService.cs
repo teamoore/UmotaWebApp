@@ -34,7 +34,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                return await dbContext.MalzKarts.Where(i => i.Logref == logref)
+                return await dbContext.V002Malzemelers.Where(i => i.Logref == logref)
                         .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
             }
         }
@@ -50,10 +50,13 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                return await dbContext.MalzKarts.Where(x => x.Adi.ToLower().Contains(word)
-                || x.Marka.ToLower().Contains(word)
-                || x.Logokodu.ToLower().Contains(word)
-                || x.Ozelkod.ToLower().Contains(word))
+                return await dbContext.V002Malzemelers.Where(x => x.Adi.ToLower().Contains(word)
+                || x.Kodu.ToLower().Contains(word)
+                || x.Adi3.ToLower().Contains(word)
+                || x.Grupkodu.ToLower().Contains(word)
+                || x.Ozelkod.ToLower().Contains(word)
+                || x.Ozelkod2.ToLower().Contains(word)
+                || x.Ozelkod3.ToLower().Contains(word))
                     .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
             }
         }
