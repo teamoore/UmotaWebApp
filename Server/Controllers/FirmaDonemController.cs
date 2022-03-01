@@ -28,6 +28,7 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("List")]
+        [AllowAnonymous]
         public async Task<ServiceResponse<List<SisFirmaDonemDto>>> GetSisFirmaDonem(string kullanici_kodu)
         {
             try
