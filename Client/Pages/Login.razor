@@ -129,7 +129,7 @@
                 return;
             }
 
-            await LocalStorage.SetItemAsync<string>(Consts.Token, response.ApiToken.Replace("\"", ""));
+            await LocalStorage.SetItemAsync(Consts.Token, response.ApiToken);
             await LocalStorage.SetItemAsync<string>(Consts.KullaniciKodu, response.KullaniciDto.KullaniciKodu);
 
             var firma = firmalar.Where(x => x.logref == selectedFirmaDonem).SingleOrDefault();
@@ -138,7 +138,12 @@
 
             (AuthenticationStateProvider as AuthStateProvider).NotifyUserLogin(response.KullaniciDto.KullaniciKodu);
 
-            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", response.ApiToken.Replace("\"", ""));
+            //client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", response.ApiToken);
+
+            var authStr = $"Bearer " + response.ApiToken.Replace("\"", "");
+            authStr = authStr.Replace("\"", "");
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", authStr);
 
             navManager.NavigateTo("/");
         }

@@ -33,7 +33,11 @@ namespace UmotaWebApp.Client.Utils
 
             var cp = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name,kkodu) }, "jwtAuthType"));
 
-            Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenStr);
+            //Client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", tokenStr);
+            var authStr = $"Bearer " + tokenStr.Replace("\"", "");
+            authStr = authStr.Replace("\"", "");
+            Client.DefaultRequestHeaders.Clear();
+            Client.DefaultRequestHeaders.Add("Authorization", authStr);
 
             return new AuthenticationState(cp);
         }
