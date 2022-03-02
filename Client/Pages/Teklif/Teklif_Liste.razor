@@ -13,29 +13,37 @@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
-        <MudTh>Teklif No</MudTh>
-        <MudTh>Proje Adı</MudTh>
         <MudTh>Durum</MudTh>
+        <MudTh>Teklif No</MudTh>
         <MudTh>Tarih</MudTh>
-        <MudTh>Teslim Tarihi</MudTh>
-        <MudTh>Cari</MudTh>
         <MudTh>Cari Kodu</MudTh>
-        <MudTh>İlgili Kişi</MudTh>
-        <MudTh>Teslim Şekli</MudTh>
+        <MudTh>Cari Adı</MudTh>
+        <MudTh>Tutar TL</MudTh>
+        <MudTh>Tutar</MudTh>
+        <MudTh>Döviz</MudTh>
+        <MudTh>Proje Adı</MudTh>
+        <MudTh>Satış Temsilcisi</MudTh>
+        <MudTh>Teslim Tarihi</MudTh>
+        <MudTh>Açıklama</MudTh>
+        <MudTh>Kaydı Giren</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd>
             <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="" OnClick="(() => TeklifDetay(context.Logref))"></CustomEditButtonComponent>
         </MudTd>
-        <MudTd DataLabel="Teklif No">@context.Teklifno</MudTd>
-        <MudTd DataLabel="Proje">@context.Proje</MudTd>
         <MudTd DataLabel="Durum">@context.Duruminfo</MudTd>
+        <MudTd DataLabel="Teklif No">@context.Teklifno</MudTd>
         <MudTd DataLabel="Tarih">@context.TarihFormatted</MudTd>
+        <MudTd DataLabel="Cari Kodu">@context.Carikodu</MudTd>
+        <MudTd DataLabel="Cari Adı">@context.Cariadi</MudTd>
+        <MudTd DataLabel="Tutar TL">@context.Tutarmatrahtl</MudTd>
+        <MudTd DataLabel="Tutar">@context.Tutarmatrah</MudTd>
+        <MudTd DataLabel="Döviz">@context.Dovizdokuid</MudTd>
+        <MudTd DataLabel="Proje Adı">@context.Proje</MudTd>
+        <MudTd DataLabel="Satış Temsilcisi">@context.Temsilciadi</MudTd>
         <MudTd DataLabel="Teslim Tarihi">@context.TeslimTarihiFormatted</MudTd>
-        <MudTd DataLabel="Cari">@context.LcariAdi</MudTd>
-        <MudTd DataLabel="Cari Kodu">@context.LcariKodu</MudTd>
-        <MudTd DataLabel="İlgili Kişi">@context.Lpersoneladi</MudTd>
-        <MudTd DataLabel="Teslim Şekli">@context.TeslimSekli</MudTd>
+        <MudTd DataLabel="Açıklama">@context.Aciklama1</MudTd>
+        <MudTd DataLabel="Kaydı Giren">@context.Insuser</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />

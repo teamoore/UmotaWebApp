@@ -13,6 +13,12 @@ namespace UmotaWebApp.Client.Utils
         public const string Token = "token";
     }
 
+    public class Mesajlar
+    {
+        public const string MetinGir = "Aranacak metni giriniz.";
+        public const string Seciniz = "Seçiniz...";
+    }
+
     public class SabitTip
     {
         public const int DovizKodlari = 1;

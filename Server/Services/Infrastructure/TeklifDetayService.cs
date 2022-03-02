@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Data.Models;
@@ -29,14 +32,18 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             if (string.IsNullOrEmpty(firmaId))
                 throw new Exception("Firma Dönem seçimi yapınız");
 
-            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
-            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
-            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
             {
-                return await dbContext.Teklifdetays.Where(x => x.Logref == logref)
-                        .ProjectTo<TeklifDetayDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
+                db.Open();
+
+                var sql = "select top 1 * from " + Configuration.GetUmotaObjectName("v010_teklifdetay", firmaId: firmaId) + " where logref=" + logref;
+
+                var result = await db.QueryAsync<TeklifDetayDto>(sql, commandType: CommandType.Text);
+
+                db.Close();
+
+                return result.SingleOrDefault();
+
             }
         }
 
@@ -45,14 +52,18 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             if (string.IsNullOrEmpty(firmaId))
                 throw new Exception("Firma Dönem seçimi yapınız");
 
-            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
-            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
-            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
             {
-                return await dbContext.Teklifdetays.Where(x => x.Teklifref.Value == teklifRef)
-                        .ProjectTo<TeklifDetayDto>(Mapper.ConfigurationProvider).ToListAsync();
+                db.Open();
+
+                var sql = "select * from " + Configuration.GetUmotaObjectName("v010_teklifdetay", firmaId: firmaId) + " where teklifref=" + teklifRef;
+
+                var result = await db.QueryAsync<TeklifDetayDto>(sql, commandType: CommandType.Text);
+
+                db.Close();
+
+                return result.ToList();
+
             }
         }
 
@@ -64,7 +75,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                var teklifDetayRow = await dbContext.Teklifdetays.Where(x => x.Logref == request.TeklifDetay.Logref).SingleOrDefaultAsync();
+                var teklifDetayRow = await dbContext.V010Teklifdetays.Where(x => x.Logref == request.TeklifDetay.Logref).SingleOrDefaultAsync();
                 if (teklifDetayRow == null)
                     throw new ApiException("Teklif Detayı bulunamadı");
 

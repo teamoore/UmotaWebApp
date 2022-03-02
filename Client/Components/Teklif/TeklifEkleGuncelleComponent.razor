@@ -21,15 +21,14 @@
             </div>
 
             <div class="form-group">
-                <label>Cari</label>
                 <div class="row">
                     <div class="col-md-2">
                         <label>Cari Kodu</label>
-                        <InputText @bind-Value="teklif.LcariKodu" class="form-control" placeholder="Cari Kodu" />
+                        <InputText @bind-Value="teklif.Carikodu" class="form-control" placeholder="Cari Kodu" />
                     </div>
                     <div class="col-md-4">
                         <label>Cari Adı</label>
-                        <InputText @bind-Value="teklif.LcariAdi" class="form-control" placeholder="Cari Adı" />
+                        <InputText @bind-Value="teklif.Cariadi" class="form-control" placeholder="Cari Adı" />
                     </div>
                     <div class="col-md-2">
                         <label>Cari Seçim</label>
@@ -50,6 +49,7 @@
                         <InputSelect @bind-Value="teklif.Lpersonelref" class="form-control">
                             @if (PersonelListesi != null)
                             {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                 @foreach (var item in PersonelListesi)
                                 {
                                     <option value="@item.LOGICALREF">@item.DEFINITION_</option>
@@ -67,6 +67,7 @@
                         <InputSelect @bind-Value="teklif.TeslimSekli" class="form-control">
                             @if (TeslimSekliListesi != null)
                             {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                 @foreach (var item in TeslimSekliListesi)
                                 {
                                     <option value="@item">@item</option>
@@ -91,6 +92,7 @@
                         <InputSelect @bind-Value="teklif.LodemePlani" class="form-control">
                             @if (OdemePlaniListesi != null)
                             {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                 @foreach (var item in OdemePlaniListesi)
                                 {
                                     <option value="@item.LOGICALREF">@item.DEFINITION_</option>
@@ -102,6 +104,35 @@
                         <label>Proje Adı</label>
                         <InputText @bind-Value="teklif.Proje" class="form-control"></InputText>
                     </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Teklif Para Birimi</label>
+
+                        <InputSelect class="form-control" @bind-Value="DovizTuruBilgisi">
+                            @if (DovizListesi != null)
+                            {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                @foreach (var item in DovizListesi)
+                                {
+                                    <option value="@item.CURTYPE">@item.CURCODE</option>
+                                }
+                            }
+                        </InputSelect>
+
+                    </div>
+                    <div class="col-md-4">
+                        <label>Döviz Kuru</label>
+                        <InputNumber @bind-Value="teklif.Dovizkuruid" class="form-control" placeholder="@_DovizKuruState"/>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Genel İsk.%</label>
+                        <InputNumber @bind-Value="teklif.Gniskoran" class="form-control" />
+                    </div>
+
                 </div>
             </div>
 
@@ -147,6 +178,30 @@
     [Parameter]
     public int? logRef { get; set; }
 
+    private int _dovizTuru = -1;
+    public int DovizTuruBilgisi
+    {
+        get {
+            if (teklif.Dovizrefid.HasValue == false)
+                return -1;
+
+            return teklif.Dovizrefid.Value;
+        }
+        set{
+            _dovizTuru = value;
+            teklif.Dovizrefid = _dovizTuru;
+
+
+            DovizKuruGetir().GetAwaiter();
+
+
+        }
+    }
+
+    private string _DovizKuruState = "";
+
+    public IEnumerable<DovizDto> DovizListesi { get; set; }
+
     [Parameter]
     public EventCallback OnVazgecClicked { get; set; }
 
@@ -179,6 +234,7 @@
         await OdemePlaniCek();
 
         await GetTeklif();
+        await DovizListesiGetir();
 
     }
 
@@ -194,7 +250,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
-            var result = await httpClient.GetServiceResponseAsync<TeklifDto>(UrlHelper.TeklifGetir +"?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no);
+            var result = await httpClient.GetServiceResponseAsync<TeklifDto>(UrlHelper.TeklifGetir + "?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no);
             if (result != null)
             {
                 teklif = result;
@@ -216,7 +272,10 @@
 
     public async Task CariListesiAc()
     {
-        var cariForm = modal.Show<Pages.Cari.Cari_Sec>();
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
         var result = await cariForm.Result;
 
         if (!result.Cancelled)
@@ -238,6 +297,7 @@
         {
             teklif.Upddate = DateTime.Now;
             teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklif.Status = 1;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
@@ -269,6 +329,10 @@
             teklif.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklif.Tarih = teklif.Tarih.HasValue ? teklif.Tarih : DateTime.Now;
             teklif.Saat = teklif.Saat.HasValue ? teklif.Saat : DateTime.Now;
+            teklif.Status = 0;
+            teklif.Trcode = 1;
+            teklif.Duruminfo = "Teklif Hazırlanıyor";
+
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
             if (selectedFirmaDonem == null)
@@ -283,7 +347,7 @@
 
             var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifRequestDto>(UrlHelper.TeklifKaydet, request);
 
-            Snackbar.Add("Teklif güncellendi", severity:Severity.Success);
+            Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
 
             navigation.NavigateTo("/stek_listef_detay/" + result.Logref);
 
@@ -375,6 +439,65 @@
         {
 
             throw;
+        }
+    }
+
+    public async Task DovizListesiGetir()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<IEnumerable<DovizDto>>(UrlHelper.DovizListesi + "?logofirmno=" + selectedFirmaDonem.firma_no.Value);
+            if (result != null)
+            {
+                DovizListesi = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+        }
+    }
+
+
+    public async Task DovizKuruGetir()
+    {
+        try
+        {
+            if (teklif.Dovizrefid <= 0)
+            {
+                throw new Exception("Döviz tipi seçmelisiniz");
+            }
+            _DovizKuruState = "Çekiliyor...";
+            teklif.Dovizkuruid = null;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new DovizKuruRequestDto();
+            request.KurTarihi = teklif.Tarih.Value;
+            request.KurTuru = 4;
+            request.DovizTuru = teklif.Dovizrefid.Value;
+            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<double, DovizKuruRequestDto>(UrlHelper.DovizKuruGetir, request);
+
+            teklif.Dovizkuruid = result;
+            _DovizKuruState = "Güncel";
+
+            this.StateHasChanged();
+
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
     }
 }

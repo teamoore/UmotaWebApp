@@ -10,7 +10,7 @@
                     / Teslim Tarihi : @(teklif.TeslimTarihi.HasValue ? teklif.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "")
                 </h6>
                 <p class="card-text">
-                    <strong>Firma:</strong> @teklif.LcariAdi <br />
+                    <strong>Firma:</strong> @teklif.Cariadi <br />
                     <strong>Proje Adı:</strong> @teklif.Proje <br />
                     <strong>İlgili Kişi:</strong> @teklif.IlgiliAdi
                     <br />
@@ -31,8 +31,8 @@
         <hr />
         <div class="row">
             <div class="col-md-4">
-                <button class="btn btn-primary" @onclick="Duzenle"><i class="fa fa-edit"></i> Düzenle</button>
-                <button class="btn btn-primary" @onclick="TeklifDetayEkle"><i class="fa fa-plus"></i> Malzeme Ekle</button>
+                <button class="btn btn-primary" @onclick="Duzenle"><i class="fa fa-edit"></i> Teklif Düzenle</button>
+                <button class="btn btn-primary" @onclick="TeklifDetayEkle"><i class="fa fa-plus"></i> Yeni Satır Ekle</button>
             </div>
         </div>
 
@@ -43,9 +43,9 @@
 
 <MudTable Items="@teklifDetayList" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Teklif Detay Listesi</MudText>
+        <MudText Typo="Typo.h6">Teklif Satırları</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Teklif Detay Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="_searchString" Placeholder="Satırlarda Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
@@ -63,8 +63,8 @@
             <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" @onclick="(() => TeklifDetayGuncelle(context.Logref))"/>
         </MudTd>
         <MudTd DataLabel="Çizim Kodu">@context.Cizimkodu</MudTd>
-        <MudTd DataLabel="Stok Kodu">@context.LstokKodu</MudTd>
-        <MudTd DataLabel="Stok Adı">@context.LstokAdi</MudTd>
+        <MudTd DataLabel="Stok Kodu">@context.Malzkodu</MudTd>
+        <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
         <MudTd DataLabel="Birim Fiyat">@context.Fiyat</MudTd>
         <MudTd DataLabel="Tutar">@context.Tutar</MudTd>

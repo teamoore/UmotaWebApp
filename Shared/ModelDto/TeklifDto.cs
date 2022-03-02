@@ -60,8 +60,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? Upddate { get; set; }
         public byte? Trcode { get; set; }
 
-        public string PersonelAdi { get; set; }
-
         public string TarihFormatted
         {
             get
@@ -77,5 +75,25 @@ namespace UmotaWebApp.Shared.ModelDto
                 return this.TeslimTarihi.HasValue ? this.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "-";
             }
         }
+
+        public string Carikodu { get; set; }
+        public string Cariadi { get; set; }
+        public string Odemeplanikodu { get; set; }
+        public string Odemeplaniadi { get; set; }
+        public string Temsilcikodu { get; set; }
+        public string Temsilciadi { get; set; }
+        public string Dovizdoku { get; set; }
+        public string Dovizdokuid { get; set; }
+        public string Sevkkodu { get; set; }
+        public string SevkEdilecekBayiAdi { get; set; }
+        public string Sevkadres1 { get; set; }
+        public string Sevkadres2 { get; set; }
+        public string Ilce { get; set; }
+        public string Il { get; set; }
+        public string Tel1 { get; set; }
+        public string Tel2 { get; set; }
+        public string SevkIlgilisi { get; set; }
+        public string Faks { get; set; }
+        public string Mail { get; set; }
     }
 }

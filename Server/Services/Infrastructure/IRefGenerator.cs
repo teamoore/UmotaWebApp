@@ -12,6 +12,5 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<int> RefNoAl(string tablename, string firmaId);
         public Task<IEnumerable<OdemePlaniDto>> GetOdemePlaniList(int logofirmno);
         public Task<IEnumerable<SisSabitlerDetayDto>> GetSabitDetayList(int tip);
-        public Task<IEnumerable<DovizDto>> GetDovizList(int logofirmno);
     }
 }
