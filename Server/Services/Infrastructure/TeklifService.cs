@@ -39,20 +39,27 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
 
-            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firma_id)))
             {
-                return await dbContext.Teklifs.Where(i => i.Logref == logref)
-                    .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
+                db.Open();
+
+                var sql = "select top 1 * from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId: firma_id) + " where logref=" + logref;
+
+                var result = await db.QueryAsync<TeklifDto>(sql, commandType: CommandType.Text);
+
+                db.Close();
+
+                return result.SingleOrDefault();
             }
         }
 
         public async Task<List<TeklifDto>> GetTeklifDtos(string firmaId)
         {
-            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
             {
                 db.Open();
 
-                var sql = "select top 100 * from " + Configuration.GetUmotaObjectName("teklif",firmaId:firmaId) + " order by insdate desc";
+                var sql = "select top 100 * from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " order by insdate desc";
 
                 var result = await db.QueryAsync<TeklifDto>(sql, commandType: CommandType.Text);
 

@@ -79,5 +79,13 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? Upddate { get; set; }
         public int? Siplogref { get; set; }
         public int? FiltreHarRef { get; set; }
+        public string Malzkodu { get; set; }
+        public string Malzadi { get; set; }
+        public string Ozelkod5 { get; set; }
+        public string Birimkodu { get; set; }
+        public string Dovizdoku { get; set; }
+        public string Satsipno { get; set; }
+        public int? Satmalzlogref { get; set; }
+        public string MontajYeri { get; set; }
     }
 }

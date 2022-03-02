@@ -24,11 +24,11 @@
                 <div class="row">
                     <div class="col-md-2">
                         <label>Cari Kodu</label>
-                        <InputText @bind-Value="teklif.LcariKodu" class="form-control" placeholder="Cari Kodu" />
+                        <InputText @bind-Value="teklif.Carikodu" class="form-control" placeholder="Cari Kodu" />
                     </div>
                     <div class="col-md-4">
                         <label>Cari Adı</label>
-                        <InputText @bind-Value="teklif.LcariAdi" class="form-control" placeholder="Cari Adı" />
+                        <InputText @bind-Value="teklif.Cariadi" class="form-control" placeholder="Cari Adı" />
                     </div>
                     <div class="col-md-2">
                         <label>Cari Seçim</label>
@@ -297,6 +297,7 @@
         {
             teklif.Upddate = DateTime.Now;
             teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklif.Status = 1;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
@@ -328,6 +329,10 @@
             teklif.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklif.Tarih = teklif.Tarih.HasValue ? teklif.Tarih : DateTime.Now;
             teklif.Saat = teklif.Saat.HasValue ? teklif.Saat : DateTime.Now;
+            teklif.Status = 0;
+            teklif.Trcode = 1;
+            teklif.Duruminfo = "Teklif Hazırlanıyor";
+
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
             if (selectedFirmaDonem == null)

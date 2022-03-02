@@ -216,6 +216,7 @@
         {
             teklifDetay.Upddate = DateTime.Now;
             teklifDetay.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklifDetay.Status = 1;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
@@ -242,6 +243,7 @@
             teklifDetay.Insdate = DateTime.Now;
             teklifDetay.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklifDetay.Teklifref = teklifRef;
+            teklifDetay.Status = 0;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 

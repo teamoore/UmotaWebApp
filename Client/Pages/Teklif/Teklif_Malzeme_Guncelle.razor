@@ -10,7 +10,7 @@
                     / Teslim Tarihi : @(teklif.TeslimTarihi.HasValue ? teklif.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "")
                 </h6>
                 <p class="card-text">
-                    <strong>Firma:</strong> @teklif.LcariAdi <br />
+                    <strong>Firma:</strong> @teklif.Cariadi <br />
                     <strong>Proje Adı:</strong> @teklif.Proje <br />
                     <strong>İlgili Kişi:</strong> @teklif.IlgiliAdi
                     <br />
@@ -63,8 +63,8 @@
             <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" @onclick="(() => TeklifDetayGuncelle(context.Logref))"/>
         </MudTd>
         <MudTd DataLabel="Çizim Kodu">@context.Cizimkodu</MudTd>
-        <MudTd DataLabel="Stok Kodu">@context.LstokKodu</MudTd>
-        <MudTd DataLabel="Stok Adı">@context.LstokAdi</MudTd>
+        <MudTd DataLabel="Stok Kodu">@context.Malzkodu</MudTd>
+        <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
         <MudTd DataLabel="Birim Fiyat">@context.Fiyat</MudTd>
         <MudTd DataLabel="Tutar">@context.Tutar</MudTd>
