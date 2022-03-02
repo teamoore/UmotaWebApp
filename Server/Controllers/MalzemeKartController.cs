@@ -64,5 +64,25 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("fiyatgetir")]
+        public async Task<ServiceResponse<IEnumerable<MalzemeFiyatDto>>> MalzemeFiyatGetir(MalzemeFiyatRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<IEnumerable<MalzemeFiyatDto>>()
+                {
+                    Value = await MalzemeKartService.MalzemeFiyatGetir(request)
+                };
+            }
+            catch (ApiExcetion ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<IEnumerable<MalzemeFiyatDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }
