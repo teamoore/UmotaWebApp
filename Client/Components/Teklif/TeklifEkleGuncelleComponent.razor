@@ -50,6 +50,7 @@
                         <InputSelect @bind-Value="teklif.Lpersonelref" class="form-control">
                             @if (PersonelListesi != null)
                             {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                 @foreach (var item in PersonelListesi)
                                 {
                                     <option value="@item.LOGICALREF">@item.DEFINITION_</option>
@@ -67,6 +68,7 @@
                         <InputSelect @bind-Value="teklif.TeslimSekli" class="form-control">
                             @if (TeslimSekliListesi != null)
                             {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                 @foreach (var item in TeslimSekliListesi)
                                 {
                                     <option value="@item">@item</option>
@@ -91,6 +93,7 @@
                         <InputSelect @bind-Value="teklif.LodemePlani" class="form-control">
                             @if (OdemePlaniListesi != null)
                             {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                 @foreach (var item in OdemePlaniListesi)
                                 {
                                     <option value="@item.LOGICALREF">@item.DEFINITION_</option>
@@ -102,6 +105,27 @@
                         <label>Proje Adı</label>
                         <InputText @bind-Value="teklif.Proje" class="form-control"></InputText>
                     </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Teklif Para Birimi</label>
+
+                        <InputSelect @bind-Value="teklif.Dovizrefid" class="form-control">
+                            @if (DovizListesi != null)
+                            {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                @foreach (var item in DovizListesi)
+                                {
+                                    <option value="@item.CURTYPE">@item.CURCODE</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+
+
                 </div>
             </div>
 
@@ -147,6 +171,8 @@
     [Parameter]
     public int? logRef { get; set; }
 
+    public IEnumerable<DovizDto> DovizListesi { get; set; }
+
     [Parameter]
     public EventCallback OnVazgecClicked { get; set; }
 
@@ -179,6 +205,7 @@
         await OdemePlaniCek();
 
         await GetTeklif();
+        await DovizListesiGetir();
 
     }
 
@@ -216,7 +243,10 @@
 
     public async Task CariListesiAc()
     {
-        var cariForm = modal.Show<Pages.Cari.Cari_Sec>();
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
         var result = await cariForm.Result;
 
         if (!result.Cancelled)
@@ -369,6 +399,28 @@
             if (result != null)
             {
                 OdemePlaniListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    public async Task DovizListesiGetir()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<IEnumerable<DovizDto>>(UrlHelper.DovizListesi + "?logofirmno=" + selectedFirmaDonem.firma_no.Value);
+            if (result != null)
+            {
+                DovizListesi = result;
             }
         }
         catch (Exception)

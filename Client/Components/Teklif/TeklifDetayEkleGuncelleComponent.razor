@@ -158,7 +158,12 @@
     {
         try
         {
-            var result = await httpClient.GetServiceResponseAsync<List<DovizDto>>("/api/helper/GetDovizList?logofirmno=1");
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<List<DovizDto>>(UrlHelper.DovizListesi + "?logofirmno=" + selectedFirmaDonem.firma_no);
             if (result != null)
             {
                 DovizListesi = result;

@@ -22,5 +22,7 @@ namespace UmotaWebApp.Client.Utils
         public const string CariKartKaydet = "/api/carikart/save";
         public const string CariKartGuncelle = "/api/carikart/update";
         public const string RefNoAl = "/api/helper/RefNoAl";
+        public const string DovizListesi = "/api/doviz/GetDovizList";
+        public const string DovizKuruGetir = "/api/doviz/GetDovizKur";
     }
 }

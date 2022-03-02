@@ -120,26 +120,6 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
-        [HttpGet("GetDovizList")]
-        public async Task<ServiceResponse<IEnumerable<DovizDto>>> GetDovizList(int logofirmno)
-        {
-            try
-            {
-                return new ServiceResponse<IEnumerable<DovizDto>>()
-                {
-                    Value = await RefService.GetDovizList(logofirmno)
-                };
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<IEnumerable<DovizDto>>();
-                e.SetException(ex);
-                return e;
-            }
-        }
-
         [HttpGet("GetSabitDetayList")]
         public async Task<ServiceResponse<IEnumerable<SisSabitlerDetayDto>>> GetSabitDetayList(int tip)
         {

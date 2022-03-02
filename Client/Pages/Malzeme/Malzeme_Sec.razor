@@ -21,11 +21,10 @@
 </EditForm>
 
 
-<MudTable Items="@malzemeKarts" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeKartDto,bool>(FilterFunc1)">
+<MudTable Items="@malzemeKarts" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Malzeme Kart Listesi</MudText>
-        <MudSpacer />
-        <MudTextField @bind-Value="_searchStringMalzeme" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
@@ -85,24 +84,6 @@
     private bool _sortNameByLength;
     private bool _searchStarted = false;
 
-    private bool FilterFunc1(MalzemeKartDto element) => FilterFunc(element, _searchStringMalzeme);
-
-    private bool FilterFunc(MalzemeKartDto element, string searchString)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.Kodu != null && element.Kodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Adi != null && element.Adi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Ozelkod != null && element.Mensei != null
-            && $"{element.Ozelkod} {element.Mensei} ".Contains(searchString))
-            return true;
-        return false;
-    }
-
-
-
     private async Task LoadMalzemeKartList()
     {
         _searchStarted = true;
@@ -140,6 +121,11 @@
     {
         try
         {
+            if (string.IsNullOrEmpty(malzemeKart.Adi))
+            {
+                throw new Exception(Utils.Mesajlar.MetinGir);
+            }
+
             _searchStarted = true;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);

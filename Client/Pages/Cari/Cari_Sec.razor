@@ -34,11 +34,10 @@
     <MudProgressCircular Color="Color.Success" Indeterminate="true" />
 }
 
-<MudTable Items="@cariler" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<CariKartDto,bool>(FilterFunc1)">
+<MudTable Items="@cariler" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Cari Listesi</MudText>
-        <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
@@ -90,21 +89,6 @@
     private bool _sortNameByLength;
     private bool _searchStarted = false;
 
-    private bool FilterFunc1(CariKartDto element) => FilterFunc(element, _searchString);
-
-    private bool FilterFunc(CariKartDto element, string searchString)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.Kodu != null && element.Kodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Adi != null && element.Adi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Ozelkod != null
-            && $"{element.Ozelkod}".Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
-    }
 
     public string ResultText { get; set; }
 
@@ -119,6 +103,11 @@
 
         try
         {
+            if (string.IsNullOrEmpty(cari.Adi))
+            {
+                throw new Exception(Utils.Mesajlar.MetinGir);
+            }
+
             _searchStarted = true;
             ResultText = string.Empty;
 
@@ -156,7 +145,7 @@
                 throw new Exception("Firma dönem seçilmedi");
 
 
-            var cari = await httpClient.GetServiceResponseAsync<CariKartDto>(UrlHelper.CariKartGetir +"?kod=" + kod + "&firmaId=" + selectedFirmaDonem.firma_no.ToString());
+            var cari = await httpClient.GetServiceResponseAsync<CariKartDto>(UrlHelper.CariKartGetir + "?kod=" + kod + "&firmaId=" + selectedFirmaDonem.firma_no.ToString());
             if (cari != null)
             {
                 modalParameters = new ModalParameters();
