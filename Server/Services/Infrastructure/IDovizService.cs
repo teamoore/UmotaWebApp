@@ -10,6 +10,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     {
         public Task<IEnumerable<DovizDto>> GetDovizList(int logofirmano);
 
-        public Task<double> LogoDovKurAl(int logofirmno, int dovizturu, int kurturu, DateTime kurtarihi);
+        public Task<double> LogoDovKurAl(DovizKuruRequestDto request);
     }
 }

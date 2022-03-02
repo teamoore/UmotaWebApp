@@ -21,7 +21,6 @@
             </div>
 
             <div class="form-group">
-                <label>Cari</label>
                 <div class="row">
                     <div class="col-md-2">
                         <label>Cari Kodu</label>
@@ -113,7 +112,7 @@
                     <div class="col-md-4">
                         <label>Teklif Para Birimi</label>
 
-                        <InputSelect @bind-Value="teklif.Dovizrefid" class="form-control">
+                        <InputSelect class="form-control" @bind-Value="DovizTuruBilgisi">
                             @if (DovizListesi != null)
                             {
                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -123,8 +122,16 @@
                                 }
                             }
                         </InputSelect>
-                    </div>
 
+                    </div>
+                    <div class="col-md-4">
+                        <label>Döviz Kuru</label>
+                        <InputNumber @bind-Value="teklif.Dovizkuruid" class="form-control" placeholder="@_DovizKuruState"/>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Genel İsk.%</label>
+                        <InputNumber @bind-Value="teklif.Gniskoran" class="form-control" />
+                    </div>
 
                 </div>
             </div>
@@ -170,6 +177,28 @@
 
     [Parameter]
     public int? logRef { get; set; }
+
+    private int _dovizTuru = -1;
+    public int DovizTuruBilgisi
+    {
+        get {
+            if (teklif.Dovizrefid.HasValue == false)
+                return -1;
+
+            return teklif.Dovizrefid.Value;
+        }
+        set{
+            _dovizTuru = value;
+            teklif.Dovizrefid = _dovizTuru;
+
+
+            DovizKuruGetir().GetAwaiter();
+
+
+        }
+    }
+
+    private string _DovizKuruState = "";
 
     public IEnumerable<DovizDto> DovizListesi { get; set; }
 
@@ -221,7 +250,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
-            var result = await httpClient.GetServiceResponseAsync<TeklifDto>(UrlHelper.TeklifGetir +"?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no);
+            var result = await httpClient.GetServiceResponseAsync<TeklifDto>(UrlHelper.TeklifGetir + "?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no);
             if (result != null)
             {
                 teklif = result;
@@ -313,7 +342,7 @@
 
             var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifRequestDto>(UrlHelper.TeklifKaydet, request);
 
-            Snackbar.Add("Teklif güncellendi", severity:Severity.Success);
+            Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
 
             navigation.NavigateTo("/stek_listef_detay/" + result.Logref);
 
@@ -423,10 +452,47 @@
                 DovizListesi = result;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+        }
+    }
 
-            throw;
+
+    public async Task DovizKuruGetir()
+    {
+        try
+        {
+            if (teklif.Dovizrefid <= 0)
+            {
+                throw new Exception("Döviz tipi seçmelisiniz");
+            }
+            _DovizKuruState = "Çekiliyor...";
+            teklif.Dovizkuruid = null;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new DovizKuruRequestDto();
+            request.KurTarihi = teklif.Tarih.Value;
+            request.KurTuru = 4;
+            request.DovizTuru = teklif.Dovizrefid.Value;
+            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<double, DovizKuruRequestDto>(UrlHelper.DovizKuruGetir, request);
+
+            teklif.Dovizkuruid = result;
+            _DovizKuruState = "Güncel";
+
+            this.StateHasChanged();
+
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
     }
 }

@@ -43,14 +43,14 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
-        [HttpGet("GetDovizKur")]
-        public async Task<ServiceResponse<double>> GetirDovizKur(int logofirmno, int dovizturu, int kurturu, DateTime kurtarihi)
+        [HttpPost("GetDovizKur")]
+        public async Task<ServiceResponse<double>> GetirDovizKur(DovizKuruRequestDto request)
         {
             try
             {
                 return new ServiceResponse<double>()
                 {
-                    Value = await dovizService.LogoDovKurAl(logofirmno, dovizturu, kurturu, kurtarihi)
+                    Value = await dovizService.LogoDovKurAl(request)
                 };
             }
             catch (Exception ex)
