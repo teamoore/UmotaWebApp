@@ -63,9 +63,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
             }
         }
-        public async Task<IEnumerable<MalzemeFiyatDto>>MalzemeFiyatGetir(MalzemeFiyatRequestDto request)
+        public async Task<MalzemeFiyatDto>MalzemeFiyatGetir(MalzemeFiyatRequestDto request)
         {
-            IEnumerable<MalzemeFiyatDto> res;
+            MalzemeFiyatDto res = new MalzemeFiyatDto();
 
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
             {
@@ -94,33 +94,32 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 var p = new DynamicParameters();
                 p.Add("@TARIH", value: request.Tarih, dbType: DbType.DateTime);
 
-                res = await db.QueryAsync<MalzemeFiyatDto>(sqlstring+ sqlstring2, p, commandType: CommandType.Text);
+                res = await db.QuerySingleOrDefaultAsync<MalzemeFiyatDto>(sqlstring+ sqlstring2, p, commandType: CommandType.Text);
 
                 // Bulamazsa Cari ve Tüm Para Birime Göre
-                if (res == null || !res.Any())
+                if (res == null)
                 {
                     sqlstring2 = " AND A.CLIENTCODE = '" + request.CariKodu + "'" +
                         " order by A.LOGICALREF DESC";
 
-                    res = await db.QueryAsync<MalzemeFiyatDto>(sqlstring + sqlstring2, p, commandType: CommandType.Text);
+                    res = await db.QuerySingleOrDefaultAsync<MalzemeFiyatDto>(sqlstring + sqlstring2, p, commandType: CommandType.Text);
 
                 }
-
                 // Bulamazsa Carisiz ve Para Birime Göre
-                if (res == null || !res.Any())
+                if (res == null)
                 {
                     sqlstring2 = " AND A.CURRENCY = " + request.DovizRef +
                         " order by A.CLIENTCODE ASC, A.LOGICALREF DESC";
 
-                    res = await db.QueryAsync<MalzemeFiyatDto>(sqlstring + sqlstring2, p, commandType: CommandType.Text);
+                    res = await db.QuerySingleOrDefaultAsync<MalzemeFiyatDto>(sqlstring + sqlstring2, p, commandType: CommandType.Text);
                 }
 
                 // Bulamazsa Carisiz ve Tüm Para Birime Göre
-                if (res == null || !res.Any())
+                if (res == null)
                 {
                     sqlstring2 = " order by A.CLIENTCODE ASC, A.LOGICALREF DESC";
 
-                    res = await db.QueryAsync<MalzemeFiyatDto>(sqlstring + sqlstring2, p, commandType: CommandType.Text);
+                    res = await db.QuerySingleOrDefaultAsync<MalzemeFiyatDto>(sqlstring + sqlstring2, p, commandType: CommandType.Text);
                 }
             }
 

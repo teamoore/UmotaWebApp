@@ -32,18 +32,12 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<TeklifDto> GetTeklifByRef(int logref, string firma_id)
         {
-            if (string.IsNullOrEmpty(firma_id))
-                throw new Exception("Firma Dönem seçimi yapınız");
-
-            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firma_id);
-            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firma_id)))
             {
                 db.Open();
 
-                var sql = "select top 1 * from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId: firma_id) + " where logref=" + logref;
+                var sql = "select top 1 *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
+                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId: firma_id) + " where logref=" + logref;
 
                 var result = await db.QueryAsync<TeklifDto>(sql, commandType: CommandType.Text);
 
@@ -59,7 +53,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 db.Open();
 
-                var sql = "select top 100 * from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " order by insdate desc";
+                var sql = "select top 100 *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
+                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " order by insdate desc";
 
                 var result = await db.QueryAsync<TeklifDto>(sql, commandType: CommandType.Text);
 

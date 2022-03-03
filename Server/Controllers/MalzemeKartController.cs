@@ -66,11 +66,11 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("fiyatgetir")]
-        public async Task<ServiceResponse<IEnumerable<MalzemeFiyatDto>>> MalzemeFiyatGetir(MalzemeFiyatRequestDto request)
+        public async Task<ServiceResponse<MalzemeFiyatDto>> MalzemeFiyatiGetir(MalzemeFiyatRequestDto request)
         {
             try
             {
-                return new ServiceResponse<IEnumerable<MalzemeFiyatDto>>()
+                return new ServiceResponse<MalzemeFiyatDto>()
                 {
                     Value = await MalzemeKartService.MalzemeFiyatGetir(request)
                 };
@@ -79,7 +79,7 @@ namespace UmotaWebApp.Server.Controllers
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
-                var e = new ServiceResponse<IEnumerable<MalzemeFiyatDto>>();
+                var e = new ServiceResponse<MalzemeFiyatDto>();
                 e.SetException(ex);
                 return e;
             }

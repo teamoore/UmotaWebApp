@@ -18,11 +18,11 @@
                 <div class="row">
                     <div class="col-md-4">
                         <label>Malzeme Kodu</label>
-                        <InputText @bind-Value="teklifDetay.LstokKodu" class="form-control" placeholder="Stok Kodu" />
+                        <InputText @bind-Value="teklifDetay.Malzkodu" class="form-control" placeholder="Stok Kodu" />
                     </div>
                     <div class="col-md-6">
                         <label>Malzeme Tanımı</label>
-                        <InputText @bind-Value="teklifDetay.LstokAdi" class="form-control" placeholder="Stok Adı" />
+                        <InputText @bind-Value="teklifDetay.Malzadi" class="form-control" placeholder="Stok Adı" />
                     </div>
                     <div class="col-md-2">
                         <label>Malzemeler</label>
@@ -46,6 +46,7 @@
                     <div class="col-md-2">
                         <label>Döviz</label>
                         <InputSelect @bind-Value="teklifDetay.Dovizref" class="form-control">
+                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
                             @if (DovizListesi != null)
                             {
                                 @foreach (var item in DovizListesi)
@@ -189,10 +190,41 @@
             if (result.Data != null)
             {
                 var mkart = (MalzemeKartDto)result.Data;
-                teklifDetay.LstokAdi = mkart.Adi;
-                teklifDetay.LstokKodu = mkart.Kodu;
-                teklifDetay.Fiyat = mkart.Satfiyat;
-                teklifDetay.Fiyattl = mkart.Satfiyat;
+                teklifDetay.LstokId = mkart.Logref;
+                teklifDetay.Malzadi = mkart.Adi;
+                teklifDetay.Malzkodu = mkart.Kodu;
+                //teklifDetay.Marka = mkart.Descr;
+                //teklifDetay.Mensei = mkart.Definition;
+                if (mkart.Kodu.StartsWith("UMOTA"))
+                {
+                    teklifDetay.Fiyat = mkart.Satfiyat;
+                    switch (mkart.SatfiyatDov)
+                    {
+                        case "TL":
+                            teklifDetay.Dovizref = 160;
+                            break;
+                        case "USD":
+                            teklifDetay.Dovizref = 1;
+                            break;
+                        case "EUR":
+                            teklifDetay.Dovizref = 20;
+                            break;
+                        case "GBP":
+                            teklifDetay.Dovizref = 17;
+                            break;
+                        case "CHF":
+                            teklifDetay.Dovizref = 1;
+                            break;
+                        default:
+                            teklifDetay.Dovizref = 160;
+                            break;
+                    }
+                    teklifDetay.Maliyet1 = mkart.Alfiyat;
+                    teklifDetay.Maliyet2 = mkart.Alfiyat;
+                } else
+                {
+                    await FiyatGetir();
+                }
             }
 
         }
@@ -267,4 +299,48 @@
     {
         await ModalInstance.CloseAsync();
     }
+
+    public async Task FiyatGetir()
+    {
+        try
+        {
+            //if (teklif.Dovizrefid <= 0)
+            //{
+            //    throw new Exception("Döviz tipi seçmelisiniz");
+            //}
+            //_DovizKuruState = "Çekiliyor...";
+            //teklif.Dovizkuruid = null;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new MalzemeFiyatRequestDto();
+            request.Tarih = DateTime.Now;
+            request.MalzemeRef = teklifDetay.LstokId.Value;
+            request.CariKodu = "";
+            request.BirimKodu = "ADET";
+            request.DovizRef = teklifDetay.Dovizref.HasValue ? teklifDetay.Dovizref.Value : 160;
+            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<MalzemeFiyatDto, MalzemeFiyatRequestDto>(UrlHelper.MalzemeFiyatGetir, request);
+
+            if (result != null)
+            {
+                teklifDetay.Fiyat = result.Fiyat;
+                teklifDetay.Dovizref = result.DovizRef;
+            }
+            ////_DovizKuruState = "Güncel";
+
+            this.StateHasChanged();
+
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
 }
