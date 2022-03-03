@@ -119,6 +119,13 @@
             await GetTeklifDetay();
             return;
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!IsUpdate)
+        {
+        }
 
         await DovizListesiGetir();
     }

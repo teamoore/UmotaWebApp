@@ -36,7 +36,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 db.Open();
 
-                var sql = "select top 1 * from " + Configuration.GetUmotaObjectName("v010_teklifdetay", firmaId: firmaId) + " where logref=" + logref;
+                var sql = "select top 1 *, lstok_id LstokId, lstok_kodu LstokKodu, lstok_adi LstokAdi, teslim_tarihi TeslimTarihi, filtre_har_ref FiltreHarRef, montaj_yeri MontajYeri" +
+                    " from " + Configuration.GetUmotaObjectName("v010_teklifdetay", firmaId: firmaId) + " where logref=" + logref;
 
                 var result = await db.QueryAsync<TeklifDetayDto>(sql, commandType: CommandType.Text);
 
@@ -56,7 +57,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 db.Open();
 
-                var sql = "select * from " + Configuration.GetUmotaObjectName("v010_teklifdetay", firmaId: firmaId) + " where teklifref=" + teklifRef;
+                var sql = "select *,lstok_id LstokId, lstok_kodu LstokKodu, lstok_adi LstokAdi, teslim_tarihi TeslimTarihi, filtre_har_ref FiltreHarRef, montaj_yeri MontajYeri " +
+                    " from " + Configuration.GetUmotaObjectName("v010_teklifdetay", firmaId: firmaId) + " where teklifref=" + teklifRef;
 
                 var result = await db.QueryAsync<TeklifDetayDto>(sql, commandType: CommandType.Text);
 
@@ -75,10 +77,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                var teklifDetayRow = await dbContext.V010Teklifdetays.Where(x => x.Logref == request.TeklifDetay.Logref).SingleOrDefaultAsync();
+                var teklifDetayRow = await dbContext.Teklifdetays.Where(x => x.Logref == request.TeklifDetay.Logref).SingleOrDefaultAsync();
                 if (teklifDetayRow == null)
                     throw new ApiException("Teklif Detayı bulunamadı");
 
+                request.TeklifDetay = await CalculateTeklifDetay(request.TeklifDetay);
                 Mapper.Map(request.TeklifDetay, teklifDetayRow);
                 await dbContext.SaveChangesAsync();
 
@@ -114,7 +117,10 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         private async Task<TeklifDetayDto> CalculateTeklifDetay(TeklifDetayDto td)
         {
-            td.Tutar = td.Miktar * td.Fiyat;
+            if (td.Miktar.HasValue && td.Fiyat.HasValue)
+                td.Tutar = Math.Round(td.Miktar.Value * td.Fiyat.Value, 2);
+            else
+                td.Tutar = 0;
             return await Task.FromResult(td);
         }
 
@@ -137,7 +143,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 foreach (var item in teklifDetayList)
                 {
                     if (item.Miktar.HasValue && item.Fiyat.HasValue)
-                        toplamTutar = toplamTutar + (item.Miktar.Value * item.Fiyat.Value);
+                        toplamTutar = toplamTutar + (Math.Round(item.Miktar.Value * item.Fiyat.Value, 2));
                     if (item.Miktar.HasValue && item.Fiyattl.HasValue)
                         toplamTutarTL = toplamTutarTL + (item.Miktar.Value * item.Fiyattl.Value);
                 }
