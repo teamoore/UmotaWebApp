@@ -27,5 +27,11 @@ namespace UmotaWebApp.Server.Data.Models
         public double? Height { get; set; }
         public string Ebatt { get; set; }
         public int? Birimsetiref { get; set; }
+        public int? Birimref { get; set; }
+        public string Birimkodu { get; set; }
+        public double? Alfiyat { get; set; }
+        public string AlfiyatDov { get; set; }
+        public double? Satfiyat { get; set; }
+        public string SatfiyatDov { get; set; }
     }
 }

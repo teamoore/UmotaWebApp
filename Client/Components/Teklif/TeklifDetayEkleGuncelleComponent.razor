@@ -11,6 +11,10 @@
                         <label>Çizim Kodu</label>
                         <InputText @bind-Value="teklifDetay.Cizimkodu" class="form-control" placeholder="Çizim Kodu" />
                     </div>
+                    <div class="col-md-4">
+                        <label>Poz No</label>
+                        <InputText @bind-Value="teklifDetay.Sipnosira" class="form-control" placeholder="Poz no" />
+                    </div>
                 </div>
             </div>
 
@@ -26,9 +30,26 @@
                     </div>
                     <div class="col-md-2">
                         <label>Malzemeler</label>
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" 
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
                                    OnClick="MalzemeListesiAc"
                                    Color="Color.Info" Size="Size.Medium">Bul</MudButton>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Marka</label>
+                        <InputText @bind-Value="teklifDetay.Marka" class="form-control" placeholder="Marka" disabled/>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Menşei</label>
+                        <InputText @bind-Value="teklifDetay.Mensei" class="form-control" placeholder="Menşei" disabled/>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Ebat</label>
+                        <InputText @bind-Value="teklifDetay.Ebat" class="form-control" placeholder="Ebat" disabled/>
                     </div>
                 </div>
             </div>
@@ -40,8 +61,12 @@
                         <InputNumber @bind-Value="teklifDetay.Miktar" class="form-control" placeholder="Miktar" />
                     </div>
                     <div class="col-md-2">
+                        <label>Birim</label>
+                        <InputText @bind-Value="teklifDetay.Birimkodu" class="form-control" placeholder="Birim" disabled />
+                    </div>
+                    <div class="col-md-2">
                         <label>Fiyat</label>
-                        <InputNumber @bind-Value="teklifDetay.Fiyat" class="form-control" placeholder="Fiyat" disabled/>
+                        <InputNumber @bind-Value="teklifDetay.Fiyat" class="form-control" placeholder="Fiyat" disabled />
                     </div>
                     <div class="col-md-2">
                         <label>Döviz</label>
@@ -56,8 +81,7 @@
                             }
                         </InputSelect>
                     </div>
-
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <label>Tutar</label>
                         <InputNumber @bind-Value="teklifDetay.Tutar" class="form-control" placeholder="Tutar" />
                     </div>
@@ -111,35 +135,67 @@
 
     public List<DovizDto> DovizListesi { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    private bool _TeklifDetayCekildi = false;
+
+    protected override Task OnParametersSetAsync()
     {
         IsUpdate = logRef.HasValue;
-        if (IsUpdate)
-        {
-            await GetTeklifDetay();
-            return;
-        }
+        return Task.CompletedTask;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        if (!IsUpdate)
+        IsUpdate = logRef.HasValue;
+
+        if (IsUpdate && !_TeklifDetayCekildi)
         {
+            await GetTeklifDetay();
+        }
+        else
+        {
+            await GetTeklifDetaySiraNo();
         }
 
+
         await DovizListesiGetir();
+    }
+
+    public async Task GetTeklifDetaySiraNo()
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(teklifDetay.Sipnosira))
+                return;
+
+            if (teklifRef == null)
+                return;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma dönem seçilmedi");
+
+            var result = await httpClient.GetServiceResponseAsync<string>(UrlHelper.TeklifDetaySiraNo + "?teklifref=" + teklifRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+
+            teklifDetay.Sipnosira = result;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
     }
 
     public async Task GetTeklifDetay()
     {
         try
         {
+
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma dönem seçilmedi");
 
             teklifDetay = await httpClient.GetServiceResponseAsync<TeklifDetayDto>(UrlHelper.TeklifDetayGetir + "?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
+            _TeklifDetayCekildi = true;
         }
         catch (Exception ex)
         {
@@ -200,8 +256,10 @@
                 teklifDetay.LstokId = mkart.Logref;
                 teklifDetay.Malzadi = mkart.Adi;
                 teklifDetay.Malzkodu = mkart.Kodu;
-                //teklifDetay.Marka = mkart.Descr;
-                //teklifDetay.Mensei = mkart.Definition;
+                teklifDetay.Birimkodu = mkart.Birimkodu;
+                teklifDetay.Marka = mkart.Descr;
+                teklifDetay.Mensei = mkart.Definition;
+                teklifDetay.Ebat = mkart.Ebatt;
                 if (mkart.Kodu.StartsWith("UMOTA"))
                 {
                     teklifDetay.Fiyat = mkart.Satfiyat;
@@ -340,7 +398,7 @@
             }
             ////_DovizKuruState = "Güncel";
 
-            this.StateHasChanged();
+            // this.StateHasChanged();
 
 
         }

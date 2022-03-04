@@ -124,5 +124,25 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpGet("getsirano")]
+        public async Task<ServiceResponse<string>> GetSiraNo(int teklifref, string firmaId)
+        {
+            try
+            {
+                return new ServiceResponse<string>()
+                {
+                    Value = await TeklifDetayService.GetTeklifDetaySiraNo(teklifref, firmaId)
+                };
+            }
+            catch (ApiExcetion ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<string>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

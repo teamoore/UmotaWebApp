@@ -85,6 +85,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 Mapper.Map(request.TeklifDetay, teklifDetayRow);
                 await dbContext.SaveChangesAsync();
 
+                await CalculateTeklif(request.TeklifDetay.Teklifref.Value, request.FirmaId.ToString());
+
                 return Mapper.Map<TeklifDetayDto>(teklifDetayRow);
             }
 
@@ -121,6 +123,10 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 td.Tutar = Math.Round(td.Miktar.Value * td.Fiyat.Value, 2);
             else
                 td.Tutar = 0;
+
+            if (td.Dovizkuru.HasValue)
+                td.Tutartl = Math.Round(td.Tutar.Value * td.Dovizkuru.Value,2);
+
             return await Task.FromResult(td);
         }
 
@@ -142,10 +148,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
                 foreach (var item in teklifDetayList)
                 {
-                    if (item.Miktar.HasValue && item.Fiyat.HasValue)
-                        toplamTutar = toplamTutar + (Math.Round(item.Miktar.Value * item.Fiyat.Value, 2));
-                    if (item.Miktar.HasValue && item.Fiyattl.HasValue)
-                        toplamTutarTL = toplamTutarTL + (item.Miktar.Value * item.Fiyattl.Value);
+                    if (item.Tutar.HasValue )
+                        toplamTutar = toplamTutar + item.Tutar.Value;
+
+                    if (item.Tutartl.HasValue)
+                        toplamTutarTL = toplamTutarTL + item.Tutartl.Value;
                 }
 
                 var teklif = await dbContext.Teklifs.Where(x => x.Logref == teklifRef).SingleOrDefaultAsync();
@@ -191,6 +198,28 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             }
 
 
+        }
+
+        public async Task<string> GetTeklifDetaySiraNo(int teklifRef, string firmaId)
+        {
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
+            {
+                db.Open();
+
+                var sql = "select coalesce(max(sipnosira),'00000') as sipnosira from " +
+                    Configuration.GetUmotaObjectName("TeklifDetay", firmaId: firmaId) + " where teklifref=" + teklifRef;
+
+                var result = await db.ExecuteScalarAsync<string>("select dbo.GenerateNewCode(isnull(("+ sql +"),'00000')) as value"
+                    , commandType: CommandType.Text);
+           
+                db.Close();
+
+                return result;
+
+            }
         }
     }
 }

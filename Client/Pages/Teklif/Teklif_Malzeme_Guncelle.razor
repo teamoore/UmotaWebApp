@@ -50,6 +50,7 @@
     <HeaderContent>
         <MudTh>#</MudTh>
         <MudTh>Çizim Kodu</MudTh>
+        <MudTh>Poz No</MudTh>
         <MudTh>Stok Kodu</MudTh>
         <MudTh>Stok Adı</MudTh>
         <MudTh>Miktar</MudTh>
@@ -59,10 +60,11 @@
 
     </HeaderContent>
     <RowTemplate>
-        <MudTd>            
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" @onclick="(() => TeklifDetayGuncelle(context.Logref))"/>
+        <MudTd>
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" @onclick="(() => TeklifDetayGuncelle(context.Logref))" />
         </MudTd>
         <MudTd DataLabel="Çizim Kodu">@context.Cizimkodu</MudTd>
+        <MudTd DataLabel="Poz No">@context.Sipnosira</MudTd>
         <MudTd DataLabel="Stok Kodu">@context.Malzkodu</MudTd>
         <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
@@ -142,7 +144,7 @@
             var result = await httpClient.GetServiceResponseAsync<List<TeklifDetayDto>>("/api/teklifdetay/list?teklifRef=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
             if (result != null)
             {
-                teklifDetayList = result.OrderByDescending(x => x.Insdate).ToList();
+                teklifDetayList = result.OrderBy(x => x.Sipnosira).ToList();
                 _miktar = teklifDetayList.Sum(x => x.Miktar);
             }
         }
