@@ -20,11 +20,11 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <label>Malzeme Kodu</label>
                         <InputText @bind-Value="teklifDetay.Malzkodu" class="form-control" placeholder="Stok Kodu" />
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label>Malzeme Tanımı</label>
                         <InputText @bind-Value="teklifDetay.Malzadi" class="form-control" placeholder="Stok Adı" />
                     </div>
@@ -39,17 +39,17 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label>Marka</label>
-                        <InputText @bind-Value="teklifDetay.Marka" class="form-control" placeholder="Marka" disabled/>
+                        <InputText @bind-Value="teklifDetay.Marka" class="form-control" placeholder="Marka" disabled />
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label>Menşei</label>
-                        <InputText @bind-Value="teklifDetay.Mensei" class="form-control" placeholder="Menşei" disabled/>
+                        <InputText @bind-Value="teklifDetay.Mensei" class="form-control" placeholder="Menşei" disabled />
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label>Ebat</label>
-                        <InputText @bind-Value="teklifDetay.Ebat" class="form-control" placeholder="Ebat" disabled/>
+                        <InputText @bind-Value="teklifDetay.Ebat" class="form-control" placeholder="Ebat" disabled />
                     </div>
                 </div>
             </div>
@@ -58,7 +58,7 @@
                 <div class="row">
                     <div class="col-md-2">
                         <label>Mitar</label>
-                        <InputNumber @bind-Value="teklifDetay.Miktar" class="form-control" placeholder="Miktar" />
+                        <InputNumber @bind-Value="pageMiktar" class="form-control" placeholder="Miktar" />
                     </div>
                     <div class="col-md-2">
                         <label>Birim</label>
@@ -68,7 +68,7 @@
                         <label>Fiyat</label>
                         <InputNumber @bind-Value="teklifDetay.Fiyat" class="form-control" placeholder="Fiyat" disabled />
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <label>Döviz</label>
                         <InputSelect @bind-Value="teklifDetay.Dovizref" class="form-control">
                             <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -88,14 +88,72 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-1">
+                        <label>İsk-1 %</label>
+                        <InputNumber @bind-Value="pageIskYuz1" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <label>İsk-1 Tutar</label>
+                        <InputNumber @bind-Value="teklifDetay.Isktut1" class="form-control" disabled />
+                    </div>
+                    <div class="col-md-1">
+                        <label>İsk-2 %</label>
+                        <InputNumber @bind-Value="pageIskYuz2" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <label>İsk-2 Tutar</label>
+                        <InputNumber @bind-Value="teklifDetay.Isktut2" class="form-control" disabled />
+                    </div>
+                    <div class="col-md-1">
+                        <label>İsk-3 %</label>
+                        <InputNumber @bind-Value="pageIskYuz3" class="form-control" />
+                    </div>
+                    <div class="col-md-2">
+                        <label>İsk-3 Tutar</label>
+                        <InputNumber @bind-Value="teklifDetay.Isktut3" class="form-control" disabled />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-1">
+                        <label>İsk-Genel %</label>
+                        <InputNumber @bind-Value="teklifDetay.Iskyuz4" class="form-control" disabled />
+                    </div>
+                    <div class="col-md-2">
+                        <label>İsk-Genel Tutar</label>
+                        <InputNumber @bind-Value="teklifDetay.Isktut4" class="form-control" disabled />
+                    </div>
+                    <div class="col-md-2">
+                        <label>KDV Mahrahı</label>
+                        <InputNumber @bind-Value="teklifDetay.Kdvmatrah" class="form-control" disabled />
+                    </div>
+                    <div class="col-md-1">
+                        <label>KDV %</label>
+                        <InputNumber @bind-Value="teklifDetay.Kdvyuz" class="form-control" disabled />
+                    </div>
+                    <div class="col-md-2">
+                        <label>KDV Tutarı</label>
+                        <InputNumber @bind-Value="teklifDetay.Kdvtut" class="form-control" disabled />
+                    </div>
+                    <div class="col-md-2">
+                        <label>Net Tutar</label>
+                        <InputNumber @bind-Value="teklifDetay.Nettutar" class="form-control" disabled />
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </div>
+            </div>
 
 
-    <div class="form-group">
-        <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
-        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
-    </div>
+            <div class="form-group">
+                <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
+                <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+            </div>
 
 </EditForm>
 
@@ -136,6 +194,74 @@
     public List<DovizDto> DovizListesi { get; set; }
 
     private bool _TeklifDetayCekildi = false;
+
+    private double? _pageMiktar = 1;
+    public double? pageMiktar
+    {
+        get
+        {
+            _pageMiktar = teklifDetay.Miktar;
+            return _pageMiktar;
+        }
+        set
+        {
+            _pageMiktar = value;
+            teklifDetay.Miktar = value;
+
+            CalculateTeklifDetay();
+        }
+    }
+
+    private double? _pageIskYuz1 = 0;
+    public double? pageIskYuz1
+    {
+        get
+        {
+            _pageIskYuz1 = teklifDetay.Iskyuz1;
+            return _pageIskYuz1;
+        }
+        set
+        {
+            _pageIskYuz1 = value;
+            teklifDetay.Iskyuz1 = value;
+
+            CalculateTeklifDetay();
+        }
+    }
+
+    private double? _pageIskYuz2 = 0;
+    public double? pageIskYuz2
+    {
+        get
+        {
+            _pageIskYuz2 = teklifDetay.Iskyuz2;
+            return _pageIskYuz2;
+        }
+        set
+        {
+            _pageIskYuz2 = value;
+            teklifDetay.Iskyuz2 = value;
+
+            CalculateTeklifDetay();
+        }
+    }
+
+    private double? _pageIskYuz3 = 0;
+    public double? pageIskYuz3
+    {
+        get
+        {
+            _pageIskYuz3 = teklifDetay.Iskyuz3;
+            return _pageIskYuz3;
+        }
+        set
+        {
+            _pageIskYuz3 = value;
+            teklifDetay.Iskyuz3 = value;
+
+            CalculateTeklifDetay();
+        }
+    }
 
     protected override Task OnParametersSetAsync()
     {
@@ -407,5 +533,43 @@
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
     }
+
+    private void CalculateTeklifDetay()
+    {
+        if (teklifDetay.Miktar.HasValue && teklifDetay.Fiyat.HasValue)
+            teklifDetay.Tutar = Math.Round(teklifDetay.Miktar.Value * teklifDetay.Fiyat.Value, 2);
+        else
+            teklifDetay.Tutar = 0;
+
+        if (teklifDetay.Dovizkuru.HasValue)
+            teklifDetay.Tutartl = Math.Round(teklifDetay.Tutar.Value * teklifDetay.Dovizkuru.Value, 2);
+        else
+            teklifDetay.Tutartl = 0;
+
+        if (teklifDetay.Iskyuz1.HasValue)
+            teklifDetay.Isktut1 = Math.Round((teklifDetay.Tutar.Value * teklifDetay.Iskyuz1.Value) / 100,2);
+        else
+            teklifDetay.Isktut1 = 0;
+
+        if (teklifDetay.Iskyuz2.HasValue)
+            teklifDetay.Isktut2 = Math.Round(((teklifDetay.Tutar.Value - teklifDetay.Isktut1.Value) * teklifDetay.Iskyuz2.Value) / 100,2);
+        else
+            teklifDetay.Isktut2 = 0;
+
+        if (teklifDetay.Iskyuz3.HasValue)
+            teklifDetay.Isktut3 = Math.Round(((teklifDetay.Tutar.Value - teklifDetay.Isktut2.Value - teklifDetay.Isktut1.Value) * teklifDetay.Iskyuz3.Value) / 100,2);
+        else
+            teklifDetay.Isktut3 = 0;
+
+        if (teklifDetay.Iskyuz4.HasValue)
+            teklifDetay.Isktut4 = Math.Round(((teklifDetay.Tutar.Value - teklifDetay.Isktut2.Value - teklifDetay.Isktut1.Value - teklifDetay.Isktut3.Value) * teklifDetay.Iskyuz4.Value) / 100,2);
+        else
+            teklifDetay.Isktut4 = 0;
+
+        teklifDetay.Kdvmatrah = teklifDetay.Tutar.Value - teklifDetay.Isktut1.Value - teklifDetay.Isktut2.Value - teklifDetay.Isktut3.Value - teklifDetay.Isktut4.Value;
+        teklifDetay.Kdvtut = Math.Round((teklifDetay.Kdvmatrah.Value * (teklifDetay.Kdvyuz.HasValue ? teklifDetay.Kdvyuz.Value : 0)) / 100,2);
+        teklifDetay.Nettutar = teklifDetay.Kdvmatrah.Value + teklifDetay.Kdvtut.Value;
+    }
+
 
 }

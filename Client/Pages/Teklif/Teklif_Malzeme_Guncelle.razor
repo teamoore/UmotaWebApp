@@ -210,10 +210,13 @@
     {
         try
         {
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
             modalParameters = new ModalParameters();
             modalParameters.Add("teklifRef", logref);
 
-            var malzKartForm = modal.Show<TeklifDetayEkleGuncelleComponent>("Teklif Detay", parameters: modalParameters);
+            var malzKartForm = modal.Show<TeklifDetayEkleGuncelleComponent>("Teklif Detay", parameters: modalParameters, options: opt);
             var result = await malzKartForm.Result;
 
             if (!result.Cancelled)
@@ -240,10 +243,13 @@
     {
         try
         {
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
             modalParameters = new ModalParameters();
             modalParameters.Add("logRef", logref);
 
-            var malzKartForm = modal.Show<TeklifDetayEkleGuncelleComponent>("Teklif Detay", parameters: modalParameters);
+            var malzKartForm = modal.Show<TeklifDetayEkleGuncelleComponent>("Teklif Detay", parameters: modalParameters, options: opt);
             var result = await malzKartForm.Result;
 
             if (!result.Cancelled)
@@ -252,7 +258,7 @@
                 {
                     var secim = (TeklifDetayDto)result.Data;
 
-                    Snackbar.Add("Malzeme Kartı güncellendi : " + secim.LstokAdi);
+                    Snackbar.Add("Malzeme Kartı güncellendi : " + secim.Malzadi, severity:Severity.Info);
 
                     await LoadTeklifData();
                     await LoadTeklifDetayData();

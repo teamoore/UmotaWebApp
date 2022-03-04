@@ -81,7 +81,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 if (teklifDetayRow == null)
                     throw new ApiException("Teklif Detayı bulunamadı");
 
-                request.TeklifDetay = await CalculateTeklifDetay(request.TeklifDetay);
+                //request.TeklifDetay = await CalculateTeklifDetay(request.TeklifDetay);
                 Mapper.Map(request.TeklifDetay, teklifDetayRow);
                 await dbContext.SaveChangesAsync();
 
@@ -103,7 +103,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                request.TeklifDetay = await CalculateTeklifDetay(request.TeklifDetay);
+                //request.TeklifDetay = await CalculateTeklifDetay(request.TeklifDetay);
 
                 var teklifDetayRow = Mapper.Map<Teklifdetay>(request.TeklifDetay);
                 await dbContext.Teklifdetays.AddAsync(teklifDetayRow);
@@ -126,6 +126,32 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             if (td.Dovizkuru.HasValue)
                 td.Tutartl = Math.Round(td.Tutar.Value * td.Dovizkuru.Value,2);
+
+            if (td.Iskyuz1.HasValue)
+                td.Isktut1 = (td.Tutar * td.Iskyuz1) / 100;               
+            
+            if (td.Iskyuz2.HasValue)
+                td.Isktut2 = ((td.Tutar - td.Isktut1) * td.Iskyuz2) / 100;
+
+            if (td.Iskyuz3.HasValue)
+                td.Isktut3 = ((td.Tutar - td.Isktut2 - td.Isktut1) * td.Iskyuz3) / 100;
+
+            if (td.Iskyuz4.HasValue)
+                td.Isktut4 = ((td.Tutar - td.Isktut2 - td.Isktut1 - td.Isktut3) * td.Iskyuz4) / 100;
+                        
+
+            if (td.Isktut1.HasValue)
+                td.Kdvmatrah = td.Tutar - td.Isktut1.Value;
+
+            if (td.Isktut2.HasValue)
+                td.Kdvmatrah = td.Tutar - td.Isktut2.Value;
+
+            if (td.Isktut3.HasValue)
+                td.Kdvmatrah = td.Tutar - td.Isktut3.Value;
+
+            if (td.Isktut4.HasValue)
+                td.Kdvmatrah = td.Tutar - td.Isktut4.Value;
+
 
             return await Task.FromResult(td);
         }
