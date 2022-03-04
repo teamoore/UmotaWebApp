@@ -225,7 +225,7 @@
                 {
                     var secim = (TeklifDetayDto)result.Data;
 
-                    Snackbar.Add("Malzeme Kartı eklendi : " + secim.LstokAdi, severity: Severity.Success);
+                    Snackbar.Add("Malzeme Kartı eklendi : " + secim.Malzadi, severity: Severity.Success);
 
                     await LoadTeklifData();
                     await LoadTeklifDetayData();
