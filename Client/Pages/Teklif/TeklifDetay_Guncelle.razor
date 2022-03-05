@@ -1,0 +1,19 @@
+﻿@page "/teklifdetay_guncelle/{logRef:int}"
+
+<TeklifDetayEkleGuncelleComponent logRef="logRef" ></TeklifDetayEkleGuncelleComponent>
+@code {
+
+    [Parameter]
+    public int logRef { get; set; }
+
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public void Vazgec()
+    {
+        navigation.NavigateTo("/stek_listef_detay/" + logRef);
+    }
+
+    
+}

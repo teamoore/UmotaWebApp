@@ -1,159 +1,169 @@
 ﻿
 <EditForm Model="teklifDetay">
     <DataAnnotationsValidator />
-    <ValidationSummary />
-
     <div class="mt-12">
         <div class="form">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-4">
-                        <label>Çizim Kodu</label>
-                        <InputText @bind-Value="teklifDetay.Cizimkodu" class="form-control" placeholder="Çizim Kodu" />
-                    </div>
-                    <div class="col-md-4">
-                        <label>Poz No</label>
-                        <InputText @bind-Value="teklifDetay.Sipnosira" class="form-control" placeholder="Poz no" />
+            <MudTabs Elevation="2" Rounded="true" Centered="false" Class="my-6">
+                <hr />
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-1">
+                            <label>İsk-Genel %</label>
+                            <InputNumber @bind-Value="teklifDetay.Iskyuz4" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-2">
+                            <label>İsk-Genel Tutar</label>
+                            <InputNumber @bind-Value="teklifDetay.Isktut4" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-2">
+                            <label>KDV Mahrahı</label>
+                            <InputNumber @bind-Value="teklifDetay.Kdvmatrah" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-1">
+                            <label>KDV %</label>
+                            <InputNumber @bind-Value="teklifDetay.Kdvyuz" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-2">
+                            <label>KDV Tutarı</label>
+                            <InputNumber @bind-Value="teklifDetay.Kdvtut" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-2">
+                            <label>Net Tutar</label>
+                            <InputNumber @bind-Value="teklifDetay.Nettutar" class="form-control" disabled />
+                        </div>
                     </div>
                 </div>
-            </div>
+                <hr />
+                <MudTabPanel Icon="@Icons.Material.Filled.AddTask" Text="Malzeme" BadgeColor="Color.Error">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>Çizim Kodu</label>
+                                <InputText @bind-Value="teklifDetay.Cizimkodu" class="form-control" placeholder="Çizim Kodu" />
+                            </div>
+                            <div class="col-md-4">
+                                <label>Poz No</label>
+                                <InputText @bind-Value="teklifDetay.Sipnosira" class="form-control" placeholder="Poz no" />
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-2">
-                        <label>Malzeme Kodu</label>
-                        <InputText @bind-Value="teklifDetay.Malzkodu" class="form-control" placeholder="Stok Kodu" />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Malzeme Kodu</label>
+                                <InputText @bind-Value="teklifDetay.Malzkodu" class="form-control" placeholder="Stok Kodu" />
+                            </div>
+                            <div class="col-md-4">
+                                <label>Malzeme Tanımı</label>
+                                <InputText @bind-Value="teklifDetay.Malzadi" class="form-control" placeholder="Stok Adı" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Malzemeler</label>
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
+                                           OnClick="MalzemeListesiAc"
+                                           Color="Color.Info" Size="Size.Medium">Bul</MudButton>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <label>Malzeme Tanımı</label>
-                        <InputText @bind-Value="teklifDetay.Malzadi" class="form-control" placeholder="Stok Adı" />
-                    </div>
-                    <div class="col-md-2">
-                        <label>Malzemeler</label>
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
-                                   OnClick="MalzemeListesiAc"
-                                   Color="Color.Info" Size="Size.Medium">Bul</MudButton>
-                    </div>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-3">
-                        <label>Marka</label>
-                        <InputText @bind-Value="teklifDetay.Marka" class="form-control" placeholder="Marka" disabled />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>Marka</label>
+                                <InputText @bind-Value="teklifDetay.Marka" class="form-control" placeholder="Marka" disabled />
+                            </div>
+                            <div class="col-md-3">
+                                <label>Menşei</label>
+                                <InputText @bind-Value="teklifDetay.Mensei" class="form-control" placeholder="Menşei" disabled />
+                            </div>
+                            <div class="col-md-3">
+                                <label>Ebat</label>
+                                <InputText @bind-Value="teklifDetay.Ebat" class="form-control" placeholder="Ebat" disabled />
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <label>Menşei</label>
-                        <InputText @bind-Value="teklifDetay.Mensei" class="form-control" placeholder="Menşei" disabled />
-                    </div>
-                    <div class="col-md-3">
-                        <label>Ebat</label>
-                        <InputText @bind-Value="teklifDetay.Ebat" class="form-control" placeholder="Ebat" disabled />
-                    </div>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-2">
-                        <label>Mitar</label>
-                        <InputNumber @bind-Value="pageMiktar" class="form-control" placeholder="Miktar" />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Mitar</label>
+                                <InputNumber @bind-Value="pageMiktar" class="form-control" placeholder="Miktar" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Birim</label>
+                                <InputText @bind-Value="teklifDetay.Birimkodu" class="form-control" placeholder="Birim" disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Fiyat</label>
+                                <InputNumber @bind-Value="teklifDetay.Fiyat" class="form-control" placeholder="Fiyat" disabled />
+                            </div>
+                            <div class="col-md-1">
+                                <label>Döviz</label>
+                                <InputSelect @bind-Value="teklifDetay.Dovizref" class="form-control">
+                                    <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                    @if (DovizListesi != null)
+                                    {
+                                        @foreach (var item in DovizListesi)
+                                        {
+                                            <option value="@item.CURTYPE">@item.CURCODE</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-2">
+                                <label>Tutar</label>
+                                <InputNumber @bind-Value="teklifDetay.Tutar" class="form-control" placeholder="Tutar" />
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <label>Birim</label>
-                        <InputText @bind-Value="teklifDetay.Birimkodu" class="form-control" placeholder="Birim" disabled />
+                </MudTabPanel>
+                <MudTabPanel Icon="@Icons.Material.Filled.MoneyOff" Text="İskonto" BadgeColor="Color.Success">
+                    <hr />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>İsk-1 %</label>
+                                <InputNumber @bind-Value="pageIskYuz1" class="form-control" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>İsk-1 Tutar</label>
+                                <InputNumber @bind-Value="teklifDetay.Isktut1" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-1">
+                                <label>İsk-2 %</label>
+                                <InputNumber @bind-Value="pageIskYuz2" class="form-control" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>İsk-2 Tutar</label>
+                                <InputNumber @bind-Value="teklifDetay.Isktut2" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-1">
+                                <label>İsk-3 %</label>
+                                <InputNumber @bind-Value="pageIskYuz3" class="form-control" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>İsk-3 Tutar</label>
+                                <InputNumber @bind-Value="teklifDetay.Isktut3" class="form-control" disabled />
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-2">
-                        <label>Fiyat</label>
-                        <InputNumber @bind-Value="teklifDetay.Fiyat" class="form-control" placeholder="Fiyat" disabled />
-                    </div>
-                    <div class="col-md-1">
-                        <label>Döviz</label>
-                        <InputSelect @bind-Value="teklifDetay.Dovizref" class="form-control">
-                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                            @if (DovizListesi != null)
-                            {
-                                @foreach (var item in DovizListesi)
-                                {
-                                    <option value="@item.CURTYPE">@item.CURCODE</option>
-                                }
-                            }
-                        </InputSelect>
-                    </div>
-                    <div class="col-md-2">
-                        <label>Tutar</label>
-                        <InputNumber @bind-Value="teklifDetay.Tutar" class="form-control" placeholder="Tutar" />
-                    </div>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-1">
-                        <label>İsk-1 %</label>
-                        <InputNumber @bind-Value="pageIskYuz1" class="form-control" />
-                    </div>
-                    <div class="col-md-2">
-                        <label>İsk-1 Tutar</label>
-                        <InputNumber @bind-Value="teklifDetay.Isktut1" class="form-control" disabled />
-                    </div>
-                    <div class="col-md-1">
-                        <label>İsk-2 %</label>
-                        <InputNumber @bind-Value="pageIskYuz2" class="form-control" />
-                    </div>
-                    <div class="col-md-2">
-                        <label>İsk-2 Tutar</label>
-                        <InputNumber @bind-Value="teklifDetay.Isktut2" class="form-control" disabled />
-                    </div>
-                    <div class="col-md-1">
-                        <label>İsk-3 %</label>
-                        <InputNumber @bind-Value="pageIskYuz3" class="form-control" />
-                    </div>
-                    <div class="col-md-2">
-                        <label>İsk-3 Tutar</label>
-                        <InputNumber @bind-Value="teklifDetay.Isktut3" class="form-control" disabled />
-                    </div>
-                </div>
-            </div>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-1">
-                        <label>İsk-Genel %</label>
-                        <InputNumber @bind-Value="teklifDetay.Iskyuz4" class="form-control" disabled />
-                    </div>
-                    <div class="col-md-2">
-                        <label>İsk-Genel Tutar</label>
-                        <InputNumber @bind-Value="teklifDetay.Isktut4" class="form-control" disabled />
-                    </div>
-                    <div class="col-md-2">
-                        <label>KDV Mahrahı</label>
-                        <InputNumber @bind-Value="teklifDetay.Kdvmatrah" class="form-control" disabled />
-                    </div>
-                    <div class="col-md-1">
-                        <label>KDV %</label>
-                        <InputNumber @bind-Value="teklifDetay.Kdvyuz" class="form-control" disabled />
-                    </div>
-                    <div class="col-md-2">
-                        <label>KDV Tutarı</label>
-                        <InputNumber @bind-Value="teklifDetay.Kdvtut" class="form-control" disabled />
-                    </div>
-                    <div class="col-md-2">
-                        <label>Net Tutar</label>
-                        <InputNumber @bind-Value="teklifDetay.Nettutar" class="form-control" disabled />
-                    </div>
-                </div>
-            </div>
+                </MudTabPanel>
+            </MudTabs>
+
+
+
 
         </div>
-            </div>
+    </div>
 
 
-            <div class="form-group">
-                <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
-                <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
-            </div>
+    <div class="form-group">
+        <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
 
 </EditForm>
 
@@ -428,9 +438,11 @@
         else
             await SaveTeklifDetay();
 
-        modalParameters = new ModalParameters();
+        navigation.NavigateTo("/stek_listef_detay/" + teklifDetay.Teklifref);
+
+        /*modalParameters = new ModalParameters();
         modalParameters.Add("teklifDetay", teklifDetay);
-        await ModalInstance.CloseAsync(ModalResult.Ok<TeklifDetayDto>(teklifDetay));
+        await ModalInstance.CloseAsync(ModalResult.Ok<TeklifDetayDto>(teklifDetay));*/
     }
 
     private async Task UpdateTeklifDetay()
@@ -486,21 +498,25 @@
         }
     }
 
-    public async Task Vazgec()
+    public Task Vazgec()
     {
-        await ModalInstance.CloseAsync();
+        if (teklifRef != null)
+        {
+            navigation.NavigateTo("/stek_listef_detay/" + teklifRef);
+        }
+
+        if (teklifDetay != null && teklifDetay.Teklifref != null)
+        {
+            navigation.NavigateTo("/stek_listef_detay/" + teklifDetay.Teklifref);
+        }
+
+        return Task.CompletedTask;
     }
 
     public async Task FiyatGetir()
     {
         try
         {
-            //if (teklif.Dovizrefid <= 0)
-            //{
-            //    throw new Exception("Döviz tipi seçmelisiniz");
-            //}
-            //_DovizKuruState = "Çekiliyor...";
-            //teklif.Dovizkuruid = null;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 

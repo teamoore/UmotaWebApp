@@ -1,0 +1,17 @@
+﻿@page "/teklifdetay_ekle/{teklifRef:int}"
+
+<TeklifDetayEkleGuncelleComponent teklifRef="teklifRef" OnVazgecClicked="Vazgec"></TeklifDetayEkleGuncelleComponent>
+@code {
+
+    [Parameter]
+    public int teklifRef { get; set; }
+
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public void Vazgec()
+    {
+        navigation.NavigateTo("/stek_listef_detay/" + teklifRef);
+    }
+}

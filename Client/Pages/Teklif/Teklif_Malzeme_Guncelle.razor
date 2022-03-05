@@ -210,7 +210,9 @@
     {
         try
         {
-            var opt = new ModalOptions();
+            navigation.NavigateTo("/teklifdetay_ekle/" + logref);
+
+            /*var opt = new ModalOptions();
             opt.ContentScrollable = true;
 
             modalParameters = new ModalParameters();
@@ -231,7 +233,7 @@
                     await LoadTeklifDetayData();
                 }
 
-            }
+            }*/
         }
         catch (Exception ex)
         {
@@ -239,11 +241,13 @@
         }
     }
 
-    public async Task TeklifDetayGuncelle(int logref)
+    public void TeklifDetayGuncelle(int logref)
     {
         try
         {
-            var opt = new ModalOptions();
+            navigation.NavigateTo("/teklifdetay_guncelle/" + logref);
+
+            /*var opt = new ModalOptions();
             opt.ContentScrollable = true;
 
             modalParameters = new ModalParameters();
@@ -264,7 +268,7 @@
                     await LoadTeklifDetayData();
                 }
 
-            }
+            }*/
         }
         catch (Exception)
         {
