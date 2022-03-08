@@ -1,13 +1,13 @@
 ﻿@page "/stek_listef"
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif" 
-                 ShowButtons="true"
+                 ShowButtons="false"
                  onDoneButtonClicked="TeklifAra" ShowSearchSection="true"></HeaderSearchBar>
 
 
 <MudTable Items="@teklifler" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<TeklifDto,bool>(FilterFunc1)">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Teklif Listesi</MudText>
+        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTeklif" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Teklif Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>

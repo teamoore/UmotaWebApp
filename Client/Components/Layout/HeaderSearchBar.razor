@@ -17,12 +17,12 @@
 
         @if (ShowSearchSection)
         {
-            <EditForm Model="header" class="form-inline my-2 my-lg-0">
+    <EditForm Model="header" class="form-inline my-2 my-lg-0">
 
-                <InputText @bind-Value="header.SearchText" class="form-control mr-sm-2" />
-                <SaveButtonComponent Caption="Bul" @onclick="SearchClicked" />
+        <InputText @bind-Value="header.SearchText" class="form-control mr-sm-2" />
+        <button class="btn btn-outline-success my-2 my-sm-0" @onclick="SearchClicked">Ara</button>
 
-            </EditForm>
+    </EditForm>
 
         }
 
