@@ -19,5 +19,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public string MailImza { get; set; }
         public string LogoUsername { get; set; }
         public string LogoPassword { get; set; }
+        public string WebSifre { get; set; }
     }
 }

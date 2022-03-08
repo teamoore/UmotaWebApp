@@ -1,0 +1,30 @@
+﻿@page "/stek_listef_guncelle/{teklifref:int}"
+
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+<TeklifEkleGuncelleComponent OnVazgecClicked="goBackTeklifList" logRef="TeklifRef"></TeklifEkleGuncelleComponent>
+
+
+@code {
+
+    [Parameter]
+    public int TeklifRef { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Teklif Güncelle";
+        return Task.CompletedTask;
+    }
+
+    public void goBackTeklifList()
+    {
+        navigation.NavigateTo("/stek_listef");
+    }
+
+
+}

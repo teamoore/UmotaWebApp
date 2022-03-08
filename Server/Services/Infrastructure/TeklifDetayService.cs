@@ -116,46 +116,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
 
         }
-
-        private async Task<TeklifDetayDto> CalculateTeklifDetay(TeklifDetayDto td)
-        {
-            if (td.Miktar.HasValue && td.Fiyat.HasValue)
-                td.Tutar = Math.Round(td.Miktar.Value * td.Fiyat.Value, 2);
-            else
-                td.Tutar = 0;
-
-            if (td.Dovizkuru.HasValue)
-                td.Tutartl = Math.Round(td.Tutar.Value * td.Dovizkuru.Value,2);
-
-            if (td.Iskyuz1.HasValue)
-                td.Isktut1 = (td.Tutar * td.Iskyuz1) / 100;               
-            
-            if (td.Iskyuz2.HasValue)
-                td.Isktut2 = ((td.Tutar - td.Isktut1) * td.Iskyuz2) / 100;
-
-            if (td.Iskyuz3.HasValue)
-                td.Isktut3 = ((td.Tutar - td.Isktut2 - td.Isktut1) * td.Iskyuz3) / 100;
-
-            if (td.Iskyuz4.HasValue)
-                td.Isktut4 = ((td.Tutar - td.Isktut2 - td.Isktut1 - td.Isktut3) * td.Iskyuz4) / 100;
-                        
-
-            if (td.Isktut1.HasValue)
-                td.Kdvmatrah = td.Tutar - td.Isktut1.Value;
-
-            if (td.Isktut2.HasValue)
-                td.Kdvmatrah = td.Tutar - td.Isktut2.Value;
-
-            if (td.Isktut3.HasValue)
-                td.Kdvmatrah = td.Tutar - td.Isktut3.Value;
-
-            if (td.Isktut4.HasValue)
-                td.Kdvmatrah = td.Tutar - td.Isktut4.Value;
-
-
-            return await Task.FromResult(td);
-        }
-
+          
         private async Task CalculateTeklif(int teklifRef, string firmaId)
         {
 
@@ -169,22 +130,42 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
                 var teklifDetayList = await dbContext.Teklifdetays.Where(x => x.Teklifref == teklifRef).ToListAsync();
-                var toplamTutar = new double();
+                var toplamTutarID = new double();
                 var toplamTutarTL = new double();
+                var toplamTutarRD = new double();
+                var kdvMatrahID = new double();
+                var kdvMatrahTL = new double();
+                var kdvMatrahrd = new double();
 
                 foreach (var item in teklifDetayList)
                 {
-                    if (item.Tutar.HasValue )
-                        toplamTutar = toplamTutar + item.Tutar.Value;
+                    if (item.Tutarid.HasValue )
+                        toplamTutarID += item.Tutarid.Value;
 
                     if (item.Tutartl.HasValue)
-                        toplamTutarTL = toplamTutarTL + item.Tutartl.Value;
+                        toplamTutarTL += item.Tutartl.Value;
+
+                    if (item.Tutarrd.HasValue)
+                        toplamTutarRD += item.Tutarrd.Value;
+
+                    if (item.Kdvmatrahid.HasValue)
+                        kdvMatrahID += item.Kdvmatrahid.Value;
+
+                    if (item.Kdvmatrahtl.HasValue)
+                        kdvMatrahTL += item.Kdvmatrahtl.Value;
+
+                    if (item.Kdvmatrahrd.HasValue)
+                        kdvMatrahrd += item.Kdvmatrahrd.Value;
                 }
 
                 var teklif = await dbContext.Teklifs.Where(x => x.Logref == teklifRef).SingleOrDefaultAsync();
 
-                teklif.Tutar = toplamTutar;
+                teklif.Tutar = toplamTutarID;
                 teklif.Tutartl = toplamTutarTL;
+                teklif.Tutarrd = toplamTutarRD;
+                teklif.Tutarmatrah = kdvMatrahID;
+                teklif.Tutarmatrahtl = kdvMatrahTL;
+                teklif.Tutarmatrahrd = kdvMatrahrd;
 
                 await dbContext.SaveChangesAsync();
             }

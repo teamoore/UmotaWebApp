@@ -23,5 +23,6 @@ namespace UmotaWebApp.Server.Data.Models
         public string MailImza { get; set; }
         public string LogoUsername { get; set; }
         public string LogoPassword { get; set; }
+        public string WebSifre { get; set; }
     }
 }

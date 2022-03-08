@@ -201,6 +201,8 @@
 
     TeklifDetayDto teklifDetay = new TeklifDetayDto();
 
+    TeklifDto teklif = new TeklifDto();
+
     public List<DovizDto> DovizListesi { get; set; }
 
     private bool _TeklifDetayCekildi = false;
@@ -294,6 +296,7 @@
 
 
         await DovizListesiGetir();
+        await GetTeklif();
     }
 
     public async Task GetTeklifDetaySiraNo()
@@ -393,9 +396,11 @@
                 teklifDetay.Malzadi = mkart.Adi;
                 teklifDetay.Malzkodu = mkart.Kodu;
                 teklifDetay.Birimkodu = mkart.Birimkodu;
+                teklifDetay.Unitsetllogref = mkart.Birimref;
                 teklifDetay.Marka = mkart.Descr;
                 teklifDetay.Mensei = mkart.Definition;
                 teklifDetay.Ebat = mkart.Ebatt;
+                teklifDetay.Kdvyuz = mkart.Kdvyuz;
                 if (mkart.Kodu.StartsWith("UMOTA"))
                 {
                     teklifDetay.Fiyat = mkart.Satfiyat;
@@ -437,20 +442,16 @@
             await UpdateTeklifDetay();
         else
             await SaveTeklifDetay();
-
-        navigation.NavigateTo("/stek_listef_detay/" + teklifDetay.Teklifref);
-
-        /*modalParameters = new ModalParameters();
-        modalParameters.Add("teklifDetay", teklifDetay);
-        await ModalInstance.CloseAsync(ModalResult.Ok<TeklifDetayDto>(teklifDetay));*/
     }
 
     private async Task UpdateTeklifDetay()
     {
         try
         {
+            TeklifDetayValidation();
+
             teklifDetay.Upddate = DateTime.Now;
-            teklifDetay.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklifDetay.Upduser = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
             teklifDetay.Status = 1;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
@@ -463,6 +464,16 @@
 
             Snackbar.Add("Teklif güncellendi", severity:Severity.Success);
 
+            navigation.NavigateTo("/stek_listef_detay/" + teklifDetay.Teklifref);
+
+        }
+        catch (ClientException e)
+        {
+            foreach (var item in e.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
         }
         catch (Exception ex)
         {
@@ -474,9 +485,11 @@
     {
         try
         {
+            TeklifDetayValidation();
+
             await LogRefUret();
             teklifDetay.Insdate = DateTime.Now;
-            teklifDetay.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklifDetay.Insuser = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
             teklifDetay.Teklifref = teklifRef;
             teklifDetay.Status = 0;
 
@@ -490,7 +503,16 @@
 
             Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
 
-            await ModalInstance.CloseAsync(ModalResult.Ok<TeklifDetayDto>(teklifDetay));
+            navigation.NavigateTo("/stek_listef_detay/" + teklifDetay.Teklifref);
+
+        }
+        catch (ClientException e)
+        {
+            foreach (var item in e.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
         }
         catch (Exception ex)
         {
@@ -526,8 +548,8 @@
             var request = new MalzemeFiyatRequestDto();
             request.Tarih = DateTime.Now;
             request.MalzemeRef = teklifDetay.LstokId.Value;
-            request.CariKodu = "";
-            request.BirimKodu = "ADET";
+            request.CariKodu = teklif.Carikodu;
+            request.BirimKodu = teklifDetay.Birimkodu;
             request.DovizRef = teklifDetay.Dovizref.HasValue ? teklifDetay.Dovizref.Value : 160;
             request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
 
@@ -557,11 +579,6 @@
         else
             teklifDetay.Tutar = 0;
 
-        if (teklifDetay.Dovizkuru.HasValue)
-            teklifDetay.Tutartl = Math.Round(teklifDetay.Tutar.Value * teklifDetay.Dovizkuru.Value, 2);
-        else
-            teklifDetay.Tutartl = 0;
-
         if (teklifDetay.Iskyuz1.HasValue)
             teklifDetay.Isktut1 = Math.Round((teklifDetay.Tutar.Value * teklifDetay.Iskyuz1.Value) / 100,2);
         else
@@ -585,7 +602,159 @@
         teklifDetay.Kdvmatrah = teklifDetay.Tutar.Value - teklifDetay.Isktut1.Value - teklifDetay.Isktut2.Value - teklifDetay.Isktut3.Value - teklifDetay.Isktut4.Value;
         teklifDetay.Kdvtut = Math.Round((teklifDetay.Kdvmatrah.Value * (teklifDetay.Kdvyuz.HasValue ? teklifDetay.Kdvyuz.Value : 0)) / 100,2);
         teklifDetay.Nettutar = teklifDetay.Kdvmatrah.Value + teklifDetay.Kdvtut.Value;
+
+        if (teklifDetay.Dovizref == 160)
+        {
+            teklifDetay.Fiyattl = teklifDetay.Fiyat;
+            teklifDetay.Tutartl = teklifDetay.Tutar.Value;
+            teklifDetay.Isktut1tl = teklifDetay.Isktut1.Value;
+            teklifDetay.Isktut2tl = teklifDetay.Isktut2.Value;
+            teklifDetay.Isktut3tl = teklifDetay.Isktut3.Value;
+            teklifDetay.Isktut4tl = teklifDetay.Isktut4.Value;
+            teklifDetay.Kdvmatrahtl = teklifDetay.Kdvmatrah.Value;
+            teklifDetay.Kdvtuttl = teklifDetay.Kdvtut.Value;
+            teklifDetay.Nettutartl = teklifDetay.Nettutar.Value;
+        }
+        else
+        if (teklifDetay.Dovizkuru.HasValue)
+        {
+            teklifDetay.Fiyattl = Math.Round(teklifDetay.Fiyat.Value * teklifDetay.Dovizkuru.Value, 2);
+            teklifDetay.Tutartl = Math.Round(teklifDetay.Tutar.Value * teklifDetay.Dovizkuru.Value, 2);
+            teklifDetay.Isktut1tl = Math.Round(teklifDetay.Isktut1.Value * teklifDetay.Dovizkuru.Value, 2);
+            teklifDetay.Isktut2tl = Math.Round(teklifDetay.Isktut2.Value * teklifDetay.Dovizkuru.Value, 2);
+            teklifDetay.Isktut3tl = Math.Round(teklifDetay.Isktut3.Value * teklifDetay.Dovizkuru.Value, 2);
+            teklifDetay.Isktut4tl = Math.Round(teklifDetay.Isktut4.Value * teklifDetay.Dovizkuru.Value, 2);
+            teklifDetay.Kdvmatrahtl = Math.Round(teklifDetay.Kdvmatrah.Value * teklifDetay.Dovizkuru.Value, 2);
+            teklifDetay.Kdvtuttl = Math.Round(teklifDetay.Kdvtut.Value * teklifDetay.Dovizkuru.Value, 2);
+            teklifDetay.Nettutartl = Math.Round(teklifDetay.Nettutar.Value * teklifDetay.Dovizkuru.Value, 2);
+        }
+        else
+        {
+            teklifDetay.Fiyattl = 0;
+            teklifDetay.Tutartl = 0;
+            teklifDetay.Isktut1tl = 0;
+            teklifDetay.Isktut2tl = 0;
+            teklifDetay.Isktut3tl = 0;
+            teklifDetay.Isktut4tl = 0;
+            teklifDetay.Kdvmatrahtl = 0;
+            teklifDetay.Kdvtuttl = 0;
+            teklifDetay.Nettutartl = 0;
+        }
+
+        if (teklifDetay.Dovizref == teklif.Dovizrefid)
+        {
+            teklifDetay.Tutarid = teklifDetay.Tutar.Value;
+            teklifDetay.Isktut1id = teklifDetay.Isktut1.Value;
+            teklifDetay.Isktut2id = teklifDetay.Isktut2.Value;
+            teklifDetay.Isktut3id = teklifDetay.Isktut3.Value;
+            teklifDetay.Isktut4id = teklifDetay.Isktut4.Value;
+            teklifDetay.Kdvmatrahid = teklifDetay.Kdvmatrah.Value;
+            teklifDetay.Kdvtutid = teklifDetay.Kdvtut.Value;
+            teklifDetay.Nettutarid = teklifDetay.Nettutar.Value;
+        }
+        else
+        if (teklif.Dovizkuruid.HasValue)
+        {
+            teklifDetay.Tutarid = Math.Round(teklifDetay.Tutartl.Value / teklif.Dovizkuruid.Value, 2);
+            teklifDetay.Isktut1id = Math.Round(teklifDetay.Isktut1tl.Value / teklif.Dovizkuruid.Value, 2);
+            teklifDetay.Isktut2id = Math.Round(teklifDetay.Isktut2tl.Value / teklif.Dovizkuruid.Value, 2);
+            teklifDetay.Isktut3id = Math.Round(teklifDetay.Isktut3tl.Value / teklif.Dovizkuruid.Value, 2);
+            teklifDetay.Isktut4id = Math.Round(teklifDetay.Isktut4tl.Value / teklif.Dovizkuruid.Value, 2);
+            teklifDetay.Kdvmatrahid = Math.Round(teklifDetay.Kdvmatrahtl.Value / teklif.Dovizkuruid.Value, 2);
+            teklifDetay.Kdvtutid = Math.Round(teklifDetay.Kdvtuttl.Value / teklif.Dovizkuruid.Value, 2);
+            teklifDetay.Nettutarid = Math.Round(teklifDetay.Nettutartl.Value / teklif.Dovizkuruid.Value, 2);
+        } else
+        {
+            teklifDetay.Tutarid = 0;
+            teklifDetay.Isktut1id = 0;
+            teklifDetay.Isktut2id = 0;
+            teklifDetay.Isktut3id = 0;
+            teklifDetay.Isktut4id = 0;
+            teklifDetay.Kdvmatrahid = 0;
+            teklifDetay.Kdvtutid = 0;
+            teklifDetay.Nettutarid = 0;
+        }
+
+        if (teklifDetay.Dovizref == teklif.Dovizref)
+        {
+            teklifDetay.Tutarrd = teklifDetay.Tutar.Value;
+            teklifDetay.Isktut1rd = teklifDetay.Isktut1.Value;
+            teklifDetay.Isktut2rd = teklifDetay.Isktut2.Value;
+            teklifDetay.Isktut3rd = teklifDetay.Isktut3.Value;
+            teklifDetay.Isktut4rd = teklifDetay.Isktut4.Value;
+            teklifDetay.Kdvmatrahrd = teklifDetay.Kdvmatrah.Value;
+            teklifDetay.Kdvtutrd = teklifDetay.Kdvtut.Value;
+            teklifDetay.Nettutarrd = teklifDetay.Nettutar.Value;
+        }
+        else
+        if (teklif.Dovizkuru.HasValue)
+        {
+            teklifDetay.Tutarrd = Math.Round(teklifDetay.Tutartl.Value / teklif.Dovizkuru.Value, 2);
+            teklifDetay.Isktut1rd = Math.Round(teklifDetay.Isktut1tl.Value / teklif.Dovizkuru.Value, 2);
+            teklifDetay.Isktut2rd = Math.Round(teklifDetay.Isktut2tl.Value / teklif.Dovizkuru.Value, 2);
+            teklifDetay.Isktut3rd = Math.Round(teklifDetay.Isktut3tl.Value / teklif.Dovizkuru.Value, 2);
+            teklifDetay.Isktut4rd = Math.Round(teklifDetay.Isktut4tl.Value / teklif.Dovizkuru.Value, 2);
+            teklifDetay.Kdvmatrahrd = Math.Round(teklifDetay.Kdvmatrahtl.Value / teklif.Dovizkuru.Value, 2);
+            teklifDetay.Kdvtutrd = Math.Round(teklifDetay.Kdvtuttl.Value / teklif.Dovizkuru.Value, 2);
+            teklifDetay.Nettutarrd = Math.Round(teklifDetay.Nettutartl.Value / teklif.Dovizkuru.Value, 2);
+        }
+        else
+        {
+            teklifDetay.Tutarrd = 0;
+            teklifDetay.Isktut1rd = 0;
+            teklifDetay.Isktut2rd = 0;
+            teklifDetay.Isktut3rd = 0;
+            teklifDetay.Isktut4rd = 0;
+            teklifDetay.Kdvmatrahrd = 0;
+            teklifDetay.Kdvtutrd = 0;
+            teklifDetay.Nettutarrd = 0;
+        }
+
     }
 
+    public async Task GetTeklif()
+    {
+        try
+        {
 
+            if (teklifRef.HasValue == false)
+                return;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<TeklifDto>(UrlHelper.TeklifGetir + "?logref=" + teklifRef.Value + "&firmaId=" + selectedFirmaDonem.firma_no);
+            if (result != null)
+            {
+                teklif = result;
+
+                teklifDetay.Iskyuz4 = teklif.Gniskoran;
+            }
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+        }
+    }
+
+    public void TeklifDetayValidation()
+    {
+        var err = new List<string>();
+
+        if (teklifDetay.LstokId == null)
+            err.Add("Malzeme boş geçilemez");
+
+        if (teklifDetay.Miktar == null)
+            err.Add("Miktar boş geçilemez");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Teklif Detay Hatası");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
 }

@@ -126,7 +126,7 @@
                     </div>
                     <div class="col-md-4">
                         <label>Döviz Kuru</label>
-                        <InputNumber @bind-Value="teklif.Dovizkuruid" class="form-control" placeholder="@_DovizKuruState"/>
+                        <InputNumber @bind-Value="teklif.Dovizkuruid" class="form-control" placeholder="@_DovizKuruState" />
                     </div>
                     <div class="col-md-4">
                         <label>Genel İsk.%</label>
@@ -181,13 +181,15 @@
     private int _dovizTuru = -1;
     public int DovizTuruBilgisi
     {
-        get {
+        get
+        {
             if (teklif.Dovizrefid.HasValue == false)
                 return -1;
 
             return teklif.Dovizrefid.Value;
         }
-        set{
+        set
+        {
             _dovizTuru = value;
             teklif.Dovizrefid = _dovizTuru;
 
@@ -224,6 +226,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        IsUpdate = logRef.HasValue;
+
         if (!IsUpdate)
         {
             teklif.Tarih = DateTime.Now;
@@ -295,8 +299,10 @@
     {
         try
         {
+            TeklifValidation();
+
             teklif.Upddate = DateTime.Now;
-            teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklif.Upduser = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
             teklif.Status = 1;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
@@ -315,6 +321,14 @@
             navigation.NavigateTo("/stek_listef_detay/" + result.Logref);
 
         }
+        catch (ClientException e)
+        {
+            foreach (var item in e.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
@@ -323,20 +337,50 @@
 
     private async Task SaveTeklif()
     {
+
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
         try
         {
+            TeklifValidation();
+
+            teklif.Dovizref = 20;
+
+            var requestDovizKuru = new DovizKuruRequestDto();
+            requestDovizKuru.KurTarihi = teklif.Tarih.Value;
+            requestDovizKuru.KurTuru = 4;
+            requestDovizKuru.DovizTuru = teklif.Dovizref.Value;
+            requestDovizKuru.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+
+            var dovizKuruResult = await httpClient.PostGetServiceResponseAsync<double, DovizKuruRequestDto>(UrlHelper.DovizKuruGetir, requestDovizKuru);
+
+            teklif.Dovizkuru = dovizKuruResult;
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+
             teklif.Insdate = DateTime.Now;
-            teklif.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklif.Insuser = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
             teklif.Tarih = teklif.Tarih.HasValue ? teklif.Tarih : DateTime.Now;
             teklif.Saat = teklif.Saat.HasValue ? teklif.Saat : DateTime.Now;
             teklif.Status = 0;
             teklif.Trcode = 1;
             teklif.Duruminfo = "Teklif Hazırlanıyor";
-
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
 
             await TeklifNoUret();
             await LogRefUret();
@@ -463,7 +507,6 @@
         }
     }
 
-
     public async Task DovizKuruGetir()
     {
         try
@@ -498,6 +541,25 @@
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    public void TeklifValidation()
+    {
+        var err = new List<string>();
+
+        if (teklif.Cariref == null)
+            err.Add("Cari Hesap boş geçilemez");
+
+        if (string.IsNullOrEmpty(teklif.IlgiliAdi))
+            err.Add("Firma yetkilisi boş geçilemez");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Teklif Hatası");
+            ex.ErrorList = err;
+
+            throw ex;
         }
     }
 }

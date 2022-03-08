@@ -3,27 +3,39 @@
 <div class="card" style="width: 100%;">
     <div class="card-body">
         <h5 class="card-title">Teklif Numarası : @teklif.Teklifno</h5>
+         
+            <h6 class="card-subtitle mb-2 text-muted">
+                Teklif Tarihi : @(teklif.Tarih.HasValue ? teklif.Tarih.Value.ToString("dd.MM.yyyy") : "")
+                / Teslim Tarihi : @(teklif.TeslimTarihi.HasValue ? teklif.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "")
+            </h6>
+         
         <div class="row">
-            <div class="col-md-6">
-                <h6 class="card-subtitle mb-2 text-muted">
-                    Teklif Tarihi : @(teklif.Tarih.HasValue ? teklif.Tarih.Value.ToString("dd.MM.yyyy") : "")
-                    / Teslim Tarihi : @(teklif.TeslimTarihi.HasValue ? teklif.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "")
-                </h6>
+            <div class="col-md-4">
+
                 <p class="card-text">
                     <strong>Firma:</strong> @teklif.Cariadi <br />
-                    <strong>Proje Adı:</strong> @teklif.Proje <br />
                     <strong>İlgili Kişi:</strong> @teklif.IlgiliAdi
                     <br />
-                    <strong>Açıklama :</strong> @teklif.Aciklama1
+
+                    <strong>Açıklama :</strong> @teklif.Aciklama1 <br />
+                    <strong>Proje Adı:</strong> @teklif.Proje <br />
                 </p>
 
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <p class="card-text">
-                    
-                    <strong>Teklif Tutar :</strong> @(teklif.Tutar.HasValue ? teklif.Tutar.Value : "0")
-                    <br />
-                    <strong>Miktar : </strong> @(_miktar.HasValue ? _miktar.Value : 0)
+
+                    <strong>Satır Sayısı : </strong> @(_miktar.HasValue ? _miktar.Value : 0)
+                    <br /><strong>Teklif Tutar :</strong> @(teklif.Tutarmatrah.HasValue ? teklif.Tutarmatrah.Value : "0")
+                    <br /><strong>Teklif Para Birimi : </strong> @(teklif.Dovizdokuid)
+                    <br /><strong>Teklif Tutar TL :</strong>@(teklif.Tutarmatrahtl.HasValue ? teklif.Tutarmatrahtl.Value : "0")
+
+                </p>
+
+            </div>
+            <div class="col-md-4">
+                <p class="card-text">
+                    <strong>Satış Temsilcisi : </strong> @teklif.Temsilciadi
                 </p>
 
             </div>
@@ -54,6 +66,7 @@
         <MudTh>Stok Kodu</MudTh>
         <MudTh>Stok Adı</MudTh>
         <MudTh>Miktar</MudTh>
+        <MudTh>Birim</MudTh>
         <MudTh>Birim Fiyat</MudTh>
         <MudTh>Tutar</MudTh>
         <MudTh>#</MudTh>
@@ -68,6 +81,7 @@
         <MudTd DataLabel="Stok Kodu">@context.Malzkodu</MudTd>
         <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
+        <MudTd DataLabel="Birim">@context.Birimkodu</MudTd>
         <MudTd DataLabel="Birim Fiyat">@context.Fiyat</MudTd>
         <MudTd DataLabel="Tutar">@context.Tutar</MudTd>
         <MudTd>
@@ -145,12 +159,12 @@
             if (result != null)
             {
                 teklifDetayList = result.OrderBy(x => x.Sipnosira).ToList();
-                _miktar = teklifDetayList.Sum(x => x.Miktar);
+                _miktar = teklifDetayList.Count();
             }
         }
         catch (Exception ex)
         {
-            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+            Snackbar.Add(ex.Message, Severity.Error);
         }
     }
 
@@ -171,7 +185,7 @@
         }
         catch (Exception ex)
         {
-            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+            Snackbar.Add(ex.Message, Severity.Error);
         }
     }
 
@@ -180,23 +194,11 @@
 
         try
         {
-            modalParameters = new ModalParameters();
-            modalParameters.Add("logRef", logref);
-            modalParameters.Add(nameof(TeklifEkleGuncelleComponent.OnVazgecClicked),
-                EventCallback.Factory.Create(this, Kapat));
-
-            var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
-            var duzenleForm = modal.Show<TeklifEkleGuncelleComponent>("Teklif Güncelle", parameters: modalParameters, options: opt);
-
-            var result = await duzenleForm.Result;
-
-            await LoadTeklifData();
+            navigation.NavigateTo("/stek_listef_guncelle/" + logref);
         }
         catch (Exception ex)
         {
-            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+            Snackbar.Add(ex.Message, Severity.Error);
         }
 
     }
@@ -206,34 +208,11 @@
         await ModalInstance.CloseAsync();
     }
 
-    public async Task TeklifDetayEkle()
+    public void TeklifDetayEkle()
     {
         try
         {
             navigation.NavigateTo("/teklifdetay_ekle/" + logref);
-
-            /*var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
-            modalParameters = new ModalParameters();
-            modalParameters.Add("teklifRef", logref);
-
-            var malzKartForm = modal.Show<TeklifDetayEkleGuncelleComponent>("Teklif Detay", parameters: modalParameters, options: opt);
-            var result = await malzKartForm.Result;
-
-            if (!result.Cancelled)
-            {
-                if (result.Data != null)
-                {
-                    var secim = (TeklifDetayDto)result.Data;
-
-                    Snackbar.Add("Malzeme Kartı eklendi : " + secim.Malzadi, severity: Severity.Success);
-
-                    await LoadTeklifData();
-                    await LoadTeklifDetayData();
-                }
-
-            }*/
         }
         catch (Exception ex)
         {
@@ -247,33 +226,10 @@
         {
             navigation.NavigateTo("/teklifdetay_guncelle/" + logref);
 
-            /*var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
-            modalParameters = new ModalParameters();
-            modalParameters.Add("logRef", logref);
-
-            var malzKartForm = modal.Show<TeklifDetayEkleGuncelleComponent>("Teklif Detay", parameters: modalParameters, options: opt);
-            var result = await malzKartForm.Result;
-
-            if (!result.Cancelled)
-            {
-                if (result.Data != null)
-                {
-                    var secim = (TeklifDetayDto)result.Data;
-
-                    Snackbar.Add("Malzeme Kartı güncellendi : " + secim.Malzadi, severity:Severity.Info);
-
-                    await LoadTeklifData();
-                    await LoadTeklifDetayData();
-                }
-
-            }*/
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            Snackbar.Add(ex.Message, Severity.Error);
         }
     }
 

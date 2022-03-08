@@ -49,7 +49,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<SisKullaniciLoginResponseDto> Login(SisKullaniciLoginRequestDto request)
         {
-            var kullanici = await MasterDbContext.SisKullanicis.Where(x => x.KullaniciKodu == request.Kod && x.KullaniciSifre == request.Sifre)
+            var kullanici = await MasterDbContext.SisKullanicis.Where(x => x.KullaniciKodu == request.Kod && x.WebSifre == request.Sifre)
               .ProjectTo<SisKullaniciDto>(Mapper.ConfigurationProvider).FirstOrDefaultAsync();
 
             if (kullanici == null)

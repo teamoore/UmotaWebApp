@@ -27,7 +27,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 string LogoDbName = Configuration["LogoDbName"];
                 string LogoFirmaNo = logofirmno.ToString("000");
-                string sqlstring = "SELECT  LOGICALREF, FIRMNR , CURTYPE, CURCODE , CURNAME from " + LogoDbName + ".[dbo].[L_CURRENCYLIST] with(nolock) WHERE CURTYPE IN(0,1,20,160,17,53) and FIRMNR = " + LogoFirmaNo + " order by CURCODE";
+                string sqlstring = "SELECT  LOGICALREF, FIRMNR , CURTYPE, CURCODE , CURNAME from " + LogoDbName + ".[dbo].[L_CURRENCYLIST] with(nolock) WHERE CURTYPE IN(1,20,160,17) and FIRMNR = " + LogoFirmaNo + " order by CURCODE";
 
                 IEnumerable<DovizDto> dbResponse;
                 dbResponse = await db.QueryAsync<DovizDto>(sqlstring, commandType: CommandType.Text);
