@@ -66,6 +66,26 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpGet("get")]
+        public async Task<ServiceResponse<CariKartDto>> CariKartGetirLogRef(int logref, string firmaId)
+        {
+            try
+            {
+                return new ServiceResponse<CariKartDto>()
+                {
+                    Value = await CariKartService.GetCariKart(logref, firmaId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<CariKartDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
         [HttpPost("save")]
         public async Task<ServiceResponse<CariKartDto>> CariKartKaydet(CariKartRequestDto request)
         {

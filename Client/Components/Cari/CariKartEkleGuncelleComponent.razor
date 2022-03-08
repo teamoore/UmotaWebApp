@@ -125,7 +125,7 @@
 @code
 {
     [Parameter]
-    public string CariKartRef { get; set; }
+    public int? CariKartRef { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
@@ -158,7 +158,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
-            cariModel = await httpClient.GetServiceResponseAsync<CariKartDto>(UrlHelper.CariKartGetir + "?kod=" + CariKartRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+            cariModel = await httpClient.GetServiceResponseAsync<CariKartDto>(UrlHelper.CariKartGetirLogRef + "?logref=" + CariKartRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
         }
         catch (Exception ex)
@@ -214,13 +214,18 @@
 
     protected override Task OnParametersSetAsync()
     {
-        isUpdate = !string.IsNullOrEmpty(CariKartRef);
+        if (CariKartRef != null)
+            isUpdate = true;
+
         return Task.CompletedTask;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        if(isUpdate)
+        if (CariKartRef != null)
+            isUpdate = true;
+
+        if (isUpdate)
         {
             await CariKartGetir();
             return;

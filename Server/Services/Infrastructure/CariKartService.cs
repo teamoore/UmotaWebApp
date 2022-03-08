@@ -119,5 +119,23 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return results;
             }
         }
+
+        public async Task<CariKartDto> GetCariKart(int logref, string firmaId)
+        {
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                IQueryable<CariKartDto> qry = dbContext.CariKarts.Where(i => i.Logref == logref)
+                            .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider);
+
+                return await qry.SingleOrDefaultAsync();
+            }
+        }
     }
 }

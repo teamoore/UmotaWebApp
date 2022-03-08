@@ -10,6 +10,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     {
         public Task<List<CariKartDto>> GetCariKartDtos(string firmaId);
         public Task<CariKartDto> GetCariKartByKod(string kod, string firmaId);
+        public Task<CariKartDto> GetCariKart(int logref, string firmaId);
         public Task<CariKartDto> SaveCariKart(CariKartRequestDto request);
         public Task<CariKartDto> UpdateCariKart(CariKartRequestDto request);
         public Task<List<CariKartDto>> SearchCariKarts(CariKartRequestDto request);

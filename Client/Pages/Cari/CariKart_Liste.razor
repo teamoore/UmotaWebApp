@@ -4,27 +4,39 @@
                  ShowButtons="true"
                  ShowSearchSection="true"></HeaderSearchBar>
 
-<MudDataGrid MultiSelection="true" Items="@cariler" Dense="true" Sortable="true" Filterable="true" QuickFilter="@_quickFilter">
+<MudTable Items="@cariler" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<CariKartDto,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Cari Kartlar</MudText>
         <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Cari Kart Ara" Adornment="Adornment.Start" Immediate="true"
-                      AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="_searchString" Placeholder="Teklif Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
-    <Columns>
-        <Column T="CariKartDto" Field="Adi" Title="Kod" Sortable="false" Filterable="false" />
-        <Column T="CariKartDto" Field="Kodu" SortBy="@_sortBy" />
-        <Column T="CariKartDto" Field="Adi2" Title="Adı 2" />
-        <Column T="CariKartDto" Field="Adres1" Title="Adres 1" />
-        <Column T="CariKartDto" Field="Ilce" Title="İlçe" />
-        <Column T="CariKartDto" Field="Il" Title="Şehir" />
-        <Column T="CariKartDto" Field="Ulke" Title="Ülke" />
-        <Column T="CariKartDto" Field="Tel1" Title="Telefon" />
-    </Columns>
+    <HeaderContent>
+        <MudTh>Adı</MudTh>
+        <MudTh>Kodu</MudTh>
+        <MudTh>Adı 2</MudTh>
+        <MudTh>Adres 1</MudTh>
+        <MudTh>İlçe</MudTh>
+        <MudTh>Şehir</MudTh>
+        <MudTh>Ülke</MudTh>
+        <MudTh>Telefon</MudTh>
+        
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="" OnClick="(() => CariKartGuncelle(context.Logref))"></CustomEditButtonComponent>
+        </MudTd>
+        <MudTd DataLabel="Adı">@context.Adi</MudTd>
+        <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
+        <MudTd DataLabel="Adı 2">@context.Adi2</MudTd>
+        <MudTd DataLabel="Adres 1">@context.Adres1</MudTd>
+        <MudTd DataLabel="İlçe">@context.Ilce</MudTd>
+        <MudTd DataLabel="Şehir">@context.Il</MudTd>
+        <MudTd DataLabel="Ülke">@context.Ulke</MudTd>
+    </RowTemplate>
     <PagerContent>
-        <MudDataGridPager T="CariKartDto" />
+        <MudTablePager />
     </PagerContent>
-</MudDataGrid>
+</MudTable>
 
 @code
 {
@@ -47,31 +59,21 @@
     private string _searchString;
     private bool _sortNameByLength;
 
-    // custom sort by name length
-    private Func<CariKartDto, object> _sortBy => x =>
+    private bool FilterFunc1(CariKartDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(CariKartDto element, string searchString)
     {
-        if (_sortNameByLength)
-            return x.Adi.Length;
-        else
-            return x.Adi;
-    };
-    // quick filter - filter gobally across multiple columns with the same input
-    private Func<CariKartDto, bool> _quickFilter => x =>
-    {
-        if (string.IsNullOrWhiteSpace(_searchString))
+        if (string.IsNullOrWhiteSpace(searchString))
             return true;
-
-        if (x.Adi.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Adi != null && element.Adi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-
-        if (x.Kodu.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Adi2 != null && element.Adi2.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-
-        if ($"{x.Adi} {x.Adi2} {x.Kodu} {x.Ozelkod} {x.Ozelkod2} {x.Il} {x.Ilce} {x.Ulke} {x.Adres1}".Contains(_searchString,  StringComparison.OrdinalIgnoreCase))
+        if (element.Ilce != null && element.Il != null && element.Adres1 != null
+            && $"{element.Ilce} {element.Il} {element.Adres1}".Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-
         return false;
-    };
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -127,9 +129,9 @@
         }
     }
 
-    public void CariKartGuncelle(string kod)
+    public void CariKartGuncelle(int logref)
     {
-        navigation.NavigateTo("/r_carilistef_guncelle/" + kod);
+        navigation.NavigateTo("/r_carilistef_guncelle/" + logref);
     }
 
     public void CreateCariKart()
