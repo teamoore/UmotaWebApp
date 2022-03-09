@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -32,7 +33,7 @@ namespace UmotaWebApp.Client.Utils
         public static string FormattedDouble(double? m)
         {
             if (m.HasValue)
-                return string.Format("{0:0,0.0}", m.Value);
+                return m.Value.ToString("F", CultureInfo.InvariantCulture);
 
             return "0.0";
         }

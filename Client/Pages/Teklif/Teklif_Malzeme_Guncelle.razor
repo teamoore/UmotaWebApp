@@ -82,8 +82,8 @@
         <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
         <MudTd DataLabel="Birim">@context.Birimkodu</MudTd>
-        <MudTd DataLabel="Birim Fiyat">@context.Fiyat</MudTd>
-        <MudTd DataLabel="Tutar">@context.Tutar</MudTd>
+        <MudTd DataLabel="Birim Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.Fiyat))</MudTd>
+        <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Tutar))</MudTd>
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
         </MudTd>
