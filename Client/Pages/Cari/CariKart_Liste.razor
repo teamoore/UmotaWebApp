@@ -1,12 +1,12 @@
 ﻿@page "/r_carilistef"
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="CreateCariKart" onDoneButtonClicked="HeaderSearch"
-                 ShowButtons="true"
+                 ShowButtons="false"
                  ShowSearchSection="true"></HeaderSearchBar>
 
 <MudTable Items="@cariler" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<CariKartDto,bool>(FilterFunc1)">
     <ToolBarContent>
-        <MudText Typo="Typo.h6">Cari Kartlar</MudText>
+        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="CreateCariKart" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Teklif Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
@@ -23,7 +23,7 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="" OnClick="(() => CariKartGuncelle(context.Logref))"></CustomEditButtonComponent>
+            <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => CariKartGuncelle(context.Logref))" Size="Size.Medium" />
         </MudTd>
         <MudTd DataLabel="Adı">@context.Adi</MudTd>
         <MudTd DataLabel="Kodu">@context.Kodu</MudTd>

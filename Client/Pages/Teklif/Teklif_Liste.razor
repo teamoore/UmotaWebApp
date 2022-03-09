@@ -28,16 +28,16 @@
         <MudTh>Kaydı Giren</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd>
-            <CustomEditButtonComponent IsSmall="true" IsOutline="true" Caption="" OnClick="(() => TeklifDetay(context.Logref))"></CustomEditButtonComponent>
+        <MudTd>            
+            <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => TeklifDetay(context.Logref))" Size="Size.Medium" />
         </MudTd>
         <MudTd DataLabel="Durum">@context.Duruminfo</MudTd>
         <MudTd DataLabel="Teklif No">@context.Teklifno</MudTd>
         <MudTd DataLabel="Tarih">@context.TarihFormatted</MudTd>
         <MudTd DataLabel="Cari Kodu">@context.Carikodu</MudTd>
         <MudTd DataLabel="Cari Adı">@context.Cariadi</MudTd>
-        <MudTd DataLabel="Tutar TL">@context.Tutarmatrahtl</MudTd>
-        <MudTd DataLabel="Tutar">@context.Tutarmatrah</MudTd>
+        <MudTd DataLabel="Tutar TL" Style="text-align:right">@(Helper.FormattedDouble(context.Tutarmatrahtl))</MudTd>
+        <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Tutarmatrah))</MudTd>
         <MudTd DataLabel="Döviz">@context.Dovizdokuid</MudTd>
         <MudTd DataLabel="Proje Adı">@context.Proje</MudTd>
         <MudTd DataLabel="Satış Temsilcisi">@context.Temsilciadi</MudTd>

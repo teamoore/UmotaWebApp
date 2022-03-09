@@ -29,5 +29,13 @@ namespace UmotaWebApp.Client.Utils
             return result2;
         }
 
+        public static string FormattedDouble(double? m)
+        {
+            if (m.HasValue)
+                return string.Format("{0:0,0.0}", m.Value);
+
+            return "0.0";
+        }
+
     }
 }

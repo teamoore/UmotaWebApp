@@ -7,22 +7,31 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         @if (ShowButtons)
         {
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                @*<button class="btn btn-link" @onclick="AddNewClicked">Yeni Ekle</button>*@
-                <button class="btn btn-primary" @onclick="AddNewClicked"><i class="fa fa-plus"></i>Yeni Ekle</button>
-            </li>
-        </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    @*<button class="btn btn-link" @onclick="AddNewClicked">Yeni Ekle</button>*@
+                    <button class="btn btn-primary" @onclick="AddNewClicked"><i class="fa fa-plus"></i>Yeni Ekle</button>
+                </li>
+            </ul>
         }
 
         @if (ShowSearchSection)
         {
-    <EditForm Model="header" class="form-inline my-2 my-lg-0">
 
-        <InputText @bind-Value="header.SearchText" class="form-control mr-sm-2" />
-        <button class="btn btn-outline-success my-2 my-sm-0" @onclick="SearchClicked">Ara</button>
+            <ul class="nav navbar-nav ms-auto">
+                <li>
+                    <EditForm Model="header" class="form-inline my-2 my-lg-0">
 
-    </EditForm>
+                        <InputText @bind-Value="header.SearchText" class="form-control mr-sm-2" />
+                        <button class="btn btn-outline-success my-2 my-sm-0" @onclick="SearchClicked">Ara</button>
+
+                    </EditForm>
+
+                </li>
+            </ul>
+
+
+
 
         }
 
