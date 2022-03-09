@@ -124,6 +124,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 if (teklifRow == null)
                     throw new ApiException("Teklif Detayı bulunamadı");
 
+                // Güncellenen teklifi loga at
+                var teklifLog = new TeklifLog();
+                Mapper.Map(teklifRow, teklifLog);
+                await dbContext.TeklifLogs.AddAsync(teklifLog);
+
                 Mapper.Map(request.Teklif, teklifRow);
                 await dbContext.SaveChangesAsync();
 
