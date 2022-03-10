@@ -35,9 +35,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                var results = await dbContext.CariKarts
+                var results = await dbContext.V001CariKarts
                                         .Take(100)
-                                        .OrderByDescending(x => x.Insdate)
+                                        .OrderByDescending(x => x.Logref)
                                         .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider).ToListAsync();
 
                 return results;
@@ -55,7 +55,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                IQueryable<CariKartDto> qry = dbContext.CariKarts.Where(i => i.Kodu == kod)
+                IQueryable<CariKartDto> qry = dbContext.V001CariKarts.Where(i => i.Kodu == kod)
                             .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider);
 
                 return await qry.SingleOrDefaultAsync();
@@ -106,7 +106,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
                 var word = request.CariKart.Adi.ToLower();
-                var results = await dbContext.CariKarts.Where(x =>
+                var results = await dbContext.V001CariKarts.Where(x =>
                         x.Adi.ToLower().Contains(word)
                         || x.Adi2.ToLower().Contains(word)
                         || x.Adres1.ToLower().Contains(word)
@@ -131,7 +131,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                IQueryable<CariKartDto> qry = dbContext.CariKarts.Where(i => i.Logref == logref)
+                IQueryable<CariKartDto> qry = dbContext.V001CariKarts.Where(i => i.Logref == logref)
                             .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider);
 
                 return await qry.SingleOrDefaultAsync();
