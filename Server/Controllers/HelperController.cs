@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
+using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ServiceResponses;
 
@@ -34,14 +35,14 @@ namespace UmotaWebApp.Server.Controllers
             try
             {
                 if (string.IsNullOrEmpty(table))
-                    throw new ApiExcetion("tablo adı boş geldi.Ref üretilemedi !");
+                    throw new ApiException("tablo adı boş geldi.Ref üretilemedi !");
 
                 return new ServiceResponse<string>()
                 {
                     Value = await RefService.GenerateRowRef(table, keyField, firmaId)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -146,14 +147,14 @@ namespace UmotaWebApp.Server.Controllers
             try
             {
                 if (string.IsNullOrEmpty(tablename))
-                    throw new ApiExcetion("tablo adı boş geldi.Ref üretilemedi !");
+                    throw new ApiException("tablo adı boş geldi.Ref üretilemedi !");
 
                 return new ServiceResponse<int>()
                 {
                     Value = await RefService.RefNoAl(tablename, firmaId)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 

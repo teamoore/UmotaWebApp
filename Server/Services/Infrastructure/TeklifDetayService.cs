@@ -81,6 +81,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 if (teklifDetayRow == null)
                     throw new ApiException("Teklif Detayı bulunamadı");
 
+                var teklifRow = await dbContext.Teklifs.Where(x => x.Logref == teklifDetayRow.Teklifref).SingleOrDefaultAsync();
+                if (teklifRow == null)
+                    throw new ApiException("Teklif bulunamadı");
+
+                ValidateTeklif(teklifRow);
 
                 // Güncellenen teklif detayını loga at
                 var teklifDetayLog = new TeklifdetayLog();
@@ -108,7 +113,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                //request.TeklifDetay = await CalculateTeklifDetay(request.TeklifDetay);
+                var teklifRow = await dbContext.Teklifs.Where(x => x.Logref == request.TeklifDetay.Teklifref).SingleOrDefaultAsync();
+                if (teklifRow == null)
+                    throw new ApiException("Teklif bulunamadı");
+
+                ValidateTeklif(teklifRow);
 
                 var teklifDetayRow = Mapper.Map<Teklifdetay>(request.TeklifDetay);
                 await dbContext.Teklifdetays.AddAsync(teklifDetayRow);
@@ -178,7 +187,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         }
 
-        public async Task<bool> DeleteTeklifDetay(int logref, string firmaId)
+        public async Task<bool> DeleteTeklifDetay(int logref, string firmaId, string kullanici)
         {
             if (string.IsNullOrEmpty(firmaId))
                 throw new Exception("Firma Dönem seçimi yapınız");
@@ -194,14 +203,19 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 if (row == null)
                     throw new Exception("Silinecek teklif detayı bulunamadı");
 
+                var teklifRow = await dbContext.Teklifs.Where(x => x.Logref == row.Teklifref).SingleOrDefaultAsync();
+                if (teklifRow == null)
+                    throw new Exception("Silinecek teklif detayına ait, teklif bulunamadı");
+
+                ValidateBeforeDelete(teklifRow);
+
                 var teklifRef = row.Teklifref;
 
-                dbContext.Teklifdetays.Attach(row);
-                dbContext.Teklifdetays.Remove(row);
+                row.Status = 2;
+                row.Upddate = DateTime.Now;
+                row.Upduser = kullanici;
+                                
                 await dbContext.SaveChangesAsync();
-
-                if (!teklifRef.HasValue)
-                    throw new Exception("Teklif detayı silinirken hata oluştu");
 
                 // teklif detayı silindikten sonra teklif tutarı güncelle
                 await CalculateTeklif(teklifRef.Value, firmaId);
@@ -232,6 +246,19 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return result;
 
             }
+        }
+
+        private void ValidateBeforeDelete(Teklif t)
+        {
+            if (!t.Duruminfo.Equals("Teklif Revizyonda") && !t.Duruminfo.Equals("Teklif Hazırlanıyor"))
+                throw new ApiException("Teklif durumu silmek için uygun değil");
+
+        }
+
+        private void ValidateTeklif(Teklif t)
+        {
+            if (!t.Duruminfo.Equals("Teklif Revizyonda") && !t.Duruminfo.Equals("Teklif Hazırlanıyor"))
+                throw new ApiException("Teklif durumu güncellemek için uygun değil");
         }
     }
 }

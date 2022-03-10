@@ -126,5 +126,39 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             return res;
         }
 
+        public async Task<MalzemeFiyatDto> MalzemeMaliyetGetir(MalzemeFiyatRequestDto request)
+        {
+            MalzemeFiyatDto res = new MalzemeFiyatDto();
+
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            {
+                string LogoDbName = Configuration["LogoDbName"];
+                string LogoFirmaNo = request.LogoFirmaNo.ToString("000");
+                string TblPRCLIST = "LG_" + LogoFirmaNo + "_PRCLIST";
+                string TblUNITSETL = "LG_" + LogoFirmaNo + "_UNITSETL";
+                string TblCURRENCYLIST = "L_CURRENCYLIST";
+
+                string sqlstring = "SELECT TOP 1 A.CARDREF MalzemeRef, A.PRICE Fiyat, A.CURRENCY DovizRef, B.CURCODE DovizKodu" +
+                    ", C.LOGICALREF FiyatBirimRef, C.CODE FiyatBirimKodu, C.UNITSETREF FiyatBirimSetiRef, A.INCVAT KdvDahil" +
+                    ", (case when  ISNUMERIC(A.DEFINITION_) = 1 then A.PRICE * A.DEFINITION_ else A.PRICE END) OzelFiyat" +
+                    " from " + LogoDbName + ".[dbo]." + TblPRCLIST + " A with(nolock) " +
+                    " left join " + LogoDbName + ".[dbo]." + TblCURRENCYLIST + " B WITH(NOLOCK) ON A.CURRENCY = B.CURTYPE AND B.FIRMNR = " + request.LogoFirmaNo +
+                    " left join " + LogoDbName + ".[dbo]." + TblUNITSETL + " C WITH(NOLOCK) ON  A.UOMREF = C.LOGICALREF" +
+                     
+                " WHERE A.PTYPE = 1 AND A.ACTIVE = 0" +
+                    " AND A.CARDREF = " + request.MalzemeRef +
+                    " AND C.CODE = '" + request.BirimKodu + "'" +
+                    " AND @TARIH BETWEEN A.BEGDATE AND A.ENDDATE " +
+                    " AND A.CURRENCY = " + request.DovizRef +
+                    " order by A.CLIENTCODE";
+
+                var p = new DynamicParameters();
+                p.Add("@TARIH", value: request.Tarih, dbType: DbType.DateTime);
+
+                res = await db.QuerySingleOrDefaultAsync<MalzemeFiyatDto>(sqlstring, p, commandType: CommandType.Text);
+            }
+
+            return res;
+        }
     }
 }

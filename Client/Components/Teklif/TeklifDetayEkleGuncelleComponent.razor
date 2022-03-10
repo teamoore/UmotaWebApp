@@ -2,37 +2,19 @@
 <EditForm Model="teklifDetay">
     <DataAnnotationsValidator />
     <div class="mt-12">
+
         <div class="form">
-            <MudTabs Elevation="2" Rounded="true" Centered="false" Class="my-6">
-                <hr />
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-md-1">
-                            <label>İsk-Genel %</label>
-                            <InputNumber @bind-Value="teklifDetay.Iskyuz4" class="form-control" disabled />
-                        </div>
-                        <div class="col-md-2">
-                            <label>İsk-Genel Tutar</label>
-                            <InputNumber @bind-Value="teklifDetay.Isktut4" class="form-control" disabled />
-                        </div>
-                        <div class="col-md-2">
-                            <label>KDV Mahrahı</label>
-                            <InputNumber @bind-Value="teklifDetay.Kdvmatrah" class="form-control" disabled />
-                        </div>
-                        <div class="col-md-1">
-                            <label>KDV %</label>
-                            <InputNumber @bind-Value="teklifDetay.Kdvyuz" class="form-control" disabled />
-                        </div>
-                        <div class="col-md-2">
-                            <label>KDV Tutarı</label>
-                            <InputNumber @bind-Value="teklifDetay.Kdvtut" class="form-control" disabled />
-                        </div>
-                        <div class="col-md-2">
-                            <label>Net Tutar</label>
-                            <InputNumber @bind-Value="teklifDetay.Nettutar" class="form-control" disabled />
-                        </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><span style="color:navy">Teklif Numarası :</span> @teklif.Teklifno <span style="color:navy">Müşteri :</span> @teklif.Cariadi</h5>
                     </div>
+
                 </div>
+            </div>
+
+            <MudTabs Elevation="2" Rounded="true" Centered="false" Class="my-6">
+
                 <hr />
                 <MudTabPanel Icon="@Icons.Material.Filled.AddTask" Text="Malzeme" BadgeColor="Color.Error">
                     <div class="form-group">
@@ -90,7 +72,7 @@
                                 <label>Mitar</label>
                                 <InputNumber @bind-Value="pageMiktar" class="form-control" placeholder="Miktar" />
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <label>Birim</label>
                                 <InputText @bind-Value="teklifDetay.Birimkodu" class="form-control" placeholder="Birim" disabled />
                             </div>
@@ -112,11 +94,25 @@
                                 </InputSelect>
                             </div>
                             <div class="col-md-2">
+                                <label>Kur</label>
+                                <InputNumber @bind-Value="teklifDetay.Dovizkuru" class="form-control" placeholder="Kur" />
+                            </div>
+                            <div class="col-md-2">
                                 <label>Tutar</label>
                                 <InputNumber @bind-Value="teklifDetay.Tutar" class="form-control" placeholder="Tutar" />
                             </div>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <label>Açıklama</label>
+                                <InputText @bind-Value="teklifDetay.Aciklama" class="form-control" placeholder="Açıklama" />
+                            </div>
+                        </div>
+                    </div>
+
                 </MudTabPanel>
                 <MudTabPanel Icon="@Icons.Material.Filled.Percent" Text="İskonto" BadgeColor="Color.Success">
                     <hr />
@@ -148,9 +144,78 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Maliyet 1</label>
+                                <InputNumber @bind-Value="teklifDetay.Maliyet1" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Maliyet 1 Top.</label>
+                                <InputNumber @bind-Value="Maliyet1Top" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Maliyet 2</label>
+                                <InputNumber @bind-Value="teklifDetay.Maliyet2" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Maliyet 2 Top.</label>
+                                <InputNumber @bind-Value="Maliyet2Top" class="form-control" disabled />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <label>Maliyet 1 İD</label>
+                                <InputNumber @bind-Value="teklifDetay.Maliyet1id" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Maliyet 1 Top.İD</label>
+                                <InputNumber @bind-Value="Maliyet1Topid" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Maliyet 2 İD</label>
+                                <InputNumber @bind-Value="teklifDetay.Maliyet2id" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Maliyet 2 Top.İD</label>
+                                <InputNumber @bind-Value="Maliyet2Topid" class="form-control" disabled />
+                            </div>
+                        </div>
+                    </div>
 
 
                 </MudTabPanel>
+                <hr />
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-1">
+                            <label>İsk-Genel %</label>
+                            <InputNumber @bind-Value="teklifDetay.Iskyuz4" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-2">
+                            <label>İsk-Genel Tutar</label>
+                            <InputNumber @bind-Value="teklifDetay.Isktut4" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-2">
+                            <label>KDV Mahrahı</label>
+                            <InputNumber @bind-Value="teklifDetay.Kdvmatrah" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-1">
+                            <label>KDV %</label>
+                            <InputNumber @bind-Value="teklifDetay.Kdvyuz" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-2">
+                            <label>KDV Tutarı</label>
+                            <InputNumber @bind-Value="teklifDetay.Kdvtut" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-2">
+                            <label>Net Tutar</label>
+                            <InputNumber @bind-Value="teklifDetay.Nettutar" class="form-control" disabled />
+                        </div>
+                    </div>
+                </div>
             </MudTabs>
 
 
@@ -275,6 +340,78 @@
         }
     }
 
+    private double? _maliyet1Top = 0;
+    public double? Maliyet1Top
+    {
+        get
+        {
+            if (teklifDetay.Miktar.HasValue && teklifDetay.Maliyet1.HasValue)
+                _maliyet1Top = Math.Round(teklifDetay.Miktar.Value * teklifDetay.Maliyet1.Value, 2);
+            else
+                _maliyet1Top = 0;
+
+            return _maliyet1Top;
+        }
+        set
+        {
+            _maliyet1Top = value;
+        }
+    }
+
+    private double? _maliyet2Top = 0;
+    public double? Maliyet2Top
+    {
+        get
+        {
+            if (teklifDetay.Miktar.HasValue && teklifDetay.Maliyet2.HasValue)
+                _maliyet2Top = Math.Round(teklifDetay.Miktar.Value * teklifDetay.Maliyet2.Value, 2);
+            else
+                _maliyet2Top = 0;
+
+            return _maliyet2Top;
+        }
+        set
+        {
+            _maliyet2Top = value;
+        }
+    }
+
+    private double? _maliyet1Topid = 0;
+    public double? Maliyet1Topid
+    {
+        get
+        {
+            if (teklifDetay.Miktar.HasValue && teklifDetay.Maliyet1id.HasValue)
+                _maliyet1Topid = Math.Round(teklifDetay.Miktar.Value * teklifDetay.Maliyet1id.Value, 2);
+            else
+                _maliyet1Topid = 0;
+
+            return _maliyet1Topid;
+        }
+        set
+        {
+            _maliyet1Topid = value;
+        }
+    }
+
+    private double? _maliyet2Topid = 0;
+    public double? Maliyet2Topid
+    {
+        get
+        {
+            if (teklifDetay.Miktar.HasValue && teklifDetay.Maliyet2id.HasValue)
+                _maliyet2Topid = Math.Round(teklifDetay.Miktar.Value * teklifDetay.Maliyet2id.Value, 2);
+            else
+                _maliyet2Topid = 0;
+
+            return _maliyet2Topid;
+        }
+        set
+        {
+            _maliyet2Topid = value;
+        }
+    }
+
     protected override Task OnParametersSetAsync()
     {
         IsUpdate = logRef.HasValue;
@@ -335,6 +472,8 @@
             teklifDetay = await httpClient.GetServiceResponseAsync<TeklifDetayDto>(UrlHelper.TeklifDetayGetir + "?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
             _TeklifDetayCekildi = true;
+
+            teklifRef = teklifDetay.Teklifref.Value;
         }
         catch (Exception ex)
         {
@@ -384,7 +523,7 @@
         var opt = new ModalOptions();
         opt.ContentScrollable = true;
 
-        var form = modal.Show<Pages.Malzeme.Malzeme_Sec>("Malzeme Seç",options: opt);
+        var form = modal.Show<Pages.Malzeme.Malzeme_Sec>("Malzeme Seç", options: opt);
         var result = await form.Result;
 
         if (!result.Cancelled)
@@ -397,10 +536,12 @@
                 teklifDetay.Malzkodu = mkart.Kodu;
                 teklifDetay.Birimkodu = mkart.Birimkodu;
                 teklifDetay.Unitsetllogref = mkart.Birimref;
+                teklifDetay.Unitsetref = mkart.Birimsetiref;
                 teklifDetay.Marka = mkart.Descr;
                 teklifDetay.Mensei = mkart.Definition;
                 teklifDetay.Ebat = mkart.Ebatt;
                 teklifDetay.Kdvyuz = mkart.Kdvyuz;
+                teklifDetay.Ozelkod5 = mkart.Ozelkod5;
                 if (mkart.Kodu.StartsWith("UMOTA"))
                 {
                     teklifDetay.Fiyat = mkart.Satfiyat;
@@ -427,9 +568,11 @@
                     }
                     teklifDetay.Maliyet1 = mkart.Alfiyat;
                     teklifDetay.Maliyet2 = mkart.Alfiyat;
-                } else
+                }
+                else
                 {
                     await FiyatGetir();
+                    await MaliyetGetir();
                 }
             }
 
@@ -460,12 +603,21 @@
             request.TeklifDetay = teklifDetay;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
-            var result = await httpClient.PostGetServiceResponseAsync<TeklifDetayDto, TeklifDetayRequestDto>("/api/teklifdetay/update", request);
+            var result = await httpClient.PostAsJsonAsync("/api/teklifdetay/update", request);
 
-            Snackbar.Add("Teklif güncellendi", severity:Severity.Success);
+            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<TeklifDetayDto>>();
+            if (!response.Success)
+                throw new Exception(response.Message);
+
+            Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
 
             navigation.NavigateTo("/stek_listef_detay/" + teklifDetay.Teklifref);
 
+        }
+        catch (ApiException exx)
+        {
+            Snackbar.Add(exx.Message, severity: Severity.Warning);
+            return;
         }
         catch (ClientException e)
         {
@@ -477,7 +629,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
     }
 
@@ -498,8 +650,12 @@
             var request = new TeklifDetayRequestDto();
             request.TeklifDetay = teklifDetay;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
+                        
+            var result = await httpClient.PostAsJsonAsync("/api/teklifdetay/save", request);
 
-            var result = await httpClient.PostGetServiceResponseAsync<TeklifDetayDto, TeklifDetayRequestDto>("/api/teklifdetay/save", request);
+            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<TeklifDetayDto>>();
+            if (!response.Success)
+                throw new Exception(response.Message);
 
             Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
 
@@ -572,6 +728,42 @@
         }
     }
 
+    public async Task MaliyetGetir()
+    {
+        try
+        {
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new MalzemeFiyatRequestDto();
+            request.Tarih = DateTime.Now;
+            request.MalzemeRef = teklifDetay.LstokId.Value;
+            request.BirimKodu = teklifDetay.Birimkodu;
+            request.DovizRef = teklifDetay.Dovizref.HasValue ? teklifDetay.Dovizref.Value : 160;
+            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<MalzemeFiyatDto, MalzemeFiyatRequestDto>(UrlHelper.MalzemeMaliyetGetir, request);
+
+            if (result != null)
+            {
+                teklifDetay.Maliyet1 = result.Fiyat;
+                teklifDetay.Maliyet2 = result.OzelFiyat;
+            }
+            ////_DovizKuruState = "Güncel";
+
+            // this.StateHasChanged();
+
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
     private void CalculateTeklifDetay()
     {
         if (teklifDetay.Miktar.HasValue && teklifDetay.Fiyat.HasValue)
@@ -580,27 +772,27 @@
             teklifDetay.Tutar = 0;
 
         if (teklifDetay.Iskyuz1.HasValue)
-            teklifDetay.Isktut1 = Math.Round((teklifDetay.Tutar.Value * teklifDetay.Iskyuz1.Value) / 100,2);
+            teklifDetay.Isktut1 = Math.Round((teklifDetay.Tutar.Value * teklifDetay.Iskyuz1.Value) / 100, 2);
         else
             teklifDetay.Isktut1 = 0;
 
         if (teklifDetay.Iskyuz2.HasValue)
-            teklifDetay.Isktut2 = Math.Round(((teklifDetay.Tutar.Value - teklifDetay.Isktut1.Value) * teklifDetay.Iskyuz2.Value) / 100,2);
+            teklifDetay.Isktut2 = Math.Round(((teklifDetay.Tutar.Value - teklifDetay.Isktut1.Value) * teklifDetay.Iskyuz2.Value) / 100, 2);
         else
             teklifDetay.Isktut2 = 0;
 
         if (teklifDetay.Iskyuz3.HasValue)
-            teklifDetay.Isktut3 = Math.Round(((teklifDetay.Tutar.Value - teklifDetay.Isktut2.Value - teklifDetay.Isktut1.Value) * teklifDetay.Iskyuz3.Value) / 100,2);
+            teklifDetay.Isktut3 = Math.Round(((teklifDetay.Tutar.Value - teklifDetay.Isktut2.Value - teklifDetay.Isktut1.Value) * teklifDetay.Iskyuz3.Value) / 100, 2);
         else
             teklifDetay.Isktut3 = 0;
 
         if (teklifDetay.Iskyuz4.HasValue)
-            teklifDetay.Isktut4 = Math.Round(((teklifDetay.Tutar.Value - teklifDetay.Isktut2.Value - teklifDetay.Isktut1.Value - teklifDetay.Isktut3.Value) * teklifDetay.Iskyuz4.Value) / 100,2);
+            teklifDetay.Isktut4 = Math.Round(((teklifDetay.Tutar.Value - teklifDetay.Isktut2.Value - teklifDetay.Isktut1.Value - teklifDetay.Isktut3.Value) * teklifDetay.Iskyuz4.Value) / 100, 2);
         else
             teklifDetay.Isktut4 = 0;
 
         teklifDetay.Kdvmatrah = teklifDetay.Tutar.Value - teklifDetay.Isktut1.Value - teklifDetay.Isktut2.Value - teklifDetay.Isktut3.Value - teklifDetay.Isktut4.Value;
-        teklifDetay.Kdvtut = Math.Round((teklifDetay.Kdvmatrah.Value * (teklifDetay.Kdvyuz.HasValue ? teklifDetay.Kdvyuz.Value : 0)) / 100,2);
+        teklifDetay.Kdvtut = Math.Round((teklifDetay.Kdvmatrah.Value * (teklifDetay.Kdvyuz.HasValue ? teklifDetay.Kdvyuz.Value : 0)) / 100, 2);
         teklifDetay.Nettutar = teklifDetay.Kdvmatrah.Value + teklifDetay.Kdvtut.Value;
 
         if (teklifDetay.Dovizref == 160)
@@ -663,7 +855,8 @@
             teklifDetay.Kdvmatrahid = Math.Round(teklifDetay.Kdvmatrahtl.Value / teklif.Dovizkuruid.Value, 2);
             teklifDetay.Kdvtutid = Math.Round(teklifDetay.Kdvtuttl.Value / teklif.Dovizkuruid.Value, 2);
             teklifDetay.Nettutarid = Math.Round(teklifDetay.Nettutartl.Value / teklif.Dovizkuruid.Value, 2);
-        } else
+        }
+        else
         {
             teklifDetay.Tutarid = 0;
             teklifDetay.Isktut1id = 0;
@@ -710,13 +903,28 @@
             teklifDetay.Nettutarrd = 0;
         }
 
+        if (teklifDetay.Dovizref == teklif.Dovizrefid)
+        {
+            teklifDetay.Maliyet1id = teklifDetay.Maliyet1.Value;
+            teklifDetay.Maliyet2id = teklifDetay.Maliyet2.Value;
+        }
+        else
+        if (teklif.Dovizkuruid.HasValue)
+        {
+            teklifDetay.Maliyet1id = Math.Round(teklifDetay.Maliyet1.Value * teklifDetay.Dovizkuru.Value / teklif.Dovizkuruid.Value, 2);
+            teklifDetay.Maliyet2id = Math.Round(teklifDetay.Maliyet2.Value * teklifDetay.Dovizkuru.Value / teklif.Dovizkuruid.Value, 2);
+        }
+        else
+        {
+            teklifDetay.Maliyet1id = 0;
+            teklifDetay.Maliyet2id = 0;
+        }
     }
 
     public async Task GetTeklif()
     {
         try
         {
-
             if (teklifRef.HasValue == false)
                 return;
 
@@ -731,6 +939,13 @@
                 teklif = result;
 
                 teklifDetay.Iskyuz4 = teklif.Gniskoran;
+
+                if (!IsUpdate)
+                {
+                    teklifDetay.Dovizref = teklif.Dovizrefid;
+                    teklifDetay.Dovizkuru = teklif.Dovizkuruid;
+                }
+
             }
         }
         catch (Exception ex)

@@ -16,5 +16,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public string FiyatBirimKodu { get; set; }
         public int FiyatBirimSetiRef { get; set; }
         public byte? KdvDahil { get; set; }
+        public double OzelFiyat { get; set; }
     }
 }

@@ -50,5 +50,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public double? Height { get; set; }
         public string Ebatt { get; set; }
         public double? Kdvyuz { get; set; }
+        public string Ozelkod5 { get; set; }
     }
 }

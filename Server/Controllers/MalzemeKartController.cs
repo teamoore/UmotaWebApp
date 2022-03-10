@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
+using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ServiceResponses;
 
@@ -35,7 +36,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await MalzemeKartService.SearchMalzemeKart(request)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -55,7 +56,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await MalzemeKartService.GetMalzemeKart(logref,firmaId)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -75,7 +76,27 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await MalzemeKartService.MalzemeFiyatGetir(request)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<MalzemeFiyatDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("maliyetgetir")]
+        public async Task<ServiceResponse<MalzemeFiyatDto>> MalzemeMaliyetiGetir(MalzemeFiyatRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<MalzemeFiyatDto>()
+                {
+                    Value = await MalzemeKartService.MalzemeMaliyetGetir(request)
+                };
+            }
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 

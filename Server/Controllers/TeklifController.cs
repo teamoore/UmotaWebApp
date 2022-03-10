@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
+using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ServiceResponses;
 
@@ -35,7 +36,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await TeklifService.GetTeklifDtos(firmaId)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -55,7 +56,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await TeklifService.SearchTeklif(teklif)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -75,7 +76,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await TeklifService.SaveTeklif(request)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -95,7 +96,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await TeklifService.GetTeklifByRef(logref, firmaId)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -115,7 +116,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await TeklifService.UpdateTeklif(request)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 

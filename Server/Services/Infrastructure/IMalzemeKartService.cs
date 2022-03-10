@@ -11,5 +11,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<MalzemeKartDto> GetMalzemeKart(int logref, string firmaId);
         public Task<List<MalzemeKartDto>> SearchMalzemeKart(MalzemeKartRequestDto request);
         public Task<MalzemeFiyatDto> MalzemeFiyatGetir(MalzemeFiyatRequestDto request);
+        public Task<MalzemeFiyatDto> MalzemeMaliyetGetir(MalzemeFiyatRequestDto request);
     }
 }

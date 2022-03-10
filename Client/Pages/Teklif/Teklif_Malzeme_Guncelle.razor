@@ -3,41 +3,70 @@
 <div class="card" style="width: 100%;">
     <div class="card-body">
         <h5 class="card-title">Teklif Numarası : @teklif.Teklifno</h5>
-         
-            <h6 class="card-subtitle mb-2 text-muted">
-                Teklif Tarihi : @(teklif.Tarih.HasValue ? teklif.Tarih.Value.ToString("dd.MM.yyyy") : "")
-                / Teslim Tarihi : @(teklif.TeslimTarihi.HasValue ? teklif.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "")
-            </h6>
-         
+
+        <h6 class="card-subtitle mb-2 text-muted">
+            Teklif Tarihi : @(teklif.Tarih.HasValue ? teklif.Tarih.Value.ToString("dd.MM.yyyy") : "")
+            / Teslim Tarihi : @(teklif.TeslimTarihi.HasValue ? teklif.TeslimTarihi.Value.ToString("dd.MM.yyyy") : "")
+        </h6>
+
         <div class="row">
             <div class="col-md-4">
 
-                <p class="card-text">
-                    <strong>Firma:</strong> @teklif.Cariadi <br />
-                    <strong>İlgili Kişi:</strong> @teklif.IlgiliAdi
-                    <br />
-
-                    <strong>Açıklama :</strong> @teklif.Aciklama1 <br />
-                    <strong>Proje Adı:</strong> @teklif.Proje <br />
-                </p>
+                <table class="table table-responsive-sm table-borderless">
+                    <tbody>
+                        <tr>
+                            <td>Firma</td>
+                            <td>@teklif.Cariadi</td>
+                        </tr>
+                        <tr>
+                            <td>İlgili Kişi</td>
+                            <td>@teklif.IlgiliAdi</td>
+                        </tr>
+                        <tr>
+                            <td>Proje Adı</td>
+                            <td>@teklif.Proje</td>
+                        </tr>
+                        <tr>
+                            <td>Açıklama</td>
+                            <td>@teklif.Aciklama1</td>
+                        </tr>                        
+                    </tbody>
+                </table>
 
             </div>
             <div class="col-md-4">
-                <p class="card-text">
 
-                    <strong>Satır Sayısı : </strong> @(_miktar.HasValue ? _miktar.Value : 0)
-                    <br /><strong>Teklif Tutar :</strong> @(teklif.Tutarmatrah.HasValue ? teklif.Tutarmatrah.Value : "0")
-                    <br /><strong>Teklif Para Birimi : </strong> @(teklif.Dovizdokuid)
-                    <br /><strong>Teklif Tutar TL :</strong>@(teklif.Tutarmatrahtl.HasValue ? teklif.Tutarmatrahtl.Value : "0")
-
-                </p>
+                <table class="table table-responsive-sm table-borderless">
+                    <tbody>
+                        <tr>
+                            <td>Satır Sayısı</td>
+                            <td style="text-align:right">@(_miktar.HasValue ? _miktar.Value : 0)</td>
+                        </tr>
+                        <tr>
+                            <td>Teklif Tutar</td>
+                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrah))</td>
+                        </tr>
+                        <tr>
+                            <td>Teklif Para Birimi</td>
+                            <td style="text-align:right">@(teklif.Dovizdokuid)</td>
+                        </tr>
+                        <tr>
+                            <td>Teklif Tutar TL</td>
+                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrahtl))</td>
+                        </tr>
+                    </tbody>
+                </table>
 
             </div>
             <div class="col-md-4">
-                <p class="card-text">
-                    <strong>Satış Temsilcisi : </strong> @teklif.Temsilciadi
-                </p>
-
+                <table class="table table-responsive-sm table-borderless">
+                    <tbody>
+                        <tr>
+                            <td>Satış Temsilcisi</td>
+                            <td style="text-align:right">@teklif.Temsilciadi</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
         <hr />
@@ -48,7 +77,7 @@
             </div>
         </div>
 
-        
+
     </div>
 </div>
 
@@ -68,7 +97,9 @@
         <MudTh>Miktar</MudTh>
         <MudTh>Birim</MudTh>
         <MudTh>Birim Fiyat</MudTh>
+        <MudTh>Döviz</MudTh>
         <MudTh>Tutar</MudTh>
+        <MudTh>Tutar İD</MudTh>
         <MudTh>#</MudTh>
 
     </HeaderContent>
@@ -83,7 +114,9 @@
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
         <MudTd DataLabel="Birim">@context.Birimkodu</MudTd>
         <MudTd DataLabel="Birim Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.Fiyat))</MudTd>
+        <MudTd DataLabel="Döviz">@context.Dovizdoku</MudTd>
         <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Tutar))</MudTd>
+        <MudTd DataLabel="Tutar İD" Style="text-align:right">@(Helper.FormattedDouble(context.Tutarid))</MudTd>
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
         </MudTd>
@@ -189,18 +222,9 @@
         }
     }
 
-    public async Task Duzenle()
+    public void Duzenle()
     {
-
-        try
-        {
-            navigation.NavigateTo("/stek_listef_guncelle/" + logref);
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, Severity.Error);
-        }
-
+        navigation.NavigateTo("/stek_listef_guncelle/" + logref);
     }
 
     private async Task Kapat()
@@ -237,14 +261,18 @@
     {
         try
         {
-            var modalRes = await ModalManager.ShowConfirmationAsync("Teklif Detay Silinecek!", "Teklif Detayını silmek istediğinizden emin misiniz?","Evet","Hayır");
+            var modalRes = await ModalManager.ShowConfirmationAsync("Teklif Detay Silinecek!", "Teklif Detayını silmek istediğinizden emin misiniz?", "Evet", "Hayır");
             if (!modalRes)
                 return;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            var kullanici = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
 
 
-            var delete = await httpClient.GetServiceResponseAsync<bool>("/api/teklifdetay/delete?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+            var delete = await httpClient.GetFromJsonAsync<ServiceResponse<bool>>("/api/teklifdetay/delete?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value + "&kullanici=" + kullanici);
+
+            if (delete.Success == false)
+                throw new Exception(delete.Message);
 
             Snackbar.Add("Teklif detayı silindi");
 
@@ -253,7 +281,8 @@
         }
         catch (Exception ex)
         {
-            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
     }
+
 }

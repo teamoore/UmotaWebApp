@@ -12,7 +12,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<List<TeklifDetayDto>> GetTeklifDetays(int teklifRef, string firmaId);
         public Task<TeklifDetayDto> SaveTeklifDetay(TeklifDetayRequestDto request);
         public Task<TeklifDetayDto> UpdateTeklifDetay(TeklifDetayRequestDto request);
-        public Task<bool> DeleteTeklifDetay(int logref, string firmaId);
+        public Task<bool> DeleteTeklifDetay(int logref, string firmaId, string kullanici);
         public Task<string> GetTeklifDetaySiraNo(int teklifRef, string firmaId);
     }
 }

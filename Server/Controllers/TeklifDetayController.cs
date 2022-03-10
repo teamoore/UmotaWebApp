@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
+using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ServiceResponses;
 
@@ -35,7 +36,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await TeklifDetayService.GetTeklifDetays(teklifRef, firmaId)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -55,7 +56,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await TeklifDetayService.GetTeklifDetay(logref, firmaId)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -75,7 +76,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await TeklifDetayService.SaveTeklifDetay(request)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -95,7 +96,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await TeklifDetayService.UpdateTeklifDetay(request)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -106,16 +107,16 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("delete")]
-        public async Task<ServiceResponse<bool>> DeleteTeklifDetay(int logref, string firmaId)
+        public async Task<ServiceResponse<bool>> DeleteTeklifDetay(int logref, string firmaId, string kullanici)
         {
             try
             {
                 return new ServiceResponse<bool>()
                 {
-                    Value = await TeklifDetayService.DeleteTeklifDetay(logref, firmaId)
+                    Value = await TeklifDetayService.DeleteTeklifDetay(logref, firmaId, kullanici)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
@@ -135,7 +136,7 @@ namespace UmotaWebApp.Server.Controllers
                     Value = await TeklifDetayService.GetTeklifDetaySiraNo(teklifref, firmaId)
                 };
             }
-            catch (ApiExcetion ex)
+            catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
