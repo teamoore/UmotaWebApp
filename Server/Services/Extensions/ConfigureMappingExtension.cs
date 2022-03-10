@@ -42,6 +42,8 @@ namespace UmotaWebApp.Server.Services.Extensions
             CreateMap<V001CariKart, CariKartDto>()
                 .ForMember(dest => dest.Active, opt => opt.MapFrom(src => src.Active.HasValue ? (src.Active.Equals(1) ? byte.Parse("1") : byte.Parse("0")) : byte.Parse("0")))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (src.Status.Equals(1) ? byte.Parse("1") : byte.Parse("0")) : byte.Parse("0")));
+
+            CreateMap<V009Teklif, TeklifDto>().ReverseMap();
         }
     }
 

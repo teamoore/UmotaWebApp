@@ -92,7 +92,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 var word = request.Teklif.Aciklama1.ToLower();
 
-                return await dbContext.Teklifs.Where(x => x.Aciklama1.ToLower().Contains(word)
+                return await dbContext.V009Teklifs.Where(x => x.Aciklama1.ToLower().Contains(word)
                 || x.Aciklama2.ToLower().Contains(word)
                 || x.Aciklama3.ToLower().Contains(word)
                 || x.Aciklama3.ToLower().Contains(word)
