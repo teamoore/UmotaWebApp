@@ -1,6 +1,6 @@
 ﻿@page "/stek_listef"
 
-<HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif" 
+<HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif"
                  ShowButtons="false"
                  onDoneButtonClicked="TeklifAra" ShowSearchSection="true"></HeaderSearchBar>
 
@@ -28,8 +28,15 @@
         <MudTh>Kaydı Giren</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd>            
-            <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => TeklifDetay(context.Logref))" Size="Size.Medium" />
+        <MudTd>
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
+                <MudMenuItem OnClick="(() => TeklifDetay(context.Logref))">Güncelle</MudMenuItem>
+                <MudMenuItem>Teklif Müşteriye Gönderildi</MudMenuItem>
+                <MudMenuItem>Müşteri Teklifi Onayladı</MudMenuItem>
+                <MudMenuItem>Müşteri Teklifte Revize İstedi</MudMenuItem>
+                <MudMenuItem>Müşteri Teklifi İptal Etti</MudMenuItem>
+                <MudMenuItem>UNO Teklifi İptal Etti</MudMenuItem>
+            </MudMenu>
         </MudTd>
         <MudTd DataLabel="Durum">@context.Duruminfo</MudTd>
         <MudTd DataLabel="Teklif No">@context.Teklifno</MudTd>
