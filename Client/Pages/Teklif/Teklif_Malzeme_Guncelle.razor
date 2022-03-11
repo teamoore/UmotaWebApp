@@ -13,7 +13,7 @@
         <div class="row">
             <div class="col-md-4">
 
-                <table class="table table-responsive-sm table-borderless">
+                <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
                     <tbody>
                         <tr>
                             <td>Firma</td>
@@ -32,12 +32,12 @@
                             <td>@teklif.Aciklama1</td>
                         </tr>
                     </tbody>
-                </table>
+                </MudSimpleTable>
 
             </div>
             <div class="col-md-4">
 
-                <table class="table table-responsive-sm table-borderless">
+                <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
                     <tbody>
                         <tr>
                             <td>Satır Sayısı</td>
@@ -56,25 +56,29 @@
                             <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrahtl))</td>
                         </tr>
                     </tbody>
-                </table>
+                </MudSimpleTable>
 
             </div>
+
             <div class="col-md-4">
-                <table class="table table-responsive-sm table-borderless">
+
+                <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
                     <tbody>
                         <tr>
                             <td>Satış Temsilcisi</td>
                             <td style="text-align:right">@teklif.Temsilciadi</td>
                         </tr>
                     </tbody>
-                </table>
+                </MudSimpleTable>
+
             </div>
+
         </div>
         <hr />
         <div class="row">
             <div class="col-md-12">
-                <button class="btn btn-primary" @onclick="Duzenle"><i class="fa fa-edit"></i> Teklif Düzenle</button>
-                <button class="btn btn-primary" @onclick="TeklifDetayEkle"><i class="fa fa-plus"></i> Yeni Satır Ekle</button>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" OnClick="Duzenle" Color="Color.Primary">Teklif Düzenle</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddTask" OnClick="TeklifDetayEkle" Color="Color.Primary">Yeni Satır Ekle</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" OnClick="SayfayiYazdir" Color="Color.Primary">Sayfayı Yazdır</MudButton>
             </div>
         </div>

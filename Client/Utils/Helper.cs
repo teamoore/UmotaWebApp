@@ -33,9 +33,10 @@ namespace UmotaWebApp.Client.Utils
         public static string FormattedDouble(double? m)
         {
             if (m.HasValue)
-                return m.Value.ToString("F", CultureInfo.InvariantCulture);
+                return String.Format("{0:N2}", m.Value);
+            //return m.Value.ToString("F", CultureInfo.InvariantCulture);
 
-            return "0.0";
+            return "0.00";
         }
 
     }
