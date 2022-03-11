@@ -99,6 +99,7 @@
         <MudTh>Birim Fiyat</MudTh>
         <MudTh>Döviz</MudTh>
         <MudTh>Tutar</MudTh>
+        <MudTh>Net Fiyat İD</MudTh>
         <MudTh>Tutar İD</MudTh>
         <MudTh>#</MudTh>
 
@@ -116,7 +117,8 @@
         <MudTd DataLabel="Birim Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.Fiyat))</MudTd>
         <MudTd DataLabel="Döviz">@context.Dovizdoku</MudTd>
         <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Tutar))</MudTd>
-        <MudTd DataLabel="Tutar İD" Style="text-align:right">@(Helper.FormattedDouble(context.Tutarid))</MudTd>
+        <MudTd DataLabel="Net Fiyat İD" Style="text-align:right">@(Helper.FormattedDouble(context.Miktar.HasValue ? context.Kdvmatrahid.Value / context.Miktar.Value : 0))</MudTd>
+        <MudTd DataLabel="Tutar İD" Style="text-align:right">@(Helper.FormattedDouble(context.Kdvmatrahid))</MudTd>
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
         </MudTd>
