@@ -1,4 +1,5 @@
 ﻿@page "/stek_listef_detay/{logref:int}"
+@inject IJSRuntime jsRuntime
 
 <div class="card" style="width: 100%;">
     <div class="card-body">
@@ -29,7 +30,7 @@
                         <tr>
                             <td>Açıklama</td>
                             <td>@teklif.Aciklama1</td>
-                        </tr>                        
+                        </tr>
                     </tbody>
                 </table>
 
@@ -71,15 +72,17 @@
         </div>
         <hr />
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-12">
                 <button class="btn btn-primary" @onclick="Duzenle"><i class="fa fa-edit"></i> Teklif Düzenle</button>
                 <button class="btn btn-primary" @onclick="TeklifDetayEkle"><i class="fa fa-plus"></i> Yeni Satır Ekle</button>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" OnClick="SayfayiYazdir" Color="Color.Primary">Sayfayı Yazdır</MudButton>
             </div>
         </div>
 
 
     </div>
 </div>
+
 
 
 <MudTable Items="@teklifDetayList" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
@@ -136,6 +139,7 @@
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
     [CascadingParameter] ModalParameters modalParameters { get; set; }
+
 
     [Inject]
     ModalManager ModalManager { get; set; }
@@ -283,6 +287,12 @@
         {
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
+    }
+
+
+    private async Task SayfayiYazdir()
+    {
+        await jsRuntime.InvokeVoidAsync("printPage");
     }
 
 }
