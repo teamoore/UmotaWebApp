@@ -268,7 +268,7 @@
                 return;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-            var kullanici = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
+            var kullanici = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
 
             var delete = await httpClient.GetFromJsonAsync<ServiceResponse<bool>>("/api/teklifdetay/delete?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value + "&kullanici=" + kullanici);

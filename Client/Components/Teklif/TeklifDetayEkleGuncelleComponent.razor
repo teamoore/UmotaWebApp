@@ -648,7 +648,7 @@
             TeklifDetayValidation();
 
             teklifDetay.Upddate = DateTime.Now;
-            teklifDetay.Upduser = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
+            teklifDetay.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklifDetay.Status = 1;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
@@ -695,7 +695,7 @@
 
             await LogRefUret();
             teklifDetay.Insdate = DateTime.Now;
-            teklifDetay.Insuser = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
+            teklifDetay.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklifDetay.Teklifref = teklifRef;
             teklifDetay.Status = 0;
 

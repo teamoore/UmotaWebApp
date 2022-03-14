@@ -54,8 +54,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 db.Open();
 
                 var sql = "select top 100 *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
-                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " order by insdate desc";
+                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " where 1=1";
 
+                sql += " order by insdate desc";
                 var result = await db.QueryAsync<TeklifDto>(sql, commandType: CommandType.Text);
 
                 db.Close();
