@@ -36,7 +36,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
                 db.Close();
 
-                return result.ToList();
+                return result.OrderByDescending(x => x.ondeger).ThenByDescending(x => x.logref).ToList();
 
             }
 
