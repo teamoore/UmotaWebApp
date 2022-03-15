@@ -103,7 +103,7 @@
         {
             var result = await client.GetServiceResponseAsync<List<SisFirmaDonemDto>>("/api/FirmaDonem/List?kullanici_kodu=" + request.Kod);
 
-            if (result != null)
+            if (result != null && result.Count > 0)
             {
                 firmalar = result;
                 selectedFirmaDonem = firmalar[0].logref;

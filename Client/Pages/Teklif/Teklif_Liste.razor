@@ -104,7 +104,8 @@
     private async Task LoadTeklifler()
     {
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-        teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>(UrlHelper.TeklifListesi + "?firmaId=" + selectedFirmaDonem.firma_no);
+        var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+        teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>(UrlHelper.TeklifListesi + "?firmaId=" + selectedFirmaDonem.firma_no+"&kullanicikodu="+kullanicikodu);
         teklifler = teklifler.OrderByDescending(i => i.Insdate).ToList();
     }
 

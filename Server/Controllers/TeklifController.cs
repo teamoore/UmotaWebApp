@@ -27,13 +27,13 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<ServiceResponse<List<TeklifDto>>> GetTeklifList(string firmaId)
+        public async Task<ServiceResponse<List<TeklifDto>>> GetTeklifList(string firmaId, string kullanicikodu)
         {
             try
             {
                 return new ServiceResponse<List<TeklifDto>>()
                 {
-                    Value = await TeklifService.GetTeklifDtos(firmaId)
+                    Value = await TeklifService.GetTeklifDtos(firmaId,kullanicikodu)
                 };
             }
             catch (ApiException ex)
