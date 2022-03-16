@@ -31,11 +31,7 @@
         <MudTd>
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
                 <MudMenuItem OnClick="(() => TeklifDetay(context.Logref))">Güncelle</MudMenuItem>
-                <MudMenuItem>Teklif Müşteriye Gönderildi</MudMenuItem>
-                <MudMenuItem>Müşteri Teklifi Onayladı</MudMenuItem>
-                <MudMenuItem>Müşteri Teklifte Revize İstedi</MudMenuItem>
-                <MudMenuItem>Müşteri Teklifi İptal Etti</MudMenuItem>
-                <MudMenuItem>UNO Teklifi İptal Etti</MudMenuItem>
+                <MudMenuItem OnClick="(() => TeklifDurumDegistir(context.Logref))">Durum Değiştir</MudMenuItem>
             </MudMenu>
         </MudTd>
         <MudTd DataLabel="Durum">@context.Duruminfo</MudTd>
@@ -142,5 +138,10 @@
 
         teklifler = result;
 
+    }
+
+    public void TeklifDurumDegistir(int logref)
+    {
+        navigation.NavigateTo("/stek_listef_detay/" + logref.ToString());
     }
 }
