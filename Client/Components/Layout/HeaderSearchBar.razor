@@ -9,7 +9,6 @@
         {
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                    @*<button class="btn btn-link" @onclick="AddNewClicked">Yeni Ekle</button>*@
                     <button class="btn btn-primary" @onclick="AddNewClicked"><i class="fa fa-plus"></i>Yeni Ekle</button>
                 </li>
             </ul>
@@ -23,7 +22,7 @@
                     <EditForm Model="header" class="form-inline my-2 my-lg-0">
 
                         <InputText @bind-Value="header.SearchText" class="form-control mr-sm-2" />
-                        <button class="btn btn-outline-success my-2 my-sm-0" @onclick="SearchClicked">Ara</button>
+                        <button class="btn btn-outline-success my-2 my-sm-0" @onclick="SearchClicked">@ButonText</button>
 
                     </EditForm>
 
@@ -53,6 +52,8 @@
     [Parameter]
     public bool ShowButtons { get; set; }
 
+    public string ButonText = "Ara";
+
     [Parameter]
     public EventCallback onDoneButtonClicked { get; set; }
 
@@ -62,7 +63,9 @@
 
     protected async Task SearchClicked()
     {
+        ButonText = "Aranıyor...";
         await onDoneButtonClicked.InvokeAsync();
+        ButonText = "Ara";
     }
 
     protected async Task AddNewClicked()

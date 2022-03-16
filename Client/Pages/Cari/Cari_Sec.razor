@@ -12,7 +12,7 @@
                 </div>
                 <div class="col-md-8">
                     <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage"
-                               OnClick="CariBul" Color="Color.Primary">Cari Bul</MudButton>
+                               OnClick="CariBul" Color="Color.Primary">@ButonText</MudButton>
                 </div>
             </div>
 
@@ -91,6 +91,7 @@
 
 
     public string ResultText { get; set; }
+    public string ButonText = "Cari Bul";
 
     private async Task LoadCariler()
     {
@@ -107,6 +108,8 @@
             {
                 throw new Exception(Utils.Mesajlar.MetinGir);
             }
+
+            ButonText = "Aranıyor...";
 
             _searchStarted = true;
             ResultText = string.Empty;
@@ -132,6 +135,7 @@
         finally
         {
             _searchStarted = false;
+            ButonText = "Cari Bul";
         }
 
     }

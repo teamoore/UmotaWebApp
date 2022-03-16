@@ -11,7 +11,7 @@
                 </div>
                 <div class="col-md-8">
                     <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage"
-                               OnClick="MalzemeBul" Color="Color.Primary">Malzeme Bul</MudButton>
+                               OnClick="MalzemeBul" Color="Color.Primary">@ButonText</MudButton>
                 </div>
             </div>
 
@@ -79,6 +79,7 @@
     public MalzemeKartDto malzemeKart = new MalzemeKartDto();
 
     public string ResultText { get; set; }
+    public string ButonText = "Malzeme Bul";
 
     private string _searchStringMalzeme = "";
     private bool _sortNameByLength;
@@ -125,6 +126,7 @@
             {
                 throw new Exception(Utils.Mesajlar.MetinGir);
             }
+            ButonText = "Aranıyor...";
 
             _searchStarted = true;
 
@@ -144,6 +146,7 @@
         finally
         {
             _searchStarted = false;
+            ButonText = "Malzeme Bul";
         }
     }
 
