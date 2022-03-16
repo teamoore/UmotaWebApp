@@ -19,11 +19,11 @@
                 <MudTabPanel Icon="@Icons.Material.Filled.AddTask" Text="Malzeme" BadgeColor="Color.Error">
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label>Çizim Kodu</label>
                                 <InputText @bind-Value="teklifDetay.Cizimkodu" class="form-control" placeholder="Çizim Kodu" />
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <label>Poz No</label>
                                 <InputText @bind-Value="teklifDetay.Sipnosira" class="form-control" placeholder="Poz no" />
                             </div>
@@ -68,7 +68,7 @@
 
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <label>Mitar</label>
                                 <InputNumber @bind-Value="pageMiktar" class="form-control" placeholder="Miktar" />
                             </div>
@@ -77,8 +77,8 @@
                                 <InputText @bind-Value="teklifDetay.Birimkodu" class="form-control" placeholder="Birim" disabled />
                             </div>
                             <div class="col-md-2">
-                                <label>Fiyat</label>
-                                <InputNumber @bind-Value="teklifDetay.Fiyat" class="form-control" placeholder="Fiyat" disabled />
+                                <label>Liste Fiyatı</label>
+                                <InputNumber @bind-Value="teklifDetay.Fiyat" class="form-control" placeholder="Liste Fiyatı" disabled />
                             </div>
                             <div class="col-md-1">
                                 <label>Döviz</label>
@@ -93,7 +93,7 @@
                                     }
                                 </InputSelect>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <label>Kur</label>
                                 <InputNumber @bind-Value="teklifDetay.Dovizkuru" class="form-control" placeholder="Kur" />
                             </div>
@@ -103,6 +103,35 @@
                             </div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-1">
+                                <label>İsk-Genel %</label>
+                                <InputNumber @bind-Value="teklifDetay.Iskyuz4" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-1">
+                                <label>İsk-1 %</label>
+                                <InputNumber @bind-Value="pageIskYuz1" class="form-control" />
+                            </div>
+                            <div class="col-md-1">
+                                <label>İsk-2 %</label>
+                                <InputNumber @bind-Value="pageIskYuz2" class="form-control" />
+                            </div>
+                            <div class="col-md-1">
+                                <label>İsk-3 %</label>
+                                <InputNumber @bind-Value="pageIskYuz3" class="form-control" />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Net Fiyat İD</label>
+                                <InputNumber @bind-Value="BirimFiyatNetid" class="form-control" placeholder="Net Fiyat İD" disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label>Toplam Tutar İD</label>
+                                <InputNumber @bind-Value="teklifDetay.Kdvmatrahid" class="form-control" placeholder="Toplam Tutar İD" disabled />
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div class="form-group">
                         <div class="row">
@@ -118,25 +147,17 @@
                     <hr />
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-md-1">
-                                <label>İsk-1 %</label>
-                                <InputNumber @bind-Value="pageIskYuz1" class="form-control" />
+                            <div class="col-md-2">
+                                <label>İsk-Genel Tutar</label>
+                                <InputNumber @bind-Value="teklifDetay.Isktut4" class="form-control" disabled />
                             </div>
                             <div class="col-md-2">
                                 <label>İsk-1 Tutar</label>
                                 <InputNumber @bind-Value="teklifDetay.Isktut1" class="form-control" disabled />
                             </div>
-                            <div class="col-md-1">
-                                <label>İsk-2 %</label>
-                                <InputNumber @bind-Value="pageIskYuz2" class="form-control" />
-                            </div>
                             <div class="col-md-2">
                                 <label>İsk-2 Tutar</label>
                                 <InputNumber @bind-Value="teklifDetay.Isktut2" class="form-control" disabled />
-                            </div>
-                            <div class="col-md-1">
-                                <label>İsk-3 %</label>
-                                <InputNumber @bind-Value="pageIskYuz3" class="form-control" />
                             </div>
                             <div class="col-md-2">
                                 <label>İsk-3 Tutar</label>
@@ -190,17 +211,17 @@
                 <hr />
                 <div class="form-group">
                     <div class="row">
-                        <div class="col-md-1">
-                            <label>İsk-Genel %</label>
-                            <InputNumber @bind-Value="teklifDetay.Iskyuz4" class="form-control" disabled />
+                        <div class="col-md-2">
+                            <label>Toplam Tutar</label>
+                            <InputNumber @bind-Value="teklifDetay.Tutarid" class="form-control" disabled />
                         </div>
                         <div class="col-md-2">
-                            <label>İsk-Genel Tutar</label>
-                            <InputNumber @bind-Value="teklifDetay.Isktut4" class="form-control" disabled />
+                            <label>Iskonto Toplam Tutar</label>
+                            <InputNumber @bind-Value="IskTopid" class="form-control" disabled />
                         </div>
                         <div class="col-md-2">
                             <label>KDV Mahrahı</label>
-                            <InputNumber @bind-Value="teklifDetay.Kdvmatrah" class="form-control" disabled />
+                            <InputNumber @bind-Value="teklifDetay.Kdvmatrahid" class="form-control" disabled />
                         </div>
                         <div class="col-md-1">
                             <label>KDV %</label>
@@ -208,11 +229,11 @@
                         </div>
                         <div class="col-md-2">
                             <label>KDV Tutarı</label>
-                            <InputNumber @bind-Value="teklifDetay.Kdvtut" class="form-control" disabled />
+                            <InputNumber @bind-Value="teklifDetay.Kdvtutid" class="form-control" disabled />
                         </div>
                         <div class="col-md-2">
                             <label>Net Tutar</label>
-                            <InputNumber @bind-Value="teklifDetay.Nettutar" class="form-control" disabled />
+                            <InputNumber @bind-Value="teklifDetay.Nettutarid" class="form-control" disabled />
                         </div>
                     </div>
                 </div>
@@ -412,6 +433,39 @@
         }
     }
 
+    private double? _birimfiyatnetid = 0;
+    public double? BirimFiyatNetid
+    {
+        get
+        {
+            if (teklifDetay.Miktar.HasValue && teklifDetay.Kdvmatrahid.HasValue)
+                _birimfiyatnetid = Math.Round(teklifDetay.Kdvmatrahid.Value / teklifDetay.Miktar.Value, 2);
+            else
+                _birimfiyatnetid = 0;
+
+            return _birimfiyatnetid;
+        }
+        set
+        {
+            _birimfiyatnetid = value;
+        }
+    }
+
+    private double? _isktopid = 0;
+    public double? IskTopid
+    {
+        get
+        {
+            _isktopid = (teklifDetay.Isktut1id.HasValue ? teklifDetay.Isktut1id.Value : 0) + (teklifDetay.Isktut2id.HasValue ? teklifDetay.Isktut2id.Value :0) + (teklifDetay.Isktut3id.HasValue ? teklifDetay.Isktut3id.Value : 0) + (teklifDetay.Isktut4id.HasValue ? teklifDetay.Isktut4id.Value : 0);
+
+            return _isktopid;
+        }
+        set
+        {
+            _isktopid = value;
+        }
+    }
+
     protected override Task OnParametersSetAsync()
     {
         IsUpdate = logRef.HasValue;
@@ -594,7 +648,7 @@
             TeklifDetayValidation();
 
             teklifDetay.Upddate = DateTime.Now;
-            teklifDetay.Upduser = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
+            teklifDetay.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklifDetay.Status = 1;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
@@ -641,7 +695,7 @@
 
             await LogRefUret();
             teklifDetay.Insdate = DateTime.Now;
-            teklifDetay.Insuser = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
+            teklifDetay.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklifDetay.Teklifref = teklifRef;
             teklifDetay.Status = 0;
 
@@ -650,7 +704,7 @@
             var request = new TeklifDetayRequestDto();
             request.TeklifDetay = teklifDetay;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
-                        
+
             var result = await httpClient.PostAsJsonAsync("/api/teklifdetay/save", request);
 
             var response = await result.Content.ReadFromJsonAsync<ServiceResponse<TeklifDetayDto>>();

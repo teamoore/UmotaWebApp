@@ -44,7 +44,6 @@
                 {
                     <div class="form-group">
                         <select class="form-control" @bind="selectedFirmaDonem">
-                            <option value="-1" selected>@selectBoxDesc</option>
                             @if (firmalar != null)
                             {
                                 @foreach (var item in firmalar)
@@ -92,8 +91,6 @@
     private List<SisFirmaDonemDto> firmalar = null;
     private int selectedFirmaDonem = -1;
 
-    private string selectBoxDesc = "Yükleniyor...";
-
     private SisKullaniciLoginResponseDto response { get; set; }
 
     private bool _firstStep = true;
@@ -106,10 +103,10 @@
         {
             var result = await client.GetServiceResponseAsync<List<SisFirmaDonemDto>>("/api/FirmaDonem/List?kullanici_kodu=" + request.Kod);
 
-            if (result != null)
+            if (result != null && result.Count > 0)
             {
                 firmalar = result;
-                selectBoxDesc = "Lütfen firma-dönem seçiniz";
+                selectedFirmaDonem = firmalar[0].logref;
             }
             else
             {

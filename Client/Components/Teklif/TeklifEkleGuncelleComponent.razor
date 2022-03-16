@@ -231,6 +231,7 @@
         if (!IsUpdate)
         {
             teklif.Tarih = DateTime.Now;
+            teklif.TeslimSekli = "MÜŞTERİ TESLİM";
         }
 
         await TeslimListesiCek();
@@ -302,7 +303,7 @@
             TeklifValidation();
 
             teklif.Upddate = DateTime.Now;
-            teklif.Upduser = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
+            teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklif.Status = 1;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
@@ -375,12 +376,14 @@
         {
 
             teklif.Insdate = DateTime.Now;
-            teklif.Insuser = string.Format("web:{0}", await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu));
+            teklif.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklif.Tarih = teklif.Tarih.HasValue ? teklif.Tarih : DateTime.Now;
             teklif.Saat = teklif.Saat.HasValue ? teklif.Saat : DateTime.Now;
             teklif.Status = 0;
             teklif.Trcode = 1;
             teklif.Duruminfo = "Teklif Hazırlanıyor";
+            teklif.Revizyon = 0;
+            teklif.Revzno = "";
 
             await TeklifNoUret();
             await LogRefUret();

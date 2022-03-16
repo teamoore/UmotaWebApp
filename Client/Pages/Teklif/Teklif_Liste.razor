@@ -31,12 +31,7 @@
         <MudTd>
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
                 <MudMenuItem OnClick="(() => TeklifDetay(context.Logref))">Güncelle</MudMenuItem>
-                <MudDivider />
-                <MudMenuItem>Teklif Müşteriye Gönderildi</MudMenuItem>
-                <MudMenuItem>Müşteri Teklifi Onayladı</MudMenuItem>
-                <MudMenuItem>Müşteri Teklifte Revize İstedi</MudMenuItem>
-                <MudMenuItem>Müşteri Teklifi İptal Etti</MudMenuItem>
-                <MudMenuItem>UNO Teklifi İptal Etti</MudMenuItem>
+                <MudMenuItem OnClick="(() => TeklifDurumDegistir(context.Logref))">Durum Değiştir</MudMenuItem>
             </MudMenu>
         </MudTd>
         <MudTd DataLabel="Durum">@context.Duruminfo</MudTd>
@@ -105,7 +100,8 @@
     private async Task LoadTeklifler()
     {
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-        teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>(UrlHelper.TeklifListesi + "?firmaId=" + selectedFirmaDonem.firma_no);
+        var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+        teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>(UrlHelper.TeklifListesi + "?firmaId=" + selectedFirmaDonem.firma_no+"&kullanicikodu="+kullanicikodu);
         teklifler = teklifler.OrderByDescending(i => i.Insdate).ToList();
     }
 
@@ -142,5 +138,10 @@
 
         teklifler = result;
 
+    }
+
+    public void TeklifDurumDegistir(int logref)
+    {
+        navigation.NavigateTo("/stek_listef_detay/" + logref.ToString());
     }
 }

@@ -13,6 +13,10 @@ using Microsoft.IdentityModel.Tokens;
 using UmotaWebApp.Server.Data.Models;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
+using Dapper;
+using Microsoft.Data.SqlClient;
+using System.Data;
+using UmotaWebApp.Server.Extensions;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
@@ -21,7 +25,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public IMapper Mapper { get; }
         public UmotaMasterDbContext MasterDbContext { get; }
         public IConfiguration Configuration { get; }
-
+             
         public SisKullaniciService(IMapper mapper, UmotaMasterDbContext masterDbContext, IConfiguration configuration)
         {
             Mapper = mapper;
@@ -79,5 +83,23 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             return response;
         }
 
+        public async Task<int> GetKullaniciYetkisiByKullaniciKodu(string kullanicikodu, string yetkikodu)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                var p = new DynamicParameters();
+                p.Add("@kullanici_kodu", kullanicikodu);
+                p.Add("@yetki_kodu", yetkikodu);
+                p.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+                await db.ExecuteAsync("GetKullaniciYetkisiByKullaniciKodu", p, commandType: CommandType.StoredProcedure);
+
+                int c = p.Get<int>("@ReturnValue");
+
+                return c;
+
+            }
+
+        }
     }
 }

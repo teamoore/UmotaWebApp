@@ -58,6 +58,7 @@ namespace UmotaWebApp.Server.Controllers
             try
             {
                 var list = new List<string>();
+                list.Add("MÜŞTERİ TESLİM");
                 list.Add("ŞİRKETİMİZ DEPO TESLİM");
                 list.Add("MÜŞTERİ ADRESİNE TESLİM");
                 list.Add("KARGO ALICI ÖDEMELİ");

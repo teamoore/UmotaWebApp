@@ -22,12 +22,14 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public IMapper Mapper { get; }
         public IConfiguration Configuration { get; }
         private readonly DbConnection _sql;
+        private ISisKullaniciService SisKullaniciService { get; }
 
-        public TeklifService(IMapper mapper, IConfiguration configuration, DbConnection sql)
+        public TeklifService(IMapper mapper, IConfiguration configuration, DbConnection sql, ISisKullaniciService sisKullaniciService)
         {
             Mapper = mapper;
             Configuration = configuration;
             _sql = sql;
+            SisKullaniciService = sisKullaniciService;
         }
 
         public async Task<TeklifDto> GetTeklifByRef(int logref, string firma_id)
@@ -47,15 +49,30 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             }
         }
 
-        public async Task<List<TeklifDto>> GetTeklifDtos(string firmaId)
+        public async Task<List<TeklifDto>> GetTeklifDtos(string firmaId, string kullanicikodu)
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
             {
                 db.Open();
 
                 var sql = "select top 100 *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
-                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " order by insdate desc";
+                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " a with(nolock) where 1=1";
 
+                var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, "TUMTK");
+                if (tumTeklifleriGormeYetkisi == 0) 
+                {
+                    var kesinSiparisleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, "KESIN");
+                    string kullanici_tanimlari = Configuration.GetUmotaObjectName("kullanici_tanimlari", firmaId: firmaId);
+                    sql += " and (";
+                    sql += "    (insuser = '" + kullanicikodu + "')";
+                    sql += " or exists (select aa.logref from " + kullanici_tanimlari + " aa with(nolock) where aa.teklifinsuserkodu = a.insuser and aa.kullanici_kodu = '" + kullanicikodu + "')";
+                    sql += " or exists (select aa.logref from " + kullanici_tanimlari + " aa with(nolock) where aa.plasiyerkodu = a.temsilciadi and aa.kullanici_kodu = '" + kullanicikodu + "')";
+                    if (kesinSiparisleriGormeYetkisi == 1)
+                        sql += " or (duruminfo = 'Kesin Sipariş') or  (duruminfo = 'Kesin Sipariş Logoya Aktarıldı')";
+                    sql += " )";
+                }
+
+                sql += " order by insdate desc";
                 var result = await db.QueryAsync<TeklifDto>(sql, commandType: CommandType.Text);
 
                 db.Close();
