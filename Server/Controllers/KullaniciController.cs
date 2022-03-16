@@ -47,8 +47,8 @@ namespace UmotaWebApp.Server.Controllers
  
         }
 
-        [HttpPost("GetByKod")]
-        public async Task<ServiceResponse<SisKullaniciDto>> GetSisKullanici(string kod)
+        [HttpGet("GetByKod")]
+        public async Task<ServiceResponse<SisKullaniciDto>> GetSisKullaniciGetByKod(string kod)
         {
             try
             {

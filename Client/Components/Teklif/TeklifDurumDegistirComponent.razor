@@ -21,23 +21,33 @@
                         <label>Yeni Durum</label>
                         <InputSelect @bind-Value="teklif.NewDuruminfo" class="form-control">
                             <option value=-1>@Utils.Mesajlar.Seciniz</option>
-                            @if (teklif.Duruminfo == Utils.TeklifDurum.TeklifHazirlaniyor)
+                            @if (admin == 1)
                             {
-                                <option value=@Utils.TeklifDurum.MusteriOnayiBekliyor>@Utils.TeklifDurum.TeklifMusteriyeGonderildi</option>
-                                <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
+                                <option value=@Utils.TeklifDurum.TeklifHazirlaniyor>@Utils.TeklifDurum.TeklifHazirlaniyor</option>
+                                <option value=@Utils.TeklifDurum.MusteriOnayiBekliyor>@Utils.TeklifDurum.MusteriOnayiBekliyor</option>
+                                <option value=@Utils.TeklifDurum.FinansalUygunlukBekleniyor>@Utils.TeklifDurum.FinansalUygunlukBekleniyor</option>
+                                <option value=@Utils.TeklifDurum.KesinSiparis>@Utils.TeklifDurum.KesinSiparis</option>
                             }
-                            @if (teklif.Duruminfo == Utils.TeklifDurum.MusteriOnayiBekliyor)
+                            else
                             {
-                                <option value=@Utils.TeklifDurum.FinansalUygunlukBekleniyor>@Utils.TeklifDurum.MusteriTeklifiOnayladi</option>
-                                <option value=@Utils.TeklifDurum.MusteriTeklifteRevizeIstedi>@Utils.TeklifDurum.MusteriTeklifteRevizeIstedi</option>
-                                <option value=@Utils.TeklifDurum.MusteriTeklifiIptalEtti>@Utils.TeklifDurum.MusteriTeklifiIptalEtti</option>
-                                <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
-                            }
-                            @if (teklif.Duruminfo == Utils.TeklifDurum.FinansalUygunlukBekleniyor)
-                            {
-                                <option value=@Utils.TeklifDurum.KesinSiparis>@Utils.TeklifDurum.FinansalUygunlukVer</option>
-                                <option value=@Utils.TeklifDurum.MusteriTeklifiIptalEtti>@Utils.TeklifDurum.MusteriTeklifiIptalEtti</option>
-                                <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
+                                @if (teklif.Duruminfo == Utils.TeklifDurum.TeklifHazirlaniyor)
+                                {
+                                    <option value=@Utils.TeklifDurum.MusteriOnayiBekliyor>@Utils.TeklifDurum.TeklifMusteriyeGonderildi</option>
+                                    <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
+                                }
+                                @if (teklif.Duruminfo == Utils.TeklifDurum.MusteriOnayiBekliyor)
+                                {
+                                    <option value=@Utils.TeklifDurum.FinansalUygunlukBekleniyor>@Utils.TeklifDurum.MusteriTeklifiOnayladi</option>
+                                    <option value=@Utils.TeklifDurum.MusteriTeklifteRevizeIstedi>@Utils.TeklifDurum.MusteriTeklifteRevizeIstedi</option>
+                                    <option value=@Utils.TeklifDurum.MusteriTeklifiIptalEtti>@Utils.TeklifDurum.MusteriTeklifiIptalEtti</option>
+                                    <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
+                                }
+                                @if (teklif.Duruminfo == Utils.TeklifDurum.FinansalUygunlukBekleniyor)
+                                {
+                                    <option value=@Utils.TeklifDurum.KesinSiparis>@Utils.TeklifDurum.FinansalUygunlukVer</option>
+                                    <option value=@Utils.TeklifDurum.MusteriTeklifiIptalEtti>@Utils.TeklifDurum.MusteriTeklifiIptalEtti</option>
+                                    <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
+                                }
                             }
                         </InputSelect>
                     </div>
@@ -83,10 +93,16 @@
     [Parameter]
     public int? logRef { get; set; }
 
+    [Parameter]
+    public int? admin { get; set; }
+
+    public bool isAdmin { get; set; }
+
     TeklifDto teklif = new TeklifDto();
 
     protected override async Task OnInitializedAsync()
     {
+        await ValidateAdmin();
         await GetTeklif();
     }
 
@@ -157,8 +173,39 @@
         }
     }
 
+
     public async Task Vazgec()
     {
         await ModalInstance.CloseAsync();
+    }
+
+    private async Task ValidateAdmin()
+    {
+        if (admin.HasValue && admin.Value == 1)
+        {
+            try
+            {
+                var kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+                var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanici_kodu);
+
+                if (result != null)
+                {
+                    isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
+                }
+            }
+            catch (Exception)
+            {
+                isAdmin = false;
+            }
+
+            if (!isAdmin)
+            {
+                Snackbar.Add("Admin değilsiniz", severity: Severity.Warning);
+                await ModalInstance.CloseAsync(); ;
+            }
+        }
+
+
     }
 }

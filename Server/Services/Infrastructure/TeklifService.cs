@@ -185,7 +185,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 if (teklifRow.Duruminfo.Equals(request.Teklif.Duruminfo) == false)
                     throw new ApiException("Teklifin Durumu sizden önce değiştirilmiş , işlem durudurulacak");
 
-                if (request.Teklif.NewDuruminfo == TeklifDurum.KesinSiparis)
+                if (request.Teklif.Duruminfo == TeklifDurum.FinansalUygunlukBekleniyor && request.Teklif.NewDuruminfo == TeklifDurum.KesinSiparis)
                 {
                     var teklif_finans_onay = await dbContext.TeklifFinansOnays
                         .Where(x => 

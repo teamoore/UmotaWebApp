@@ -29,5 +29,6 @@ namespace UmotaWebApp.Client.Utils
         public const string DovizListesi = "/api/doviz/GetDovizList";
         public const string DovizKuruGetir = "/api/doviz/GetDovizKur";
         public const string TeklifDetaySiraNo = "/api/teklifdetay/getsirano";
+        public const string KullaniciGetByKod = "/api/kullanici/GetByKod";
     }
 }

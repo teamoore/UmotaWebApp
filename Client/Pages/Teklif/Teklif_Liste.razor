@@ -31,7 +31,11 @@
         <MudTd>
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
                 <MudMenuItem OnClick="(() => TeklifDetay(context.Logref))">Güncelle</MudMenuItem>
-                <MudMenuItem OnClick="(() => TeklifDurumDegistir(context.Logref))">Durum Değiştir</MudMenuItem>
+                <MudMenuItem OnClick="(() => TeklifDurumDegistir(context.Logref,null))">Durum Değiştir</MudMenuItem>
+                @if (isAdmin)
+                {
+                    <MudMenuItem OnClick="(() => TeklifDurumDegistir(context.Logref,1))">Durum Değiştir(Admin)</MudMenuItem>
+                }
             </MudMenu>
         </MudTd>
         <MudTd DataLabel="Durum">@context.Duruminfo</MudTd>
@@ -78,6 +82,8 @@
     private string _searchString = "";
     private bool _sortNameByLength;
 
+    private bool isAdmin = false;
+
     private bool FilterFunc1(TeklifDto element) => FilterFunc(element, _searchString);
 
     private bool FilterFunc(TeklifDto element, string searchString)
@@ -98,6 +104,7 @@
     {
         header.HeaderText = "Teklif Listesi";
         await LoadTeklifler();
+        await CheckUser();
     }
 
     private async Task LoadTeklifler()
@@ -143,7 +150,7 @@
 
     }
 
-    public async Task TeklifDurumDegistir(int logref)
+    public async Task TeklifDurumDegistir(int logref, int? admin)
     {
         var opt = new ModalOptions();
         opt.ContentScrollable = true;
@@ -151,6 +158,8 @@
         var parameters = new ModalParameters();
         parameters.Add("logRef", logref);
 
+        if (admin.HasValue)
+            parameters.Add("admin", admin.Value);
 
         var teklifDurumForm = modal.Show<TeklifDurumDegistirComponent>("Durum Değiştir", parameters: parameters, options: opt);
         var result = await teklifDurumForm.Result;
@@ -160,4 +169,24 @@
             await LoadTeklifler();
         }
     }
+
+    private async Task CheckUser()
+    {
+        try
+        {
+            var kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanici_kodu);
+
+            if (result != null)
+            {
+                isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
+            }
+        }
+        catch (Exception)
+        {
+            isAdmin = false;
+        }
+    }
+
 }
