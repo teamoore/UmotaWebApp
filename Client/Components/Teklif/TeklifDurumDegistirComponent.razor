@@ -1,0 +1,164 @@
+﻿<EditForm Model="teklif">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mt-12">
+        <div class="form">
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Teklif No</label>
+                        <InputText @bind-Value="teklif.Teklifno" class="form-control" disabled></InputText>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Mevcut Durum</label>
+                        <InputText @bind-Value="teklif.Duruminfo" class="form-control" disabled></InputText>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-10">
+                        <label>Yeni Durum</label>
+                        <InputSelect @bind-Value="teklif.NewDuruminfo" class="form-control">
+                            <option value=-1>@Utils.Mesajlar.Seciniz</option>
+                            @if (teklif.Duruminfo == Utils.TeklifDurum.TeklifHazirlaniyor)
+                            {
+                                <option value=@Utils.TeklifDurum.MusteriOnayiBekliyor>@Utils.TeklifDurum.TeklifMusteriyeGonderildi</option>
+                                <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
+                            }
+                            @if (teklif.Duruminfo == Utils.TeklifDurum.MusteriOnayiBekliyor)
+                            {
+                                <option value=@Utils.TeklifDurum.FinansalUygunlukBekleniyor>@Utils.TeklifDurum.MusteriTeklifiOnayladi</option>
+                                <option value=@Utils.TeklifDurum.MusteriTeklifteRevizeIstedi>@Utils.TeklifDurum.MusteriTeklifteRevizeIstedi</option>
+                                <option value=@Utils.TeklifDurum.MusteriTeklifiIptalEtti>@Utils.TeklifDurum.MusteriTeklifiIptalEtti</option>
+                                <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
+                            }
+                            @if (teklif.Duruminfo == Utils.TeklifDurum.FinansalUygunlukBekleniyor)
+                            {
+                                <option value=@Utils.TeklifDurum.KesinSiparis>@Utils.TeklifDurum.FinansalUygunlukVer</option>
+                                <option value=@Utils.TeklifDurum.MusteriTeklifiIptalEtti>@Utils.TeklifDurum.MusteriTeklifiIptalEtti</option>
+                                <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    <div class="col-md-10">
+                        <label>Açıklama</label>
+                        <InputTextArea @bind-Value="teklif.TeklifDurumAciklama" class="form-control"></InputTextArea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Kaydet" OnClick="UpdateTeklifDurum" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+
+</EditForm>
+
+@code {
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+
+    [Parameter]
+    public int? logRef { get; set; }
+
+    TeklifDto teklif = new TeklifDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetTeklif();
+    }
+
+    public async Task GetTeklif()
+    {
+        try
+        {
+            if (logRef.HasValue == false)
+                return;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<TeklifDto>(UrlHelper.TeklifGetir + "?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no);
+            if (result != null)
+            {
+                teklif = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+        }
+    }
+
+    private async Task UpdateTeklifDurum()
+    {
+        try
+        {
+
+            teklif.Upddate = DateTime.Now;
+            teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklif.Status = 1;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new TeklifRequestDto();
+            request.Teklif = teklif;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostAsJsonAsync(UrlHelper.TeklifDurumGuncelle, request);
+
+            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<TeklifDto>>();
+            if (!response.Success)
+                throw new Exception(response.Message);
+
+            Snackbar.Add("Teklif Durumu güncellendi", severity: Severity.Success);
+
+
+            await ModalInstance.CloseAsync();
+        }
+        catch (ClientException e)
+        {
+            foreach (var item in e.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+}

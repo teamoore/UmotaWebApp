@@ -56,6 +56,9 @@
 
 @code {
 
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
     [Inject]
     ModalManager ModalManager { get; set; }
 
@@ -140,8 +143,21 @@
 
     }
 
-    public void TeklifDurumDegistir(int logref)
+    public async Task TeklifDurumDegistir(int logref)
     {
-        navigation.NavigateTo("/stek_listef_detay/" + logref.ToString());
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("logRef", logref);
+
+
+        var teklifDurumForm = modal.Show<TeklifDurumDegistirComponent>("Durum Değiştir", parameters: parameters, options: opt);
+        var result = await teklifDurumForm.Result;
+
+        if (!result.Cancelled)
+        {
+            await LoadTeklifler();
+        }
     }
 }

@@ -125,5 +125,25 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("updatedurum")]
+        public async Task<ServiceResponse<TeklifDto>> UpdateTeklifDurumu(TeklifRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<TeklifDto>()
+                {
+                    Value = await TeklifService.UpdateTeklifDurum(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<TeklifDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

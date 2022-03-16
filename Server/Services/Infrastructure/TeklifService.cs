@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Data.Models;
 using UmotaWebApp.Server.Extensions;
+using UmotaWebApp.Shared.Consts;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 
@@ -58,17 +59,17 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 var sql = "select top 100 *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
                     " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " a with(nolock) where 1=1";
 
-                var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, "TUMTK");
+                var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, KullaniciYetkiKodlari.TumTeklifleriGorebilir);
                 if (tumTeklifleriGormeYetkisi == 0) 
                 {
-                    var kesinSiparisleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, "KESIN");
+                    var kesinSiparisleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, KullaniciYetkiKodlari.KesinSiparisleriGorebilir);
                     string kullanici_tanimlari = Configuration.GetUmotaObjectName("kullanici_tanimlari", firmaId: firmaId);
                     sql += " and (";
                     sql += "    (insuser = '" + kullanicikodu + "')";
                     sql += " or exists (select aa.logref from " + kullanici_tanimlari + " aa with(nolock) where aa.teklifinsuserkodu = a.insuser and aa.kullanici_kodu = '" + kullanicikodu + "')";
                     sql += " or exists (select aa.logref from " + kullanici_tanimlari + " aa with(nolock) where aa.plasiyerkodu = a.temsilciadi and aa.kullanici_kodu = '" + kullanicikodu + "')";
                     if (kesinSiparisleriGormeYetkisi == 1)
-                        sql += " or (duruminfo = 'Kesin Sipariş') or  (duruminfo = 'Kesin Sipariş Logoya Aktarıldı')";
+                        sql += " or (duruminfo = '"+ TeklifDurum.KesinSiparis +"') or  (duruminfo = '"+ TeklifDurum.KesinSipLogoyaAktarildi +"')";
                     sql += " )";
                 }
 
@@ -93,6 +94,16 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 var teklif = Mapper.Map<Teklif>(request.Teklif);
                 await dbContext.Teklifs.AddAsync(teklif);
+
+                var tdd = new TeklifDurumDetay();
+                tdd.Teklifref = teklif.Logref;
+                tdd.Tarih = DateTime.Now;
+                tdd.Duruminfo = teklif.Duruminfo;
+                tdd.Aciklama = teklif.Aciklama1;
+                tdd.KullaniciKodu = teklif.Insuser;
+
+                await dbContext.TeklifDurumDetays.AddAsync(tdd);
+
                 await dbContext.SaveChangesAsync();
                 return Mapper.Map<TeklifDto>(teklif);
             }
@@ -157,5 +168,54 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
 
         }
+
+        public async Task<TeklifDto> UpdateTeklifDurum(TeklifRequestDto request)
+        {
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var teklifRow = await dbContext.Teklifs.Where(x => x.Logref == request.Teklif.Logref).SingleOrDefaultAsync();
+                if (teklifRow == null)
+                    throw new ApiException("Teklif bulunamadı");
+
+                if (teklifRow.Duruminfo.Equals(request.Teklif.Duruminfo) == false)
+                    throw new ApiException("Teklifin Durumu sizden önce değiştirilmiş , işlem durudurulacak");
+
+                if (request.Teklif.NewDuruminfo == TeklifDurum.KesinSiparis)
+                {
+                    var teklif_finans_onay = await dbContext.TeklifFinansOnays
+                        .Where(x => 
+                            x.Bas <= request.Teklif.Tutarmatrahtl &&
+                            x.Bit >= request.Teklif.Tutarmatrahtl &&
+                            ( x.Onay1 == request.Teklif.Upduser || x.Onay2 == request.Teklif.Upduser || x.Onay3 == request.Teklif.Upduser )
+                        ).SingleOrDefaultAsync();
+
+                    if (teklif_finans_onay == null)
+                        throw new ApiException("Finansal Uygunluk vermek için yetkiniz bulunamadı");
+                }
+
+                var teklifDurum = new TeklifDurumDetay();
+                teklifDurum.Aciklama = request.Teklif.TeklifDurumAciklama;
+                teklifDurum.Tarih = DateTime.Now;
+                teklifDurum.Teklifref = request.Teklif.Logref;
+                teklifDurum.Duruminfo = request.Teklif.NewDuruminfo;
+                teklifDurum.KullaniciKodu = request.Teklif.Upduser;
+
+                await dbContext.TeklifDurumDetays.AddAsync(teklifDurum);
+
+                request.Teklif.Duruminfo = request.Teklif.NewDuruminfo;
+                 
+                Mapper.Map(request.Teklif, teklifRow);
+                await dbContext.SaveChangesAsync();
+
+                return Mapper.Map<TeklifDto>(teklifRow);
+            }
+        }
+
+        
     }
 }

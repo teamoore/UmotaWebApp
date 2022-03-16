@@ -95,5 +95,8 @@ namespace UmotaWebApp.Shared.ModelDto
         public string SevkIlgilisi { get; set; }
         public string Faks { get; set; }
         public string Mail { get; set; }
+
+        public string TeklifDurumAciklama { get; set; }
+        public string NewDuruminfo { get; set; }
     }
 }
