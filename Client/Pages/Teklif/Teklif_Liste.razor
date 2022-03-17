@@ -6,7 +6,7 @@
 
 @if (loadingCompleted == false)
 {
-    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
 <MudTable Items="@teklifler" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<TeklifDto,bool>(FilterFunc1)">
@@ -126,9 +126,9 @@
             loadingCompleted = true;
             teklifler = teklifler.OrderByDescending(i => i.Insdate).ToList();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Snackbar.Add("Beklenmedik bir hata oluştur", severity: Severity.Error);
+            Snackbar.Add(ex.Message, severity: Severity.Error);
         }
     }
 
