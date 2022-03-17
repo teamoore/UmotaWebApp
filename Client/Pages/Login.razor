@@ -138,8 +138,6 @@
 
             (AuthenticationStateProvider as AuthStateProvider).NotifyUserLogin(response.KullaniciDto.KullaniciKodu);
 
-            //client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", response.ApiToken);
-
             var authStr = $"Bearer " + response.ApiToken.Replace("\"", "");
             authStr = authStr.Replace("\"", "");
             client.DefaultRequestHeaders.Clear();

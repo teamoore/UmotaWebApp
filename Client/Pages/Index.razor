@@ -1,6 +1,28 @@
 ﻿@page "/"
 
+
 <h1>UNO Endüstriyel CRM</h1>
 
 versiyon 0.1
+
+@code {
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthState { get; set; }
+
+    [Inject]
+    NavigationManager NavigationManager { get; set; }
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        var authState = await AuthState;
+
+        if (!authState.User.Identity.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("login");
+        }
  
+    }
+}
+
