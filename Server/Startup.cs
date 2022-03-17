@@ -49,6 +49,7 @@ namespace UmotaWebApp.Server
             services.AddScoped<IPersonelService, PersonelService>();
             services.AddScoped<ISisFirmaDonemService, SisFirmaDonemService>();
             services.AddScoped<IDovizService, DovizService>();
+            services.AddScoped<IFaaliyetService, FaaliyetService>();
 
             services.AddDbContext<UmotaMasterDbContext>(config =>
             {

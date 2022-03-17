@@ -1,0 +1,27 @@
+﻿@page "/faaliyet_listef_ekle"
+
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+<FaaliyetEkleGuncelleComponent OnVazgecClicked="goBackTeklifList"></FaaliyetEkleGuncelleComponent>
+
+
+@code {
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Faaliyet Oluştur";
+        return Task.CompletedTask;
+    }
+
+    public void goBackTeklifList()
+    {
+        navigation.NavigateTo("/faaliyet_listef");
+    }
+
+
+}

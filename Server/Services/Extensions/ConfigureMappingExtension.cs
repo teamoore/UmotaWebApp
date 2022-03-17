@@ -44,6 +44,8 @@ namespace UmotaWebApp.Server.Services.Extensions
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.HasValue ? (src.Status.Equals(1) ? byte.Parse("1") : byte.Parse("0")) : byte.Parse("0")));
 
             CreateMap<V009Teklif, TeklifDto>().ReverseMap();
+            CreateMap<V020Faaliyet, FaaliyetDto>().ReverseMap();
+            CreateMap<Faaliyet, FaaliyetDto>().ReverseMap();
         }
     }
 

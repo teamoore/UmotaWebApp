@@ -1,0 +1,137 @@
+﻿@page "/faaliyet_listef"
+
+<HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif"
+                 ShowButtons="false"
+                 onDoneButtonClicked="FaaliyetAra" ShowSearchSection="true"></HeaderSearchBar>
+
+
+<MudTable Items="@listItems" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<FaaliyetDto,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTeklif" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Faaliyet Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>Faaliyet Türü</MudTh>
+        <MudTh>Tarih</MudTh>
+        <MudTh>Giren</MudTh>
+        <MudTh>Konu</MudTh>
+        <MudTh>Cari Adı</MudTh>
+        <MudTh>İlgili Kişi</MudTh>
+        <MudTh>İlçe</MudTh>
+        <MudTh>İl</MudTh>
+        <MudTh>Ürün Grubu</MudTh>
+        <MudTh>İlgili Ürün</MudTh>
+        <MudTh>Yapılanlar</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
+                <MudMenuItem OnClick="(() => TeklifDetay(context.Logref))">Güncelle</MudMenuItem>
+            </MudMenu>
+        </MudTd>
+        <MudTd DataLabel="Faaliyet Türü">@(context.Islemturu == 0 ? "Planlanan Faaliyet" : "Gerçekleşen Faaliyet")</MudTd>
+        <MudTd DataLabel="Tarih">@context.TarihFormatted</MudTd>
+        <MudTd DataLabel="Giren">@context.Giren</MudTd>
+        <MudTd DataLabel="Konu">@context.Konu</MudTd>
+        <MudTd DataLabel="Cari Adı">@context.Cariadi</MudTd>
+        <MudTd DataLabel="İlgili Kişi">@context.Kisiadi</MudTd>
+        <MudTd DataLabel="İlçe">@context.Ilce</MudTd>
+        <MudTd DataLabel="il">@context.Il</MudTd>
+        <MudTd DataLabel="Ürün Grubu">@context.Grup1</MudTd>
+        <MudTd DataLabel="İlgili Ürün">@context.Malzemeadi</MudTd>
+        <MudTd DataLabel="Yapılanlar">@context.Yapilanlar</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+
+@code {
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    public List<FaaliyetDto> listItems { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    private string _searchString = "";
+    private bool _sortNameByLength;
+
+    private bool FilterFunc1(FaaliyetDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(FaaliyetDto element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Konu != null && element.Konu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Cariadi != null && element.Cariadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Faaliyet Listesi";
+        await LoadList();
+    }
+
+    private async Task LoadList()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+        listItems = await httpClient.GetServiceResponseAsync<List<FaaliyetDto>>(UrlHelper.FaaliyetListesi + "?firmaId=" + selectedFirmaDonem.firma_no + "&kullanicikodu=" + kullanicikodu);
+        listItems = listItems.OrderByDescending(i => i.Insdate).ToList();
+    }
+
+    public void TeklifDetay(int logref)
+    {
+        navigation.NavigateTo("/faaliyet_listef_guncelle/" + logref.ToString());
+    }
+
+    public void YeniTeklif()
+    {
+        navigation.NavigateTo("/faaliyet_listef_ekle");
+    }
+
+    private async Task FaaliyetAra()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        var request = new FaaliyetRequestDto();
+        request.Aranacak = header.SearchText;
+        request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+        var result = await httpClient.PostGetServiceResponseAsync<List<FaaliyetDto>, FaaliyetRequestDto>(UrlHelper.FaaliyetAra, request);
+        if (result == null || result.Count == 0)
+        {
+            await ModalManager.ShowMessageAsync("Arama", "Aradığınız kritere uygun kayıt bulunamadı.\n Lütfen detaylı aramayı seçiniz");
+            return;
+        }
+
+        listItems = result;
+
+    }
+
+
+
+}
