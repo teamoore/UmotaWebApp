@@ -4,6 +4,10 @@
                  ShowButtons="false"
                  onDoneButtonClicked="TeklifAra" ShowSearchSection="true"></HeaderSearchBar>
 
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
 
 <MudTable Items="@teklifler" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<TeklifDto,bool>(FilterFunc1)">
     <ToolBarContent>
@@ -73,6 +77,9 @@
     HttpClient httpClient { get; set; }
 
     [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
     public List<TeklifDto> teklifler { get; set; }
@@ -83,6 +90,7 @@
     private bool _sortNameByLength;
 
     private bool isAdmin = false;
+    private bool loadingCompleted = false;
 
     private bool FilterFunc1(TeklifDto element) => FilterFunc(element, _searchString);
 
@@ -109,10 +117,19 @@
 
     private async Task LoadTeklifler()
     {
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-        var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-        teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>(UrlHelper.TeklifListesi + "?firmaId=" + selectedFirmaDonem.firma_no+"&kullanicikodu="+kullanicikodu);
-        teklifler = teklifler.OrderByDescending(i => i.Insdate).ToList();
+        try
+        {
+            loadingCompleted = false;
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>(UrlHelper.TeklifListesi + "?firmaId=" + selectedFirmaDonem.firma_no + "&kullanicikodu=" + kullanicikodu);
+            loadingCompleted = true;
+            teklifler = teklifler.OrderByDescending(i => i.Insdate).ToList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
     }
 
     public void TeklifDetay(int logref)
@@ -127,26 +144,39 @@
 
     private async Task TeklifAra()
     {
-        var teklifSearch = new TeklifDto();
-        teklifSearch.Aciklama1 = header.SearchText;
-
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-        if (selectedFirmaDonem == null)
-            throw new Exception("Firma Dönem Seçili değil");
-
-        var request = new TeklifRequestDto();
-        request.Teklif = teklifSearch;
-        request.FirmaId = selectedFirmaDonem.firma_no.Value;
-
-        var result = await httpClient.PostGetServiceResponseAsync<List<TeklifDto>, TeklifRequestDto>(UrlHelper.TeklifAra, request);
-        if (result == null || result.Count == 0)
+        try
         {
-            await ModalManager.ShowMessageAsync("Arama", "Aradığınız kritere göre teklif bulunamadı.\n Lütfen detaylı aramayı seçiniz");
-            return;
-        }
+            loadingCompleted = false;
 
-        teklifler = result;
+            var teklifSearch = new TeklifDto();
+            teklifSearch.Aciklama1 = header.SearchText;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new TeklifRequestDto();
+            request.Teklif = teklifSearch;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<List<TeklifDto>, TeklifRequestDto>(UrlHelper.TeklifAra, request);
+            if (result == null || result.Count == 0)
+            {                
+                Snackbar.Add("Aradığınız kritere göre teklif bulunamadı.", severity: Severity.Warning);
+                loadingCompleted = true;
+                header.SearchText = string.Empty;
+                return;
+            }
+
+            loadingCompleted = true;
+
+            teklifler = result;
+        }
+        catch (Exception)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştur", severity: Severity.Error);
+        }
 
     }
 
