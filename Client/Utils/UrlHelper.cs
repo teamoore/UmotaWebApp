@@ -21,14 +21,22 @@ namespace UmotaWebApp.Client.Utils
         public const string TeklifDetayGetir = "/api/teklifdetay/get";
         public const string CariKartAra = "/api/carikart/search";
         public const string CariKartGetir = "/api/carikart/getByKod";
+        public const string CariKartKisiGetir = "/api/carikart/getkisiler";
         public const string CariKartGetirLogRef = "/api/carikart/get";
         public const string CariKartListesi = "/api/carikart/list";
         public const string CariKartKaydet = "/api/carikart/save";
         public const string CariKartGuncelle = "/api/carikart/update";
+        public const string CariKartKisiKaydet = "/api/carikart/savekisi";
+        public const string CariKartKisiGuncelle = "/api/carikart/updatekisi";
         public const string RefNoAl = "/api/helper/RefNoAl";
         public const string DovizListesi = "/api/doviz/GetDovizList";
         public const string DovizKuruGetir = "/api/doviz/GetDovizKur";
         public const string TeklifDetaySiraNo = "/api/teklifdetay/getsirano";
         public const string KullaniciGetByKod = "/api/kullanici/GetByKod";
+        public const string FaaliyetListesi = "/api/faaliyet/list";
+        public const string FaaliyetAra = "/api/faaliyet/search";
+        public const string FaaliyetGetir = "/api/faaliyet/get";
+        public const string FaaliyetKaydet = "/api/faaliyet/save";
+        public const string FaaliyetGuncelle = "/api/faaliyet/update";
     }
 }

@@ -1,0 +1,619 @@
+﻿<EditForm Model="recordDto">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mt-12">
+        <div class="form">
+            <div class="form-group">
+
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Teklif Tarihi</label>
+                        <InputDate @bind-Value="recordDto.Tarih" class="form-control"></InputDate>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Faaliyet Türü</label>
+                        <InputSelect @bind-Value="recordDto.Islemturu" class="form-control">
+                            <option value="1">Gerçekleşen Faaliyet</option>
+                            <option value="0">Planlanan Faaliyet</option>
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Konu</label>
+                        <InputSelect @bind-Value="recordDto.Konu" class="form-control">
+                            @if (KonuListesi != null)
+                            {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                @foreach (var item in KonuListesi)
+                                {
+                                    <option value="@item.Adi">@item.Adi</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Cari Kodu</label>
+                        <InputText @bind-Value="recordDto.Carikodu" class="form-control" placeholder="Cari Kodu" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Cari Adı</label>
+                        <InputText @bind-Value="recordDto.Cariadi" class="form-control" placeholder="Cari Adı" />
+                    </div>
+                    <div class="col-md-4">
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Medium>Bul</MudButton>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Color="Color.Info" Size=Size.Medium>Yeni Cari</MudButton>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="YeniKisiEkle" Color="Color.Info" Size=Size.Medium>Yeni Kişi</MudButton>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
+                        <tbody>
+                            <tr>
+                                <td>İlgili Kişi 1</td>
+                                <td>
+                                    <InputSelect @bind-Value="recordDto.Kisiref" class="form-control">
+                                        @if (KisiListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in KisiListesi)
+                                            {
+                                                <option value="@item.Logref">@item.Tamadi</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>İlgili Kişi 2</td>
+                                <td>
+                                    <InputSelect @bind-Value="recordDto.Kisiref2" class="form-control">
+                                        @if (KisiListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in KisiListesi)
+                                            {
+                                                <option value="@item.Logref">@item.Tamadi</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>İlgili Kişi 3</td>
+                                <td>
+                                    <InputSelect @bind-Value="recordDto.Kisiref3" class="form-control">
+                                        @if (KisiListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in KisiListesi)
+                                            {
+                                                <option value="@item.Logref">@item.Tamadi</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>İlgili Kişi 4</td>
+                                <td>
+                                    <InputSelect @bind-Value="recordDto.Kisiref4" class="form-control">
+                                        @if (KisiListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in KisiListesi)
+                                            {
+                                                <option value="@item.Logref">@item.Tamadi</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>İlgili Kişi 5</td>
+                                <td>
+                                    <InputSelect @bind-Value="recordDto.Kisiref5" class="form-control">
+                                        @if (KisiListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in KisiListesi)
+                                            {
+                                                <option value="@item.Logref">@item.Tamadi</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </div>
+                <div class="col-md-4">
+                    <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
+                        <tbody>
+                            <tr>
+                                <td>Ürün Grubu 1</td>
+                                <td>
+                                    <InputSelect @bind-Value="recordDto.Grup1" class="form-control">
+                                        @if (UrunGrubuListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in UrunGrubuListesi)
+                                            {
+                                                <option value="@item.Adi">@item.Adi</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Ürün Grubu 2</td>
+                                <td>
+                                    <InputSelect @bind-Value="recordDto.Grup2" class="form-control">
+                                        @if (UrunGrubuListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in UrunGrubuListesi)
+                                            {
+                                                <option value="@item.Adi">@item.Adi</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Ürün Grubu 3</td>
+                                <td>
+                                    <InputSelect @bind-Value="recordDto.Grup3" class="form-control">
+                                        @if (UrunGrubuListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in UrunGrubuListesi)
+                                            {
+                                                <option value="@item.Adi">@item.Adi</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Ürün Grubu 4</td>
+                                <td>
+                                    <InputSelect @bind-Value="recordDto.Grup4" class="form-control">
+                                        @if (UrunGrubuListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in UrunGrubuListesi)
+                                            {
+                                                <option value="@item.Adi">@item.Adi</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Ürün Grubu 5</td>
+                                <td>
+                                    <InputSelect @bind-Value="recordDto.Grup5" class="form-control">
+                                        @if (UrunGrubuListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in UrunGrubuListesi)
+                                            {
+                                                <option value="@item.Adi">@item.Adi</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                </div>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Malzeme Kodu</label>
+                        <InputText @bind-Value="recordDto.Malzemekodu" class="form-control" placeholder="Stok Kodu" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Malzeme Tanımı</label>
+                        <InputText @bind-Value="recordDto.Malzemeadi" class="form-control" placeholder="Stok Adı" />
+                    </div>
+                    <div class="col-md-2">
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
+                                   OnClick="MalzemeListesiAc"
+                                   Color="Color.Info" Size="Size.Medium">Bul</MudButton>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Açıklama</label>
+                        <InputTextArea @bind-Value="recordDto.Yapilanlar" class="form-control"></InputTextArea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+
+</EditForm>
+
+@code {
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Parameter]
+    public int? logRef { get; set; }
+
+    [Parameter]
+    public EventCallback OnVazgecClicked { get; set; }
+
+    public bool IsUpdate { get; set; }
+
+    FaaliyetDto recordDto = new FaaliyetDto();
+
+    public List<SisSabitlerDetayDto> UrunGrubuListesi { get; set; }
+    public List<SisSabitlerDetayDto> KonuListesi { get; set; }
+    public List<KisilerDto> KisiListesi { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsUpdate = logRef.HasValue;
+
+        if (!IsUpdate)
+        {
+            recordDto.Tarih = DateTime.Now;
+            recordDto.Islemturu = 1;
+        }
+
+        await GetRecord();
+        await GetKonuListesi();
+        await GetUrunGrubuListesi();
+        await GetKisiListesi();
+    }
+
+    public async Task GetRecord()
+    {
+        try
+        {
+            if (logRef.HasValue == false)
+                return;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<FaaliyetDto>(UrlHelper.FaaliyetGetir + "?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no);
+            if (result != null)
+            {
+                recordDto = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+        }
+    }
+
+    public async Task ValidSubmit()
+    {
+        if (IsUpdate)
+            await UpdateRecord();
+        else
+            await SaveRecord();
+    }
+
+    public async Task CariListesiAc()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (CariKartDto)result.Data;
+                recordDto.Cariadi = cariSecim.Adi;
+                recordDto.Carikodu = cariSecim.Kodu;
+                recordDto.Cariref = cariSecim.Logref;
+                await GetKisiListesi();
+            }
+        }
+    }
+
+    public async Task YeniCariEkle()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+
+        var cariForm = modal.Show<CariKartEkleGuncelleComponent>("Yeni Cari Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (CariKartDto)result.Data;
+                recordDto.Cariadi = cariSecim.Adi;
+                recordDto.Carikodu = cariSecim.Kodu;
+                recordDto.Cariref = cariSecim.Logref;
+                KisiListesi = null;
+            }
+
+        }
+    }
+
+    public async Task YeniKisiEkle()
+    {
+        if (!recordDto.Cariref.HasValue)
+            return;
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+        parameters.Add("CariKartRef", recordDto.Cariref);
+
+        var cariForm = modal.Show<CariKartKisiEkleGuncelleComponent>("Yeni Kişi Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (KisilerDto)result.Data;
+                KisiListesi.Add(Secim);
+            }
+
+        }
+    }
+
+    private async Task UpdateRecord()
+    {
+        try
+        {
+            SubmitValidation();
+
+            recordDto.Upddate = DateTime.Now;
+            recordDto.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            recordDto.Status = 1;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new FaaliyetRequestDto();
+            request.Faaliyet = recordDto;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<FaaliyetDto, FaaliyetRequestDto>(UrlHelper.FaaliyetGuncelle, request);
+
+            Snackbar.Add("Faaliyet güncellendi", severity: Severity.Success);
+
+            navigation.NavigateTo("/faaliyet_listef");
+
+        }
+        catch (ClientException e)
+        {
+            foreach (var item in e.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    private async Task SaveRecord()
+    {
+
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+
+            recordDto.Insdate = DateTime.Now;
+            recordDto.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            recordDto.Giren = recordDto.Insuser;
+            recordDto.Tarih = recordDto.Tarih.HasValue ? recordDto.Tarih : DateTime.Now;
+            recordDto.Status = 0;
+
+            await LogRefUret();
+
+            var request = new FaaliyetRequestDto();
+            request.Faaliyet = recordDto;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<FaaliyetDto, FaaliyetRequestDto>(UrlHelper.FaaliyetKaydet, request);
+
+            Snackbar.Add("Faaliyet güncellendi", severity: Severity.Success);
+
+            navigation.NavigateTo("/faaliyet_listef");
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task Vazgec()
+    {
+        await OnVazgecClicked.InvokeAsync();
+    }
+
+    public async Task LogRefUret()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        var result2 = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=faaliyet&firmaId=" + selectedFirmaDonem.firma_no.Value);
+        recordDto.Logref = result2;
+
+    }
+
+    public void SubmitValidation()
+    {
+        var err = new List<string>();
+
+        if (!recordDto.Cariref.HasValue)
+            err.Add("Cari Hesap boş geçilemez");
+
+        if (!recordDto.Kisiref.HasValue)
+            err.Add("Firma yetkilisi boş geçilemez");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Kayıt Hatası");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
+
+    public async Task GetKonuListesi()
+    {
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<List<SisSabitlerDetayDto>>("/api/helper/GetSabitDetayList?tip=20");
+            if (result != null)
+            {
+                KonuListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    public async Task GetUrunGrubuListesi()
+    {
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<List<SisSabitlerDetayDto>>("/api/helper/GetSabitDetayList?tip=21");
+            if (result != null)
+            {
+                UrunGrubuListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    public async Task GetKisiListesi()
+    {
+        try
+        {
+            if (recordDto.Cariref.HasValue == false)
+                return;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            var result = await httpClient.GetServiceResponseAsync<List<KisilerDto>>(UrlHelper.CariKartKisiGetir + "?cariref=" + recordDto.Cariref + "&firmaId=" + selectedFirmaDonem.firma_no);
+            if (result != null)
+            {
+                KisiListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    public async Task MalzemeListesiAc()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var form = modal.Show<Pages.Malzeme.Malzeme_Sec>("Malzeme Seç", options: opt);
+        var result = await form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var mkart = (MalzemeKartDto)result.Data;
+                recordDto.Malzemeref = mkart.Logref;
+                recordDto.Malzemeadi = mkart.Adi;
+                recordDto.Malzemekodu = mkart.Kodu;
+            }
+            else
+            {
+            }
+        }
+    }
+}

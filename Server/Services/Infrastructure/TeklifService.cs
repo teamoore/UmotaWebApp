@@ -16,6 +16,7 @@ using UmotaWebApp.Shared.Consts;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 
+
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
     public class TeklifService : ITeklifService

@@ -126,6 +126,8 @@
 {
     [Parameter]
     public int? CariKartRef { get; set; }
+    [Parameter]
+    public int? modalForm { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
@@ -153,6 +155,9 @@
     {
         try
         {
+            if (!CariKartRef.HasValue)
+                return;
+
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
             if (selectedFirmaDonem == null)
@@ -176,8 +181,23 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
-            cariModel.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            cariModel.Insdate = DateTime.Now;
+            if (!isUpdate)
+            {
+                var reff = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=cari_kart&firmaId=" + selectedFirmaDonem.firma_no.Value);
+
+                cariModel.Logref = reff * -1;
+                cariModel.Status = 0;
+                cariModel.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+                cariModel.Insdate = DateTime.Now;
+                cariModel.Active = 0;
+                await NoUret();
+            }
+            else
+            {
+                cariModel.Status = 1;
+                cariModel.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+                cariModel.Upddate = DateTime.Now;
+            }
 
             var request = new CariKartRequestDto();
             request.CariKart = cariModel;
@@ -194,7 +214,10 @@
                 Snackbar.Add("Cari kart eklendi", severity: Severity.Success);
             }
 
-            goBackCariList();
+            if (modalForm.HasValue)
+                await ModalInstance.CloseAsync(ModalResult.Ok<CariKartDto>(cariModel));
+            else
+                await goBackCariList();
         }
         catch (Exception ex)
         {
@@ -207,14 +230,17 @@
         await Kaydet();
     }
 
-    void goBackCariList()
+    public async Task goBackCariList()
     {
-        navigation.NavigateTo("/r_carilistef");
+        if (modalForm.HasValue)
+            await ModalInstance.CloseAsync();
+        else
+            navigation.NavigateTo("/r_carilistef");
     }
 
     protected override Task OnParametersSetAsync()
     {
-        if (CariKartRef != null)
+        if (CariKartRef.HasValue)
             isUpdate = true;
 
         return Task.CompletedTask;
@@ -222,7 +248,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (CariKartRef != null)
+        if (CariKartRef.HasValue)
             isUpdate = true;
 
         if (isUpdate)
@@ -236,7 +262,6 @@
 
     public async Task NoUret()
     {
-
         try
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
@@ -247,10 +272,6 @@
             var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=cari_kart&keyField=kodu&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
             cariModel.Kodu = result;
-
-            var result2 = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=cari_kart&firmaId=" + selectedFirmaDonem.firma_no.Value);
-
-            cariModel.Logref = result2;
         }
         catch (Exception ex)
         {
