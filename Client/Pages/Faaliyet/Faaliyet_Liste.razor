@@ -4,6 +4,10 @@
                  ShowButtons="false"
                  onDoneButtonClicked="FaaliyetAra" ShowSearchSection="true"></HeaderSearchBar>
 
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
 
 <MudTable Items="@listItems" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<FaaliyetDto,bool>(FilterFunc1)">
     <ToolBarContent>
@@ -71,6 +75,8 @@
     private string _searchString = "";
     private bool _sortNameByLength;
 
+    private bool loadingCompleted = false;
+
     private bool FilterFunc1(FaaliyetDto element) => FilterFunc(element, _searchString);
 
     private bool FilterFunc(FaaliyetDto element, string searchString)
@@ -92,9 +98,11 @@
 
     private async Task LoadList()
     {
+        loadingCompleted = false;
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
         var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
         listItems = await httpClient.GetServiceResponseAsync<List<FaaliyetDto>>(UrlHelper.FaaliyetListesi + "?firmaId=" + selectedFirmaDonem.firma_no + "&kullanicikodu=" + kullanicikodu);
+        loadingCompleted = true;
         listItems = listItems.OrderByDescending(i => i.Insdate).ToList();
     }
 
@@ -110,6 +118,8 @@
 
     private async Task FaaliyetAra()
     {
+        loadingCompleted = false;
+
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
         if (selectedFirmaDonem == null)
@@ -123,11 +133,12 @@
         if (result == null || result.Count == 0)
         {
             await ModalManager.ShowMessageAsync("Arama", "Aradığınız kritere uygun kayıt bulunamadı.\n Lütfen detaylı aramayı seçiniz");
+            loadingCompleted = true;
             return;
         }
 
         listItems = result;
-
+        loadingCompleted = true;
     }
 
 
