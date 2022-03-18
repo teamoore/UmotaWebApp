@@ -1,13 +1,13 @@
 ﻿@page "/faaliyet_listef"
 
-<HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif"
+<HeaderSearchBar header="header" onAddNewButtonClicked="YeniKayitEkle"
                  ShowButtons="false"
                  onDoneButtonClicked="FaaliyetAra" ShowSearchSection="true"></HeaderSearchBar>
 
 
 <MudTable Items="@listItems" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<FaaliyetDto,bool>(FilterFunc1)">
     <ToolBarContent>
-        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTeklif" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Faaliyet Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
@@ -27,9 +27,7 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
-                <MudMenuItem OnClick="(() => TeklifDetay(context.Logref))">Güncelle</MudMenuItem>
-            </MudMenu>
+            <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Degistir(context.Logref))" Size="Size.Medium" />
         </MudTd>
         <MudTd DataLabel="Faaliyet Türü">@(context.Islemturu == 0 ? "Planlanan Faaliyet" : "Gerçekleşen Faaliyet")</MudTd>
         <MudTd DataLabel="Tarih">@context.TarihFormatted</MudTd>
@@ -100,12 +98,12 @@
         listItems = listItems.OrderByDescending(i => i.Insdate).ToList();
     }
 
-    public void TeklifDetay(int logref)
+    public void Degistir(int logref)
     {
         navigation.NavigateTo("/faaliyet_listef_guncelle/" + logref.ToString());
     }
 
-    public void YeniTeklif()
+    public void YeniKayitEkle()
     {
         navigation.NavigateTo("/faaliyet_listef_ekle");
     }

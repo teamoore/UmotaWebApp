@@ -146,5 +146,45 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpGet("getkisiler")]
+        public async Task<ServiceResponse<List<KisilerDto>>> GetCariKartKisilerr(int cariref, string firmaId)
+        {
+            try
+            {
+                return new ServiceResponse<List<KisilerDto>>()
+                {
+                    Value = await CariKartService.GetCariKartKisiler(cariref, firmaId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<KisilerDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("savekisi")]
+        public async Task<ServiceResponse<KisilerDto>> KisiKaydet(KisilerRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<KisilerDto>
+                {
+                    Value = await CariKartService.SaveCariKartKisi(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<KisilerDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

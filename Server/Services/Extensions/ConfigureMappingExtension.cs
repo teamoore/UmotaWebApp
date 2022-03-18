@@ -46,6 +46,8 @@ namespace UmotaWebApp.Server.Services.Extensions
             CreateMap<V009Teklif, TeklifDto>().ReverseMap();
             CreateMap<V020Faaliyet, FaaliyetDto>().ReverseMap();
             CreateMap<Faaliyet, FaaliyetDto>().ReverseMap();
+            CreateMap<Kisiler, KisilerDto>().ReverseMap();
+            CreateMap<V015Kisiler, KisilerDto>().ReverseMap();
         }
     }
 

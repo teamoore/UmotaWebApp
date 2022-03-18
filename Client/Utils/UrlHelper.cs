@@ -21,10 +21,13 @@ namespace UmotaWebApp.Client.Utils
         public const string TeklifDetayGetir = "/api/teklifdetay/get";
         public const string CariKartAra = "/api/carikart/search";
         public const string CariKartGetir = "/api/carikart/getByKod";
+        public const string CariKartKisiGetir = "/api/carikart/getkisiler";
         public const string CariKartGetirLogRef = "/api/carikart/get";
         public const string CariKartListesi = "/api/carikart/list";
         public const string CariKartKaydet = "/api/carikart/save";
         public const string CariKartGuncelle = "/api/carikart/update";
+        public const string CariKartKisiKaydet = "/api/carikart/savekisi";
+        public const string CariKartKisiGuncelle = "/api/carikart/updatekisi";
         public const string RefNoAl = "/api/helper/RefNoAl";
         public const string DovizListesi = "/api/doviz/GetDovizList";
         public const string DovizKuruGetir = "/api/doviz/GetDovizKur";

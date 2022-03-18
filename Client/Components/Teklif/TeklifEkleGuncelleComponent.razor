@@ -459,7 +459,9 @@
     {
         try
         {
-            var result = await httpClient.GetServiceResponseAsync<List<PersonelDto>>("/api/helper/GetPersonelList?logofirmno=1");
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            var result = await httpClient.GetServiceResponseAsync<List<PersonelDto>>("/api/helper/GetPersonelList?logofirmno="+selectedFirmaDonem.logo_firma.Value);
             if (result != null)
             {
                 PersonelListesi = result;
@@ -476,7 +478,8 @@
     {
         try
         {
-            var result = await httpClient.GetServiceResponseAsync<List<OdemePlaniDto>>("/api/helper/GetOdemePlaniList?logofirmno=1");
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            var result = await httpClient.GetServiceResponseAsync<List<OdemePlaniDto>>("/api/helper/GetOdemePlaniList?logofirmno="+selectedFirmaDonem.logo_firma.Value);
             if (result != null)
             {
                 OdemePlaniListesi = result;
@@ -498,7 +501,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
-            var result = await httpClient.GetServiceResponseAsync<IEnumerable<DovizDto>>(UrlHelper.DovizListesi + "?logofirmno=" + selectedFirmaDonem.firma_no.Value);
+            var result = await httpClient.GetServiceResponseAsync<IEnumerable<DovizDto>>(UrlHelper.DovizListesi + "?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
             if (result != null)
             {
                 DovizListesi = result;

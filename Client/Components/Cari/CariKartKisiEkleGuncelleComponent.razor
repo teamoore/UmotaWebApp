@@ -1,0 +1,214 @@
+﻿
+<EditForm Model="cariModel" OnValidSubmit="ValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mt-5">
+
+        <div class="form">
+
+            <div class="form-group">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Kişi Adı</label>
+                        <InputText @bind-Value="cariModel.Tamadi" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Bölüm</label>
+                        <InputText @bind-Value="cariModel.Bolum" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>Pozisyon</label>
+                        <InputText @bind-Value="cariModel.Pozisyon" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Cep Telefonu</label>
+                        <InputText @bind-Value="cariModel.Ceptel" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label>İş Telefonu</label>
+                        <InputText @bind-Value="cariModel.Istel" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>E-Posta</label>
+                        <InputText @bind-Value="cariModel.Mail" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Açıklama</label>
+                        <InputTextArea @bind-Value="cariModel.Aciklama" class="form-control"></InputTextArea>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Kaydet" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="goBackCariList" />
+    </div>
+
+</EditForm>
+
+
+
+@code
+{
+    [Parameter]
+    public int? logref { get; set; }
+    [Parameter]
+    public int? CariKartRef { get; set; }
+    [Parameter]
+    public int? modalForm { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    KisilerDto cariModel = new KisilerDto();
+
+    private bool isUpdate = false;
+
+    public async Task KartGetir()
+    {
+        try
+        {
+            if (!logref.HasValue)
+                return;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            cariModel = await httpClient.GetServiceResponseAsync<KisilerDto>(UrlHelper.CariKartGetirLogRef + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task Kaydet()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            if (!isUpdate)
+            {
+                var reff = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=cari_kart&firmaId=" + selectedFirmaDonem.firma_no.Value);
+
+                cariModel.Logref = reff;
+                cariModel.Cariref = CariKartRef;
+                cariModel.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+                cariModel.Insdate = DateTime.Now;
+            }
+            else
+            {
+                cariModel.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+                cariModel.Upddate = DateTime.Now;
+            }
+
+            var request = new KisilerRequestDto();
+            request.Kisiler = cariModel;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            if (isUpdate)
+            {
+                cariModel = await httpClient.PostGetServiceResponseAsync<KisilerDto, KisilerRequestDto>(UrlHelper.CariKartKisiGuncelle, request);
+                Snackbar.Add("Kişi güncellendi", severity: Severity.Success);
+            }
+            else
+            {
+                cariModel = await httpClient.PostGetServiceResponseAsync<KisilerDto, KisilerRequestDto>(UrlHelper.CariKartKisiKaydet, request);
+                Snackbar.Add("Kişi eklendi", severity: Severity.Success);
+            }
+
+            if (modalForm.HasValue)
+                await ModalInstance.CloseAsync(ModalResult.Ok<KisilerDto>(cariModel));
+            else
+                await goBackCariList();
+        }
+        catch (Exception ex)
+        {
+            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+        }
+    }
+
+    public async Task ValidSubmit()
+    {
+        await Kaydet();
+    }
+
+    public async Task goBackCariList()
+    {
+        if (modalForm.HasValue)
+            await ModalInstance.CloseAsync();
+        else
+            navigation.NavigateTo("/r_carilistef");
+    }
+
+    protected override Task OnParametersSetAsync()
+    {
+        if (logref.HasValue)
+            isUpdate = true;
+
+        return Task.CompletedTask;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (logref.HasValue)
+            isUpdate = true;
+
+        if (isUpdate)
+        {
+            await KartGetir();
+            return;
+        }
+    }
+
+
+}

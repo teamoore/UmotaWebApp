@@ -14,6 +14,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<CariKartDto> SaveCariKart(CariKartRequestDto request);
         public Task<CariKartDto> UpdateCariKart(CariKartRequestDto request);
         public Task<List<CariKartDto>> SearchCariKarts(CariKartRequestDto request);
-
+        public Task<List<KisilerDto>> GetCariKartKisiler(int cariref, string firmaId);
+        public Task<KisilerDto> SaveCariKartKisi(KisilerRequestDto request);
     }
 }
