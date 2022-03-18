@@ -19,7 +19,8 @@
         <MudTh>#</MudTh>
         <MudTh>Faaliyet Türü</MudTh>
         <MudTh>Tarih</MudTh>
-        <MudTh>Giren</MudTh>
+        <MudTh>Kaydı Giren</MudTh>
+        <MudTh>Kayıt Tarihi</MudTh>
         <MudTh>Konu</MudTh>
         <MudTh>Cari Adı</MudTh>
         <MudTh>İlgili Kişi</MudTh>
@@ -36,6 +37,7 @@
         <MudTd DataLabel="Faaliyet Türü">@(context.Islemturu == 0 ? "Planlanan Faaliyet" : "Gerçekleşen Faaliyet")</MudTd>
         <MudTd DataLabel="Tarih">@context.TarihFormatted</MudTd>
         <MudTd DataLabel="Giren">@context.Giren</MudTd>
+        <MudTd DataLabel="Kayıt Tarihi">@context.Insdate</MudTd>
         <MudTd DataLabel="Konu">@context.Konu</MudTd>
         <MudTd DataLabel="Cari Adı">@context.Cariadi</MudTd>
         <MudTd DataLabel="İlgili Kişi">@context.Kisiadi</MudTd>

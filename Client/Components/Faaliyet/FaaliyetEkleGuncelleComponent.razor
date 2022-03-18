@@ -8,7 +8,7 @@
 
                 <div class="row">
                     <div class="col-md-2">
-                        <label>Teklif Tarihi</label>
+                        <label>Faaliyet Tarihi</label>
                         <InputDate @bind-Value="recordDto.Tarih" class="form-control"></InputDate>
                     </div>
                     <div class="col-md-2">
@@ -39,11 +39,11 @@
                 <div class="row">
                     <div class="col-md-2">
                         <label>Cari Kodu</label>
-                        <InputText @bind-Value="recordDto.Carikodu" class="form-control" placeholder="Cari Kodu" />
+                        <InputText @bind-Value="recordDto.Carikodu" class="form-control" placeholder="Cari Kodu" disabled />
                     </div>
                     <div class="col-md-4">
                         <label>Cari Adı</label>
-                        <InputText @bind-Value="recordDto.Cariadi" class="form-control" placeholder="Cari Adı" />
+                        <InputText @bind-Value="recordDto.Cariadi" class="form-control" placeholder="Cari Adı" disabled />
                     </div>
                     <div class="col-md-4">
                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Medium>Bul</MudButton>
@@ -223,11 +223,11 @@
                 <div class="row">
                     <div class="col-md-2">
                         <label>Malzeme Kodu</label>
-                        <InputText @bind-Value="recordDto.Malzemekodu" class="form-control" placeholder="Stok Kodu" />
+                        <InputText @bind-Value="recordDto.Malzemekodu" class="form-control" placeholder="Stok Kodu" disabled />
                     </div>
                     <div class="col-md-4">
                         <label>Malzeme Tanımı</label>
-                        <InputText @bind-Value="recordDto.Malzemeadi" class="form-control" placeholder="Stok Adı" />
+                        <InputText @bind-Value="recordDto.Malzemeadi" class="form-control" placeholder="Stok Adı" disabled />
                     </div>
                     <div class="col-md-2">
                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
@@ -241,7 +241,7 @@
                 <div class="row">
                     <div class="col-md-8">
                         <label>Açıklama</label>
-                        <InputTextArea @bind-Value="recordDto.Yapilanlar" class="form-control"></InputTextArea>
+                        <InputTextArea @bind-Value="recordDto.Yapilanlar" class="form-control" rows="6" ></InputTextArea>
                     </div>
                 </div>
             </div>
@@ -378,9 +378,8 @@
                 recordDto.Cariadi = cariSecim.Adi;
                 recordDto.Carikodu = cariSecim.Kodu;
                 recordDto.Cariref = cariSecim.Logref;
-                KisiListesi = null;
+                KisiListesi = new List<KisilerDto>();
             }
-
         }
     }
 
@@ -528,6 +527,12 @@
 
         if (!recordDto.Kisiref.HasValue)
             err.Add("Firma yetkilisi boş geçilemez");
+
+        if (!recordDto.Islemturu.HasValue)
+            err.Add("Faaliyet türü boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(recordDto.Konu))
+            err.Add("Faaliyet konusu boş geçilemez");
 
         if (err.Count > 0)
         {

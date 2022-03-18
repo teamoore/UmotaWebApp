@@ -138,7 +138,7 @@
 
             if (!isUpdate)
             {
-                var reff = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=cari_kart&firmaId=" + selectedFirmaDonem.firma_no.Value);
+                var reff = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=kisiler&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
                 cariModel.Logref = reff;
                 cariModel.Cariref = CariKartRef;
