@@ -14,6 +14,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UmotaWebApp.Server.Extensions;
+using DinkToPdf.Contracts;
+using DinkToPdf;
+using System.IO;
+using System.Reflection;
+using System;
 
 namespace UmotaWebApp.Server
 {
@@ -50,6 +55,14 @@ namespace UmotaWebApp.Server
             services.AddScoped<ISisFirmaDonemService, SisFirmaDonemService>();
             services.AddScoped<IDovizService, DovizService>();
             services.AddScoped<IFaaliyetService, FaaliyetService>();
+            services.AddScoped<IPdfGenerator, PdfGeneratorService>();
+
+            var architectureFolder = (IntPtr.Size == 8) ? "64 bit" : "32 bit";
+            var wkHtmlToPdfPath = Path.Combine(Environment.CurrentDirectory, $"wkhtmltox\\v0.12.4\\{architectureFolder}\\libwkhtmltox");
+            CustomAssemblyLoadContext context = new CustomAssemblyLoadContext();
+            context.LoadUnmanagedLibrary(wkHtmlToPdfPath);
+            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+
 
             services.AddDbContext<UmotaMasterDbContext>(config =>
             {

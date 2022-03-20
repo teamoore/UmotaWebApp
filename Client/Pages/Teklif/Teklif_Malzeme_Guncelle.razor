@@ -1,4 +1,5 @@
 ﻿@page "/stek_listef_detay/{logref:int}"
+@using System.IO;
 @inject IJSRuntime jsRuntime
 
 <div class="card" style="width: 100%;">
@@ -84,6 +85,8 @@
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" OnClick="Duzenle" Color="Color.Primary">Teklif Düzenle</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddTask" OnClick="TeklifDetayEkle" Color="Color.Primary">Yeni Satır Ekle</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" OnClick="SayfayiYazdir" Color="Color.Primary">Sayfayı Yazdır</MudButton>
+
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PictureAsPdf" OnClick="PdfOlustur" Color="Color.Primary">Pdf</MudButton>
             </div>
         </div>
 
@@ -303,6 +306,22 @@
     private async Task SayfayiYazdir()
     {
         await jsRuntime.InvokeVoidAsync("printPage");
+    }
+
+    private async Task PdfOlustur()
+    {
+        try
+        {
+            var request = new PdfGeneratorRequestDto();
+            request.teklif = this.teklif;
+            request.teklifDetays = this.teklifDetayList;
+
+            var result = await httpClient.PostGetServiceResponseAsync<bool,PdfGeneratorRequestDto>("/api/Pdf/CreateTeklifPdfDocument", request);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
     }
 
 }
