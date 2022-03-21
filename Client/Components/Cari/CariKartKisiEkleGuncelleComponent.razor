@@ -131,6 +131,22 @@
     {
         try
         {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
             if (selectedFirmaDonem == null)
@@ -210,5 +226,29 @@
         }
     }
 
+    public void SubmitValidation()
+    {
+        var err = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(cariModel.Tamadi))
+            err.Add("Kişi Adı boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(cariModel.Pozisyon))
+            err.Add("Pozisyon boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(cariModel.Mail))
+            err.Add("E-posta boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(cariModel.Ceptel))
+            err.Add("Cep Telefonu boş geçilemez");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Boş geçilemez alanlar");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
 
 }

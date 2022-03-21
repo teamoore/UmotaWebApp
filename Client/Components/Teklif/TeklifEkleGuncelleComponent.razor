@@ -24,15 +24,16 @@
                 <div class="row">
                     <div class="col-md-2">
                         <label>Cari Kodu</label>
-                        <InputText @bind-Value="teklif.Carikodu" class="form-control" placeholder="Cari Kodu" />
+                        <InputText @bind-Value="teklif.Carikodu" class="form-control" placeholder="Cari Kodu" disabled/>
                     </div>
                     <div class="col-md-4">
                         <label>Cari Adı</label>
-                        <InputText @bind-Value="teklif.Cariadi" class="form-control" placeholder="Cari Adı" />
+                        <InputText @bind-Value="teklif.Cariadi" class="form-control" placeholder="Cari Adı" disabled/>
                     </div>
-                    <div class="col-md-2">
-                        <label>Cari Seçim</label>
-                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Primary">Cari Bul</MudButton>
+                    <div class="col-md-6">
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Medium>Bul</MudButton>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Color="Color.Info" Size=Size.Medium>Yeni Cari</MudButton>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="YeniKisiEkle" Color="Color.Info" Size=Size.Medium>Yeni Kişi</MudButton>
                     </div>
                 </div>
 
@@ -42,7 +43,16 @@
                 <div class="row">
                     <div class="col-md-4">
                         <label>Firma Yetkilisi</label>
-                        <InputText @bind-Value="teklif.IlgiliAdi" class="form-control"></InputText>
+                        <InputSelect @bind-Value="teklif.IlgiliAdi" class="form-control">
+                            @if (KisiListesi != null)
+                            {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                @foreach (var item in KisiListesi)
+                                {
+                                    <option value="@item.Tamadi">@item.Tamadi</option>
+                                }
+                            }
+                        </InputSelect>
                     </div>
                     <div class="col-md-4">
                         <label>Satış Temsilcisi</label>
@@ -109,7 +119,7 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <label>Teklif Para Birimi</label>
 
                         <InputSelect class="form-control" @bind-Value="DovizTuruBilgisi">
@@ -128,7 +138,7 @@
                         <label>Döviz Kuru</label>
                         <InputNumber @bind-Value="teklif.Dovizkuruid" class="form-control" placeholder="@_DovizKuruState" />
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-2">
                         <label>Genel İsk.%</label>
                         <InputNumber @bind-Value="teklif.Gniskoran" class="form-control" />
                     </div>
@@ -217,6 +227,8 @@
 
     public List<OdemePlaniDto> OdemePlaniListesi { get; set; }
 
+    public List<KisilerDto> KisiListesi { get; set; }
+
     protected override async Task OnParametersSetAsync()
     {
         IsUpdate = logRef.HasValue;
@@ -240,7 +252,7 @@
 
         await GetTeklif();
         await DovizListesiGetir();
-
+        await GetKisiListesi();
     }
 
     public async Task GetTeklif()
@@ -291,6 +303,57 @@
                 teklif.Cariadi = cariSecim.Adi;
                 teklif.Carikodu = cariSecim.Kodu;
                 teklif.Cariref = cariSecim.Logref;
+                await GetKisiListesi();
+            }
+
+        }
+    }
+
+    public async Task YeniCariEkle()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+
+        var cariForm = modal.Show<CariKartEkleGuncelleComponent>("Yeni Cari Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (CariKartDto)result.Data;
+                teklif.Cariadi = cariSecim.Adi;
+                teklif.Carikodu = cariSecim.Kodu;
+                teklif.Cariref = cariSecim.Logref;
+                KisiListesi = new List<KisilerDto>();
+            }
+        }
+    }
+
+    public async Task YeniKisiEkle()
+    {
+        if (!teklif.Cariref.HasValue)
+            return;
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+        parameters.Add("CariKartRef", teklif.Cariref);
+
+        var cariForm = modal.Show<CariKartKisiEkleGuncelleComponent>("Yeni Kişi Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (KisilerDto)result.Data;
+                KisiListesi.Add(Secim);
             }
 
         }
@@ -566,6 +629,28 @@
             ex.ErrorList = err;
 
             throw ex;
+        }
+    }
+
+    public async Task GetKisiListesi()
+    {
+        try
+        {
+            if (teklif.Cariref.HasValue == false)
+                return;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            var result = await httpClient.GetServiceResponseAsync<List<KisilerDto>>(UrlHelper.CariKartKisiGetir + "?cariref=" + teklif.Cariref + "&firmaId=" + selectedFirmaDonem.firma_no);
+            if (result != null)
+            {
+                KisiListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
         }
     }
 }

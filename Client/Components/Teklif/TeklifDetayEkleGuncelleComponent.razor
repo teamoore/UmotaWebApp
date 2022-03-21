@@ -82,7 +82,7 @@
                             </div>
                             <div class="col-md-1">
                                 <label>Döviz</label>
-                                <InputSelect @bind-Value="teklifDetay.Dovizref" class="form-control">
+                                <InputSelect @bind-Value="DovizTuruBilgisi" class="form-control">
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                     @if (DovizListesi != null)
                                     {
@@ -95,7 +95,7 @@
                             </div>
                             <div class="col-md-1">
                                 <label>Kur</label>
-                                <InputNumber @bind-Value="teklifDetay.Dovizkuru" class="form-control" placeholder="Kur" />
+                                <InputNumber @bind-Value="teklifDetay.Dovizkuru" class="form-control" placeholder="@_DovizKuruState"/>
                             </div>
                             <div class="col-md-2">
                                 <label>Tutar</label>
@@ -291,6 +291,32 @@
 
     public List<DovizDto> DovizListesi { get; set; }
 
+    private int _dovizTuru = -1;
+    public int DovizTuruBilgisi
+    {
+        get
+        {
+            if (teklifDetay.Dovizref.HasValue == false)
+                return -1;
+
+            return teklifDetay.Dovizref.Value;
+        }
+        set
+        {
+            _dovizTuru = value;
+            teklifDetay.Dovizref = _dovizTuru;
+
+            if (teklifDetay.Dovizref == teklif.Dovizrefid)
+                teklifDetay.Dovizkuru = teklif.Dovizkuruid;
+            else
+            if (teklifDetay.Dovizref == 160)
+                teklifDetay.Dovizkuru = 1;
+            else
+                DovizKuruGetir().GetAwaiter();
+        }
+    }
+
+    private string _DovizKuruState = "";
     private bool _TeklifDetayCekildi = false;
 
     private double? _pageMiktar = 1;
@@ -768,12 +794,14 @@
             {
                 teklifDetay.Fiyat = result.Fiyat;
                 teklifDetay.Dovizref = result.DovizRef;
+                if (teklifDetay.Dovizref == teklif.Dovizrefid)
+                    teklifDetay.Dovizkuru = teklif.Dovizkuruid;
+                else
+                if (teklifDetay.Dovizref == 160)
+                    teklifDetay.Dovizkuru = 1;
+                else
+                    await DovizKuruGetir();
             }
-            ////_DovizKuruState = "Güncel";
-
-            // this.StateHasChanged();
-
-
         }
         catch (Exception ex)
         {
@@ -1024,4 +1052,41 @@
             throw ex;
         }
     }
+
+    public async Task DovizKuruGetir()
+    {
+        try
+        {
+            if (teklifDetay.Dovizref <= 0)
+            {
+                throw new Exception("Döviz tipi seçmelisiniz");
+            }
+            _DovizKuruState = "Çekiliyor...";
+            teklifDetay.Dovizkuru = null;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new DovizKuruRequestDto();
+            request.KurTarihi = teklif.Tarih.Value;
+            request.KurTuru = 4;
+            request.DovizTuru = teklifDetay.Dovizref.Value;
+            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<double, DovizKuruRequestDto>(UrlHelper.DovizKuruGetir, request);
+
+            teklifDetay.Dovizkuru = result;
+            _DovizKuruState = "Güncel";
+
+            this.StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
 }

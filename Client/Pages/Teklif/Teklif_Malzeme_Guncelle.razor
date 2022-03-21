@@ -45,15 +45,15 @@
                         </tr>
                         <tr>
                             <td>Teklif Tutar</td>
-                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrah))</td>
+                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrah)) @(teklif.Dovizdokuid)</td>
                         </tr>
                         <tr>
-                            <td>Teklif Para Birimi</td>
-                            <td style="text-align:right">@(teklif.Dovizdokuid)</td>
+                            <td>Teklif Para Birimi / Kuru</td>
+                            <td style="text-align:right">@(teklif.Dovizdokuid) / @(teklif.Dovizkuruid)</td>
                         </tr>
                         <tr>
                             <td>Teklif Tutar TL</td>
-                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrahtl))</td>
+                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrahtl)) TL</td>
                         </tr>
                     </tbody>
                 </MudSimpleTable>
@@ -101,17 +101,19 @@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
-        <MudTh>Çizim Kodu</MudTh>
         <MudTh>Poz No</MudTh>
         <MudTh>Stok Kodu</MudTh>
         <MudTh>Stok Adı</MudTh>
         <MudTh>Miktar</MudTh>
         <MudTh>Birim</MudTh>
-        <MudTh>Birim Fiyat</MudTh>
-        <MudTh>Döviz</MudTh>
+        <MudTh>Net Fiyat</MudTh>
         <MudTh>Tutar</MudTh>
-        <MudTh>Net Fiyat İD</MudTh>
-        <MudTh>Tutar İD</MudTh>
+        <MudTh>Maliyet 1 Toplam </MudTh>
+        <MudTh>Maliyet 2 Toplam </MudTh>
+        <MudTh>İsk-1 %</MudTh>
+        <MudTh>İsk-2 %</MudTh>
+        <MudTh>İsk-3 %</MudTh>
+        <MudTh>Genel %</MudTh>
         <MudTh>#</MudTh>
 
     </HeaderContent>
@@ -119,17 +121,19 @@
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" @onclick="(() => TeklifDetayGuncelle(context.Logref))" />
         </MudTd>
-        <MudTd DataLabel="Çizim Kodu">@context.Cizimkodu</MudTd>
         <MudTd DataLabel="Poz No">@context.Sipnosira</MudTd>
         <MudTd DataLabel="Stok Kodu">@context.Malzkodu</MudTd>
         <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
         <MudTd DataLabel="Birim">@context.Birimkodu</MudTd>
-        <MudTd DataLabel="Birim Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.Fiyat))</MudTd>
-        <MudTd DataLabel="Döviz">@context.Dovizdoku</MudTd>
-        <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Tutar))</MudTd>
-        <MudTd DataLabel="Net Fiyat İD" Style="text-align:right">@(Helper.FormattedDouble(context.Miktar.HasValue ? context.Kdvmatrahid.Value / context.Miktar.Value : 0))</MudTd>
-        <MudTd DataLabel="Tutar İD" Style="text-align:right">@(Helper.FormattedDouble(context.Kdvmatrahid))</MudTd>
+        <MudTd DataLabel="Net Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.Miktar.HasValue ? context.Kdvmatrahid.Value / context.Miktar.Value : 0))</MudTd>
+        <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Kdvmatrahid))</MudTd>
+        <MudTd DataLabel="Maliyet 1 Toplam" Style="text-align:right">@(Helper.FormattedDouble(context.Maliyet1id * context.Miktar))</MudTd>
+        <MudTd DataLabel="Maliyet 2 Toplam" Style="text-align:right">@(Helper.FormattedDouble(context.Maliyet2id * context.Miktar))</MudTd>
+        <MudTd DataLabel="İsk-1 %">@context.Iskyuz1</MudTd>
+        <MudTd DataLabel="İsk-2 %">@context.Iskyuz2</MudTd>
+        <MudTd DataLabel="İsk-3 %">@context.Iskyuz3</MudTd>
+        <MudTd DataLabel="Genel %">@context.Iskyuz4</MudTd>
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
         </MudTd>
@@ -185,7 +189,6 @@
             return true;
         if (element.LstokKodu != null && element.LstokKodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-
 
         return false;
     }
