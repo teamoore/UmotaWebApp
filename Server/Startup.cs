@@ -19,6 +19,8 @@ using DinkToPdf;
 using System.IO;
 using System.Reflection;
 using System;
+using UmotaWebApp.Shared.Config;
+using UmotaWebApp.Server.Services.Email;
 
 namespace UmotaWebApp.Server
 {
@@ -36,12 +38,20 @@ namespace UmotaWebApp.Server
         public void ConfigureServices(IServiceCollection services)
         {
 
+
             services.AddControllersWithViews();
             services.AddRazorPages();
 
             services.ConfigureMapping();
 
             services.AddDbConnection();
+
+            services.AddScoped<IEmailSender, EmailSender>();
+            var emailConfig = Configuration
+                    .GetSection("EmailConfiguration")
+                    .Get<EmailConfiguration>();
+
+            services.AddSingleton(emailConfig);
 
             services.AddScoped<ISisKullaniciService, SisKullaniciService>();
             services.AddScoped<ISisFirmaService, SisFirmaService>();
@@ -57,11 +67,14 @@ namespace UmotaWebApp.Server
             services.AddScoped<IFaaliyetService, FaaliyetService>();
             services.AddScoped<IPdfGenerator, PdfGeneratorService>();
 
+
             var architectureFolder = (IntPtr.Size == 8) ? "64 bit" : "32 bit";
             var wkHtmlToPdfPath = Path.Combine(Environment.CurrentDirectory, $"wkhtmltox\\v0.12.4\\{architectureFolder}\\libwkhtmltox");
             CustomAssemblyLoadContext context = new CustomAssemblyLoadContext();
             context.LoadUnmanagedLibrary(wkHtmlToPdfPath);
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+
+
 
 
             services.AddDbContext<UmotaMasterDbContext>(config =>

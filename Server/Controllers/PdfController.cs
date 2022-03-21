@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using UmotaWebApp.Server.Services.Email;
 using UmotaWebApp.Server.Services.Infrastructure;
+using UmotaWebApp.Shared.Config;
 using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ServiceResponses;
 
@@ -17,11 +19,13 @@ namespace UmotaWebApp.Server.Controllers
     {
         private ILogger<PdfController> logger { get; }
         private IPdfGenerator pdf { get; set; }
+        private IEmailSender _emailSender { get; set; }
 
-        public PdfController(ILogger<PdfController> logger, IPdfGenerator pdf)
+        public PdfController(ILogger<PdfController> logger, IPdfGenerator pdf, IEmailSender emailSender)
         {
             this.logger = logger;
             this.pdf = pdf;
+            this._emailSender = emailSender;
         }
 
         [HttpPost("CreateTeklifPdfDocument")]
@@ -41,6 +45,10 @@ namespace UmotaWebApp.Server.Controllers
 
                     await fs.WriteAsync(pdfData, 0, pdfData.Length);
                     fs.Close();
+
+
+                    var message = new Message(new string[] { "timurgundogdu@gmail.com" }, "Test mail with Attachments", "This is the content from our mail with attachments.", pdfData);
+                    _emailSender.SendEmail(message);
                 }
 
                 return new ServiceResponse<bool>()
