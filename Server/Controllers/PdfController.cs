@@ -39,7 +39,7 @@ namespace UmotaWebApp.Server.Controllers
                     throw new Exception("Pdf oluşturma hatası : Teklif Cari Mail adresi boş olamaz");
                 }
 
-                if (request.teklif.Mail.IsValidEmail())
+                if (request.teklif.Mail.IsValidEmail() == false)
                 {
                     throw new Exception("Pdf Oluşturma hatası : Geçersiz e-posta adres " + request.teklif.Mail);
                 }
