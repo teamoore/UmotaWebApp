@@ -9,7 +9,7 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@listItems" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<FaaliyetDto,bool>(FilterFunc1)">
+<MudTable Items="@listItems" Dense="true" Hover="true" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<FaaliyetDto,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         <MudSpacer />
@@ -27,7 +27,6 @@
         <MudTh>İlçe</MudTh>
         <MudTh>İl</MudTh>
         <MudTh>Ürün Grubu</MudTh>
-        <MudTh>İlgili Ürün</MudTh>
         <MudTh>Yapılanlar</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -44,11 +43,16 @@
         <MudTd DataLabel="İlçe">@context.Ilce</MudTd>
         <MudTd DataLabel="il">@context.Il</MudTd>
         <MudTd DataLabel="Ürün Grubu">@context.Grup1</MudTd>
-        <MudTd DataLabel="İlgili Ürün">@context.Malzemeadi</MudTd>
-        <MudTd DataLabel="Yapılanlar">@context.Yapilanlar</MudTd>
+
+        <MudTd DataLabel="Yapılanlar">
+            
+            <MudTooltip Text="@context.Yapilanlar" Arrow="true" Placement="Placement.Top">
+                @context.Yapilanlar.MinimizeString(50)
+            </MudTooltip>
+            </MudTd>
     </RowTemplate>
     <PagerContent>
-        <MudTablePager />
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı"/>
     </PagerContent>
 </MudTable>
 
@@ -89,6 +93,33 @@
             return true;
         if (element.Cariadi != null && element.Cariadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
+        if (element.Kisiadi != null && element.Kisiadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Kisiadi2 != null && element.Kisiadi2.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Kisiadi3 != null && element.Kisiadi3.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Kisiadi4 != null && element.Kisiadi4.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Kisiadi5 != null && element.Kisiadi5.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Grup1 != null && element.Grup1.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Grup2 != null && element.Grup2.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Grup3 != null && element.Grup3.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Grup4 != null && element.Grup4.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Grup5 != null && element.Grup5.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Insuser != null && element.Insuser.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Yapilanlar != null && element.Yapilanlar.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+
+
         return false;
     }
 

@@ -77,7 +77,7 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <label>Şahıs Şirketi mi?</label>
                         <InputSelect @bind-Value="cariModel.Sahismi" class="form-control">
                             <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -85,11 +85,11 @@
                             <option value="1">Evet</option>
                         </InputSelect>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <label>Vergi/TCK No</label>
                         <InputText @bind-Value="cariModel.Vdno" class="form-control" />
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <label>Vergi Dairesi</label>
                         <InputText @bind-Value="cariModel.Vdadi" class="form-control" />
                     </div>
@@ -113,7 +113,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label>E-Posta</label>
-                        <InputText @bind-Value="cariModel.Mail" class="form-control" />
+                        <InputText @bind-Value="cariModel.Mail" class="form-control"  type="email"/>
                     </div>
                     <div class="col-md-6">
                         <label>Web Sitesi</label>
@@ -347,7 +347,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
-            var result = await httpClient.GetServiceResponseAsync<List<SpeCodesDto>>(UrlHelper.CariSektorList + "?logofirmno=" + selectedFirmaDonem.firma_no);
+            var result = await httpClient.GetServiceResponseAsync<List<SpeCodesDto>>(UrlHelper.CariSektorList + "?logofirmno=" + selectedFirmaDonem.logo_firma);
             if (result != null)
             {
                 SektorListesi = result;

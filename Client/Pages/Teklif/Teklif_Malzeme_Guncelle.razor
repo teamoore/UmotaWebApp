@@ -12,9 +12,9 @@
         </h6>
 
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
 
-                <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
+                <MudSimpleTable Dense="true" Hover="false" Bordered="false" Loading="@(loadingCompleted == false)" Striped="false" Style="overflow-x: auto;">
                     <tbody>
                         <tr>
                             <td>Firma</td>
@@ -22,7 +22,7 @@
                         </tr>
                         <tr>
                             <td>İlgili Kişi</td>
-                            <td>@teklif.IlgiliAdi</td>
+                            <td>@teklif.IlgiliAdi (@teklif.Mail)</td>
                         </tr>
                         <tr>
                             <td>Proje Adı</td>
@@ -36,34 +36,61 @@
                 </MudSimpleTable>
 
             </div>
-            <div class="col-md-4">
 
-                <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
+            <div class="col-md-3">
+
+                <MudSimpleTable Dense="true" Hover="false" Loading="@(loadingCompleted == false)" Bordered="false" Striped="false" Style="overflow-x: auto;">
                     <tbody>
-                        <tr>
-                            <td>Satır Sayısı</td>
-                            <td style="text-align:right">@(_miktar.HasValue ? _miktar.Value : 0)</td>
-                        </tr>
                         <tr>
                             <td>Teklif Tutar</td>
                             <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrah)) @(teklif.Dovizdokuid)</td>
+                        </tr>
+
+                        <tr>
+                            <td>Teklif Tutar TL</td>
+                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrahtl)) TL</td>
                         </tr>
                         <tr>
                             <td>Teklif Para Birimi / Kuru</td>
                             <td style="text-align:right">@(teklif.Dovizdokuid) / @(teklif.Dovizkuruid)</td>
                         </tr>
-                        <tr>
-                            <td>Teklif Tutar TL</td>
-                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrahtl)) TL</td>
-                        </tr>
+
                     </tbody>
                 </MudSimpleTable>
 
             </div>
 
-            <div class="col-md-4">
+            @if (maliyetGor || maliyetGor2)
+            {
+                <div class="col-md-3">
+                    <MudSimpleTable Dense="true" Hover="false" Loading="@(loadingCompleted == false)" Bordered="false" Striped="false" Style="overflow-x: auto;">
+                        <tbody>
 
-                <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
+                            @if (maliyetGor)
+                            {
+                                <tr>
+                                    <td>Maliyet 1 Toplam</td>
+                                    <td style="text-align:right">@(Helper.FormattedDouble(this.teklifDetayList.Sum(x => x.Miktar * x.Maliyet1id))) @teklif.Dovizdokuid</td>
+                                </tr>
+                            }
+
+                            @if (maliyetGor2)
+                            {
+                                <tr>
+                                    <td>Maliyet 2 Toplam</td>
+                                    <td style="text-align:right">@(Helper.FormattedDouble(this.teklifDetayList.Sum(x => x.Miktar * x.Maliyet2id))) @teklif.Dovizdokuid</td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </MudSimpleTable>
+                </div>
+            }
+
+
+            <div class="col-md-3">
+
+                <MudSimpleTable Dense="true" Hover="false" Loading="@(loadingCompleted == false)" Bordered="false" Striped="false" Style="overflow-x: auto;">
                     <tbody>
                         <tr>
                             <td>Satış Temsilcisi</td>
@@ -72,6 +99,10 @@
                         <tr>
                             <td>Teklif Durumu</td>
                             <td style="text-align:right">@teklif.Duruminfo</td>
+                        </tr>
+                        <tr>
+                            <td>Satır Sayısı</td>
+                            <td style="text-align:right">@(_miktar.HasValue ? _miktar.Value : 0)</td>
                         </tr>
                     </tbody>
                 </MudSimpleTable>
@@ -100,13 +131,14 @@
 
 
 
-<MudTable Items="@teklifDetayList" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
+<MudTable Items="@teklifDetayList" Dense="true" Hover="true" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Teklif Satırları</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Satırlarda Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
+
         <MudTh>#</MudTh>
         <MudTh>Poz No</MudTh>
         <MudTh>Stok Kodu</MudTh>
@@ -128,6 +160,7 @@
         <MudTh>İsk-3 %</MudTh>
         <MudTh>Genel %</MudTh>
         <MudTh>#</MudTh>
+
 
     </HeaderContent>
     <RowTemplate>
@@ -156,10 +189,12 @@
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
         </MudTd>
-        </RowTemplate>
+    </RowTemplate>
+
     <PagerContent>
-        <MudTablePager />
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
     </PagerContent>
+
 </MudTable>
 
 
@@ -206,6 +241,8 @@
     private bool _showDownloadPdf = false;
     private string _pdfPath = "";
 
+    private bool loadingCompleted = false;
+
     private bool FilterFunc1(TeklifDetayDto element) => FilterFunc(element, _searchString);
 
     private bool FilterFunc(TeklifDetayDto element, string searchString)
@@ -225,6 +262,7 @@
         await LoadTeklifData();
         await LoadTeklifDetayData();
         await KullaniciYetkileriGetir();
+        loadingCompleted = true;
     }
 
     private async Task LoadTeklifDetayData()

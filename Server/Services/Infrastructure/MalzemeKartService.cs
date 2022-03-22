@@ -121,7 +121,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             return res;
         }
-
         public async Task<MalzemeFiyatDto> MalzemeMaliyetGetir(MalzemeFiyatRequestDto request)
         {
             MalzemeFiyatDto res = new MalzemeFiyatDto();

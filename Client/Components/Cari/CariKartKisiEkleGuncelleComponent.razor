@@ -10,7 +10,7 @@
             <div class="form-group">
 
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-10">
                         <label>Kişi Adı</label>
                         <InputText @bind-Value="cariModel.Tamadi" class="form-control" />
                     </div>
@@ -19,11 +19,11 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label>Bölüm</label>
                         <InputText @bind-Value="cariModel.Bolum" class="form-control" />
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label>Pozisyon</label>
                         <InputText @bind-Value="cariModel.Pozisyon" class="form-control" />
                     </div>
@@ -32,11 +32,11 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label>Cep Telefonu</label>
                         <InputText @bind-Value="cariModel.Ceptel" class="form-control" />
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label>İş Telefonu</label>
                         <InputText @bind-Value="cariModel.Istel" class="form-control" />
                     </div>
@@ -45,16 +45,16 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-10">
                         <label>E-Posta</label>
-                        <InputText @bind-Value="cariModel.Mail" class="form-control" />
+                        <InputText @bind-Value="cariModel.Mail" class="form-control" type="email" />
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-10">
                         <label>Açıklama</label>
                         <InputTextArea @bind-Value="cariModel.Aciklama" class="form-control"></InputTextArea>
                     </div>
