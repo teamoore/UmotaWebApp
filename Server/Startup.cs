@@ -21,6 +21,7 @@ using System.Reflection;
 using System;
 using UmotaWebApp.Shared.Config;
 using UmotaWebApp.Server.Services.Email;
+using UmotaWebApp.Server.Services;
 
 namespace UmotaWebApp.Server
 {
@@ -72,7 +73,7 @@ namespace UmotaWebApp.Server
             var wkHtmlToPdfPath = Path.Combine(Environment.CurrentDirectory, $"wkhtmltox\\v0.12.4\\{architectureFolder}\\libwkhtmltox");
             CustomAssemblyLoadContext context = new CustomAssemblyLoadContext();
             context.LoadUnmanagedLibrary(wkHtmlToPdfPath);
-            services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+            services.AddSingleton(typeof(IConverter), new STASynchronizedConverter(new PdfTools()));
 
 
 

@@ -1,4 +1,5 @@
 ﻿using DinkToPdf;
+using DinkToPdf.Contracts;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,14 +11,15 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 {
     public class PdfGeneratorService : IPdfGenerator
     {
-        public PdfGeneratorService()
-        {
+        private IConverter converter { get; set; }
 
+        public PdfGeneratorService(IConverter converter)
+        {
+            this.converter = converter;
         }
 
         public MemoryStream CreateTeklifDetayPdf(TeklifDto teklif, List<TeklifDetayDto> teklifDetays)
-        {
-            var converter = new SynchronizedConverter(new PdfTools());
+        {            
             var doc = new HtmlToPdfDocument()
             {
                 GlobalSettings = {
