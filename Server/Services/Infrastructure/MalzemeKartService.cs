@@ -44,23 +44,19 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<List<MalzemeKartDto>> SearchMalzemeKart(MalzemeKartRequestDto request)
         {
-
             var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
             var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
 
-            var word = request.MalzemeKart.Adi.ToLower();
+            string word = request.MalzemeKart.Adi != null ? request.MalzemeKart.Adi.ToLower() : null;
+            string marka = request.MalzemeKart.Marka != null ? request.MalzemeKart.Marka.ToLower() : null;
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                return await dbContext.V002Malzemelers.Where(x => x.Adi.ToLower().Contains(word)
-                || x.Kodu.ToLower().Contains(word)
-                || x.Adi3.ToLower().Contains(word)
-                || x.Grupkodu.ToLower().Contains(word)
-                || x.Ozelkod.ToLower().Contains(word)
-                || x.Ozelkod2.ToLower().Contains(word)
-                || x.Ozelkod3.ToLower().Contains(word))
-                    .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
+                return await dbContext.V002Malzemelers.Where(x => 
+                (word == null || x.Adi.ToLower().Contains(word) || x.Kodu.ToLower().Contains(word))
+                && (marka == null || x.Descr.Contains(marka))
+                    ).ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
             }
         }
         public async Task<MalzemeFiyatDto>MalzemeFiyatGetir(MalzemeFiyatRequestDto request)
@@ -125,7 +121,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             return res;
         }
-
         public async Task<MalzemeFiyatDto> MalzemeMaliyetGetir(MalzemeFiyatRequestDto request)
         {
             MalzemeFiyatDto res = new MalzemeFiyatDto();

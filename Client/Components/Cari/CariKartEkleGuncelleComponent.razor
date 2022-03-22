@@ -8,50 +8,54 @@
         <div class="form">
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-6">
-                        <label>Ref</label>
-                        <InputNumber @bind-Value="cariModel.Logref" class="form-control" disabled/>
-                    </div>
-                    <div class="col-md-6">
+                    <div class="col-md-2">
                         <label>Kodu</label>
-                        <InputText @bind-Value="cariModel.Kodu" class="form-control" disabled/>
+                        <InputText @bind-Value="cariModel.Kodu" class="form-control" disabled />
                     </div>
                 </div>
-                
             </div>
 
             <div class="form-group">
-
                 <div class="row">
                     <div class="col-md-6">
-                        <label>Adı</label>
+                        <label>Ünvanı</label>
                         <InputText @bind-Value="cariModel.Adi" class="form-control" />
                     </div>
                     <div class="col-md-6">
-                        <label>Adı 2</label>
+                        <label>Tabela Ünvanı</label>
                         <InputText @bind-Value="cariModel.Adi2" class="form-control" />
                     </div>
                 </div>
-                
             </div>
 
             <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Adres (1.Satır)</label>
+                        <InputText @bind-Value="cariModel.Adres1" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Adres (2.Satır)</label>
+                        <InputText @bind-Value="cariModel.Adres1" class="form-control" />
+                    </div>
+                </div>
+            </div>
 
+            <div class="form-group">
                 <div class="row">
                     <div class="col-md-4">
-                        <label>İlçe</label>
-                        <InputText @bind-Value="cariModel.Ilce" class="form-control" />
+                        <label>Ülke</label>
+                        <InputText @bind-Value="cariModel.Ulke" class="form-control" />
                     </div>
                     <div class="col-md-4">
                         <label>Şehir</label>
                         <InputText @bind-Value="cariModel.Il" class="form-control" />
                     </div>
                     <div class="col-md-4">
-                        <label>Ülke</label>
-                        <InputText @bind-Value="cariModel.Ulke" class="form-control" />
+                        <label>İlçe</label>
+                        <InputText @bind-Value="cariModel.Ilce" class="form-control" />
                     </div>
                 </div>
-                
             </div>
 
             <div class="form-group">
@@ -69,43 +73,54 @@
                         <InputText @bind-Value="cariModel.Faks" class="form-control" />
                     </div>
                 </div>
-                
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Şahıs Şirketi mi?</label>
+                        <InputSelect @bind-Value="cariModel.Sahismi" class="form-control">
+                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                            <option value="0">Hayır</option>
+                            <option value="1">Evet</option>
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Vergi/TCK No</label>
+                        <InputText @bind-Value="cariModel.Vdno" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Vergi Dairesi</label>
+                        <InputText @bind-Value="cariModel.Vdadi" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Sektör</label>
+                        <InputSelect @bind-Value="cariModel.Ozelkod3" class="form-control">
+                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                            @if (SektorListesi != null)
+                            {
+                                @foreach (var item in SektorListesi)
+                                {
+                                    <option value="@item.SPECODE">@item.SPECODE</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-6">
                         <label>E-Posta</label>
-                        <InputText @bind-Value="cariModel.Mail" class="form-control" />
+                        <InputText @bind-Value="cariModel.Mail" class="form-control"  type="email"/>
                     </div>
                     <div class="col-md-6">
                         <label>Web Sitesi</label>
                         <InputText @bind-Value="cariModel.Web" class="form-control" />
                     </div>
                 </div>
-                
-            </div>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-3">
-                        <label>Özel Kod</label>
-                        <InputText @bind-Value="cariModel.Ozelkod" class="form-control" />
-                    </div>
-                    <div class="col-md-3">
-                        <label>Özel Kod 2</label>
-                        <InputText @bind-Value="cariModel.Ozelkod2" class="form-control" />
-                    </div>
-                    <div class="col-md-3">
-                        <label>Özel Kod 3</label>
-                        <InputText @bind-Value="cariModel.Ozelkod3" class="form-control" />
-                    </div>
-                    <div class="col-md-3">
-                        <label>Özel Kod 4</label>
-                        <InputText @bind-Value="cariModel.Ozelkod4" class="form-control" />
-                    </div>
-                </div>
-                
             </div>
 
         </div>
@@ -148,6 +163,7 @@
     ILocalStorageService LocalStorageService { get; set; }
 
     CariKartDto cariModel = new CariKartDto();
+    public List<SpeCodesDto> SektorListesi { get; set; }
 
     private bool isUpdate = false;
 
@@ -174,6 +190,22 @@
 
     public async Task Kaydet()
     {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
         try
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
@@ -252,12 +284,11 @@
             isUpdate = true;
 
         if (isUpdate)
-        {
             await CariKartGetir();
-            return;
-        }
+        else
+            await NoUret();
 
-        await NoUret();
+        await SektorListesiGetir();
     }
 
     public async Task NoUret()
@@ -279,4 +310,53 @@
         }
     }
 
+    public void SubmitValidation()
+    {
+        var err = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(cariModel.Adi))
+            err.Add("Ünvan boş geçilemez");
+
+        if (cariModel.Sahismi == null || cariModel.Sahismi == -1)
+            err.Add("Şahıs Şirketi/Tüzel Kişilik bilgisini seçiniz");
+
+        if (cariModel.Sahismi == 0 && cariModel.Vdno.Length > 0 && cariModel.Vdno.Length < 10)
+            err.Add("Vergi No 10 hane girilmelidir");
+
+        if (cariModel.Sahismi == 1 && cariModel.Vdno.Length > 0 && cariModel.Vdno.Length < 11)
+            err.Add("TCK No 11 hane girilmelidir");
+
+        if (string.IsNullOrWhiteSpace(cariModel.Ozelkod3))
+            err.Add("Sektör boş geçilemez");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Boş geçilemez alanlar");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
+
+    public async Task SektorListesiGetir()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<List<SpeCodesDto>>(UrlHelper.CariSektorList + "?logofirmno=" + selectedFirmaDonem.logo_firma);
+            if (result != null)
+            {
+                SektorListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
 }
