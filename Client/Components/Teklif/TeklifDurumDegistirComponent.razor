@@ -23,30 +23,30 @@
                             <option value=-1>@Utils.Mesajlar.Seciniz</option>
                             @if (admin == 1)
                             {
-                                <option value=@Utils.TeklifDurum.TeklifHazirlaniyor>@Utils.TeklifDurum.TeklifHazirlaniyor</option>
-                                <option value=@Utils.TeklifDurum.MusteriOnayiBekliyor>@Utils.TeklifDurum.MusteriOnayiBekliyor</option>
-                                <option value=@Utils.TeklifDurum.FinansalUygunlukBekleniyor>@Utils.TeklifDurum.FinansalUygunlukBekleniyor</option>
-                                <option value=@Utils.TeklifDurum.KesinSiparis>@Utils.TeklifDurum.KesinSiparis</option>
+                                <option value=@TeklifDurum.TeklifHazirlaniyor>@TeklifDurum.TeklifHazirlaniyor</option>
+                                <option value=@TeklifDurum.MusteriOnayiBekliyor>@TeklifDurum.MusteriOnayiBekliyor</option>
+                                <option value=@TeklifDurum.FinansalUygunlukBekleniyor>@TeklifDurum.FinansalUygunlukBekleniyor</option>
+                                <option value=@TeklifDurum.KesinSiparis>@TeklifDurum.KesinSiparis</option>
                             }
                             else
                             {
-                                @if (teklif.Duruminfo == Utils.TeklifDurum.TeklifHazirlaniyor)
+                                @if (teklif.Duruminfo == TeklifDurum.TeklifHazirlaniyor)
                                 {
-                                    <option value=@Utils.TeklifDurum.MusteriOnayiBekliyor>@Utils.TeklifDurum.TeklifMusteriyeGonderildi</option>
-                                    <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
+                                    <option value=@TeklifDurum.MusteriOnayiBekliyor>@TeklifDurum.TeklifMusteriyeGonderildi</option>
+                                    <option value=@TeklifDurum.UnoTeklifiIptalEtti>@TeklifDurum.UnoTeklifiIptalEtti</option>
                                 }
-                                @if (teklif.Duruminfo == Utils.TeklifDurum.MusteriOnayiBekliyor)
+                                @if (teklif.Duruminfo == TeklifDurum.MusteriOnayiBekliyor)
                                 {
-                                    <option value=@Utils.TeklifDurum.FinansalUygunlukBekleniyor>@Utils.TeklifDurum.MusteriTeklifiOnayladi</option>
-                                    <option value=@Utils.TeklifDurum.MusteriTeklifteRevizeIstedi>@Utils.TeklifDurum.MusteriTeklifteRevizeIstedi</option>
-                                    <option value=@Utils.TeklifDurum.MusteriTeklifiIptalEtti>@Utils.TeklifDurum.MusteriTeklifiIptalEtti</option>
-                                    <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
+                                    <option value=@TeklifDurum.FinansalUygunlukBekleniyor>@TeklifDurum.MusteriTeklifiOnayladi</option>
+                                    <option value=@TeklifDurum.MusteriTeklifteRevizeIstedi>@TeklifDurum.MusteriTeklifteRevizeIstedi</option>
+                                    <option value=@TeklifDurum.MusteriTeklifiIptalEtti>@TeklifDurum.MusteriTeklifiIptalEtti</option>
+                                    <option value=@TeklifDurum.UnoTeklifiIptalEtti>@TeklifDurum.UnoTeklifiIptalEtti</option>
                                 }
-                                @if (teklif.Duruminfo == Utils.TeklifDurum.FinansalUygunlukBekleniyor)
+                                @if (teklif.Duruminfo == TeklifDurum.FinansalUygunlukBekleniyor)
                                 {
-                                    <option value=@Utils.TeklifDurum.KesinSiparis>@Utils.TeklifDurum.FinansalUygunlukVer</option>
-                                    <option value=@Utils.TeklifDurum.MusteriTeklifiIptalEtti>@Utils.TeklifDurum.MusteriTeklifiIptalEtti</option>
-                                    <option value=@Utils.TeklifDurum.UnoTeklifiIptalEtti>@Utils.TeklifDurum.UnoTeklifiIptalEtti</option>
+                                    <option value=@TeklifDurum.KesinSiparis>@TeklifDurum.FinansalUygunlukVer</option>
+                                    <option value=@TeklifDurum.MusteriTeklifiIptalEtti>@TeklifDurum.MusteriTeklifiIptalEtti</option>
+                                    <option value=@TeklifDurum.UnoTeklifiIptalEtti>@TeklifDurum.UnoTeklifiIptalEtti</option>
                                 }
                             }
                         </InputSelect>

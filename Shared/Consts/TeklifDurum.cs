@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UmotaWebApp.Shared.Consts
+namespace UmotaWebApp.Shared.SharedConsts
 {
     public class TeklifDurum
     {

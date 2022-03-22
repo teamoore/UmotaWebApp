@@ -108,8 +108,14 @@
         <MudTh>Birim</MudTh>
         <MudTh>Net Fiyat</MudTh>
         <MudTh>Tutar</MudTh>
-        <MudTh>Maliyet 1 Toplam </MudTh>
-        <MudTh>Maliyet 2 Toplam </MudTh>
+        @if (@maliyetGor)
+        {
+            <MudTh>Maliyet 1 Toplam </MudTh>
+        }
+        @if (@maliyetGor2)
+        {
+            <MudTh>Maliyet 2 Toplam </MudTh>
+        }
         <MudTh>İsk-1 %</MudTh>
         <MudTh>İsk-2 %</MudTh>
         <MudTh>İsk-3 %</MudTh>
@@ -128,8 +134,14 @@
         <MudTd DataLabel="Birim">@context.Birimkodu</MudTd>
         <MudTd DataLabel="Net Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.Miktar.HasValue ? context.Kdvmatrahid.Value / context.Miktar.Value : 0))</MudTd>
         <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Kdvmatrahid))</MudTd>
-        <MudTd DataLabel="Maliyet 1 Toplam" Style="text-align:right">@(Helper.FormattedDouble(context.Maliyet1id * context.Miktar))</MudTd>
-        <MudTd DataLabel="Maliyet 2 Toplam" Style="text-align:right">@(Helper.FormattedDouble(context.Maliyet2id * context.Miktar))</MudTd>
+        @if (@maliyetGor)
+        {
+            <MudTd DataLabel="Maliyet 1 Toplam" Style="text-align:right">@(Helper.FormattedDouble(context.Maliyet1id * context.Miktar))</MudTd>
+        }
+        @if (@maliyetGor2)
+        {
+            <MudTd DataLabel="Maliyet 2 Toplam" Style="text-align:right">@(Helper.FormattedDouble(context.Maliyet2id * context.Miktar))</MudTd>
+        }
         <MudTd DataLabel="İsk-1 %">@context.Iskyuz1</MudTd>
         <MudTd DataLabel="İsk-2 %">@context.Iskyuz2</MudTd>
         <MudTd DataLabel="İsk-3 %">@context.Iskyuz3</MudTd>
@@ -137,7 +149,7 @@
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
         </MudTd>
-    </RowTemplate>
+        </RowTemplate>
     <PagerContent>
         <MudTablePager />
     </PagerContent>
@@ -174,6 +186,9 @@
 
     public List<TeklifDetayDto> teklifDetayList { get; set; }
 
+    private bool maliyetGor = false;
+    private bool maliyetGor2 = false;
+
     private string _searchString = "";
     private bool _sortNameByLength;
 
@@ -197,6 +212,7 @@
     {
         await LoadTeklifData();
         await LoadTeklifDetayData();
+        await KullaniciYetkileriGetir();
     }
 
     private async Task LoadTeklifDetayData()
@@ -302,10 +318,28 @@
         }
     }
 
-
     private async Task SayfayiYazdir()
     {
         await jsRuntime.InvokeVoidAsync("printPage");
     }
 
+    public async Task KullaniciYetkileriGetir()
+    {
+        try
+        {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
+
+            maliyetGor = result == 1;
+
+            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet2GorebilsinPersonel);
+
+            maliyetGor2 = result == 1;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
 }

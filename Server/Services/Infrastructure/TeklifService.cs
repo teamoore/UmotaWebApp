@@ -15,7 +15,7 @@ using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.Consts;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
-
+using UmotaWebApp.Shared.SharedConsts;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
@@ -112,7 +112,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<List<TeklifDto>> SearchTeklif(TeklifRequestDto request)
         {
-
             var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
             var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
@@ -139,13 +138,10 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     .OrderByDescending(x => x.Tarih)
                     .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).ToListAsync();
             }
-
-
         }
 
         public async Task<TeklifDto> UpdateTeklif(TeklifRequestDto request)
         {
-
             var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
             var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
@@ -159,7 +155,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 //Teklif Para Birimi veya Döviz Kuru veya Genel iskonto oranı değişirse Detayı tekrar hesapla
                 if (teklifRow.Dovizrefid != request.Teklif.Dovizrefid || teklifRow.Dovizkuruid != request.Teklif.Dovizkuruid || teklifRow.Gniskoran != request.Teklif.Gniskoran)
                 {
-                    var teklifDetayList = await dbContext.Teklifdetays.Where(x => x.Teklifref == request.Teklif.Logref).ToListAsync();
+                    var teklifDetayList = await dbContext.Teklifdetays.Where(x => x.Teklifref == request.Teklif.Logref && x.Status < 2).ToListAsync();
                     var toplamTutarID = new double();
                     var toplamTutarTL = new double();
                     var toplamTutarRD = new double();
@@ -367,7 +363,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<TeklifDto> UpdateTeklifDurum(TeklifRequestDto request)
         {
-
             var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
             var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
