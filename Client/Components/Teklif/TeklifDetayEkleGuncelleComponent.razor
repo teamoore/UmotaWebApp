@@ -34,11 +34,11 @@
                         <div class="row">
                             <div class="col-md-2">
                                 <label>Malzeme Kodu</label>
-                                <InputText @bind-Value="teklifDetay.Malzkodu" class="form-control" placeholder="Stok Kodu" />
+                                <InputText @bind-Value="teklifDetay.Malzkodu" class="form-control" placeholder="Stok Kodu" disabled />
                             </div>
                             <div class="col-md-4">
                                 <label>Malzeme Tanımı</label>
-                                <InputText @bind-Value="teklifDetay.Malzadi" class="form-control" placeholder="Stok Adı" />
+                                <InputText @bind-Value="teklifDetay.Malzadi" class="form-control" placeholder="Stok Adı" disabled />
                             </div>
                             <div class="col-md-2">
                                 <label>Malzemeler</label>
@@ -82,33 +82,29 @@
                             </div>
                             <div class="col-md-1">
                                 <label>Döviz</label>
-                                <InputSelect @bind-Value="teklifDetay.Dovizref" class="form-control">
+                                <InputSelect @bind-Value="DovizTuruBilgisi" class="form-control">
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                     @if (DovizListesi != null)
-                                    {
-                                        @foreach (var item in DovizListesi)
-                                        {
-                                            <option value="@item.CURTYPE">@item.CURCODE</option>
-                                        }
-                                    }
+                                {
+                                @foreach (var item in DovizListesi)
+                            {
+                            <option value="@item.CURTYPE">@item.CURCODE</option>
+                    }
+                        }
                                 </InputSelect>
                             </div>
                             <div class="col-md-1">
                                 <label>Kur</label>
-                                <InputNumber @bind-Value="teklifDetay.Dovizkuru" class="form-control" placeholder="Kur" />
+                                <InputNumber @bind-Value="teklifDetay.Dovizkuru" class="form-control" placeholder="@_DovizKuruState" />
                             </div>
                             <div class="col-md-2">
                                 <label>Tutar</label>
-                                <InputNumber @bind-Value="teklifDetay.Tutar" class="form-control" placeholder="Tutar" />
+                                <InputNumber @bind-Value="teklifDetay.Tutar" class="form-control" placeholder="Tutar" disabled />
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-md-1">
-                                <label>İsk-Genel %</label>
-                                <InputNumber @bind-Value="teklifDetay.Iskyuz4" class="form-control" disabled />
-                            </div>
                             <div class="col-md-1">
                                 <label>İsk-1 %</label>
                                 <InputNumber @bind-Value="pageIskYuz1" class="form-control" />
@@ -120,6 +116,10 @@
                             <div class="col-md-1">
                                 <label>İsk-3 %</label>
                                 <InputNumber @bind-Value="pageIskYuz3" class="form-control" />
+                            </div>
+                            <div class="col-md-1">
+                                <label>İsk-Genel %</label>
+                                <InputNumber @bind-Value="teklifDetay.Iskyuz4" class="form-control" disabled />
                             </div>
                             <div class="col-md-2">
                                 <label>Net Fiyat İD</label>
@@ -133,6 +133,42 @@
                     </div>
 
 
+                    @if (@maliyetGor || maliyetGor2)
+                    {
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    @if (@maliyetGor)
+                                    {
+                                        <label>Maliyet 1 Fiyat İD</label>
+                                        <InputNumber @bind-Value="teklifDetay.Maliyet1id" class="form-control" disabled />
+                                    }
+                                </div>
+                                <div class="col-md-2">
+                                    @if (@maliyetGor2)
+                                    {
+                                        <label>Maliyet 2 Fiyat İD</label>
+                                        <InputNumber @bind-Value="teklifDetay.Maliyet2id" class="form-control" disabled />
+                                    }
+                                </div>
+                                <div class="col-md-2">
+                                    @if (@maliyetGor)
+                                    {
+                                        <label>Maliyet 1 Tutar İD</label>
+                                        <InputNumber @bind-Value="Maliyet1Topid" class="form-control" disabled />
+                                    }
+                                </div>
+                                <div class="col-md-2">
+                                    @if (@maliyetGor2)
+                                    {
+                                        <label>Maliyet 2 Tutar İD</label>
+                                        <InputNumber @bind-Value="Maliyet2Topid" class="form-control" disabled />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+
                     <div class="form-group">
                         <div class="row">
                             <div class="col-md-8">
@@ -142,71 +178,29 @@
                         </div>
                     </div>
 
-                </MudTabPanel>
+                    </MudTabPanel>
                 <MudTabPanel Icon="@Icons.Material.Filled.Percent" Text="İskonto" BadgeColor="Color.Success">
                     <hr />
                     <div class="form-group">
                         <div class="row">
                             <div class="col-md-2">
-                                <label>İsk-Genel Tutar</label>
-                                <InputNumber @bind-Value="teklifDetay.Isktut4" class="form-control" disabled />
-                            </div>
-                            <div class="col-md-2">
                                 <label>İsk-1 Tutar</label>
-                                <InputNumber @bind-Value="teklifDetay.Isktut1" class="form-control" disabled />
+                                <InputNumber @bind-Value="teklifDetay.Isktut1id" class="form-control" disabled />
                             </div>
                             <div class="col-md-2">
                                 <label>İsk-2 Tutar</label>
-                                <InputNumber @bind-Value="teklifDetay.Isktut2" class="form-control" disabled />
+                                <InputNumber @bind-Value="teklifDetay.Isktut2id" class="form-control" disabled />
                             </div>
                             <div class="col-md-2">
                                 <label>İsk-3 Tutar</label>
-                                <InputNumber @bind-Value="teklifDetay.Isktut3" class="form-control" disabled />
+                                <InputNumber @bind-Value="teklifDetay.Isktut3id" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-2">
+                                <label>İsk-Genel Tutar</label>
+                                <InputNumber @bind-Value="teklifDetay.Isktut4id" class="form-control" disabled />
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>Maliyet 1</label>
-                                <InputNumber @bind-Value="teklifDetay.Maliyet1" class="form-control" disabled />
-                            </div>
-                            <div class="col-md-2">
-                                <label>Maliyet 1 Top.</label>
-                                <InputNumber @bind-Value="Maliyet1Top" class="form-control" disabled />
-                            </div>
-                            <div class="col-md-2">
-                                <label>Maliyet 2</label>
-                                <InputNumber @bind-Value="teklifDetay.Maliyet2" class="form-control" disabled />
-                            </div>
-                            <div class="col-md-2">
-                                <label>Maliyet 2 Top.</label>
-                                <InputNumber @bind-Value="Maliyet2Top" class="form-control" disabled />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <label>Maliyet 1 İD</label>
-                                <InputNumber @bind-Value="teklifDetay.Maliyet1id" class="form-control" disabled />
-                            </div>
-                            <div class="col-md-2">
-                                <label>Maliyet 1 Top.İD</label>
-                                <InputNumber @bind-Value="Maliyet1Topid" class="form-control" disabled />
-                            </div>
-                            <div class="col-md-2">
-                                <label>Maliyet 2 İD</label>
-                                <InputNumber @bind-Value="teklifDetay.Maliyet2id" class="form-control" disabled />
-                            </div>
-                            <div class="col-md-2">
-                                <label>Maliyet 2 Top.İD</label>
-                                <InputNumber @bind-Value="Maliyet2Topid" class="form-control" disabled />
-                            </div>
-                        </div>
-                    </div>
-
-
                 </MudTabPanel>
                 <hr />
                 <div class="form-group">
@@ -238,9 +232,6 @@
                     </div>
                 </div>
             </MudTabs>
-
-
-
 
         </div>
     </div>
@@ -291,6 +282,35 @@
 
     public List<DovizDto> DovizListesi { get; set; }
 
+    private bool maliyetGor = false;
+    private bool maliyetGor2 = false;
+
+    private int _dovizTuru = -1;
+    public int DovizTuruBilgisi
+    {
+        get
+        {
+            if (teklifDetay.Dovizref.HasValue == false)
+                return -1;
+
+            return teklifDetay.Dovizref.Value;
+        }
+        set
+        {
+            _dovizTuru = value;
+            teklifDetay.Dovizref = _dovizTuru;
+
+            if (teklifDetay.Dovizref == teklif.Dovizrefid)
+                teklifDetay.Dovizkuru = teklif.Dovizkuruid;
+            else
+            if (teklifDetay.Dovizref == 160)
+                teklifDetay.Dovizkuru = 1;
+            else
+                DovizKuruGetir().GetAwaiter();
+        }
+    }
+
+    private string _DovizKuruState = "";
     private bool _TeklifDetayCekildi = false;
 
     private double? _pageMiktar = 1;
@@ -456,7 +476,7 @@
     {
         get
         {
-            _isktopid = (teklifDetay.Isktut1id.HasValue ? teklifDetay.Isktut1id.Value : 0) + (teklifDetay.Isktut2id.HasValue ? teklifDetay.Isktut2id.Value :0) + (teklifDetay.Isktut3id.HasValue ? teklifDetay.Isktut3id.Value : 0) + (teklifDetay.Isktut4id.HasValue ? teklifDetay.Isktut4id.Value : 0);
+            _isktopid = Math.Round((teklifDetay.Isktut1id.HasValue ? teklifDetay.Isktut1id.Value : 0) + (teklifDetay.Isktut2id.HasValue ? teklifDetay.Isktut2id.Value :0) + (teklifDetay.Isktut3id.HasValue ? teklifDetay.Isktut3id.Value : 0) + (teklifDetay.Isktut4id.HasValue ? teklifDetay.Isktut4id.Value : 0),2);
 
             return _isktopid;
         }
@@ -485,7 +505,7 @@
             await GetTeklifDetaySiraNo();
         }
 
-
+        await KullaniciYetkileriGetir();
         await DovizListesiGetir();
         await GetTeklif();
     }
@@ -768,12 +788,14 @@
             {
                 teklifDetay.Fiyat = result.Fiyat;
                 teklifDetay.Dovizref = result.DovizRef;
+                if (teklifDetay.Dovizref == teklif.Dovizrefid)
+                    teklifDetay.Dovizkuru = teklif.Dovizkuruid;
+                else
+                if (teklifDetay.Dovizref == 160)
+                    teklifDetay.Dovizkuru = 1;
+                else
+                    await DovizKuruGetir();
             }
-            ////_DovizKuruState = "Güncel";
-
-            // this.StateHasChanged();
-
-
         }
         catch (Exception ex)
         {
@@ -1013,8 +1035,8 @@
         if (teklifDetay.LstokId == null)
             err.Add("Malzeme boş geçilemez");
 
-        if (teklifDetay.Miktar == null)
-            err.Add("Miktar boş geçilemez");
+        if (teklifDetay.Miktar == null || teklifDetay.Miktar <= 0)
+            err.Add("Miktar sıfırdan büyük olmalı");
 
         if (err.Count > 0)
         {
@@ -1022,6 +1044,62 @@
             ex.ErrorList = err;
 
             throw ex;
+        }
+    }
+
+    public async Task DovizKuruGetir()
+    {
+        try
+        {
+            if (teklifDetay.Dovizref <= 0)
+            {
+                throw new Exception("Döviz tipi seçmelisiniz");
+            }
+            _DovizKuruState = "Çekiliyor...";
+            teklifDetay.Dovizkuru = null;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new DovizKuruRequestDto();
+            request.KurTarihi = teklif.Tarih.Value;
+            request.KurTuru = 4;
+            request.DovizTuru = teklifDetay.Dovizref.Value;
+            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<double, DovizKuruRequestDto>(UrlHelper.DovizKuruGetir, request);
+
+            teklifDetay.Dovizkuru = result;
+            _DovizKuruState = "Güncel";
+
+            this.StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    public async Task KullaniciYetkileriGetir()
+    {
+        try
+        {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi+ "?kullanicikodu="+kullanicikodu+"&yetkikodu="+ KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
+
+            maliyetGor = result == 1;
+
+            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet2GorebilsinPersonel);
+
+            maliyetGor2 = result == 1;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
     }
 }

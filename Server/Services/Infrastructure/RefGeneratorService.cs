@@ -78,9 +78,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
 
         }
-
-
-
         public async Task<IEnumerable<SisSabitlerDetayDto>> GetSabitDetayList(int tip)
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
@@ -93,6 +90,18 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
 
         }
+        public async Task<IEnumerable<SpeCodesDto>> GetCariSektorList(int logofirmno)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            {
+                string LogoDbName = Configuration["LogoDbName"];
+                string LogoFirmaNo = logofirmno.ToString("000");
+                string sqlstring = "SELECT  LOGICALREF,  SPECODE,  DEFINITION_ from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_SPECODES] with(nolock) where CODETYPE = 1 AND SPECODETYPE = 26 AND SPETYP3 = 1";
 
+                IEnumerable<SpeCodesDto> dbResponse;
+                dbResponse = await db.QueryAsync<SpeCodesDto>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
+            }
+        }
     }
 }
