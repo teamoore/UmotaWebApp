@@ -86,7 +86,11 @@
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddTask" OnClick="TeklifDetayEkle" Color="Color.Primary">Yeni Satır Ekle</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" OnClick="SayfayiYazdir" Color="Color.Primary">Sayfayı Yazdır</MudButton>
 
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PictureAsPdf" OnClick="PdfOlustur" Color="Color.Primary">Pdf</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PictureAsPdf" OnClick="PdfOlustur" Color="Color.Primary" Disabled="_pdfDisabled">Pdf Oluştur</MudButton>
+                @if (_pdfDisabled && _showDownloadPdf)
+                {
+                    <a href="@_pdfPath" class="btn btn-outline-success" role="button">Dosyayı indir</a>
+                }
             </div>
         </div>
 
@@ -177,6 +181,10 @@
     private bool _sortNameByLength;
 
     private double? _miktar = 0;
+
+    private bool _pdfDisabled = false;
+    private bool _showDownloadPdf = false;
+    private string _pdfPath = "";
 
     private bool FilterFunc1(TeklifDetayDto element) => FilterFunc(element, _searchString);
 
@@ -312,14 +320,24 @@
     {
         try
         {
+            _pdfDisabled = true;
+
             var request = new PdfGeneratorRequestDto();
             request.teklif = this.teklif;
             request.teklifDetays = this.teklifDetayList;
 
-            var result = await httpClient.PostGetServiceResponseAsync<bool,PdfGeneratorRequestDto>("/api/Pdf/CreateTeklifPdfDocument", request);
+            var result = await httpClient.PostGetServiceResponseAsync<PdfGenerateResponseDto,PdfGeneratorRequestDto>("/api/Pdf/CreateTeklifPdfDocument", request);
+
+            if (result.isSuccess)
+            {
+                Snackbar.Add("Pdf oluşturuldu", severity: Severity.Success);
+                _pdfPath = navigation.ToAbsoluteUri("/Download/" + result.PdfPath).ToString();
+                _showDownloadPdf = true;
+            }
         }
         catch (Exception ex)
         {
+            _pdfDisabled = false;
             Snackbar.Add(ex.Message, severity: Severity.Error);
         }
     }

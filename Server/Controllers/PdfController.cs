@@ -29,36 +29,46 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("CreateTeklifPdfDocument")]
-        public async Task<ServiceResponse<bool>> CreateTeklifPdfDocument(PdfGeneratorRequestDto request)
+        public async Task<ServiceResponse<PdfGenerateResponseDto>> CreateTeklifAndSendPdfDocument(PdfGeneratorRequestDto request)
         {
             try
             {
+                var filename = "";
+                var file = "";
+                byte[] pdfData = null;
+
                 using (MemoryStream pdfStream = pdf.CreateTeklifDetayPdf(request.teklif, request.teklifDetays))
                 {
                     var g = Guid.NewGuid();
                     
-                    var filename = @$"{Environment.CurrentDirectory}/Media/Files/Teklif-"+ g.ToString() +".pdf";
+                    file = "Teklif-" + g.ToString() + ".pdf";
+
+                    filename = @$"{Environment.CurrentDirectory}/Media/Files/" + file;
 
                     FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
 
-                    byte[] pdfData = pdfStream.ToArray();
+                    pdfData = pdfStream.ToArray();
 
                     await fs.WriteAsync(pdfData, 0, pdfData.Length);
                     fs.Close();
 
-
-                    var message = new Message(new string[] { "timurgundogdu@gmail.com" }, "Test mail with Attachments", "This is the content from our mail with attachments.", pdfData);
+                    var message = new Message(new string[] { "timurgundogdu@gmail.com" }, "Uno Teklif", "Teklif ektedir.", pdfData);
                     _emailSender.SendEmail(message);
                 }
 
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<PdfGenerateResponseDto>()
                 {
-                    Value = true
+                    Value = new PdfGenerateResponseDto()
+                    {
+                        isSuccess = true,
+                        PdfPath = file,
+                        PdfFile = pdfData
+                    }
                 };
             }
             catch (Exception ex)
             {
-                var e = new ServiceResponse<bool>();
+                var e = new ServiceResponse<PdfGenerateResponseDto>();
                 e.SetException(ex);
                 return e;
             }

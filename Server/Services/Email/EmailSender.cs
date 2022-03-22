@@ -53,7 +53,13 @@ namespace UmotaWebApp.Server.Services.Email
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
                     client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
 
+#if DEBUG
+
+#else
+
                     client.Send(mailMessage);
+
+#endif
                 }
                 catch(Exception ex)
                 {
