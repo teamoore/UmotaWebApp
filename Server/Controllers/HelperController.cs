@@ -165,5 +165,24 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpGet("GetCariSektorList")]
+        public async Task<ServiceResponse<IEnumerable<SpeCodesDto>>> GetCariSektorList(int logofirmno)
+        {
+            try
+            {
+                return new ServiceResponse<IEnumerable<SpeCodesDto>>()
+                {
+                    Value = await RefService.GetCariSektorList(logofirmno)
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<IEnumerable<SpeCodesDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

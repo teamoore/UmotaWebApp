@@ -92,5 +92,25 @@ namespace UmotaWebApp.Server.Controllers
             return result;
         }
 
+        [HttpGet("GetKullaniciYetkisi")]
+        public async Task<ServiceResponse<int>> GetKullaniciYetkisi(string kullanicikodu, string yetkikodu)
+        {
+            try
+            {
+                return new ServiceResponse<int>()
+                {
+                    Value = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, yetkikodu)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return e;
+            }
+
+        }
     }
 }

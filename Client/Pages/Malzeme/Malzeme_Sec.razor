@@ -7,16 +7,17 @@
 
             <div class="row">
                 <div class="col-md-4">
-                    <InputText @bind-Value="malzemeKart.Adi" class="form-control" />
+                    <InputText @bind-Value="malzemeKart.Adi" class="form-control" placeholder="Adı" />
                 </div>
-                <div class="col-md-8">
+                <div class="col-md-4">
+                    <InputText @bind-Value="malzemeKart.Marka" class="form-control" placeholder="Marka" />
+                </div>
+                <div class="col-md-4">
                     <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage"
-                               OnClick="MalzemeBul" Color="Color.Primary">@ButonText</MudButton>
+                               OnClick="MalzemeBul" Color="Color.Info" Size="Size.Medium">@ButonText</MudButton>
                 </div>
             </div>
-
         </div>
-
     </div>
 </EditForm>
 
@@ -30,9 +31,8 @@
         <MudTh>#</MudTh>
         <MudTh>Kodu</MudTh>
         <MudTh>Adı</MudTh>
-        <MudTh>Adı 3</MudTh>
+        <MudTh>Marka</MudTh>
         <MudTh>Menşei</MudTh>
-        <MudTh>Özel Kod</MudTh>
 
     </HeaderContent>
     <RowTemplate>
@@ -41,9 +41,8 @@
         </MudTd>
         <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
         <MudTd DataLabel="Adı">@context.Adi</MudTd>
-        <MudTd DataLabel="Adı3">@context.Adi3</MudTd>
-        <MudTd DataLabel="Menşei">@context.Mensei</MudTd>
-        <MudTd DataLabel="Özel Kod">@context.Ozelkod</MudTd>
+        <MudTd DataLabel="Marka">@context.Descr</MudTd>
+        <MudTd DataLabel="Menşei">@context.Definition</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager />
@@ -79,7 +78,7 @@
     public MalzemeKartDto malzemeKart = new MalzemeKartDto();
 
     public string ResultText { get; set; }
-    public string ButonText = "Malzeme Bul";
+    public string ButonText = "Ara";
 
     private string _searchStringMalzeme = "";
     private bool _sortNameByLength;
@@ -122,7 +121,7 @@
     {
         try
         {
-            if (string.IsNullOrEmpty(malzemeKart.Adi))
+            if (string.IsNullOrEmpty(malzemeKart.Adi) && string.IsNullOrEmpty(malzemeKart.Marka))
             {
                 throw new Exception(Utils.Mesajlar.MetinGir);
             }
@@ -146,7 +145,7 @@
         finally
         {
             _searchStarted = false;
-            ButonText = "Malzeme Bul";
+            ButonText = "Ara";
         }
     }
 
