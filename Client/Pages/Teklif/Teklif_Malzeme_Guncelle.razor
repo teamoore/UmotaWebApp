@@ -326,14 +326,20 @@
             request.teklif = this.teklif;
             request.teklifDetays = this.teklifDetayList;
 
-            var result = await httpClient.PostGetServiceResponseAsync<PdfGenerateResponseDto,PdfGeneratorRequestDto>("/api/Pdf/CreateTeklifPdfDocument", request);
+            var result = await httpClient.PostAsJsonAsync<PdfGeneratorRequestDto>("/api/Pdf/CreateTeklifPdfDocument", request);
+            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<PdfGenerateResponseDto>>();
 
-            if (result.isSuccess)
+            if (response.Success)
             {
                 Snackbar.Add("Pdf oluşturuldu", severity: Severity.Success);
-                _pdfPath = navigation.ToAbsoluteUri("/Download/" + result.PdfPath).ToString();
+                _pdfPath = navigation.ToAbsoluteUri("/Download/" + response.Value.PdfPath).ToString();
                 _showDownloadPdf = true;
             }
+            else
+            {
+                Snackbar.Add(response.Message, severity: Severity.Warning);
+            }
+
         }
         catch (Exception ex)
         {

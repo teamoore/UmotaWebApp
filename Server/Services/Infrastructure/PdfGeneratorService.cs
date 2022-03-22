@@ -19,7 +19,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         }
 
         public MemoryStream CreateTeklifDetayPdf(TeklifDto teklif, List<TeklifDetayDto> teklifDetays)
-        {            
+        {
             var doc = new HtmlToPdfDocument()
             {
                 GlobalSettings = {

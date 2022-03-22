@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Server.Services.Email;
 using UmotaWebApp.Server.Services.Infrastructure;
 using UmotaWebApp.Shared.Config;
@@ -33,6 +34,16 @@ namespace UmotaWebApp.Server.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(request.teklif.Mail))
+                {
+                    throw new Exception("Pdf oluşturma hatası : Teklif Cari Mail adresi boş olamaz");
+                }
+
+                if (request.teklif.Mail.IsValidEmail())
+                {
+                    throw new Exception("Pdf Oluşturma hatası : Geçersiz e-posta adres " + request.teklif.Mail);
+                }
+
                 var filename = "";
                 var file = "";
                 byte[] pdfData = null;
@@ -52,7 +63,7 @@ namespace UmotaWebApp.Server.Controllers
                     await fs.WriteAsync(pdfData, 0, pdfData.Length);
                     fs.Close();
 
-                    var message = new Message(new string[] { "timurgundogdu@gmail.com" }, "Uno Teklif", "Teklif ektedir.", pdfData);
+                    var message = new Message(new string[] { request.teklif.Mail }, "Uno Teklif", "Teklif ektedir.", pdfData);
                     _emailSender.SendEmail(message);
                 }
 
