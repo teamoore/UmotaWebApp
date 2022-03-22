@@ -331,7 +331,8 @@
 
             if (response.Success)
             {
-                Snackbar.Add("Pdf oluşturuldu", severity: Severity.Success);
+                Snackbar.Add(string.Format("Pdf oluşturuldu. Alıcı adresi : {0}, kopyası gönderildi.",
+                    this.teklif.Mail), severity: Severity.Success);
                 _pdfPath = navigation.ToAbsoluteUri("/Download/" + response.Value.PdfPath).ToString();
                 _showDownloadPdf = true;
             }
