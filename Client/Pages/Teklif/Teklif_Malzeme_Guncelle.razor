@@ -86,7 +86,7 @@
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddTask" OnClick="TeklifDetayEkle" Color="Color.Primary">Yeni Satır Ekle</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" OnClick="SayfayiYazdir" Color="Color.Primary">Sayfayı Yazdır</MudButton>
 
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PictureAsPdf" OnClick="PdfOlustur" Color="Color.Primary" Disabled="_pdfDisabled">Pdf Oluştur</MudButton>
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PictureAsPdf" OnClick="PdfOlustur" Color="Color.Primary" Disabled="_pdfDisabled">@_pdfButtonText</MudButton>
                 @if (_pdfDisabled && _showDownloadPdf)
                 {
                     <a href="@_pdfPath" class="btn btn-outline-success" role="button">Dosyayı indir</a>
@@ -183,6 +183,7 @@
     private double? _miktar = 0;
 
     private bool _pdfDisabled = false;
+    private string _pdfButtonText = "Pdf Oluştur ve Gönder";
     private bool _showDownloadPdf = false;
     private string _pdfPath = "";
 
@@ -321,6 +322,7 @@
         try
         {
             _pdfDisabled = true;
+            _pdfButtonText = "Pdf Oluşturuluyor...";
 
             var request = new PdfGeneratorRequestDto();
             request.teklif = this.teklif;
@@ -345,6 +347,7 @@
         catch (Exception ex)
         {
             _pdfDisabled = false;
+            _pdfButtonText = "Pdf Oluştur ve Gönder";
             Snackbar.Add(ex.Message, severity: Severity.Error);
         }
     }
