@@ -143,7 +143,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                var teklifDetayList = await dbContext.Teklifdetays.Where(x => x.Teklifref == teklifRef).ToListAsync();
+                var teklifDetayList = await dbContext.Teklifdetays.Where(x => x.Teklifref == teklifRef && x.Status < 2).ToListAsync();
                 var toplamTutarID = new double();
                 var toplamTutarTL = new double();
                 var toplamTutarRD = new double();

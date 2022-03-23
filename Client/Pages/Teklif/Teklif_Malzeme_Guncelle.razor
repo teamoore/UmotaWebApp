@@ -1,4 +1,5 @@
 ﻿@page "/stek_listef_detay/{logref:int}"
+@using System.IO;
 @inject IJSRuntime jsRuntime
 
 <div class="card" style="width: 100%;">
@@ -11,9 +12,9 @@
         </h6>
 
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
 
-                <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
+                <MudSimpleTable Dense="true" Hover="false" Bordered="false" Loading="@(loadingCompleted == false)" Striped="false" Style="overflow-x: auto;">
                     <tbody>
                         <tr>
                             <td>Firma</td>
@@ -21,7 +22,7 @@
                         </tr>
                         <tr>
                             <td>İlgili Kişi</td>
-                            <td>@teklif.IlgiliAdi</td>
+                            <td>@teklif.IlgiliAdi (@teklif.Mail)</td>
                         </tr>
                         <tr>
                             <td>Proje Adı</td>
@@ -35,34 +36,61 @@
                 </MudSimpleTable>
 
             </div>
-            <div class="col-md-4">
 
-                <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
+            <div class="col-md-3">
+
+                <MudSimpleTable Dense="true" Hover="false" Loading="@(loadingCompleted == false)" Bordered="false" Striped="false" Style="overflow-x: auto;">
                     <tbody>
                         <tr>
-                            <td>Satır Sayısı</td>
-                            <td style="text-align:right">@(_miktar.HasValue ? _miktar.Value : 0)</td>
-                        </tr>
-                        <tr>
                             <td>Teklif Tutar</td>
-                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrah))</td>
+                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrah)) @(teklif.Dovizdokuid)</td>
                         </tr>
-                        <tr>
-                            <td>Teklif Para Birimi</td>
-                            <td style="text-align:right">@(teklif.Dovizdokuid)</td>
-                        </tr>
+
                         <tr>
                             <td>Teklif Tutar TL</td>
-                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrahtl))</td>
+                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrahtl)) TL</td>
                         </tr>
+                        <tr>
+                            <td>Teklif Para Birimi / Kuru</td>
+                            <td style="text-align:right">@(teklif.Dovizdokuid) / @(teklif.Dovizkuruid)</td>
+                        </tr>
+
                     </tbody>
                 </MudSimpleTable>
 
             </div>
 
-            <div class="col-md-4">
+            @if (maliyetGor || maliyetGor2)
+            {
+                <div class="col-md-3">
+                    <MudSimpleTable Dense="true" Hover="false" Loading="@(loadingCompleted == false)" Bordered="false" Striped="false" Style="overflow-x: auto;">
+                        <tbody>
 
-                <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
+                            @if (maliyetGor)
+                            {
+                                <tr>
+                                    <td>Maliyet 1 Toplam</td>
+                                    <td style="text-align:right">@(Helper.FormattedDouble(this.teklifDetayList.Sum(x => x.Miktar * x.Maliyet1id))) @teklif.Dovizdokuid</td>
+                                </tr>
+                            }
+
+                            @if (maliyetGor2)
+                            {
+                                <tr>
+                                    <td>Maliyet 2 Toplam</td>
+                                    <td style="text-align:right">@(Helper.FormattedDouble(this.teklifDetayList.Sum(x => x.Miktar * x.Maliyet2id))) @teklif.Dovizdokuid</td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </MudSimpleTable>
+                </div>
+            }
+
+
+            <div class="col-md-3">
+
+                <MudSimpleTable Dense="true" Hover="false" Loading="@(loadingCompleted == false)" Bordered="false" Striped="false" Style="overflow-x: auto;">
                     <tbody>
                         <tr>
                             <td>Satış Temsilcisi</td>
@@ -71,6 +99,10 @@
                         <tr>
                             <td>Teklif Durumu</td>
                             <td style="text-align:right">@teklif.Duruminfo</td>
+                        </tr>
+                        <tr>
+                            <td>Satır Sayısı</td>
+                            <td style="text-align:right">@(_miktar.HasValue ? _miktar.Value : 0)</td>
                         </tr>
                     </tbody>
                 </MudSimpleTable>
@@ -84,6 +116,12 @@
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" OnClick="Duzenle" Color="Color.Primary">Teklif Düzenle</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddTask" OnClick="TeklifDetayEkle" Color="Color.Primary">Yeni Satır Ekle</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" OnClick="SayfayiYazdir" Color="Color.Primary">Sayfayı Yazdır</MudButton>
+
+                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PictureAsPdf" OnClick="PdfOlustur" Color="Color.Primary" Disabled="_pdfDisabled">@_pdfButtonText</MudButton>
+                @if (_pdfDisabled && _showDownloadPdf)
+                {
+                    <a href="@_pdfPath" class="btn btn-outline-success" role="button">Dosyayı indir</a>
+                }
             </div>
         </div>
 
@@ -93,50 +131,70 @@
 
 
 
-<MudTable Items="@teklifDetayList" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
+<MudTable Items="@teklifDetayList" Dense="true" Hover="true" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Teklif Satırları</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Satırlarda Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
+
         <MudTh>#</MudTh>
-        <MudTh>Çizim Kodu</MudTh>
         <MudTh>Poz No</MudTh>
         <MudTh>Stok Kodu</MudTh>
         <MudTh>Stok Adı</MudTh>
         <MudTh>Miktar</MudTh>
         <MudTh>Birim</MudTh>
-        <MudTh>Birim Fiyat</MudTh>
-        <MudTh>Döviz</MudTh>
+        <MudTh>Net Fiyat</MudTh>
         <MudTh>Tutar</MudTh>
-        <MudTh>Net Fiyat İD</MudTh>
-        <MudTh>Tutar İD</MudTh>
+        @if (@maliyetGor)
+        {
+            <MudTh>Maliyet 1 Toplam </MudTh>
+        }
+        @if (@maliyetGor2)
+        {
+            <MudTh>Maliyet 2 Toplam </MudTh>
+        }
+        <MudTh>İsk-1 %</MudTh>
+        <MudTh>İsk-2 %</MudTh>
+        <MudTh>İsk-3 %</MudTh>
+        <MudTh>Genel %</MudTh>
         <MudTh>#</MudTh>
+
 
     </HeaderContent>
     <RowTemplate>
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" @onclick="(() => TeklifDetayGuncelle(context.Logref))" />
         </MudTd>
-        <MudTd DataLabel="Çizim Kodu">@context.Cizimkodu</MudTd>
         <MudTd DataLabel="Poz No">@context.Sipnosira</MudTd>
         <MudTd DataLabel="Stok Kodu">@context.Malzkodu</MudTd>
         <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
         <MudTd DataLabel="Birim">@context.Birimkodu</MudTd>
-        <MudTd DataLabel="Birim Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.Fiyat))</MudTd>
-        <MudTd DataLabel="Döviz">@context.Dovizdoku</MudTd>
-        <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Tutar))</MudTd>
-        <MudTd DataLabel="Net Fiyat İD" Style="text-align:right">@(Helper.FormattedDouble(context.Miktar.HasValue ? context.Kdvmatrahid.Value / context.Miktar.Value : 0))</MudTd>
-        <MudTd DataLabel="Tutar İD" Style="text-align:right">@(Helper.FormattedDouble(context.Kdvmatrahid))</MudTd>
+        <MudTd DataLabel="Net Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.Miktar.HasValue ? context.Kdvmatrahid.Value / context.Miktar.Value : 0))</MudTd>
+        <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Kdvmatrahid))</MudTd>
+        @if (@maliyetGor)
+        {
+            <MudTd DataLabel="Maliyet 1 Toplam" Style="text-align:right">@(Helper.FormattedDouble(context.Maliyet1id * context.Miktar))</MudTd>
+        }
+        @if (@maliyetGor2)
+        {
+            <MudTd DataLabel="Maliyet 2 Toplam" Style="text-align:right">@(Helper.FormattedDouble(context.Maliyet2id * context.Miktar))</MudTd>
+        }
+        <MudTd DataLabel="İsk-1 %">@context.Iskyuz1</MudTd>
+        <MudTd DataLabel="İsk-2 %">@context.Iskyuz2</MudTd>
+        <MudTd DataLabel="İsk-3 %">@context.Iskyuz3</MudTd>
+        <MudTd DataLabel="Genel %">@context.Iskyuz4</MudTd>
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
         </MudTd>
     </RowTemplate>
+
     <PagerContent>
-        <MudTablePager />
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
     </PagerContent>
+
 </MudTable>
 
 
@@ -170,10 +228,20 @@
 
     public List<TeklifDetayDto> teklifDetayList { get; set; }
 
+    private bool maliyetGor = false;
+    private bool maliyetGor2 = false;
+
     private string _searchString = "";
     private bool _sortNameByLength;
 
     private double? _miktar = 0;
+
+    private bool _pdfDisabled = false;
+    private string _pdfButtonText = "Pdf Oluştur ve Gönder";
+    private bool _showDownloadPdf = false;
+    private string _pdfPath = "";
+
+    private bool loadingCompleted = false;
 
     private bool FilterFunc1(TeklifDetayDto element) => FilterFunc(element, _searchString);
 
@@ -186,7 +254,6 @@
         if (element.LstokKodu != null && element.LstokKodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-
         return false;
     }
 
@@ -194,6 +261,8 @@
     {
         await LoadTeklifData();
         await LoadTeklifDetayData();
+        await KullaniciYetkileriGetir();
+        loadingCompleted = true;
     }
 
     private async Task LoadTeklifDetayData()
@@ -299,10 +368,63 @@
         }
     }
 
-
     private async Task SayfayiYazdir()
     {
         await jsRuntime.InvokeVoidAsync("printPage");
+    }
+
+    public async Task KullaniciYetkileriGetir()
+    {
+        try
+        {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
+
+            maliyetGor = result == 1;
+
+            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet2GorebilsinPersonel);
+
+            maliyetGor2 = result == 1;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+    private async Task PdfOlustur()
+    {
+        try
+        {
+            _pdfDisabled = true;
+            _pdfButtonText = "Pdf Oluşturuluyor...";
+
+            var request = new PdfGeneratorRequestDto();
+            request.teklif = this.teklif;
+            request.teklifDetays = this.teklifDetayList;
+
+            var result = await httpClient.PostAsJsonAsync<PdfGeneratorRequestDto>("/api/Pdf/CreateTeklifPdfDocument", request);
+            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<PdfGenerateResponseDto>>();
+
+            if (response.Success)
+            {
+                Snackbar.Add(string.Format("Pdf oluşturuldu. Alıcı adresi : {0}, kopyası gönderildi.",
+                    this.teklif.Mail), severity: Severity.Success);
+                _pdfPath = navigation.ToAbsoluteUri("/Download/" + response.Value.PdfPath).ToString();
+                _showDownloadPdf = true;
+            }
+            else
+            {
+                Snackbar.Add(response.Message, severity: Severity.Warning);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            _pdfDisabled = false;
+            _pdfButtonText = "Pdf Oluştur ve Gönder";
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
     }
 
 }

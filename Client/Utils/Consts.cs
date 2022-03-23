@@ -36,20 +36,4 @@ namespace UmotaWebApp.Client.Utils
             return cleanStr;
         }
     }
-
-    public class TeklifDurum
-    {
-        public const string TeklifHazirlaniyor = "Teklif Hazırlanıyor";
-        public const string TeklifMusteriyeGonderildi = "Teklif Müşteriye Gönderildi";
-        public const string MusteriOnayiBekliyor = "Müşteri Onayı Bekliyor";
-        public const string MusteriTeklifiOnayladi = "Müşteri Teklifi Onayladı";
-        public const string MusteriTeklifteRevizeIstedi = "Müşteri Teklifte Revize İstedi";
-        public const string MusteriTeklifiIptalEtti = "Müşteri Teklifi İptal Etti";
-        public const string UnoTeklifiIptalEtti = "Uno Teklifi İptal Etti";
-        public const string FinansalUygunlukBekleniyor = "Finansal Uygunluk Bekliyor";
-        public const string FinansalUygunlukVer = "Finansal Uygunluk Ver";
-        public const string KesinSiparis = "Kesin Sipariş";
-        public const string KesinSipLogoyaAktarildi = "Kesin Sipariş Logoya Aktarıldı";
-    }
-
 }
