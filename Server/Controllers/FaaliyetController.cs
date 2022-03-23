@@ -127,5 +127,26 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpPost("getcarifaaliyetsayisi")]
+        public async Task<ServiceResponse<int>> GetCariFaaliyetSay(FaaliyetRequestDto faaliyet)
+        {
+            try
+            {
+                return new ServiceResponse<int>()
+                {
+                    Value = await FaaliyetService.GetCariFaaliyetSayisi(faaliyet)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+
     }
 }

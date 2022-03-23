@@ -7,20 +7,20 @@
             <div class="form-group">
 
                 <div class="row">
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <label>Faaliyet Tarihi</label>
                         <InputDate @bind-Value="recordDto.Tarih" class="form-control"></InputDate>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <label>Faaliyet Türü</label>
                         <InputSelect @bind-Value="recordDto.Islemturu" class="form-control">
                             <option value="1">Gerçekleşen Faaliyet</option>
                             <option value="0">Planlanan Faaliyet</option>
                         </InputSelect>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <label>Konu</label>
-                        <InputSelect @bind-Value="recordDto.Konu" class="form-control">
+                        <InputSelect @bind-Value=@Konu class="form-control">
                             @if (KonuListesi != null)
                             {
                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -30,6 +30,10 @@
                                 }
                             }
                         </InputSelect>
+                    </div>
+                    <div class="col-md-2">
+                        <label>Faaliyet Sayısı</label>
+                        <InputNumber @bind-Value="recordDto.IslemSayisi" class="form-control" placeholder="Faaliyet Sayısı" disabled />
                     </div>
                 </div>
 
@@ -290,6 +294,22 @@
     public List<SisSabitlerDetayDto> KonuListesi { get; set; }
     public List<KisilerDto> KisiListesi { get; set; }
 
+    private string _konu = "";
+    public string Konu
+    {
+        get
+        {
+            return recordDto.Konu;
+        }
+        set
+        {
+            _konu = value;
+            recordDto.Konu = _konu;
+
+            CariFaaliyetSayisiGetir().GetAwaiter();
+        }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         IsUpdate = logRef.HasValue;
@@ -355,6 +375,7 @@
                 recordDto.Carikodu = cariSecim.Kodu;
                 recordDto.Cariref = cariSecim.Logref;
                 await GetKisiListesi();
+                await CariFaaliyetSayisiGetir();
             }
         }
     }
@@ -379,6 +400,8 @@
                 recordDto.Carikodu = cariSecim.Kodu;
                 recordDto.Cariref = cariSecim.Logref;
                 KisiListesi = new List<KisilerDto>();
+                if (recordDto.Islemturu == 1)
+                    recordDto.IslemSayisi = 1;
             }
         }
     }
@@ -621,4 +644,34 @@
             }
         }
     }
+
+    public async Task CariFaaliyetSayisiGetir()
+    {
+        try
+        {
+            if (!recordDto.Cariref.HasValue || recordDto.Konu == null || recordDto.Islemturu != 1)
+                return;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new FaaliyetRequestDto();
+            request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);;
+            request.FirmaId = selectedFirmaDonem.logo_firma.Value;
+            request.Faaliyet = recordDto;
+
+            var result = await httpClient.PostGetServiceResponseAsync<int, FaaliyetRequestDto>(UrlHelper.CariFaaliyetSayisi, request);
+
+            recordDto.IslemSayisi = result;
+
+            this.StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
 }

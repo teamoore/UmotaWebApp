@@ -11,5 +11,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public string Aranacak{ get; set; }
         public short FirmaId { get; set; }
         public FaaliyetDto Faaliyet { get; set; }
+        public string kullanicikodu { get; set; }
     }
 }

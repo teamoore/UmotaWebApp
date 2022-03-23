@@ -33,11 +33,11 @@
         <MudTd>
             <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Degistir(context.Logref))" Size="Size.Medium" />
         </MudTd>
-        <MudTd DataLabel="Faaliyet Türü">@(context.Islemturu == 0 ? "Planlanan Faaliyet" : "Gerçekleşen Faaliyet")</MudTd>
+        <MudTd DataLabel="Faaliyet Türü">@(context.Islemturu == 0 ? "Planlanan" : "Gerçekleşen")</MudTd>
         <MudTd DataLabel="Tarih">@context.TarihFormatted</MudTd>
         <MudTd DataLabel="Giren">@context.Giren</MudTd>
         <MudTd DataLabel="Kayıt Tarihi">@context.Insdate</MudTd>
-        <MudTd DataLabel="Konu">@context.Konu</MudTd>
+        <MudTd DataLabel="Konu">@context.Konu @((context.IslemSayisi != null && context.IslemSayisi > 0) ? "("+context.IslemSayisi+ ")" : "") </MudTd>
         <MudTd DataLabel="Cari Adı">@context.Cariadi</MudTd>
         <MudTd DataLabel="İlgili Kişi">@context.Kisiadi</MudTd>
         <MudTd DataLabel="İlçe">@context.Ilce</MudTd>
@@ -151,16 +151,18 @@
 
     private async Task FaaliyetAra()
     {
-        loadingCompleted = false;
-
+        
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
         if (selectedFirmaDonem == null)
             throw new Exception("Firma Dönem Seçili değil");
 
+        loadingCompleted = false;
+
         var request = new FaaliyetRequestDto();
         request.Aranacak = header.SearchText;
         request.FirmaId = selectedFirmaDonem.firma_no.Value;
+        request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
         var result = await httpClient.PostGetServiceResponseAsync<List<FaaliyetDto>, FaaliyetRequestDto>(UrlHelper.FaaliyetAra, request);
         if (result == null || result.Count == 0)

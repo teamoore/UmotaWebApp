@@ -40,5 +40,6 @@ namespace UmotaWebApp.Client.Utils
         public const string FaaliyetGetir = "/api/faaliyet/get";
         public const string FaaliyetKaydet = "/api/faaliyet/save";
         public const string FaaliyetGuncelle = "/api/faaliyet/update";
+        public const string CariFaaliyetSayisi = "/api/faaliyet/getcarifaaliyetsayisi";
     }
 }
