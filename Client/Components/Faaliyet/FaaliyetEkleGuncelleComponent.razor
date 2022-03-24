@@ -12,6 +12,10 @@
                         <InputDate @bind-Value="recordDto.Tarih" class="form-control"></InputDate>
                     </div>
                     <div class="col-md-2">
+                        <MudTimePicker Label="Faaliyet Saati" Editable="true" @bind-Time="recordDto.FaaliyetSaati" />
+                    </div>
+
+                    <div class="col-md-2">
                         <label>Faaliyet Türü</label>
                         <InputSelect @bind-Value="recordDto.Islemturu" class="form-control">
                             <option value="1">Gerçekleşen Faaliyet</option>
@@ -322,6 +326,7 @@
             if (result != null)
             {
                 recordDto = result;
+                recordDto.FaaliyetSaati = recordDto.Tarih.Value.GetTime();
             }
         }
         catch (Exception ex)
@@ -418,6 +423,7 @@
             recordDto.Upddate = DateTime.Now;
             recordDto.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             recordDto.Status = 1;
+            recordDto.Tarih = recordDto.Tarih.Value.ChangeTime(recordDto.FaaliyetSaati);
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
@@ -479,8 +485,10 @@
             recordDto.Insdate = DateTime.Now;
             recordDto.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             recordDto.Giren = recordDto.Insuser;
-            recordDto.Tarih = recordDto.Tarih.HasValue ? recordDto.Tarih : DateTime.Now;
+            recordDto.Tarih = recordDto.Tarih.Value.ChangeTime(recordDto.FaaliyetSaati);
             recordDto.Status = 0;
+
+            recordDto.Tarih += recordDto.FaaliyetSaati;
 
             await LogRefUret();
 

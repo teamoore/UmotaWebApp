@@ -11,6 +11,9 @@ namespace UmotaWebApp.Shared.ModelDto
         public int Logref { get; set; }
         public string Giren { get; set; }
         public DateTime? Tarih { get; set; }
+
+        public TimeSpan? FaaliyetSaati { get; set; }
+
         public string Konu { get; set; }
         public int? IslemSayisi { get; set; }
         public string Yapilanlar { get; set; }
