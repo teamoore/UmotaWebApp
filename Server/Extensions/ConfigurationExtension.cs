@@ -16,7 +16,10 @@ namespace UmotaWebApp.Server.Extensions
             var dbServer = configuration["masterServer"];
 
             if (!string.IsNullOrEmpty(firmaId))
-                dbname = dbname + "_00" + firmaId;
+            {
+                string firmano = "00" + firmaId;
+                dbname = dbname + "_" + firmano.Substring(firmano.Length- 3, 3);
+            }
 
             return string.Format("Server={0};Database={1};user={2};password={3};",
                 dbServer, dbname, dbUser, dbPassword);
@@ -27,7 +30,10 @@ namespace UmotaWebApp.Server.Extensions
             var dbname = configuration["masterDbName"];
             
             if (!string.IsNullOrEmpty(firmaId))
-                dbname = dbname + "_00" + firmaId;
+            {
+                string firmano = "00" + firmaId;
+                dbname = dbname + "_" + firmano.Substring(firmano.Length - 3, 3);
+            }
 
             return string.Format("[{0}].[dbo].[{1}]", dbname, objectName);
         }

@@ -2,7 +2,7 @@
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="YeniKayitEkle"
                  ShowButtons="false"
-                 onDoneButtonClicked="FaaliyetAra" ShowSearchSection="true"></HeaderSearchBar>
+                 onDoneButtonClicked="FaaliyetAra" ShowSearchSection="_ShowSearchSection"></HeaderSearchBar>
 
 @if (loadingCompleted == false)
 {
@@ -11,7 +11,10 @@
 
 <MudTable Items="@listItems" Dense="true" Hover="true" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<FaaliyetDto,bool>(FilterFunc1)">
     <ToolBarContent>
-        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        @if (menuEklemeYetkisi)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        }
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Faaliyet Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
@@ -31,13 +34,16 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Degistir(context.Logref))" Size="Size.Medium" />
+            @if (menuDegistirmeYetkisi)
+            {
+                <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Degistir(context.Logref))" Size="Size.Medium" />
+            }
         </MudTd>
-        <MudTd DataLabel="Faaliyet Türü">@(context.Islemturu == 0 ? "Planlanan Faaliyet" : "Gerçekleşen Faaliyet")</MudTd>
+        <MudTd DataLabel="Faaliyet Türü">@(context.Islemturu == 0 ? "Planlanan" : "Gerçekleşen")</MudTd>
         <MudTd DataLabel="Tarih">@context.TarihFormatted</MudTd>
         <MudTd DataLabel="Giren">@context.Giren</MudTd>
         <MudTd DataLabel="Kayıt Tarihi">@context.Insdate</MudTd>
-        <MudTd DataLabel="Konu">@context.Konu</MudTd>
+        <MudTd DataLabel="Konu">@context.Konu @((context.IslemSayisi != null && context.IslemSayisi > 0) ? "("+context.IslemSayisi+ ")" : "") </MudTd>
         <MudTd DataLabel="Cari Adı">@context.Cariadi</MudTd>
         <MudTd DataLabel="İlgili Kişi">@context.Kisiadi</MudTd>
         <MudTd DataLabel="İlçe">@context.Ilce</MudTd>
@@ -45,14 +51,14 @@
         <MudTd DataLabel="Ürün Grubu">@context.Grup1</MudTd>
 
         <MudTd DataLabel="Yapılanlar">
-            
+
             <MudTooltip Text="@context.Yapilanlar" Arrow="true" Placement="Placement.Top">
                 @context.Yapilanlar.MinimizeString(50)
             </MudTooltip>
-            </MudTd>
+        </MudTd>
     </RowTemplate>
     <PagerContent>
-        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı"/>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
     </PagerContent>
 </MudTable>
 
@@ -72,6 +78,9 @@
     HttpClient httpClient { get; set; }
 
     [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
     public List<FaaliyetDto> listItems { get; set; }
@@ -80,8 +89,16 @@
 
     private string _searchString = "";
     private bool _sortNameByLength;
+    private bool _ShowSearchSection = true;
 
     private bool loadingCompleted = false;
+
+    private bool isAdmin { get; set; }
+
+    private bool menuGormeYetkisi { get; set; }
+    private bool menuEklemeYetkisi { get; set; }
+
+    private bool menuDegistirmeYetkisi { get; set; }
 
     private bool FilterFunc1(FaaliyetDto element) => FilterFunc(element, _searchString);
 
@@ -123,10 +140,30 @@
         return false;
     }
 
+    private void YetkiControl()
+    {
+        menuGormeYetkisi = isAdmin ? isAdmin : false;
+        menuEklemeYetkisi = isAdmin ? isAdmin : false;
+        menuDegistirmeYetkisi = isAdmin ? isAdmin : false;
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        header.HeaderText = "Faaliyet Listesi";
-        await LoadList();
+        try
+        {
+            header.HeaderText = "Faaliyet Listesi";
+
+            YetkiControl();
+
+            if (!isAdmin)
+                await GetUserMenuYetkisi();
+
+            await LoadList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
     }
 
     private async Task LoadList()
@@ -151,16 +188,18 @@
 
     private async Task FaaliyetAra()
     {
-        loadingCompleted = false;
 
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
         if (selectedFirmaDonem == null)
             throw new Exception("Firma Dönem Seçili değil");
 
+        loadingCompleted = false;
+
         var request = new FaaliyetRequestDto();
         request.Aranacak = header.SearchText;
         request.FirmaId = selectedFirmaDonem.firma_no.Value;
+        request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
         var result = await httpClient.PostGetServiceResponseAsync<List<FaaliyetDto>, FaaliyetRequestDto>(UrlHelper.FaaliyetAra, request);
         if (result == null || result.Count == 0)
@@ -174,6 +213,31 @@
         loadingCompleted = true;
     }
 
+    private async Task GetUserMenuYetkisi()
+    {
 
+        var kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+        var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=faaliyet_listef&hak_tipi=sel");
+
+        menuGormeYetkisi = result == 1;
+
+        if (menuGormeYetkisi)
+        {
+            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=faaliyet_listef&hak_tipi=ins");
+            menuEklemeYetkisi = result == 1;
+
+            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=faaliyet_listef&hak_tipi=upd");
+            menuDegistirmeYetkisi = result == 1;
+        }
+
+        if (!menuGormeYetkisi)
+        {
+            _ShowSearchSection = false;
+            throw new Exception("Bu sayfayı görüntüleme yetkiniz yoktur");
+        }
+
+
+    }
 
 }

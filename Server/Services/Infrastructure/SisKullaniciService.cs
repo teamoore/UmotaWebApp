@@ -32,8 +32,26 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             MasterDbContext = masterDbContext;
             Configuration = configuration;
         }
-               
 
+        public string SifreDegistir(string sifre)
+        {
+            // SELECT char(ASCII('1')^20) SQL Versiyonu bu şekilde
+            string res = sifre;
+            int len = sifre.Length;
+            char[] chars = res.ToCharArray();
+
+            for (int i = 0; i <=chars.Length-1; i++)
+            {
+                var c1 = chars[i].ToString();
+                var c2 = Encoding.ASCII.GetBytes(c1)[0];
+                var c3 = c2 ^ 20;
+                var c4 = (char)c3;
+
+                chars[i] = c4;
+            }
+
+            return new string(chars);
+        }
         public async Task<SisKullaniciDto> GetSisKullanici(string kod)
         {
             var kullanici = await MasterDbContext.SisKullanicis.Where(x => x.KullaniciKodu == kod)
@@ -53,8 +71,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<SisKullaniciLoginResponseDto> Login(SisKullaniciLoginRequestDto request)
         {
-            var kullanici = await MasterDbContext.SisKullanicis.Where(x => x.KullaniciKodu == request.Kod && x.WebSifre == request.Sifre)
+            var hashedPassword = SifreDegistir(request.Sifre);
+
+            var kullanici = await MasterDbContext.SisKullanicis.Where(x => x.KullaniciKodu == request.Kod && x.KullaniciSifre == hashedPassword)
               .ProjectTo<SisKullaniciDto>(Mapper.ConfigurationProvider).FirstOrDefaultAsync();
+
 
             if (kullanici == null)
                 throw new ApiException("Kullanıcı kodu ve/veya şifre hatalı girildi.");
@@ -93,6 +114,25 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 p.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
                 await db.ExecuteAsync("GetKullaniciYetkisiByKullaniciKodu", p, commandType: CommandType.StoredProcedure);
+
+                int c = p.Get<int>("@ReturnValue");
+
+                return c;
+
+            }
+
+        }
+        public async Task<int> GetKullaniciMenuYetkisiByMenuAdi(string kullanicikodu, string menu_dfm, string hak_tipi)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                var p = new DynamicParameters();
+                p.Add("@kullanici_kodu", kullanicikodu);
+                p.Add("@menu_dfm", menu_dfm);
+                p.Add("@hak_tipi", hak_tipi);
+                p.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+                await db.ExecuteAsync("GetKullaniciMenuYetkisiByMenuAdi", p, commandType: CommandType.StoredProcedure);
 
                 int c = p.Get<int>("@ReturnValue");
 

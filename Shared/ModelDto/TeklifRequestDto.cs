@@ -10,5 +10,9 @@ namespace UmotaWebApp.Shared.ModelDto
     {
         public TeklifDto Teklif { get; set; }
         public short FirmaId { get; set; }
+        public string kullanicikodu { get; set; }
+        public string SearchText { get; set; }
+        public DateTime? BaslangicTarih { get; set; }
+        public DateTime? BitisTarih { get; set; }
     }
 }

@@ -112,5 +112,25 @@ namespace UmotaWebApp.Server.Controllers
             }
 
         }
+
+        [HttpGet("GetKullaniciMenuYetkisi")]
+        public async Task<ServiceResponse<int>> GetKullaniciMenuYetkisi(string kullanicikodu, string menu_dfm, string hak_tipi)
+        {
+            try
+            {
+                return new ServiceResponse<int>()
+                {
+                    Value = await SisKullaniciService.GetKullaniciMenuYetkisiByMenuAdi(kullanicikodu, menu_dfm, hak_tipi)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }
