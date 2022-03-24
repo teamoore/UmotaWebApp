@@ -2,7 +2,7 @@
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif"
                  ShowButtons="false"
-                 onDoneButtonClicked="TeklifAra" ShowSearchSection="true"></HeaderSearchBar>
+                 onDoneButtonClicked="TeklifAra" ShowSearchSection="_ShowSearchSection"></HeaderSearchBar>
 
 @if (loadingCompleted == false)
 {
@@ -11,7 +11,10 @@
 
 <MudTable Items="@teklifler" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<TeklifDto,bool>(FilterFunc1)">
     <ToolBarContent>
-        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTeklif" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        @if (menuEklemeYetkisi)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTeklif" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        }
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Teklif Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
@@ -34,7 +37,10 @@
     <RowTemplate>
         <MudTd>
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
-                <MudMenuItem OnClick="(() => TeklifDetay(context.Logref))">Güncelle</MudMenuItem>
+                @if (menuDegistirmeYetkisi)
+                {
+                    <MudMenuItem OnClick="(() => TeklifDetay(context.Logref))">Değiştir</MudMenuItem>
+                }
                 <MudMenuItem OnClick="(() => TeklifDurumDegistir(context.Logref,null))">Durum Değiştir</MudMenuItem>
                 @if (isAdmin)
                 {
@@ -57,7 +63,7 @@
         <MudTd DataLabel="Kaydı Giren">@context.Insuser</MudTd>
     </RowTemplate>
     <PagerContent>
-        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı"/>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
     </PagerContent>
 </MudTable>
 
@@ -88,9 +94,15 @@
 
     private string _searchString = "";
     private bool _sortNameByLength;
+    private bool _ShowSearchSection = true;
 
-    private bool isAdmin = false;
-    private bool loadingCompleted = false;
+    private bool isAdmin { get; set; }
+
+    private bool menuGormeYetkisi { get; set; }
+    private bool menuEklemeYetkisi { get; set; }
+
+    private bool menuDegistirmeYetkisi { get; set; }
+    private bool loadingCompleted { get; set; }
 
     private bool FilterFunc1(TeklifDto element) => FilterFunc(element, _searchString);
 
@@ -108,11 +120,33 @@
         return false;
     }
 
+    private void YetkiControl()
+    {
+        menuGormeYetkisi = isAdmin ? isAdmin : false;
+        menuEklemeYetkisi = isAdmin ? isAdmin : false;
+        menuDegistirmeYetkisi = isAdmin ? isAdmin : false;
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        header.HeaderText = "Teklif Listesi";
-        await LoadTeklifler();
-        await CheckUser();
+        try
+        {
+            header.HeaderText = "Teklif Listesi";
+            await CheckUser();
+
+            YetkiControl();
+
+            if (!isAdmin)
+                await GetUserMenuYetkisi();
+
+            await LoadTeklifler();
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+
     }
 
     private async Task LoadTeklifler()
@@ -173,7 +207,7 @@
         }
         catch (Exception ex)
         {
-            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:"+ex.Message, severity: Severity.Error);
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
         }
 
     }
@@ -200,21 +234,42 @@
 
     private async Task CheckUser()
     {
-        try
-        {
-            var kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
-            var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanici_kodu);
+        var kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
-            if (result != null)
-            {
-                isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
-            }
-        }
-        catch (Exception)
+        var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanici_kodu);
+
+        if (result != null)
         {
-            isAdmin = false;
+            isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
         }
+
     }
 
+    private async Task GetUserMenuYetkisi()
+    {
+
+        var kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+        var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=stek_listef&hak_tipi=sel");
+
+        menuGormeYetkisi = result == 1;
+
+        if (menuGormeYetkisi)
+        {
+            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=stek_listef&hak_tipi=ins");
+            menuEklemeYetkisi = result == 1;
+
+            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=stek_listef&hak_tipi=upd");
+            menuDegistirmeYetkisi = result == 1;
+        }
+
+        if (!menuGormeYetkisi)
+        {
+            _ShowSearchSection = false;
+            throw new Exception("Bu sayfayı görüntüleme yetkiniz yoktur");
+        }
+
+
+    }
 }

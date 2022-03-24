@@ -35,6 +35,7 @@ namespace UmotaWebApp.Client.Utils
         public const string DovizKuruGetir = "/api/doviz/GetDovizKur";
         public const string TeklifDetaySiraNo = "/api/teklifdetay/getsirano";
         public const string KullaniciGetByKod = "/api/kullanici/GetByKod";
+        public const string KullaniciMenuYetkisi = "/api/kullanici/GetKullaniciMenuYetkisi";
         public const string FaaliyetListesi = "/api/faaliyet/list";
         public const string FaaliyetAra = "/api/faaliyet/search";
         public const string FaaliyetGetir = "/api/faaliyet/get";
