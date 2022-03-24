@@ -112,32 +112,95 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<List<TeklifDto>> SearchTeklif(TeklifRequestDto request)
         {
-            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
-            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
-            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(request.FirmaId.ToString())))
             {
-                var word = request.Teklif.Aciklama1.ToLower();
+                db.Open();
+                var p = new DynamicParameters();
 
-                return await dbContext.V009Teklifs.Where(x => x.Aciklama1.ToLower().Contains(word)
-                || x.Aciklama2.ToLower().Contains(word)
-                || x.Aciklama3.ToLower().Contains(word)
-                || x.Aciklama3.ToLower().Contains(word)
-                || x.Aciklama4.ToLower().Contains(word)
-                || x.Teklifno.ToLower().Contains(word)
-                || x.Tbelgeno.ToLower().Contains(word)
-                || x.Lpersoneladi.ToLower().Contains(word)
-                || x.Temsilciadi.ToLower().Contains(word)
-                || x.LcariAdi.ToLower().Contains(word)
-                || x.Cariadi.ToLower().Contains(word)
-                || x.LcariKodu.ToLower().Contains(word)
-                || x.Carikodu.ToLower().Contains(word)
-                || x.Proje.ToLower().Contains(word)
-                || x.IlgiliAdi.ToLower().Contains(word))
-                    .OrderByDescending(x => x.Tarih)
-                    .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).ToListAsync();
+                var sql = "select *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
+                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId: request.FirmaId.ToString()) + " a with(nolock) where 1=1";
+
+                var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(request.kullanicikodu, KullaniciYetkiKodlari.TumTeklifleriGorebilir);
+                if (tumTeklifleriGormeYetkisi == 0)
+                {
+                    var kesinSiparisleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(request.kullanicikodu, KullaniciYetkiKodlari.KesinSiparisleriGorebilir);
+                    string kullanici_tanimlari = Configuration.GetUmotaObjectName("kullanici_tanimlari", firmaId: request.FirmaId.ToString());
+                    sql += " and (";
+                    sql += "    (insuser = '" + request.kullanicikodu + "')";
+                    sql += " or exists (select aa.logref from " + kullanici_tanimlari + " aa with(nolock) where aa.teklifinsuserkodu = a.insuser and aa.kullanici_kodu = '" + request.kullanicikodu + "')";
+                    sql += " or exists (select aa.logref from " + kullanici_tanimlari + " aa with(nolock) where aa.plasiyerkodu = a.temsilciadi and aa.kullanici_kodu = '" + request.kullanicikodu + "')";
+                    if (kesinSiparisleriGormeYetkisi == 1)
+                        sql += " or (duruminfo = '" + TeklifDurum.KesinSiparis + "') or  (duruminfo = '" + TeklifDurum.KesinSipLogoyaAktarildi + "')";
+                    sql += " )";
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.SearchText))
+                {
+                    sql += " and(";
+                    sql += "    a.cariadi like @SearchText ";
+                    sql += " or a.carikodu like @SearchText ";
+                    sql += " or a.teklifno like @SearchText ";
+                    sql += " or a.proje like @SearchText ";
+                    sql += " or a.ilgili_adi like @SearchText ";
+                    sql += " or a.duruminfo like @SearchText ";
+                    sql += " or a.temsilciadi like @SearchText ";
+                    sql += " or a.aciklama1 like @SearchText ";
+                    sql += " or a.aciklama2 like @SearchText ";
+                    sql += " or a.aciklama3 like @SearchText ";
+                    sql += " or a.aciklama4 like @SearchText ";
+                    sql += " or a.dovizdoku like @SearchText ";
+                    sql += " )";
+
+                    p.Add("@SearchText", value: "%" + request.SearchText + "%", dbType: DbType.String);
+                }
+
+                if (request.BaslangicTarih != null)
+                {
+                    sql += " and a.tarih >= @bastar ";
+                    p.Add("@bastar", value: request.BaslangicTarih, dbType: DbType.DateTime);
+                }
+
+                if (request.BitisTarih != null)
+                {
+                    sql += " and a.tarih <= @bittar ";
+                    p.Add("@bittar", value: request.BitisTarih, dbType: DbType.DateTime);
+                }
+
+                sql += " order by insdate desc";
+                var result = await db.QueryAsync<TeklifDto>(sql, p, commandType: CommandType.Text);
+
+                db.Close();
+
+                return result.ToList();
+
             }
+
+            //var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            //var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            //optionsBuilder.UseSqlServer(connectionstring);
+
+            //using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            //{
+            //    var word = request.Teklif.Aciklama1.ToLower();
+
+            //    return await dbContext.V009Teklifs.Where(x => x.Aciklama1.ToLower().Contains(word)
+            //    || x.Aciklama2.ToLower().Contains(word)
+            //    || x.Aciklama3.ToLower().Contains(word)
+            //    || x.Aciklama3.ToLower().Contains(word)
+            //    || x.Aciklama4.ToLower().Contains(word)
+            //    || x.Teklifno.ToLower().Contains(word)
+            //    || x.Tbelgeno.ToLower().Contains(word)
+            //    || x.Lpersoneladi.ToLower().Contains(word)
+            //    || x.Temsilciadi.ToLower().Contains(word)
+            //    || x.LcariAdi.ToLower().Contains(word)
+            //    || x.Cariadi.ToLower().Contains(word)
+            //    || x.LcariKodu.ToLower().Contains(word)
+            //    || x.Carikodu.ToLower().Contains(word)
+            //    || x.Proje.ToLower().Contains(word)
+            //    || x.IlgiliAdi.ToLower().Contains(word))
+            //        .OrderByDescending(x => x.Tarih)
+            //        .ProjectTo<TeklifDto>(Mapper.ConfigurationProvider).ToListAsync();
+            //}
         }
 
         public async Task<TeklifDto> UpdateTeklif(TeklifRequestDto request)

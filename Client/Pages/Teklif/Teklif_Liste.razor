@@ -146,23 +146,21 @@
     {
         try
         {
-            loadingCompleted = false;
-
-            var teklifSearch = new TeklifDto();
-            teklifSearch.Aciklama1 = header.SearchText;
-
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
+            loadingCompleted = false;
+
             var request = new TeklifRequestDto();
-            request.Teklif = teklifSearch;
+            request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
+            request.SearchText = header.SearchText;
 
             var result = await httpClient.PostGetServiceResponseAsync<List<TeklifDto>, TeklifRequestDto>(UrlHelper.TeklifAra, request);
             if (result == null || result.Count == 0)
-            {                
+            {
                 Snackbar.Add("Aradığınız kritere göre teklif bulunamadı.", severity: Severity.Warning);
                 loadingCompleted = true;
                 header.SearchText = string.Empty;
@@ -173,9 +171,9 @@
 
             teklifler = result;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Snackbar.Add("Beklenmedik bir hata oluştur", severity: Severity.Error);
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:"+ex.Message, severity: Severity.Error);
         }
 
     }
