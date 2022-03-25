@@ -104,6 +104,26 @@ namespace UmotaWebApp.Server.Controllers
                 e.SetException(ex);
                 return e;
             }
+
+        }
+        [HttpPost("stokgetir")]
+        public async Task<ServiceResponse<List<MalzemeStokDto>>> GetMalzemeKartSearchListStoklu(MalzemeStokRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<List<MalzemeStokDto>>()
+                {
+                    Value = await MalzemeKartService.SearchMalzemeKartStoklu(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<MalzemeStokDto>>();
+                e.SetException(ex);
+                return e;
+            }
         }
     }
 }

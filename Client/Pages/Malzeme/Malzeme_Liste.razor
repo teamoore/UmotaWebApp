@@ -1,7 +1,166 @@
 ﻿@page "/malzeme_listef"
 
-<h3>Malzeme_Listesi</h3>
+<HeaderSearchBar header="header" onDoneButtonClicked="HeaderSearch"
+                 ShowButtons="false"
+                 ShowSearchSection="true"></HeaderSearchBar>
 
-@code {
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
 
+<MudTable Items="@stoklar" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeStokDto,bool>(FilterFunc1)">
+    @*<ToolBarContent>
+        <MudSpacer />
+        <MudTextField @bind-Value="_searchString" Placeholder="Stok Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+    </ToolBarContent>*@
+    <HeaderContent>
+        <MudTh>Kodu</MudTh>
+        <MudTh>Adı</MudTh>
+        <MudTh>Marka</MudTh>
+        <MudTh>Birim</MudTh>
+        <MudTh>Fiili Miktar</MudTh>
+        <MudTh>Rezerv Miktar</MudTh>
+        <MudTh>Öneri Sipariş Miktar</MudTh>
+        <MudTh>Satılabilir Miktar</MudTh>
+        <MudTh>Bekleyen Alım Sipariş Miktar</MudTh>
+        <MudTh>Bekleyen Alım Sipariş Tahmini Teslim Süresi</MudTh>
+        <MudTh>Satış Fiyatı</MudTh>
+        <MudTh>Satış Döviz</MudTh>
+        <MudTh>Alış Fiyatı</MudTh>
+        <MudTh>Alış Döviz</MudTh>
+        @*<MudTh>Yükseklik</MudTh>
+        <MudTh>En</MudTh>
+        <MudTh>Boy</MudTh>
+        <MudTh>Malzeme Grubu</MudTh>*@
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Kodu">@context.MalzemeKodu</MudTd>
+        <MudTd DataLabel="Adı">@context.MalzemeAdi</MudTd>
+        <MudTd DataLabel="Marka">@context.MalzemeMarka</MudTd>
+        <MudTd DataLabel="Birim">@context.BirimKodu</MudTd>
+        <MudTd DataLabel="Fiili Miktar">@context.StokMiktari</MudTd>
+        <MudTd DataLabel="Rezerv Miktar">@context.RezervMiktari</MudTd>
+        <MudTd DataLabel="Öneri Sip.Miktar">@context.BekleyenOneriSatisSiparisMiktar</MudTd>
+        <MudTd DataLabel="Satılabilir Miktar">@context.StokMiktari2</MudTd>
+        <MudTd DataLabel="Bekleyen Alım Sipariş Miktar">@context.BekleyenAlimSiparisMiktar</MudTd>
+        <MudTd DataLabel="Bekleyen Alım Sipariş Tahmini Teslim">@context.BekleyenAlimSiparisTeslimTarihiFormatted</MudTd>
+        <MudTd DataLabel="Satış Fiyatı">@context.SatisFiyati</MudTd>
+        <MudTd DataLabel="Satış Döviz">@context.SatisFiyatiDoviz</MudTd>
+        <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyati</MudTd>
+        <MudTd DataLabel="Alış Döviz">@context.AlisFiyatiDoviz</MudTd>
+        @*<MudTd DataLabel="Yükseklik">@context.MalzemeEbatYukseklik</MudTd>
+        <MudTd DataLabel="En">@context.MalzemeEbatEn</MudTd>
+        <MudTd DataLabel="Boy">@context.MalzemeEbatBoy</MudTd>
+        <MudTd DataLabel="Malzeme Grubu">@context.MalzemeGrupAdi</MudTd>*@
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
+@code
+{
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public List<MalzemeStokDto> stoklar = new List<MalzemeStokDto>();
+    private string _searchString;
+    private bool _sortNameByLength;
+    private bool loadingCompleted = true;
+
+    private bool FilterFunc1(MalzemeStokDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(MalzemeStokDto element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.MalzemeAdi != null && element.MalzemeAdi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.MalzemeKodu != null && element.MalzemeKodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.MalzemeMarka != null && element.MalzemeMarka.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Stok Listesi";
+        //await LoadList();
+    }
+
+    public async Task HeaderSearch()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma dönem seçilmedi");
+
+            if (string.IsNullOrWhiteSpace(header.SearchText))
+                return;
+
+            loadingCompleted = false;
+            var request = new MalzemeStokRequestDto();
+            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+            request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+            request.TopRowCount = 100;
+            request.SearchText = '%'+header.SearchText+'%';
+
+            var result = await httpClient.PostGetServiceResponseAsync<List<MalzemeStokDto>, MalzemeStokRequestDto>(UrlHelper.MalzemeStokGetir, request);
+            stoklar = result;
+            loadingCompleted = true;
+
+            if (stoklar == null || stoklar.Count == 0)
+            {
+                Snackbar.Add(string.Format("{0} için sonuç bulunamadı", request.SearchText), severity: Severity.Warning);
+                header.SearchText = string.Empty;
+                loadingCompleted = true;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    private async Task LoadList()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma dönem seçilmedi");
+
+            loadingCompleted = false;
+            var request = new MalzemeStokRequestDto();
+            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+            request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+            request.TopRowCount = 100;
+            var result = await httpClient.PostGetServiceResponseAsync<List<MalzemeStokDto>, MalzemeStokRequestDto>(UrlHelper.MalzemeStokGetir, request);
+            stoklar = result;
+            loadingCompleted = true;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
 }

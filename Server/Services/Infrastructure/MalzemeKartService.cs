@@ -155,5 +155,22 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             return res;
         }
+        public async Task<List<MalzemeStokDto>> SearchMalzemeKartStoklu(MalzemeStokRequestDto request)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                var p = new DynamicParameters();
+                p.Add("@LogoFirmaNo", request.LogoFirmaNo);
+                p.Add("@LogoDonemNo", request.LogoDonemNo);
+                p.Add("@SearchText", request.SearchText);
+                p.Add("@MalzemeKodu", request.MalzemeKodu);
+                p.Add("@MalzemeAdi", request.MalzemeAdi);
+                p.Add("@MalzemeMarka", request.MalzemeMarka);
+                p.Add("@TopRowCount", request.TopRowCount);
+
+                var res = await db.QueryAsync<MalzemeStokDto>("GetMalzemeStokList", p, commandType: CommandType.StoredProcedure);
+                return res.ToList();
+            }
+        }
     }
 }
