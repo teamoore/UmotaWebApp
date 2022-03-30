@@ -63,8 +63,8 @@ namespace UmotaWebApp.Server.Controllers
                     await fs.WriteAsync(pdfData, 0, pdfData.Length);
                     fs.Close();
 
-                    var message = new Message(new string[] { request.teklif.Mail }, "Uno Teklif", "Teklif ektedir.", pdfData);
-                    _emailSender.SendEmail(message);
+                    //var message = new Message(new string[] { request.teklif.Mail }, "Uno Teklif", "Teklif ektedir.", pdfData);
+                    //_emailSender.SendEmail(message);
                 }
 
                 return new ServiceResponse<PdfGenerateResponseDto>()

@@ -121,6 +121,7 @@
                 @if (_pdfDisabled && _showDownloadPdf)
                 {
                     <a href="@_pdfPath" class="btn btn-outline-success" role="button">Dosyayı indir</a>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AttachEmail" OnClick="PdfGonder" Color="Color.Secondary" Disabled="_pdfDisabled">Gönder</MudButton>
                 }
             </div>
         </div>
@@ -237,7 +238,7 @@
     private double? _miktar = 0;
 
     private bool _pdfDisabled = false;
-    private string _pdfButtonText = "Pdf Oluştur ve Gönder";
+    private string _pdfButtonText = "Pdf Oluştur";
     private bool _showDownloadPdf = false;
     private string _pdfPath = "";
 
@@ -392,6 +393,7 @@
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
     }
+
     private async Task PdfOlustur()
     {
         try
@@ -408,7 +410,8 @@
 
             if (response.Success)
             {
-                Snackbar.Add(string.Format("Pdf oluşturuldu. Alıcı adresi : {0}, kopyası gönderildi.",
+                _pdfButtonText = "PDF Oluşturuldu";
+                Snackbar.Add(string.Format("Pdf oluşturuldu",
                     this.teklif.Mail), severity: Severity.Success);
                 _pdfPath = navigation.ToAbsoluteUri("/Download/" + response.Value.PdfPath).ToString();
                 _showDownloadPdf = true;
@@ -427,4 +430,8 @@
         }
     }
 
+    private Task PdfGonder()
+    {
+        return Task.CompletedTask;
+    }
 }
