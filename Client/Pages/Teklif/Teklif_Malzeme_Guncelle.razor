@@ -117,11 +117,19 @@
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddTask" OnClick="TeklifDetayEkle" Color="Color.Primary">Yeni Satır Ekle</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" OnClick="SayfayiYazdir" Color="Color.Primary">Sayfayı Yazdır</MudButton>
 
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PictureAsPdf" OnClick="PdfOlustur" Color="Color.Primary" Disabled="_pdfDisabled">@_pdfButtonText</MudButton>
+                <MudButtonGroup Color="Color.Primary" >
+                    <MudButton Disabled="_pdfDisabled">@_pdfButtonText</MudButton>
+                    <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Disabled="_pdfDisabled" LockScroll="_pdfDisabled">
+                        <MudMenuItem OnClick="() => PdfOlustur(0)">İskontolu</MudMenuItem>
+                        <MudMenuItem OnClick="() => PdfOlustur(1)">Net</MudMenuItem>
+                        <MudMenuItem OnClick="() => PdfOlustur(2)">Net + KDV</MudMenuItem>
+                    </MudMenu>
+                </MudButtonGroup>
+
                 @if (_pdfDisabled && _showDownloadPdf)
                 {
                     <a href="@_pdfPath" class="btn btn-outline-success" role="button">Dosyayı indir</a>
-                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AttachEmail" OnClick="PdfGonder" Color="Color.Secondary" Disabled="_pdfDisabled">Gönder</MudButton>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AttachEmail" OnClick="PdfGonder" Color="Color.Secondary" Disabled="@_sendEmailDisabled">@_sendEmailText</MudButton>
                 }
             </div>
         </div>
@@ -241,6 +249,10 @@
     private string _pdfButtonText = "Pdf Oluştur";
     private bool _showDownloadPdf = false;
     private string _pdfPath = "";
+    private SharedEnums.TeklifPdfType selectedPdfType;
+
+    private bool _sendEmailDisabled = false;
+    private string _sendEmailText = "Gönder";
 
     private bool loadingCompleted = false;
 
@@ -394,7 +406,7 @@
         }
     }
 
-    private async Task PdfOlustur()
+    private async Task PdfOlustur(int type)
     {
         try
         {
@@ -404,6 +416,8 @@
             var request = new PdfGeneratorRequestDto();
             request.teklif = this.teklif;
             request.teklifDetays = this.teklifDetayList;
+            selectedPdfType = (SharedEnums.TeklifPdfType)type;
+            request.PdfType = (SharedEnums.TeklifPdfType)type;
 
             var result = await httpClient.PostAsJsonAsync<PdfGeneratorRequestDto>("/api/Pdf/CreateTeklifPdfDocument", request);
             var response = await result.Content.ReadFromJsonAsync<ServiceResponse<PdfGenerateResponseDto>>();
@@ -430,8 +444,41 @@
         }
     }
 
-    private Task PdfGonder()
+    private async Task PdfGonder()
     {
-        return Task.CompletedTask;
+        try
+        {
+            _pdfDisabled = true;
+            _sendEmailDisabled = true;
+            _sendEmailText = "Gönderiliyor...";
+
+            var request = new PdfGeneratorRequestDto();
+            request.teklif = this.teklif;
+            request.teklifDetays = this.teklifDetayList;
+
+            request.PdfType = selectedPdfType;
+
+            var result = await httpClient.PostAsJsonAsync<PdfGeneratorRequestDto>("/api/Pdf/CreateTeklifPdfDocumentSendMail", request);
+            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<PdfGenerateResponseDto>>();
+
+            if (response.Success)
+            {
+                
+                Snackbar.Add(string.Format("Teklif {0} adresine gönderildi",
+                    this.teklif.Mail), severity: Severity.Success);
+                _sendEmailText = "Gönderildi";
+            }
+            else
+            {
+                Snackbar.Add(response.Message, severity: Severity.Warning);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            _pdfDisabled = false;
+            _pdfButtonText = "Pdf Oluştur ve Gönder";
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
     }
 }

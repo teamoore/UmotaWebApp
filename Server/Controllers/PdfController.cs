@@ -30,25 +30,15 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("CreateTeklifPdfDocument")]
-        public async Task<ServiceResponse<PdfGenerateResponseDto>> CreateTeklifAndSendPdfDocument(PdfGeneratorRequestDto request)
+        public async Task<ServiceResponse<PdfGenerateResponseDto>> CreateTeklifPdfDocument(PdfGeneratorRequestDto request)
         {
             try
             {
-                if (string.IsNullOrEmpty(request.teklif.Mail))
-                {
-                    throw new Exception("Pdf oluşturma hatası : Teklif Cari Mail adresi boş olamaz");
-                }
-
-                if (request.teklif.Mail.IsValidEmail() == false)
-                {
-                    throw new Exception("Pdf Oluşturma hatası : Geçersiz e-posta adres " + request.teklif.Mail);
-                }
-
                 var filename = "";
                 var file = "";
                 byte[] pdfData = null;
 
-                using (MemoryStream pdfStream = pdf.CreateTeklifDetayPdf(request.teklif, request.teklifDetays))
+                using (MemoryStream pdfStream = pdf.CreateTeklifDetayPdf(request.teklif, request.teklifDetays, request.PdfType))
                 {
                     var g = Guid.NewGuid();
                     
@@ -87,5 +77,63 @@ namespace UmotaWebApp.Server.Controllers
           
         }
 
+
+        [HttpPost("CreateTeklifPdfDocumentSendMail")]
+        public async Task<ServiceResponse<PdfGenerateResponseDto>> CreateTeklifPdfDocumentSendMail(PdfGeneratorRequestDto request)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(request.teklif.Mail))
+                {
+                    throw new Exception("Yetkili e-posta adresi boş olamaz");
+                }
+
+                if (request.teklif.Mail.IsValidEmail() == false)
+                {
+                    throw new Exception("Geçersiz e-posta adresi : " + request.teklif.Mail);
+                }
+
+                var filename = "";
+                var file = "";
+                byte[] pdfData = null;
+
+                using (MemoryStream pdfStream = pdf.CreateTeklifDetayPdf(request.teklif, request.teklifDetays, request.PdfType))
+                {
+                    var g = Guid.NewGuid();
+
+                    file = "Teklif-" + g.ToString() + ".pdf";
+
+                    filename = @$"{Environment.CurrentDirectory}/Media/Files/" + file;
+
+                    FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
+
+                    pdfData = pdfStream.ToArray();
+
+                    await fs.WriteAsync(pdfData, 0, pdfData.Length);
+                    fs.Close();
+
+                    var message = new Message(new string[] { request.teklif.Mail }, "Uno Teklif", "Teklif ektedir.", pdfData);
+                    _emailSender.SendEmail(message);
+                }
+
+                return new ServiceResponse<PdfGenerateResponseDto>()
+                {
+                    Value = new PdfGenerateResponseDto()
+                    {
+                        isSuccess = true,
+                        PdfPath = file,
+                        PdfFile = pdfData
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                var e = new ServiceResponse<PdfGenerateResponseDto>();
+                e.SetException(ex);
+                return e;
+            }
+
+
+        }
     }
 }
