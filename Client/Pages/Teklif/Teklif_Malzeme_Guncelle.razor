@@ -173,7 +173,7 @@
         <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
         <MudTd DataLabel="Birim">@context.Birimkodu</MudTd>
-        <MudTd DataLabel="Net Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.Miktar.HasValue ? context.Kdvmatrahid.Value / context.Miktar.Value : 0))</MudTd>
+        <MudTd DataLabel="Net Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.NetFiyat.Value))</MudTd>
         <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Kdvmatrahid))</MudTd>
         @if (@maliyetGor)
         {

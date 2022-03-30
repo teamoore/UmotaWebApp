@@ -48,12 +48,16 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             var str = "<html><head>" +
                 "<link href='"+ Environment.CurrentDirectory + "/Media/css/bootstrap.min.css' rel='stylesheet' type='text/css' media='screen'/>"
                 + "</head>" +
-                "<body><div class='container'><h1>Teklif No : "+ teklif.Teklifno +"</h1>";
+                "<body><div class='container'>" +
+                "<h2>Uno Pazar</h2>"+
+                "<h4>Teklif No : "+ teklif.Teklifno +"</h4>";
 
-            str += "<h3>Cari Adı : "+ teklif.Cariadi +"</h3>";
+            str += "<h4>Cari Adı : "+ teklif.Cariadi +"</h4>";
             str += "<h4>Teklif Tarihi : "+ teklif.TarihFormatted +"</h4>";
             str += "<h4>Teslim Tarihi : "+ teklif.TeslimTarihiFormatted +"</h4>";
-            str += "<h4></h4>";
+            str += "<h4>Teklif Tutar : " + teklif.Tutarmatrah + " " + teklif.Dovizdokuid +"</h4>";
+            str += "<hr/>";
+
             if (teklifDetays != null && teklifDetays.Count != 0)
             {
                 str += "<table class='table table-striped'>";
@@ -61,12 +65,14 @@ namespace UmotaWebApp.Server.Services.Infrastructure
   <thead>
     <tr>
         <th scope='col'>#</th>
-      <th scope='col'>Çizim Kodu</th>
+      
       <th scope='col'>Poz No</th>
       <th scope='col'>Stok Kodu</th>
       <th scope='col'>Stok Adı</th>
         <th scope='col'>Miktar</th>
         <th scope='col'>Birim</th>
+        <th scope='col'>Birim Fiyat</th>
+        <th scope='col'>Tutar</th>
     </tr>
   </thead>
 <tbody>
@@ -74,14 +80,16 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 var i = 1;
                 foreach (var item in teklifDetays)
                 {
-                    str += string.Format("<tr><th scope='row'>{0}</th><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td><td>{5}</td></tr>",
+                    str += string.Format("<tr><th scope='row'>{0}</th><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td><td>{6}</td><td>{7}</td></tr>",
                         i.ToString(),
-                        item.Cizimkodu.ToValueString(),
                         item.Sipnosira.ToValueString(),
                         item.Malzkodu.ToValueString(),
                         item.Malzadi.ToValueString(),
                         item.Miktar?.ToString(),
-                        item.Birimkodu.ToValueString());
+                        item.Birimkodu.ToValueString(),     
+                        string.Format("{0:N2}", item.NetFiyat.Value),
+                        string.Format("{0:N2}", item.Kdvmatrahid.Value)
+                        );
                     i++;
                 }
                 str += "</tbody></table>";
