@@ -87,5 +87,24 @@ namespace UmotaWebApp.Shared.ModelDto
         public string Satsipno { get; set; }
         public int? Satmalzlogref { get; set; }
         public string MontajYeri { get; set; }
+
+        private double? _netFiyat = 0;
+        public double? NetFiyat
+        {
+            get
+            {
+                if (this.Miktar.HasValue == false)
+                    return 0;
+
+                if (this.Kdvmatrahid.HasValue)
+                    return this.Kdvmatrahid.Value / this.Miktar.Value;
+
+                return 0;
+            }
+            set
+            {
+                _netFiyat = value;
+            }
+        }
     }
 }
