@@ -667,7 +667,7 @@
 
             var request = new FaaliyetRequestDto();
             request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);;
-            request.FirmaId = selectedFirmaDonem.logo_firma.Value;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
             request.Faaliyet = recordDto;
 
             var result = await httpClient.PostGetServiceResponseAsync<int, FaaliyetRequestDto>(UrlHelper.CariFaaliyetSayisi, request);
