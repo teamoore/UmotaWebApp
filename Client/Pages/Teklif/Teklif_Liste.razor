@@ -9,14 +9,14 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@teklifler" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<TeklifDto,bool>(FilterFunc1)">
+<MudTable Items="@teklifler" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true" Filter="new Func<TeklifDto,bool>(FilterFunc1)">
     <ToolBarContent>
         @if (menuEklemeYetkisi)
         {
             <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTeklif" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
-        }
+        }       
         <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Teklif Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        @*<MudTextField @bind-Value="_searchString" Placeholder="Teklif Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>*@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
