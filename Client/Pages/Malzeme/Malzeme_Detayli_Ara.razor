@@ -1,0 +1,62 @@
+﻿<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">@header.HeaderText</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#malzemeDetayNavbarContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="malzemeDetayNavbarContent">
+
+
+
+            <ul class="nav navbar-nav ms-auto">
+                <li>
+                    <EditForm Model="header" class="form-inline my-2 my-lg-0">
+
+                        <InputText @bind-Value="header.SearchText" placeholder="Aranacak kelimeyi girin" class="form-control mr-sm-2" />
+                        <button class="btn btn-outline-success my-2 my-sm-0" @onclick="MarkaSearchClicked">@ButonMarkaText</button>
+                        &nbsp;
+                        <button class="btn btn-outline-success my-2 my-sm-0" @onclick="AdiSearchClicked">@ButonAdiText</button>
+                    </EditForm>
+
+                </li>
+            </ul>
+
+
+
+    </div>
+</nav>
+
+@code {
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+
+    [Parameter]
+    public HeaderBarSearch header { get; set; }
+
+
+    public string ButonMarkaText = "Marka Ara";
+    public string ButonAdiText = "Adında Ara";
+
+    [Parameter]
+    public EventCallback onMarkaSearchButtonClicked { get; set; }
+
+    [Parameter]
+    public EventCallback onAdiSearchButtonClicked { get; set; }
+
+    protected async Task MarkaSearchClicked()
+    {
+        ButonMarkaText = "Aranıyor...";
+        await onMarkaSearchButtonClicked.InvokeAsync();
+        ButonMarkaText = "Marka Ara";
+    }
+
+    protected async Task AdiSearchClicked()
+    {
+        ButonAdiText = "Aranıyor...";
+        await onAdiSearchButtonClicked.InvokeAsync();
+        ButonAdiText = "Adında Ara";
+    }
+
+}

@@ -4,20 +4,20 @@
                  ShowButtons="false"
                  ShowSearchSection="true"></HeaderSearchBar>
 
+<Malzeme_Detayli_Ara header="detayAraBar" onMarkaSearchButtonClicked="MarkaAra" onAdiSearchButtonClicked="AdindaAra"></Malzeme_Detayli_Ara>
+
 @if (loadingCompleted == false)
 {
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@stoklar" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeStokDto,bool>(FilterFunc1)">
-    @*<ToolBarContent>
-        <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Stok Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>*@
+<MudTable Items="@stoklar" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeStokDto,bool>(FilterFunc1)">
     <HeaderContent>
         <MudTh>Kodu</MudTh>
         <MudTh>Adı</MudTh>
-        <MudTh>Marka</MudTh>
+        <MudTh>
+            Marka
+        </MudTh>
         <MudTh>Birim</MudTh>
         <MudTh>Fiili Miktar</MudTh>
         <MudTh>Rezerv Miktar</MudTh>
@@ -78,6 +78,7 @@
     ISnackbar Snackbar { get; set; }
 
     public HeaderBarSearch header = new HeaderBarSearch();
+    public HeaderBarSearch detayAraBar = new HeaderBarSearch();
 
     public List<MalzemeStokDto> stoklar = new List<MalzemeStokDto>();
     private string _searchString;
@@ -99,13 +100,30 @@
         return false;
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync()
     {
         header.HeaderText = "Stok Listesi";
-        //await LoadList();
+        detayAraBar.HeaderText = "Detaylı Ara";
+
+        return Task.CompletedTask;
     }
 
     public async Task HeaderSearch()
+    {
+        await Search(header.SearchText, Enums.MalzemeDetayliArama.Genel);
+    }
+
+    public async Task MarkaAra()
+    {
+        await Search(detayAraBar.SearchText, Enums.MalzemeDetayliArama.Marka);
+    }
+
+    public async Task AdindaAra()
+    {
+        await Search(detayAraBar.SearchText, Enums.MalzemeDetayliArama.Adi);
+    }
+
+    public async Task Search(string word, Enums.MalzemeDetayliArama type)
     {
         try
         {
@@ -113,15 +131,30 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma dönem seçilmedi");
 
-            if (string.IsNullOrWhiteSpace(header.SearchText))
-                return;
+            if (string.IsNullOrWhiteSpace(word))
+                throw new Exception("Aranacak kelime boş geçilemez");
 
             loadingCompleted = false;
             var request = new MalzemeStokRequestDto();
             request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
             request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
             request.TopRowCount = 100;
-            request.SearchText = '%'+header.SearchText+'%';
+
+            switch (type)
+            {
+                case Enums.MalzemeDetayliArama.Genel:
+                    request.SearchText = '%' + word + '%';
+                    break;
+                case Enums.MalzemeDetayliArama.Marka:
+                    request.MalzemeMarka = '%' + word + '%';
+                    break;
+                case Enums.MalzemeDetayliArama.Adi:
+                    request.MalzemeAdi = '%' + word + '%';
+                    break;
+                default:
+                    request.SearchText = '%' + word + '%';
+                    break;
+            }
 
             var result = await httpClient.PostGetServiceResponseAsync<List<MalzemeStokDto>, MalzemeStokRequestDto>(UrlHelper.MalzemeStokGetir, request);
             stoklar = result;
@@ -129,15 +162,14 @@
 
             if (stoklar == null || stoklar.Count == 0)
             {
-                Snackbar.Add(string.Format("{0} için sonuç bulunamadı", request.SearchText), severity: Severity.Warning);
+                Snackbar.Add(string.Format("{0} için sonuç bulunamadı", word), severity: Severity.Warning);
                 header.SearchText = string.Empty;
                 loadingCompleted = true;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            Snackbar.Add(ex.Message, severity: Severity.Error);
         }
     }
 
