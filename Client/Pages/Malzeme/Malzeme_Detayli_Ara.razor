@@ -12,10 +12,11 @@
                 <li>
                     <EditForm Model="header" class="form-inline my-2 my-lg-0">
 
-                        <InputText @bind-Value="header.SearchText" placeholder="Aranacak kelimeyi girin" class="form-control mr-sm-2" />
-                        <button class="btn btn-outline-success my-2 my-sm-0" @onclick="MarkaSearchClicked">@ButonMarkaText</button>
+                        <InputText @bind-Value="header.MalzemeAdi" placeholder="Stok Adı" class="form-control mr-sm-2" />
+                        <InputText @bind-Value="header.MalzemeMarka" placeholder="Marka" class="form-control mr-sm-2" />
+                        <InputText @bind-Value="header.SearchText" placeholder="Genel Arama" class="form-control mr-sm-2" />
                         &nbsp;
-                        <button class="btn btn-outline-success my-2 my-sm-0" @onclick="AdiSearchClicked">@ButonAdiText</button>
+                        <button class="btn btn-outline-success my-2 my-sm-0" @onclick="SearchClicked">@ButonText</button>
                     </EditForm>
 
                 </li>
@@ -33,30 +34,20 @@
 
 
     [Parameter]
-    public HeaderBarSearch header { get; set; }
+    public MalzemeStokRequestDto header { get; set; }
 
 
-    public string ButonMarkaText = "Marka Ara";
-    public string ButonAdiText = "Adında Ara";
-
-    [Parameter]
-    public EventCallback onMarkaSearchButtonClicked { get; set; }
+    public string ButonText = "Ara";
 
     [Parameter]
-    public EventCallback onAdiSearchButtonClicked { get; set; }
+    public EventCallback onSearchButtonClicked { get; set; }
 
-    protected async Task MarkaSearchClicked()
-    {
-        ButonMarkaText = "Aranıyor...";
-        await onMarkaSearchButtonClicked.InvokeAsync();
-        ButonMarkaText = "Marka Ara";
-    }
 
-    protected async Task AdiSearchClicked()
+    protected async Task SearchClicked()
     {
-        ButonAdiText = "Aranıyor...";
-        await onAdiSearchButtonClicked.InvokeAsync();
-        ButonAdiText = "Adında Ara";
+        ButonText = "Aranıyor...";
+        await onSearchButtonClicked.InvokeAsync();
+        ButonText = "Ara";
     }
 
 }

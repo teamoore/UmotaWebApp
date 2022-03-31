@@ -17,5 +17,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public string MalzemeAdi { get; set; }
         public string MalzemeMarka { get; set; }
         public int TopRowCount { get; set; }
+        public string HeaderText { get; set; }
     }
 }

@@ -1,10 +1,6 @@
 ﻿@page "/malzeme_listef"
 
-<HeaderSearchBar header="header" onDoneButtonClicked="HeaderSearch"
-                 ShowButtons="false"
-                 ShowSearchSection="true"></HeaderSearchBar>
-
-<Malzeme_Detayli_Ara header="detayAraBar" onMarkaSearchButtonClicked="MarkaAra" onAdiSearchButtonClicked="AdindaAra"></Malzeme_Detayli_Ara>
+<Malzeme_Detayli_Ara header="detayAraBar" onSearchButtonClicked="Search"></Malzeme_Detayli_Ara>
 
 @if (loadingCompleted == false)
 {
@@ -77,8 +73,7 @@
     [Inject]
     ISnackbar Snackbar { get; set; }
 
-    public HeaderBarSearch header = new HeaderBarSearch();
-    public HeaderBarSearch detayAraBar = new HeaderBarSearch();
+    public MalzemeStokRequestDto detayAraBar = new MalzemeStokRequestDto();
 
     public List<MalzemeStokDto> stoklar = new List<MalzemeStokDto>();
     private string _searchString;
@@ -102,28 +97,12 @@
 
     protected override Task OnInitializedAsync()
     {
-        header.HeaderText = "Stok Listesi";
-        detayAraBar.HeaderText = "Detaylı Ara";
+        detayAraBar.HeaderText = "Stok Listesi";
 
         return Task.CompletedTask;
     }
 
-    public async Task HeaderSearch()
-    {
-        await Search(header.SearchText, Enums.MalzemeDetayliArama.Genel);
-    }
-
-    public async Task MarkaAra()
-    {
-        await Search(detayAraBar.SearchText, Enums.MalzemeDetayliArama.Marka);
-    }
-
-    public async Task AdindaAra()
-    {
-        await Search(detayAraBar.SearchText, Enums.MalzemeDetayliArama.Adi);
-    }
-
-    public async Task Search(string word, Enums.MalzemeDetayliArama type)
+    public async Task Search()
     {
         try
         {
@@ -131,30 +110,17 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma dönem seçilmedi");
 
-            if (string.IsNullOrWhiteSpace(word))
-                throw new Exception("Aranacak kelime boş geçilemez");
-
             loadingCompleted = false;
             var request = new MalzemeStokRequestDto();
             request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
             request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
             request.TopRowCount = 100;
-
-            switch (type)
-            {
-                case Enums.MalzemeDetayliArama.Genel:
-                    request.SearchText = '%' + word + '%';
-                    break;
-                case Enums.MalzemeDetayliArama.Marka:
-                    request.MalzemeMarka = '%' + word + '%';
-                    break;
-                case Enums.MalzemeDetayliArama.Adi:
-                    request.MalzemeAdi = '%' + word + '%';
-                    break;
-                default:
-                    request.SearchText = '%' + word + '%';
-                    break;
-            }
+            if (!string.IsNullOrWhiteSpace(detayAraBar.SearchText))
+                request.SearchText = '%' + detayAraBar.SearchText + '%';
+            if (!string.IsNullOrWhiteSpace(detayAraBar.MalzemeMarka))
+                request.MalzemeMarka = '%' + detayAraBar.MalzemeMarka + '%';
+            if (!string.IsNullOrWhiteSpace(detayAraBar.MalzemeAdi))
+                request.MalzemeAdi = '%' + detayAraBar.MalzemeAdi + '%';
 
             var result = await httpClient.PostGetServiceResponseAsync<List<MalzemeStokDto>, MalzemeStokRequestDto>(UrlHelper.MalzemeStokGetir, request);
             stoklar = result;
@@ -162,8 +128,7 @@
 
             if (stoklar == null || stoklar.Count == 0)
             {
-                Snackbar.Add(string.Format("{0} için sonuç bulunamadı", word), severity: Severity.Warning);
-                header.SearchText = string.Empty;
+                Snackbar.Add("Veri bulunamadı", severity: Severity.Warning);
                 loadingCompleted = true;
             }
         }
