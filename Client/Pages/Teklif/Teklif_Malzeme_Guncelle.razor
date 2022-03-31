@@ -2,6 +2,11 @@
 @using System.IO;
 @inject IJSRuntime jsRuntime
 
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
 <div class="card" style="width: 100%;">
     <div class="card-body">
         <h5 class="card-title">Teklif Numarası : @teklif.Teklifno</h5>
@@ -12,7 +17,7 @@
         </h6>
 
         <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-4">
 
                 <MudSimpleTable Dense="true" Hover="false" Bordered="false" Loading="@(loadingCompleted == false)" Striped="false" Style="overflow-x: auto;">
                     <tbody>
@@ -37,61 +42,48 @@
 
             </div>
 
-            <div class="col-md-3">
+            <div class="col-md-4">
 
                 <MudSimpleTable Dense="true" Hover="false" Loading="@(loadingCompleted == false)" Bordered="false" Striped="false" Style="overflow-x: auto;">
                     <tbody>
-                        <tr>
-                            <td>Teklif Tutar</td>
-                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrah)) @(teklif.Dovizdokuid)</td>
-                        </tr>
-
                         <tr>
                             <td>Teklif Tutar TL</td>
                             <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrahtl)) TL</td>
                         </tr>
                         <tr>
-                            <td>Teklif Para Birimi / Kuru</td>
-                            <td style="text-align:right">@(teklif.Dovizdokuid) / @(teklif.Dovizkuruid)</td>
+                            <td>Teklif Tutar</td>
+                            <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrah)) @(teklif.Dovizdokuid)</td>
                         </tr>
+
+                        @if (maliyetGor)
+                        {
+                            <tr>
+                                <td>Maliyet 1 Toplam</td>
+                                <td style="text-align:right">@(Helper.FormattedDouble(this.teklifDetayList.Sum(x => x.Miktar * x.Maliyet1id))) @teklif.Dovizdokuid</td>
+                            </tr>
+                        }
+
+                        @if (maliyetGor2)
+                        {
+                            <tr>
+                                <td>Maliyet 2 Toplam</td>
+                                <td style="text-align:right">@(Helper.FormattedDouble(this.teklifDetayList.Sum(x => x.Miktar * x.Maliyet2id))) @teklif.Dovizdokuid</td>
+                            </tr>
+                        }
 
                     </tbody>
                 </MudSimpleTable>
 
             </div>
 
-            @if (maliyetGor || maliyetGor2)
-            {
-                <div class="col-md-3">
-                    <MudSimpleTable Dense="true" Hover="false" Loading="@(loadingCompleted == false)" Bordered="false" Striped="false" Style="overflow-x: auto;">
-                        <tbody>
-
-                            @if (maliyetGor)
-                            {
-                                <tr>
-                                    <td>Maliyet 1 Toplam</td>
-                                    <td style="text-align:right">@(Helper.FormattedDouble(this.teklifDetayList.Sum(x => x.Miktar * x.Maliyet1id))) @teklif.Dovizdokuid</td>
-                                </tr>
-                            }
-
-                            @if (maliyetGor2)
-                            {
-                                <tr>
-                                    <td>Maliyet 2 Toplam</td>
-                                    <td style="text-align:right">@(Helper.FormattedDouble(this.teklifDetayList.Sum(x => x.Miktar * x.Maliyet2id))) @teklif.Dovizdokuid</td>
-                                </tr>
-                            }
-
-                        </tbody>
-                    </MudSimpleTable>
-                </div>
-            }
-
-
-            <div class="col-md-3">
+            <div class="col-md-4">
 
                 <MudSimpleTable Dense="true" Hover="false" Loading="@(loadingCompleted == false)" Bordered="false" Striped="false" Style="overflow-x: auto;">
                     <tbody>
+                        <tr>
+                            <td>Teklif Para Birimi / Kuru</td>
+                            <td style="text-align:right">@(teklif.Dovizdokuid) / @(teklif.Dovizkuruid)</td>
+                        </tr>
                         <tr>
                             <td>Satış Temsilcisi</td>
                             <td style="text-align:right">@teklif.Temsilciadi</td>
@@ -114,12 +106,11 @@
         <div class="row">
             <div class="col-md-12">
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" OnClick="Duzenle" Color="Color.Primary">Teklif Düzenle</MudButton>
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddTask" OnClick="TeklifDetayEkle" Color="Color.Primary">Yeni Satır Ekle</MudButton>
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" OnClick="SayfayiYazdir" Color="Color.Primary">Sayfayı Yazdır</MudButton>
 
-                <MudButtonGroup Color="Color.Primary" >
+                <MudButtonGroup Color="Color.Primary">
                     <MudButton Disabled="_pdfDisabled">@_pdfButtonText</MudButton>
-                    <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown" Disabled="_pdfDisabled" LockScroll="_pdfDisabled">
+                    <MudMenu Label="PDF Oluştur" Icon="@Icons.Material.Filled.ArrowDropDown" Disabled="_pdfDisabled" LockScroll="_pdfDisabled">
                         <MudMenuItem OnClick="() => PdfOlustur(0)">İskontolu</MudMenuItem>
                         <MudMenuItem OnClick="() => PdfOlustur(1)">Net</MudMenuItem>
                         <MudMenuItem OnClick="() => PdfOlustur(2)">Net + KDV</MudMenuItem>
@@ -142,6 +133,8 @@
 
 <MudTable Items="@teklifDetayList" Dense="true" Hover="true" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
     <ToolBarContent>
+        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="TeklifDetayEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        <MudSpacer />
         <MudText Typo="Typo.h6">Teklif Satırları</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Satırlarda Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
@@ -181,7 +174,7 @@
         <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
         <MudTd DataLabel="Birim">@context.Birimkodu</MudTd>
-        <MudTd DataLabel="Net Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.NetFiyat.Value))</MudTd>
+        <MudTd DataLabel="Net Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.NetFiyatid.Value))</MudTd>
         <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Kdvmatrahid))</MudTd>
         @if (@maliyetGor)
         {
@@ -463,7 +456,7 @@
 
             if (response.Success)
             {
-                
+
                 Snackbar.Add(string.Format("Teklif {0} adresine gönderildi",
                     this.teklif.Mail), severity: Severity.Success);
                 _sendEmailText = "Gönderildi";

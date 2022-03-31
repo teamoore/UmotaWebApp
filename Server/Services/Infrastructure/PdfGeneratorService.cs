@@ -58,46 +58,49 @@ namespace UmotaWebApp.Server.Services.Infrastructure
   <tr>
 	<td>
 		<table style='width:400px;'>
-			<tr>
-        <td>Teklif No:</td><td>" + teklif.Teklifno + @"</td>
-      </tr>
-      <tr>
-        <td>Cari Adı:</td><td>" + teklif.Cariadi + @"</td>
-      </tr>
-<tr>
-    <td>Proje Adı:</td><td>" + teklif.Proje + @"</td>
-</tr>
-<tr>
-    <td>İlgili Kişi:</td><td>" + teklif.IlgiliAdi + @"</td>
-</tr>
-      <tr>
-        <td>Teklif Tarihi:</td><td>" + teklif.TarihFormatted + @"</td>
-      </tr>
-      <tr>
-        <td>Teslim Tarihi:</td><td>" + teklif.TeslimTarihiFormatted + @"</td>
-      </tr>";
+          <tr>
+            <td>Teklif Tarihi:</td><td>" + teklif.TarihFormatted + @"</td>
+          </tr>
+	      <tr>
+            <td>Teklif No:</td><td>" + teklif.Teklifno + @"</td>
+          </tr>
+	      <tr>
+            <td>Revize No:</td><td>" + teklif.Revzno + @"</td>
+          </tr>
+          <tr>
+            <td>Firma:</td><td>" + teklif.Cariadi + @"</td>
+          </tr>
+        <tr>
+            <td>Sayın:</td><td>" + teklif.IlgiliAdi + @"</td>
+        </tr>
+        <tr>
+            <td>Proje Adı:</td><td>" + teklif.Proje + @"</td>
+        </tr>
+        <tr>
+        <td>İlgili:</td><td>" + teklif.Temsilciadi + @"</td>
+        </tr>";
 
-            switch (teklifPdfType)
-            {
-                case SharedEnums.TeklifPdfType.Iskontolu:
-                    str += "<tr><td>İskonto Tutarı:</td><td>0.00</td></tr>";
-                    break;
-                case SharedEnums.TeklifPdfType.Net:
-                    str += @"<tr>
-                            <td>Teklif Tutar:</td><td>" + teklif.Tutarmatrah + " " + teklif.Dovizdokuid + @"</td>
-                            </tr>";
-                    break;
-                case SharedEnums.TeklifPdfType.NetKdv:
-                    str += @"<tr>
-                            <td>Teklif Tutar + KDV:</td><td>" + teklif.Tutarmatrah + " " + teklif.Dovizdokuid + @"</td>
-                            </tr>";
-                    break;
-                default:
-                    break;
-            }
+            //switch (teklifPdfType)
+            //{
+            //    case SharedEnums.TeklifPdfType.Iskontolu:
+            //        str += "<tr><td>İskonto Tutarı:</td><td>0.00</td></tr>";
+            //        break;
+            //    case SharedEnums.TeklifPdfType.Net:
+            //        str += @"<tr>
+            //                <td>Teklif Tutar:</td><td>" + teklif.Tutarmatrah + " " + teklif.Dovizdokuid + @"</td>
+            //                </tr>";
+            //        break;
+            //    case SharedEnums.TeklifPdfType.NetKdv:
+            //        str += @"<tr>
+            //                <td>Teklif Tutar + KDV:</td><td>" + teklif.Tutarmatrah + " " + teklif.Dovizdokuid + @"</td>
+            //                </tr>";
+            //        break;
+            //    default:
+            //        break;
+            //}
 
-            str += @"<tr> <td>Genel Toplam:</td><td>" + teklif.Tutarmatrah + " " + teklif.Dovizdokuid + @"</td>
-                            </tr>";
+            //str += @"<tr> <td>Genel Toplam:</td><td>" + teklif.Tutarmatrah + " " + teklif.Dovizdokuid + @"</td>
+            //                </tr>";
 
             str += @"</table>
 
@@ -113,37 +116,128 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 str += @"
   <thead>
     <tr>
-            <th scope='col'>#</th>
-      
-            <th scope='col'>Poz No</th>
-            <th scope='col'>Stok Kodu</th>
-            <th scope='col'>Stok Adı</th>
-            <th scope='col'>Miktar</th>
-            <th scope='col'>Birim</th>
-            <th scope='col'>Birim Fiyat</th>
-            <th scope='col'>Tutar</th>
+            <th scope='col'>POZ</th>
+            <th scope='col'>MALZEME LİSTESİ</th>
+            <th scope='col'>EBAT</th>
+            <th scope='col'>MARKA</th>
+            <th scope='col'>MENŞEİ</th>
+            <th scope='col'>ADET</th>
+            <th scope='col'>BİRİM FİYAT</th>
+            <th scope='col'>DÖVİZ</th>
+            <th scope='col'>TOPLAM FİYAT</th>
     </tr>
   </thead>
 <tbody>
 ";
-                var i = 1;
+                double toptutar = 0;
+                double topisktutar = 0;
+                double topkdvtutar = 0;
                 foreach (var item in teklifDetays)
                 {
-           
                     str += "<tr>";
-                    str += "<th scope='row'>"+ i +"</th>";
-
                     str += Cell(item.Sipnosira);
-                    str += Cell(item.Malzkodu);
                     str += Cell(item.Malzadi);
+                    str += Cell(item.Ebat);
+                    str += Cell(item.Marka);
+                    str += Cell(item.Mensei);
                     str += Cell(item.Miktar);
-                    str += Cell(item.Birimkodu);
-                    str += Cell(item.NetFiyat);
-                    str += Cell(item.Kdvmatrahid);
+
+                    switch (teklifPdfType)
+                    {
+                        case SharedEnums.TeklifPdfType.Iskontolu:
+                            str += Cell(item.Fiyatid);
+                            str += Cell(teklif.Dovizdokuid);
+                            str += Cell(item.Tutarid);
+                            toptutar += item.Tutarid.Value;
+                            topisktutar += item.Isktut1id.Value + item.Isktut2id.Value + item.Isktut3id.Value + item.Isktut4id.Value;
+                            break;
+                        case SharedEnums.TeklifPdfType.Net:
+                            str += Cell(item.NetFiyatid);
+                            str += Cell(teklif.Dovizdokuid);
+                            str += Cell(item.Kdvmatrahid);
+                            toptutar += item.Kdvmatrahid.Value;
+                            break;
+                        case SharedEnums.TeklifPdfType.NetKdv:
+                            str += Cell(item.NetFiyatid);
+                            str += Cell(teklif.Dovizdokuid);
+                            str += Cell(item.Kdvmatrahid);
+                            toptutar += item.Kdvmatrahid.Value;
+                            topkdvtutar += item.Kdvtutid.Value;
+                            break;
+                        default:
+                            break;
+                    }
 
                     str += "</tr>";
-                    i++;
                 }
+
+                str += "<tr>";
+                str += Cell("");
+                str += Cell("TOPLAM BEDEL");
+                str += Cell("");
+                str += Cell("");
+                str += Cell("");
+                str += Cell("");
+                str += Cell("");
+                str += Cell(teklif.Dovizdokuid);
+                str += Cell(toptutar);
+                str += "</tr>";
+
+                if (teklifPdfType == SharedEnums.TeklifPdfType.Iskontolu)
+                {
+                    str += "<tr>";
+                    str += Cell("");
+                    str += Cell("İSKONTO TOPLAMI");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell(teklif.Dovizdokuid);
+                    str += Cell(topisktutar);
+                    str += "</tr>";
+
+                    str += "<tr>";
+                    str += Cell("");
+                    str += Cell("GENEL TOPLAM");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell(teklif.Dovizdokuid);
+                    str += Cell(toptutar-topisktutar);
+                    str += "</tr>";
+                }
+
+                if (teklifPdfType == SharedEnums.TeklifPdfType.NetKdv)
+                {
+                    str += "<tr>";
+                    str += Cell("");
+                    str += Cell("KDV TOPLAMI");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell(teklif.Dovizdokuid);
+                    str += Cell(topkdvtutar);
+                    str += "</tr>";
+
+                    str += "<tr>";
+                    str += Cell("");
+                    str += Cell("GENEL TOPLAM");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell("");
+                    str += Cell(teklif.Dovizdokuid);
+                    str += Cell(toptutar + topkdvtutar);
+                    str += "</tr>";
+                }
+
+
                 str += "</tbody></table>";
 
             }
@@ -164,7 +258,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         private string Cell(string td)
         {
             if (string.IsNullOrEmpty(td))
-                return "<td>--</td>";
+                return "<td></td>";
 
             return "<td>"+ td +"</td>";
         }

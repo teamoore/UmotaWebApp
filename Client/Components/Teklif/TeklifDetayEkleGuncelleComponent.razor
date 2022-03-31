@@ -1,6 +1,12 @@
 ﻿
 <EditForm Model="teklifDetay">
     <DataAnnotationsValidator />
+
+    @if (loadingCompleted == false)
+    {
+        <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+    }
+
     <div class="mt-12">
 
         <div class="form">
@@ -85,12 +91,12 @@
                                 <InputSelect @bind-Value="DovizTuruBilgisi" class="form-control">
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                     @if (DovizListesi != null)
-                                {
-                                @foreach (var item in DovizListesi)
-                            {
-                            <option value="@item.CURTYPE">@item.CURCODE</option>
-                    }
-                        }
+                                    {
+                                        @foreach (var item in DovizListesi)
+                                        {
+                                            <option value="@item.CURTYPE">@item.CURCODE</option>
+                                        }
+                                    }
                                 </InputSelect>
                             </div>
                             <div class="col-md-1">
@@ -178,7 +184,7 @@
                         </div>
                     </div>
 
-                    </MudTabPanel>
+                </MudTabPanel>
                 <MudTabPanel Icon="@Icons.Material.Filled.Percent" Text="İskonto" BadgeColor="Color.Success">
                     <hr />
                     <div class="form-group">
@@ -238,7 +244,17 @@
 
 
     <div class="form-group">
-        <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
+        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Kaydediliyor...</MudText>
+            }
+            else
+            {
+                <MudText>Kaydet</MudText>
+            }
+        </MudButton>
         <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
     </div>
 
@@ -312,6 +328,8 @@
 
     private string _DovizKuruState = "";
     private bool _TeklifDetayCekildi = false;
+    private bool loadingCompleted = false;
+    private bool _processing = false;
 
     private double? _pageMiktar = 1;
     public double? pageMiktar
@@ -508,6 +526,7 @@
         await KullaniciYetkileriGetir();
         await DovizListesiGetir();
         await GetTeklif();
+        loadingCompleted = true;
     }
 
     public async Task GetTeklifDetaySiraNo()
@@ -666,6 +685,7 @@
         try
         {
             TeklifDetayValidation();
+            _processing = true;
 
             teklifDetay.Upddate = DateTime.Now;
             teklifDetay.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
@@ -705,6 +725,10 @@
         {
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
+        finally
+        {
+            _processing = false;
+        }
     }
 
     private async Task SaveTeklifDetay()
@@ -713,6 +737,7 @@
         {
             TeklifDetayValidation();
 
+            _processing = true;
             await LogRefUret();
             teklifDetay.Insdate = DateTime.Now;
             teklifDetay.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
@@ -747,6 +772,10 @@
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
         }
     }
 

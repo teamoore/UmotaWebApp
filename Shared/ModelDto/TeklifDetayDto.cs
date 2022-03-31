@@ -88,8 +88,8 @@ namespace UmotaWebApp.Shared.ModelDto
         public int? Satmalzlogref { get; set; }
         public string MontajYeri { get; set; }
 
-        private double? _netFiyat = 0;
-        public double? NetFiyat
+        private double? _netFiyatid = 0;
+        public double? NetFiyatid
         {
             get
             {
@@ -103,7 +103,26 @@ namespace UmotaWebApp.Shared.ModelDto
             }
             set
             {
-                _netFiyat = value;
+                _netFiyatid = value;
+            }
+        }
+
+        private double? _fiyatid = 0;
+        public double? Fiyatid
+        {
+            get
+            {
+                if (this.Miktar.HasValue == false)
+                    return 0;
+
+                if (this.Tutarid.HasValue)
+                    return this.Tutarid.Value / this.Miktar.Value;
+
+                return 0;
+            }
+            set
+            {
+                _fiyatid = value;
             }
         }
     }

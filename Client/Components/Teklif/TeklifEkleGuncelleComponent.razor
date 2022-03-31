@@ -2,6 +2,11 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
+    @if (loadingCompleted == false)
+    {
+        <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+    }
+
     <div class="mt-12">
         <div class="form">
             <div class="form-group">
@@ -24,11 +29,11 @@
                 <div class="row">
                     <div class="col-md-2">
                         <label>Cari Kodu</label>
-                        <InputText @bind-Value="teklif.Carikodu" class="form-control" placeholder="Cari Kodu" disabled/>
+                        <InputText @bind-Value="teklif.Carikodu" class="form-control" placeholder="Cari Kodu" disabled />
                     </div>
                     <div class="col-md-4">
                         <label>Cari Adı</label>
-                        <InputText @bind-Value="teklif.Cariadi" class="form-control" placeholder="Cari Adı" disabled/>
+                        <InputText @bind-Value="teklif.Cariadi" class="form-control" placeholder="Cari Adı" disabled />
                     </div>
                     <div class="col-md-6">
                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Medium>Bul</MudButton>
@@ -160,7 +165,17 @@
 
 
     <div class="form-group">
-        <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
+        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Kaydediliyor...</MudText>
+            }
+            else
+            {
+                <MudText>Kaydet</MudText>
+            }
+        </MudButton>
         <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
     </div>
 
@@ -187,6 +202,9 @@
 
     [Parameter]
     public int? logRef { get; set; }
+
+    private bool loadingCompleted = false;
+    private bool _processing = false;
 
     private int _dovizTuru = -1;
     public int DovizTuruBilgisi
@@ -253,6 +271,7 @@
         await GetTeklif();
         await DovizListesiGetir();
         await GetKisiListesi();
+        loadingCompleted = true;
     }
 
     public async Task GetTeklif()
@@ -365,6 +384,7 @@
         {
             TeklifValidation();
 
+            _processing = true;
             teklif.Upddate = DateTime.Now;
             teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklif.Status = 1;
@@ -397,6 +417,10 @@
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
         }
+        finally
+        {
+            _processing = false;
+        }
     }
 
     private async Task SaveTeklif()
@@ -411,8 +435,8 @@
         {
             TeklifValidation();
 
+            _processing = true;
             teklif.Dovizref = 20;
-
             var requestDovizKuru = new DovizKuruRequestDto();
             requestDovizKuru.KurTarihi = teklif.Tarih.Value;
             requestDovizKuru.KurTuru = 4;
@@ -434,10 +458,15 @@
         catch (Exception)
         {
         }
+        finally
+        {
+            _processing = false;
+        }
 
         try
         {
 
+            _processing = true;
             teklif.Insdate = DateTime.Now;
             teklif.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklif.Tarih = teklif.Tarih.HasValue ? teklif.Tarih : DateTime.Now;
@@ -465,6 +494,10 @@
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
         }
     }
 

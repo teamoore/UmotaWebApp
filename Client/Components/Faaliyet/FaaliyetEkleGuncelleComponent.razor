@@ -2,6 +2,11 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
+    @if (loadingCompleted == false)
+    {
+        <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+    }
+
     <div class="mt-12">
         <div class="form">
             <div class="form-group">
@@ -228,28 +233,28 @@
             <br />
 
             @*<div class="form-group">
-                <div class="row">
-                    <div class="col-md-2">
-                        <label>Malzeme Kodu</label>
-                        <InputText @bind-Value="recordDto.Malzemekodu" class="form-control" placeholder="Stok Kodu" disabled />
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Malzeme Kodu</label>
+                            <InputText @bind-Value="recordDto.Malzemekodu" class="form-control" placeholder="Stok Kodu" disabled />
+                        </div>
+                        <div class="col-md-4">
+                            <label>Malzeme Tanımı</label>
+                            <InputText @bind-Value="recordDto.Malzemeadi" class="form-control" placeholder="Stok Adı" disabled />
+                        </div>
+                        <div class="col-md-2">
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
+                                       OnClick="MalzemeListesiAc"
+                                       Color="Color.Info" Size="Size.Medium">Bul</MudButton>
+                        </div>
                     </div>
-                    <div class="col-md-4">
-                        <label>Malzeme Tanımı</label>
-                        <InputText @bind-Value="recordDto.Malzemeadi" class="form-control" placeholder="Stok Adı" disabled />
-                    </div>
-                    <div class="col-md-2">
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
-                                   OnClick="MalzemeListesiAc"
-                                   Color="Color.Info" Size="Size.Medium">Bul</MudButton>
-                    </div>
-                </div>
-            </div>*@
+                </div>*@
 
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-8">
                         <label>Açıklama</label>
-                        <InputTextArea @bind-Value="recordDto.Yapilanlar" class="form-control" rows="5" ></InputTextArea>
+                        <InputTextArea @bind-Value="recordDto.Yapilanlar" class="form-control" rows="5"></InputTextArea>
                     </div>
                 </div>
             </div>
@@ -259,7 +264,17 @@
 
 
     <div class="form-group">
-        <SaveButtonComponent Caption="Kaydet" OnClick="ValidSubmit" />
+        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Kaydediliyor...</MudText>
+            }
+            else
+            {
+                <MudText>Kaydet</MudText>
+            }
+        </MudButton>
         <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
     </div>
 
@@ -291,6 +306,8 @@
     public EventCallback OnVazgecClicked { get; set; }
 
     public bool IsUpdate { get; set; }
+    private bool loadingCompleted = false;
+    private bool _processing = false;
 
     FaaliyetDto recordDto = new FaaliyetDto();
 
@@ -328,6 +345,7 @@
         await GetKonuListesi();
         await GetUrunGrubuListesi();
         await GetKisiListesi();
+        loadingCompleted = true;
     }
 
     public async Task GetRecord()
@@ -443,6 +461,7 @@
         {
             SubmitValidation();
 
+            _processing = true;
             recordDto.Upddate = DateTime.Now;
             recordDto.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             recordDto.Status = 1;
@@ -476,6 +495,10 @@
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
         }
+        finally
+        {
+            _processing = false;
+        }
     }
 
     private async Task SaveRecord()
@@ -504,7 +527,7 @@
 
         try
         {
-
+            _processing = true;
             recordDto.Insdate = DateTime.Now;
             recordDto.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             recordDto.Giren = recordDto.Insuser;
@@ -529,6 +552,10 @@
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
         }
     }
 
