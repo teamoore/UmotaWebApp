@@ -12,6 +12,7 @@ namespace UmotaWebApp.Client.Utils
         public const string FirmaDonemYetki = "firmadonemyetki";
         public const string Token = "token";
         public const string CompanyLogo = "companyLogo";
+        public const string DonemFirmalar = "donemFirmalar";
     }
 
     public class Mesajlar

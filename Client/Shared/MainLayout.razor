@@ -1,23 +1,22 @@
 ﻿@inherits LayoutComponentBase
-
 @*<MudThemeProvider />
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <div class="main">
-        <div class="top-row px-4">
-            <button type="button" class="btn btn-primary" @onclick="ShowKullaniciKart">@loginStr</button>
-            <button type="button" class="btn btn-warning" @onclick="NavigateToExit">Çıkış</button>
+    <div class="page">
+        <div class="sidebar">
+            <NavMenu />
         </div>
 
-        <div class="content px-4">
-            @Body
+        <div class="main">
+            <div class="top-row px-4">
+                <button type="button" class="btn btn-primary" @onclick="ShowKullaniciKart">@loginStr</button>
+                <button type="button" class="btn btn-warning" @onclick="NavigateToExit">Çıkış</button>
+            </div>
+
+            <div class="content px-4">
+                @Body
+            </div>
         </div>
-    </div>
-</div>*@
+    </div>*@
 
 
 <MudThemeProvider />
@@ -28,7 +27,7 @@
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudText Typo="Typo.h5" Class="ml-3">UNO Endüstriyel</MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Filled" Color="Color.Tertiary">@_selectedFirma</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="ShowDonemFirmalar">@_selectedFirma</MudButton>
         <MudText Typo="Typo.h5" Class="ml-3">&nbsp;</MudText>
         <MudAvatar Color="Color.Tertiary">@_avatarName</MudAvatar>
         <MudIconButton Icon="@Icons.Material.Filled.Logout" OnClick="NavigateToExit"></MudIconButton>
@@ -42,7 +41,7 @@
         <div class="content px-4">
             @Body
         </div>
-        
+
     </MudMainContent>
 </MudLayout>
 
@@ -126,4 +125,11 @@
                 kullanici.KullaniciAdi, kullanici.MailAdres, kullanici.KullaniciYetkiKodu, kullanici.SonGirisTarihi.Value);
             await modalManager.ShowMessageAsync("Kullanıcı Bilgi", bilgi);
         }
-    } }
+    }
+
+
+    public void ShowDonemFirmalar()
+    {
+        NavigationManager.NavigateTo("/donemfirmasec");
+    }
+}

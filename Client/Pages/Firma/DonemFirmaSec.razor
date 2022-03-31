@@ -1,0 +1,94 @@
+﻿@page "/donemfirmasec"
+
+<EditForm Model="selectedFirma">
+    <div class="mt-12">
+        <div class="form">
+            <div class="form-group">
+                <div class="row">
+
+                    <div class="col-md-4">
+                        <label>Dönem Firma Bilgisi seçiniz</label>
+
+                        <InputSelect @bind-Value="selectedFirma.logref" class="form-control">
+                            @if (firmalar != null)
+                            {
+                                <option value="-1">Firma Dönem Seçiniz</option>
+                                @foreach (var item in firmalar)
+                                {
+                                    <option value="@item.logref">@item.aciklama</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+
+                        <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="Degistir" StartIcon="@Icons.Material.Filled.ChangeCircle">Kaydet</MudButton>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+
+@code {
+    [Inject]
+    NavigationManager navManager { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorage { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    public List<SisFirmaDonemDto> firmalar = null;
+
+    public SisFirmaDonemDto selectedFirma = new SisFirmaDonemDto();
+
+    private async Task LoadFirmaDonem()
+    {
+        try
+        {
+            firmalar = await LocalStorage.GetItemAsync<List<SisFirmaDonemDto>>(Consts.DonemFirmalar);
+
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFirmaDonem();
+    }
+
+    private async Task Degistir()
+    {
+        try
+        {
+            if (selectedFirma.logref <= 0)
+            {
+                throw new Exception("Firma dönem seçmeniz gerekiyor");
+            }
+
+            var firma = firmalar.Where(x => x.logref == selectedFirma.logref).SingleOrDefault();
+
+            await LocalStorage.SetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem, firma);
+
+            navManager.NavigateTo("/stek_listef", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+}
