@@ -107,6 +107,8 @@
             {
                 firmalar = result;
                 selectedFirmaDonem = firmalar[0].logref;
+
+               await LocalStorage.SetItemAsync(Consts.DonemFirmalar,firmalar);
             }
             else
             {
