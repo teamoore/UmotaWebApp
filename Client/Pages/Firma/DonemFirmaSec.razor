@@ -59,10 +59,9 @@
             firmalar = await LocalStorage.GetItemAsync<List<SisFirmaDonemDto>>(Consts.DonemFirmalar);
 
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            Snackbar.Add(ex.Message, severity: Severity.Error);
         }
     }
 
