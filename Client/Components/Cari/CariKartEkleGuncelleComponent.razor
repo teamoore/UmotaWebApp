@@ -3,6 +3,11 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
+    @if (loadingCompleted == false)
+    {
+        <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+    }
+
     <div class="mt-5">
 
         <div class="form">
@@ -113,7 +118,7 @@
                 <div class="row">
                     <div class="col-md-6">
                         <label>E-Posta</label>
-                        <InputText @bind-Value="cariModel.Mail" class="form-control"  type="email"/>
+                        <InputText @bind-Value="cariModel.Mail" class="form-control" type="email" />
                     </div>
                     <div class="col-md-6">
                         <label>Web Sitesi</label>
@@ -129,7 +134,17 @@
 
 
     <div class="form-group">
-        <SaveButtonComponent Caption="Kaydet" />
+        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Kaydediliyor...</MudText>
+            }
+            else
+            {
+                <MudText>Kaydet</MudText>
+            }
+        </MudButton>
         <CancelButtonComponent Caption="Vazgeç" OnClick="goBackCariList" />
     </div>
 
@@ -166,6 +181,8 @@
     public List<SpeCodesDto> SektorListesi { get; set; }
 
     private bool isUpdate = false;
+    private bool loadingCompleted = false;
+    private bool _processing = false;
 
     public async Task CariKartGetir()
     {
@@ -213,6 +230,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
+            _processing = true;
             if (!isUpdate)
             {
                 var reff = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=cari_kart&firmaId=" + selectedFirmaDonem.firma_no.Value);
@@ -255,6 +273,10 @@
         {
             await ModalManager.ShowMessageAsync("Hata", ex.Message);
         }
+        finally
+        {
+            _processing = false;
+        }
     }
 
     public async Task ValidSubmit()
@@ -289,6 +311,7 @@
             await NoUret();
 
         await SektorListesiGetir();
+        loadingCompleted = true;
     }
 
     public async Task NoUret()

@@ -3,6 +3,11 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
+    @if (loadingCompleted == false)
+    {
+        <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+    }
+
     <div class="mt-5">
 
         <div class="form">
@@ -67,7 +72,17 @@
 
 
     <div class="form-group">
-        <SaveButtonComponent Caption="Kaydet" />
+        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Kaydediliyor...</MudText>
+            }
+            else
+            {
+                <MudText>Kaydet</MudText>
+            }
+        </MudButton>
         <CancelButtonComponent Caption="Vazgeç" OnClick="goBackCariList" />
     </div>
 
@@ -105,6 +120,8 @@
     KisilerDto cariModel = new KisilerDto();
 
     private bool isUpdate = false;
+    private bool loadingCompleted = false;
+    private bool _processing = false;
 
     public async Task KartGetir()
     {
@@ -152,6 +169,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
+            _processing = true;
             if (!isUpdate)
             {
                 var reff = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=kisiler&firmaId=" + selectedFirmaDonem.firma_no.Value);
@@ -191,6 +209,10 @@
         {
             await ModalManager.ShowMessageAsync("Hata", ex.Message);
         }
+        finally
+        {
+            _processing = false;
+        }
     }
 
     public async Task ValidSubmit()
@@ -224,6 +246,7 @@
             await KartGetir();
             return;
         }
+        loadingCompleted = true;
     }
 
     public void SubmitValidation()
