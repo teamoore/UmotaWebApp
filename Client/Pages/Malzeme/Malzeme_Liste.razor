@@ -11,9 +11,7 @@
     <HeaderContent>
         <MudTh>Kodu</MudTh>
         <MudTh>Adı</MudTh>
-        <MudTh>
-            Marka
-        </MudTh>
+        <MudTh>Marka</MudTh>
         <MudTh>Birim</MudTh>
         <MudTh>Fiili Miktar</MudTh>
         <MudTh>Rezerv Miktar</MudTh>
@@ -78,7 +76,7 @@
     public List<MalzemeStokDto> stoklar = new List<MalzemeStokDto>();
     private string _searchString;
     private bool _sortNameByLength;
-    private bool loadingCompleted = true;
+    private bool loadingCompleted = false;
 
     private bool FilterFunc1(MalzemeStokDto element) => FilterFunc(element, _searchString);
 
@@ -99,6 +97,7 @@
     {
         detayAraBar.HeaderText = "Stok Listesi";
 
+        loadingCompleted = true;
         return Task.CompletedTask;
     }
 
@@ -114,27 +113,31 @@
             var request = new MalzemeStokRequestDto();
             request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
             request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
-            request.TopRowCount = 100;
+            //request.TopRowCount = 100;
             if (!string.IsNullOrWhiteSpace(detayAraBar.SearchText))
                 request.SearchText = '%' + detayAraBar.SearchText + '%';
             if (!string.IsNullOrWhiteSpace(detayAraBar.MalzemeMarka))
                 request.MalzemeMarka = '%' + detayAraBar.MalzemeMarka + '%';
             if (!string.IsNullOrWhiteSpace(detayAraBar.MalzemeAdi))
                 request.MalzemeAdi = '%' + detayAraBar.MalzemeAdi + '%';
+            if (!string.IsNullOrWhiteSpace(detayAraBar.MalzemeKodu))
+                request.MalzemeKodu = '%' + detayAraBar.MalzemeKodu + '%';
 
             var result = await httpClient.PostGetServiceResponseAsync<List<MalzemeStokDto>, MalzemeStokRequestDto>(UrlHelper.MalzemeStokGetir, request);
             stoklar = result;
-            loadingCompleted = true;
 
             if (stoklar == null || stoklar.Count == 0)
             {
                 Snackbar.Add("Veri bulunamadı", severity: Severity.Warning);
-                loadingCompleted = true;
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            loadingCompleted = true;
         }
     }
 
