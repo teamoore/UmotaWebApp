@@ -338,6 +338,7 @@
         if (!IsUpdate)
         {
             recordDto.Tarih = DateTime.Now;
+            recordDto.FaaliyetSaati = recordDto.Tarih.Value.GetTime();
             recordDto.Islemturu = 1;
         }
 
@@ -533,8 +534,6 @@
             recordDto.Giren = recordDto.Insuser;
             recordDto.Tarih = recordDto.Tarih.Value.ChangeTime(recordDto.FaaliyetSaati);
             recordDto.Status = 0;
-
-            recordDto.Tarih += recordDto.FaaliyetSaati;
 
             await LogRefUret();
 
