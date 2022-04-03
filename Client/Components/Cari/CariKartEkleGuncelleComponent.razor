@@ -1,154 +1,169 @@
-﻿
-<EditForm Model="cariModel" OnValidSubmit="ValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+﻿<div class="container">
+    <EditForm Model="cariModel" OnValidSubmit="ValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    @if (loadingCompleted == false)
-    {
-        <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
-    }
+        @if (loadingCompleted == false)
+        {
+            <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+        }
 
-    <div class="mt-5">
+        <div class="mt-5">
 
-        <div class="form">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-2">
-                        <label>Kodu</label>
-                        <InputText @bind-Value="cariModel.Kodu" class="form-control" disabled />
-                    </div>
+            <div class="form">
+
+                <MudTabs  Rounded="true" Centered="false" Class="my-6">
+                    <MudTabPanel Icon="@Icons.Material.Filled.AddBusiness" Text="Cari Bilgileri" BadgeColor="Color.Error">
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Kodu</label>
+                                    <InputText @bind-Value="cariModel.Kodu" class="form-control" disabled />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label>Şahıs Şirketi mi?</label>
+                                    <InputSelect @bind-Value="cariModel.Sahismi" class="form-control">
+                                        <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                        <option value="0">Hayır</option>
+                                        <option value="1">Evet</option>
+                                    </InputSelect>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Vergi/TCK No</label>
+                                    <InputText @bind-Value="cariModel.Vdno" class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Vergi Dairesi</label>
+                                    <InputText @bind-Value="cariModel.Vdadi" class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Sektör</label>
+                                    <InputSelect @bind-Value="cariModel.Ozelkod3" class="form-control">
+                                        <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                        @if (SektorListesi != null)
+                                        {
+                                            @foreach (var item in SektorListesi)
+                                            {
+                                                <option value="@item.SPECODE">@item.DEFINITION_</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Ünvanı</label>
+                                    <InputText @bind-Value="cariModel.Adi" class="form-control" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Tabela Ünvanı</label>
+                                    <InputText @bind-Value="cariModel.Adi2" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </MudTabPanel>
+
+
+                    <MudTabPanel Icon="@Icons.Material.Filled.Phone" Text="İletişim Bilgileri" BadgeColor="Color.Error">
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Adres (1.Satır)</label>
+                                    <InputText @bind-Value="cariModel.Adres1" class="form-control" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Adres (2.Satır)</label>
+                                    <InputText @bind-Value="cariModel.Adres1" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Ülke</label>
+                                    <InputText @bind-Value="cariModel.Ulke" class="form-control" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Şehir</label>
+                                    <InputText @bind-Value="cariModel.Il" class="form-control" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label>İlçe</label>
+                                    <InputText @bind-Value="cariModel.Ilce" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Telefon 1</label>
+                                    <InputText @bind-Value="cariModel.Tel1" class="form-control" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Telefon 2</label>
+                                    <InputText @bind-Value="cariModel.Tel2" class="form-control" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Fax</label>
+                                    <InputText @bind-Value="cariModel.Faks" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>E-Posta</label>
+                                    <InputText @bind-Value="cariModel.Mail" class="form-control" type="email" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Web Sitesi</label>
+                                    <InputText @bind-Value="cariModel.Web" class="form-control" />
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </MudTabPanel>
+                </MudTabs>
+
+
+
+
+
+                <div class="form-group">
+                    <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+                        @if (_processing)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ms-2">Kaydediliyor...</MudText>
+                        }
+                        else
+                        {
+                            <MudText>Kaydet</MudText>
+                        }
+                    </MudButton>
+                    <CancelButtonComponent Caption="Vazgeç" OnClick="goBackCariList" />
                 </div>
             </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>Ünvanı</label>
-                        <InputText @bind-Value="cariModel.Adi" class="form-control" />
-                    </div>
-                    <div class="col-md-6">
-                        <label>Tabela Ünvanı</label>
-                        <InputText @bind-Value="cariModel.Adi2" class="form-control" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>Adres (1.Satır)</label>
-                        <InputText @bind-Value="cariModel.Adres1" class="form-control" />
-                    </div>
-                    <div class="col-md-6">
-                        <label>Adres (2.Satır)</label>
-                        <InputText @bind-Value="cariModel.Adres1" class="form-control" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-4">
-                        <label>Ülke</label>
-                        <InputText @bind-Value="cariModel.Ulke" class="form-control" />
-                    </div>
-                    <div class="col-md-4">
-                        <label>Şehir</label>
-                        <InputText @bind-Value="cariModel.Il" class="form-control" />
-                    </div>
-                    <div class="col-md-4">
-                        <label>İlçe</label>
-                        <InputText @bind-Value="cariModel.Ilce" class="form-control" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-4">
-                        <label>Telefon 1</label>
-                        <InputText @bind-Value="cariModel.Tel1" class="form-control" />
-                    </div>
-                    <div class="col-md-4">
-                        <label>Telefon 2</label>
-                        <InputText @bind-Value="cariModel.Tel2" class="form-control" />
-                    </div>
-                    <div class="col-md-4">
-                        <label>Fax</label>
-                        <InputText @bind-Value="cariModel.Faks" class="form-control" />
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-3">
-                        <label>Şahıs Şirketi mi?</label>
-                        <InputSelect @bind-Value="cariModel.Sahismi" class="form-control">
-                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                            <option value="0">Hayır</option>
-                            <option value="1">Evet</option>
-                        </InputSelect>
-                    </div>
-                    <div class="col-md-3">
-                        <label>Vergi/TCK No</label>
-                        <InputText @bind-Value="cariModel.Vdno" class="form-control" />
-                    </div>
-                    <div class="col-md-3">
-                        <label>Vergi Dairesi</label>
-                        <InputText @bind-Value="cariModel.Vdadi" class="form-control" />
-                    </div>
-                    <div class="col-md-3">
-                        <label>Sektör</label>
-                        <InputSelect @bind-Value="cariModel.Ozelkod3" class="form-control">
-                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                            @if (SektorListesi != null)
-                            {
-                                @foreach (var item in SektorListesi)
-                                {
-                                    <option value="@item.SPECODE">@item.DEFINITION_</option>
-                                }
-                            }
-                        </InputSelect>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>E-Posta</label>
-                        <InputText @bind-Value="cariModel.Mail" class="form-control" type="email" />
-                    </div>
-                    <div class="col-md-6">
-                        <label>Web Sitesi</label>
-                        <InputText @bind-Value="cariModel.Web" class="form-control" />
-                    </div>
-                </div>
-
-            </div>
-
         </div>
-    </div>
 
+    </EditForm>
 
-
-    <div class="form-group">
-        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
-            @if (_processing)
-            {
-                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                <MudText Class="ms-2">Kaydediliyor...</MudText>
-            }
-            else
-            {
-                <MudText>Kaydet</MudText>
-            }
-        </MudButton>
-        <CancelButtonComponent Caption="Vazgeç" OnClick="goBackCariList" />
-    </div>
-
-</EditForm>
+</div>
 
 
 

@@ -83,7 +83,7 @@
 
             await LocalStorage.SetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem, firma);
 
-            navManager.NavigateTo("/stek_listef", forceLoad: true);
+            navManager.NavigateTo("/", forceLoad: true);
         }
         catch (Exception ex)
         {

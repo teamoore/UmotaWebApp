@@ -23,7 +23,7 @@
             </EditForm>
 
 
-            <MudTable Items="@malzemeKarts" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
+            <MudTable Items="@malzemeKarts" RowsPerPage="5"  FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Malzeme Kart Listesi</MudText>
 
@@ -38,7 +38,7 @@
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>
-                        <MudFab Color="Color.Transparent" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => MalzemeKartSec(context.Logref))" />
+                        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => MalzemeKartSec(context.Logref))" />
                     </MudTd>
                     <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
                     <MudTd DataLabel="Adı">@context.Adi</MudTd>
@@ -55,7 +55,7 @@
             {
                 <MudProgressCircular Color="Color.Success" Indeterminate="true" />
             }
-        </div>
+</div>
 
 
 @code

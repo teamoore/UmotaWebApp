@@ -1,167 +1,167 @@
 ﻿@page "/cari_sec"
 
+<div class="container">
+    <EditForm Model="cari" OnValidSubmit="CariBul">
+        <div class="form">
 
-<EditForm Model="cari" OnValidSubmit="CariBul">
-    <div class="form">
+            <div class="form-group">
 
-        <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <InputText @bind-Value="cari.Adi" class="form-control" />
+                    </div>
+                    <div class="col-md-8">
+                        <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage"
+                                   OnClick="CariBul" Color="Color.Info" Size="Size.Medium">@ButonText</MudButton>
+                            </div>
+                        </div>
 
-            <div class="row">
-                <div class="col-md-4">
-                    <InputText @bind-Value="cari.Adi" class="form-control" />
+                    </div>
+
                 </div>
-                <div class="col-md-8">
-                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage"
-                               OnClick="CariBul" Color="Color.Info" Size="Size.Medium">@ButonText</MudButton>
+            </EditForm>
+
+
+            @if (string.IsNullOrEmpty(ResultText) == false)
+            {
+                <div class="alert alert-warning" role="alert">
+                    @ResultText
                 </div>
-            </div>
-
-        </div>
-
-    </div>
-</EditForm>
-
-
-@if (string.IsNullOrEmpty(ResultText) == false)
-{
-    <div class="alert alert-warning" role="alert">
-        @ResultText
-    </div>
-}
-
-@if (_searchStarted)
-{
-    <MudProgressCircular Color="Color.Success" Indeterminate="true" />
-}
-
-<MudTable Items="@cariler" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Cari Listesi</MudText>
-
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>#</MudTh>
-        <MudTh>Kodu</MudTh>
-        <MudTh>Adı</MudTh>
-        <MudTh>İlçe</MudTh>
-        <MudTh>İl</MudTh>
-
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd>
-            <MudFab Color="Color.Transparent" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => CariSec(context.Kodu))" />
-        </MudTd>
-        <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
-        <MudTd DataLabel="Adı">@context.Adi</MudTd>
-        <MudTd DataLabel="İlçe">@context.Ilce</MudTd>
-        <MudTd DataLabel="Şehir">@context.Il</MudTd>
-
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı"/>
-    </PagerContent>
-</MudTable>
-
-@code
-{
-    [CascadingParameter] IModalService modal { get; set; }
-    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
-    [CascadingParameter] ModalParameters modalParameters { get; set; }
-
-
-    [Inject]
-    NavigationManager navigation { get; set; }
-
-    [Inject]
-    HttpClient httpClient { get; set; }
-
-    [Inject]
-    ISnackbar Snackbar { get; set; }
-
-    [Inject]
-    ILocalStorageService LocalStorageService { get; set; }
-
-    public List<CariKartDto> cariler { get; set; }
-
-    public CariKartDto cari = new CariKartDto();
-
-    private string _searchString = "";
-    private bool _sortNameByLength;
-    private bool _searchStarted = false;
-
-
-    public string ResultText { get; set; }
-    public string ButonText = "Ara";
-
-    private async Task LoadCariler()
-    {
-        cariler = await httpClient.GetServiceResponseAsync<List<CariKartDto>>("/api/carikart/list");
-        cariler = cariler.OrderByDescending(i => i.Insdate).ToList();
-    }
-
-    public async Task CariBul()
-    {
-
-        try
-        {
-            if (string.IsNullOrEmpty(cari.Adi))
-            {
-                throw new Exception(Utils.Mesajlar.MetinGir);
             }
 
-            ButonText = "Aranıyor...";
-
-            _searchStarted = true;
-            ResultText = string.Empty;
-
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma dönem seçilmedi");
-            var request = new CariKartRequestDto();
-            request.CariKart = cari;
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
-
-            cariler = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartRequestDto>(UrlHelper.CariKartAra, request);
-
-            if (cariler.Count == 0)
+            @if (_searchStarted)
             {
-                ResultText = string.Format(@"'{0}' aradığınız cari bulunamadı", cari.Adi);
+                <MudProgressCircular Color="Color.Success" Indeterminate="true" />
             }
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
-        }
-        finally
-        {
-            _searchStarted = false;
-            ButonText = "Ara";
-        }
 
-    }
+            <MudTable Items="@cariler" RowsPerPage="5" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Cari Listesi</MudText>
 
-    public async Task CariSec(string kod)
-    {
-        try
-        {
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma dönem seçilmedi");
+                </ToolBarContent>
+                <HeaderContent>
+                    <MudTh>#</MudTh>
+                    <MudTh>Kodu</MudTh>
+                    <MudTh>Adı</MudTh>
+                    <MudTh>İlçe</MudTh>
+                    <MudTh>İl</MudTh>
+
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>
+                        <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => CariSec(context.Kodu))" />
+                    </MudTd>
+                    <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
+                    <MudTd DataLabel="Adı">@context.Adi</MudTd>
+                    <MudTd DataLabel="İlçe">@context.Ilce</MudTd>
+                    <MudTd DataLabel="Şehir">@context.Il</MudTd>
+
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+                </PagerContent>
+            </MudTable>
+</div>
+            @code
+{
+                [CascadingParameter] IModalService modal { get; set; }
+                [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+                [CascadingParameter] ModalParameters modalParameters { get; set; }
 
 
-            var cari = await httpClient.GetServiceResponseAsync<CariKartDto>(UrlHelper.CariKartGetir + "?kod=" + kod + "&firmaId=" + selectedFirmaDonem.firma_no.ToString());
-            if (cari != null)
-            {
-                modalParameters = new ModalParameters();
-                modalParameters.Add("secim", cari);
-                await ModalInstance.CloseAsync(ModalResult.Ok<CariKartDto>(cari));
+                [Inject]
+                NavigationManager navigation { get; set; }
+
+                [Inject]
+                HttpClient httpClient { get; set; }
+
+                [Inject]
+                ISnackbar Snackbar { get; set; }
+
+                [Inject]
+                ILocalStorageService LocalStorageService { get; set; }
+
+                public List<CariKartDto> cariler { get; set; }
+
+                public CariKartDto cari = new CariKartDto();
+
+                private string _searchString = "";
+                private bool _sortNameByLength;
+                private bool _searchStarted = false;
+
+
+                public string ResultText { get; set; }
+                public string ButonText = "Ara";
+
+                private async Task LoadCariler()
+                {
+                    cariler = await httpClient.GetServiceResponseAsync<List<CariKartDto>>("/api/carikart/list");
+                    cariler = cariler.OrderByDescending(i => i.Insdate).ToList();
+                }
+
+                public async Task CariBul()
+                {
+
+                    try
+                    {
+                        if (string.IsNullOrEmpty(cari.Adi))
+                        {
+                            throw new Exception(Utils.Mesajlar.MetinGir);
+                        }
+
+                        ButonText = "Aranıyor...";
+
+                        _searchStarted = true;
+                        ResultText = string.Empty;
+
+                        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+                        if (selectedFirmaDonem == null)
+                            throw new Exception("Firma dönem seçilmedi");
+                        var request = new CariKartRequestDto();
+                        request.CariKart = cari;
+                        request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+                        cariler = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartRequestDto>(UrlHelper.CariKartAra, request);
+
+                        if (cariler.Count == 0)
+                        {
+                            ResultText = string.Format(@"'{0}' aradığınız cari bulunamadı", cari.Adi);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Snackbar.Add(ex.Message, severity: Severity.Error);
+                    }
+                    finally
+                    {
+                        _searchStarted = false;
+                        ButonText = "Ara";
+                    }
+
+                }
+
+                public async Task CariSec(string kod)
+                {
+                    try
+                    {
+                        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+                        if (selectedFirmaDonem == null)
+                            throw new Exception("Firma dönem seçilmedi");
+
+
+                        var cari = await httpClient.GetServiceResponseAsync<CariKartDto>(UrlHelper.CariKartGetir + "?kod=" + kod + "&firmaId=" + selectedFirmaDonem.firma_no.ToString());
+                        if (cari != null)
+                        {
+                            modalParameters = new ModalParameters();
+                            modalParameters.Add("secim", cari);
+                            await ModalInstance.CloseAsync(ModalResult.Ok<CariKartDto>(cari));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Snackbar.Add(ex.Message, severity: Severity.Error);
+                    }
+                }
+
             }
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
-        }
-    }
-
-}
 
