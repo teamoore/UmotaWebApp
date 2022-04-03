@@ -1,0 +1,161 @@
+﻿@page "/malzeme_sec_liste"
+
+<EditForm Model="malzemeKart" OnValidSubmit="MalzemeBul">
+    <div class="form">
+
+        <div class="form-group">
+
+            <div class="row">
+                <div class="col-md-4">
+                    <InputText @bind-Value="malzemeKart.Adi" class="form-control" placeholder="Adı" />
+                </div>
+                <div class="col-md-4">
+                    <InputText @bind-Value="malzemeKart.Marka" class="form-control" placeholder="Marka" />
+                </div>
+                <div class="col-md-4">
+                    <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage"
+                               OnClick="MalzemeBul" Color="Color.Info" Size="Size.Medium">@ButonText</MudButton>
+                        </div>
+                    </div>
+                </div>
+
+                @if (malzemeKarts != null && malzemeKarts.Count > 0)
+                {
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label>Malzeme Seçimi Yapınız</label>
+                                <InputSelect @bind-Value="malzemeKart.Logref" class="form-control">
+                                    <option value="-1" selected>Malzeme Seçiniz</option>
+
+                                    @foreach (var item in malzemeKarts)
+                                        {
+                                        <option value="@item.Logref">[@(item.Kodu)] @(item.Adi) - Marka: @(string.IsNullOrEmpty(item.Descr) ? "(tanımsız)" : "("+ item.Descr +")") - Menşei: @(string.IsNullOrEmpty(item.Definition) ? "(tanımsız)" : "("+ item.Definition + ")")</option>
+                                        }
+                                </InputSelect>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="MalzemeKartSec" StartIcon="@Icons.Material.Filled.ArrowCircleDown">Seç</MudButton>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </EditForm>
+
+        @if (_searchStarted)
+        {
+            <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+        }
+
+        @code
+{
+            [CascadingParameter] IModalService modal { get; set; }
+            [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+            [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+            [Inject]
+            ILocalStorageService LocalStorageService { get; set; }
+
+            [Inject]
+            NavigationManager navigation { get; set; }
+
+            [Inject]
+            HttpClient httpClient { get; set; }
+
+            [Inject]
+            ISnackbar Snackbar { get; set; }
+
+            public List<MalzemeKartDto> malzemeKarts { get; set; }
+
+            public MalzemeKartDto malzemeKart = new MalzemeKartDto();
+
+            public string ResultText { get; set; }
+            public string ButonText = "Ara";
+
+            private string _searchStringMalzeme = "";
+            private bool _sortNameByLength;
+            private bool _searchStarted = false;
+
+            private async Task LoadMalzemeKartList()
+            {
+                _searchStarted = true;
+                malzemeKarts = await httpClient.GetServiceResponseAsync<List<MalzemeKartDto>>("/api/malzemekart/list");
+                _searchStarted = false;
+            }
+
+            protected override Task OnInitializedAsync()
+            {
+                malzemeKart.Logref = -1;
+                return Task.CompletedTask;
+            }
+
+            public async Task MalzemeKartSec()
+            {
+                try
+                {
+                    if (malzemeKart.Logref < 0)
+                    {
+                        throw new Exception("Malzeme seçimi yapmanız gerekmektedir.");
+                    }
+
+                    var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+                    var request = new MalzemeKartRequestDto();
+                    request.MalzemeKart = malzemeKart;
+                    request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+                    var mkart = await httpClient.GetServiceResponseAsync<MalzemeKartDto>(UrlHelper.MalzemeKartGetir + "?logref=" + malzemeKart.Logref + "&firmaId=" + request.FirmaId);
+
+                    if (mkart != null)
+                    {
+                        modalParameters = new ModalParameters();
+                        modalParameters.Add("secim", mkart);
+                        await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(mkart));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add(ex.Message, severity: Severity.Error);
+                }
+            }
+
+            public async Task MalzemeBul()
+            {
+                try
+                {
+                    if (string.IsNullOrEmpty(malzemeKart.Adi) && string.IsNullOrEmpty(malzemeKart.Marka))
+                    {
+                        throw new Exception(Utils.Mesajlar.MetinGir);
+                    }
+                    ButonText = "Aranıyor...";
+
+                    _searchStarted = true;
+
+                    var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+                    var request = new MalzemeKartRequestDto();
+                    request.MalzemeKart = malzemeKart;
+                    request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+                    malzemeKarts = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+
+                }
+                catch (Exception ex)
+                {
+                    Snackbar.Add(ex.Message, severity: Severity.Error);
+                }
+                finally
+                {
+                    _searchStarted = false;
+                    ButonText = "Ara";
+                }
+            }
+
+        }

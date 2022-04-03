@@ -614,9 +614,10 @@
     public async Task MalzemeListesiAc()
     {
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
+        opt.ContentScrollable = false;
+        
 
-        var form = modal.Show<Pages.Malzeme.Malzeme_Sec>("Malzeme Seç", options: opt);
+        var form = modal.Show<Pages.Malzeme.Malzeme_Sec_Liste>("Malzeme Seç", options: opt);
         var result = await form.Result;
 
         if (!result.Cancelled)
