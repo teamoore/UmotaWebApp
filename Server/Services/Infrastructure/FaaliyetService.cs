@@ -49,7 +49,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return result.SingleOrDefault();
             }
         }
-
         public async Task<List<FaaliyetDto>> GetFaaliyets(string firmaId, string kullanicikodu)
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
@@ -166,6 +165,32 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             return res + 1;
         }
+        public async Task<bool> DeleteFaaliyet(int logref, string firmaId, string kullanici)
+        {
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
 
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var row = await dbContext.Faaliyets.Where(x => x.Logref == logref)
+                .FirstOrDefaultAsync();
+                if (row == null)
+                    throw new Exception("Silinecek kayıt bulunamadı");
+
+                row.Status = 2;
+                row.Upddate = DateTime.Now;
+                row.Upduser = kullanici;
+
+                await dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+
+        }
     }
 }

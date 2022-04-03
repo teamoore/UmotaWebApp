@@ -147,6 +147,25 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpGet("delete")]
+        public async Task<ServiceResponse<bool>> DeleteFaaliyett(int logref, string firmaId, string kullanici)
+        {
+            try
+            {
+                return new ServiceResponse<bool>()
+                {
+                    Value = await FaaliyetService.DeleteFaaliyet(logref, firmaId, kullanici)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<bool>();
+                e.SetException(ex);
+                return e;
+            }
+        }
 
     }
 }

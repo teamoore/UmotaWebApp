@@ -470,6 +470,42 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             }
         }
 
-        
+        public async Task<bool> DeleteTeklif(int logref, string firmaId, string kullanici)
+        {
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var row = await dbContext.Teklifs.Where(x => x.Logref == logref)
+                .FirstOrDefaultAsync();
+                if (row == null)
+                    throw new Exception("Silinecek kayıt bulunamadı");
+
+                var teklifDetayList = await dbContext.Teklifdetays.Where(x => x.Teklifref == logref && x.Status < 2).ToListAsync();
+
+                foreach (var teklifDetay in teklifDetayList)
+                {
+                    teklifDetay.Status = 2;
+                    teklifDetay.Upddate = DateTime.Now;
+                    teklifDetay.Upduser = kullanici;
+                }
+
+                row.Status = 2;
+                row.Upddate = DateTime.Now;
+                row.Upduser = kullanici;
+
+                await dbContext.SaveChangesAsync();
+
+                return true;
+            }
+
+
+        }
+
     }
 }

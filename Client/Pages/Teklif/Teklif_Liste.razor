@@ -33,6 +33,7 @@
         <MudTh>Teslim Tarihi</MudTh>
         <MudTh>Açıklama</MudTh>
         <MudTh>Kaydı Giren</MudTh>
+        <MudTh>#</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd>
@@ -61,6 +62,10 @@
         <MudTd DataLabel="Teslim Tarihi">@context.TeslimTarihiFormatted</MudTd>
         <MudTd DataLabel="Açıklama">@context.Aciklama1</MudTd>
         <MudTd DataLabel="Kaydı Giren">@context.Insuser</MudTd>
+        @if (menuSilmeYetkisi)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
+        }
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
@@ -100,6 +105,7 @@
 
     private bool menuGormeYetkisi { get; set; }
     private bool menuEklemeYetkisi { get; set; }
+    private bool menuSilmeYetkisi { get; set; }
 
     private bool menuDegistirmeYetkisi { get; set; }
     private bool loadingCompleted { get; set; }
@@ -125,6 +131,7 @@
         menuGormeYetkisi = isAdmin ? isAdmin : false;
         menuEklemeYetkisi = isAdmin ? isAdmin : false;
         menuDegistirmeYetkisi = isAdmin ? isAdmin : false;
+        menuSilmeYetkisi = isAdmin ? isAdmin : false;
     }
 
     protected override async Task OnInitializedAsync()
@@ -262,6 +269,9 @@
 
             result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=stek_listef&hak_tipi=upd");
             menuDegistirmeYetkisi = result == 1;
+
+            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=stek_listef&hak_tipi=del");
+            menuSilmeYetkisi = result == 1;
         }
 
         if (!menuGormeYetkisi)
@@ -269,7 +279,33 @@
             _ShowSearchSection = false;
             throw new Exception("Bu sayfayı görüntüleme yetkiniz yoktur");
         }
-
-
     }
+
+    public async Task Sil(int logref)
+    {
+        try
+        {
+            var modalRes = await ModalManager.ShowConfirmationAsync("Teklif silinecek!", "Silmek istediğinizden emin misiniz?", "Evet", "Hayır");
+            if (!modalRes)
+                return;
+
+            loadingCompleted = false;
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            var kullanici = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var delete = await httpClient.GetFromJsonAsync<ServiceResponse<bool>>(Utils.UrlHelper.TeklifSil + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value + "&kullanici=" + kullanici);
+
+            if (delete.Success == false)
+                throw new Exception(delete.Message);
+
+            Snackbar.Add("Teklif silindi");
+
+            await LoadTeklifler();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
 }
