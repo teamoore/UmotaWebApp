@@ -151,6 +151,7 @@
         menuGormeYetkisi = isAdmin ? isAdmin : false;
         menuEklemeYetkisi = isAdmin ? isAdmin : false;
         menuDegistirmeYetkisi = isAdmin ? isAdmin : false;
+        menuSilmeYetkisi = isAdmin ? isAdmin : false;
     }
 
     protected override async Task OnInitializedAsync()
@@ -158,6 +159,7 @@
         try
         {
             header.HeaderText = "Faaliyet Listesi";
+            await CheckUser();
 
             YetkiControl();
 
@@ -261,7 +263,7 @@
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
             var kullanici = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
-            var delete = await httpClient.GetFromJsonAsync<ServiceResponse<bool>>("/api/faaliyet/delete?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value + "&kullanici=" + kullanici);
+            var delete = await httpClient.GetFromJsonAsync<ServiceResponse<bool>>(Utils.UrlHelper.FaaliyetSil + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value + "&kullanici=" + kullanici);
 
             if (delete.Success == false)
                 throw new Exception(delete.Message);
@@ -275,4 +277,19 @@
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
     }
+
+    private async Task CheckUser()
+    {
+
+        var kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+        var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanici_kodu);
+
+        if (result != null)
+        {
+            isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
+        }
+
+    }
+
 }

@@ -15,6 +15,7 @@ namespace UmotaWebApp.Client.Utils
         public const string TeklifDurumGuncelle = "/api/teklif/updatedurum";
         public const string TeklifAra = "/api/teklif/search";
         public const string TeklifGetir = "/api/teklif/get";
+        public const string TeklifSil = "/api/teklif/delete";
         public const string MalzemeKartAra = "/api/malzemekart/search";
         public const string MalzemeKartGetir = "/api/malzemekart/get";
         public const string MalzemeFiyatGetir = "/api/malzemekart/fiyatgetir";
@@ -42,6 +43,7 @@ namespace UmotaWebApp.Client.Utils
         public const string FaaliyetGetir = "/api/faaliyet/get";
         public const string FaaliyetKaydet = "/api/faaliyet/save";
         public const string FaaliyetGuncelle = "/api/faaliyet/update";
+        public const string FaaliyetSil = "/api/faaliyet/delete";
         public const string CariFaaliyetSayisi = "/api/faaliyet/getcarifaaliyetsayisi";
     }
 }

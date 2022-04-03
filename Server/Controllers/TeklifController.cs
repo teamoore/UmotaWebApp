@@ -145,5 +145,25 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpGet("delete")]
+        public async Task<ServiceResponse<bool>> DeleteTeliff(int logref, string firmaId, string kullanici)
+        {
+            try
+            {
+                return new ServiceResponse<bool>()
+                {
+                    Value = await TeklifService.DeleteTeklif(logref, firmaId, kullanici)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<bool>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }
