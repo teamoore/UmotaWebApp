@@ -420,7 +420,8 @@
                 _pdfButtonText = "PDF Oluşturuldu";
                 Snackbar.Add(string.Format("Pdf oluşturuldu",
                     this.teklif.Mail), severity: Severity.Success);
-                _pdfPath = navigation.ToAbsoluteUri("/Download/" + response.Value.PdfPath).ToString();
+
+                _pdfPath = navigation.ToAbsoluteUri("/Media/Files/Files/" + response.Value.PdfPath).ToString();
                 _showDownloadPdf = true;
             }
             else

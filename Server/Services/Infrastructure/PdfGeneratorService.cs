@@ -33,7 +33,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                         new ObjectSettings() {
                             PagesCount = true,
                             HtmlContent = CreateHtml(teklif,teklifDetays,teklifPdfType),
-                            WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" },
+                            WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet= Path.Combine(Directory.GetCurrentDirectory(),"Media","css","bootstrap.min.css") },
                             HeaderSettings = { FontSize = 11, Right = "Page [page] of [toPage]", Line = true, Spacing = 2.812 }
                         }
                          }
@@ -114,7 +114,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 str += "<table class='table table-striped'>";
                 str += @"
-  <thead>
+ 
     <tr>
             <th scope='col'>POZ</th>
             <th scope='col'>MALZEME LİSTESİ</th>
@@ -126,8 +126,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             <th scope='col'>DÖVİZ</th>
             <th scope='col'>TOPLAM FİYAT</th>
     </tr>
-  </thead>
-<tbody>
+ 
 ";
                 double toptutar = 0;
                 double topisktutar = 0;
@@ -238,7 +237,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 }
 
 
-                str += "</tbody></table>";
+                str += "</table>";
 
             }
 
