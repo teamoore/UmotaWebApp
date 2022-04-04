@@ -119,7 +119,7 @@
 
                 @if (_pdfDisabled && _showDownloadPdf)
                 {
-                    <a href="@_pdfPath" class="btn btn-outline-success" role="button">Dosyayı indir</a>
+                    <a href="@_pdfPath" class="btn btn-outline-success" role="button" download="teklif">Dosyayı indir</a>
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AttachEmail" OnClick="PdfGonder" Color="Color.Secondary" Disabled="@_sendEmailDisabled">@_sendEmailText</MudButton>
                 }
             </div>
