@@ -26,6 +26,19 @@
 
                         <div class="form-group">
                             <div class="row">
+                                <div class="col-md-6">
+                                    <label>Ünvanı</label>
+                                    <InputText @bind-Value="cariModel.Adi" class="form-control" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Tabela Ünvanı</label>
+                                    <InputText @bind-Value="cariModel.Adi2" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
                                 <div class="col-md-3">
                                     <label>Şahıs Şirketi mi?</label>
                                     <InputSelect @bind-Value="cariModel.Sahismi" class="form-control">
@@ -54,19 +67,6 @@
                                             }
                                         }
                                     </InputSelect>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label>Ünvanı</label>
-                                    <InputText @bind-Value="cariModel.Adi" class="form-control" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label>Tabela Ünvanı</label>
-                                    <InputText @bind-Value="cariModel.Adi2" class="form-control" />
                                 </div>
                             </div>
                         </div>

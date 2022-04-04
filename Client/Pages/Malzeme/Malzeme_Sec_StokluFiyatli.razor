@@ -1,164 +1,164 @@
 ﻿@page "/malzeme_sec_stoklufiyatli"
 
+<div class="container">
+    <EditForm Model="malzemeKart" OnValidSubmit="MalzemeBul">
+        <div class="form">
 
-<EditForm Model="malzemeKart" OnValidSubmit="MalzemeBul">
-    <div class="form">
+            <div class="form-group">
 
-        <div class="form-group">
-
-            <div class="row">
-                <div class="col-md-4">
-                    <InputText @bind-Value="malzemeKart.MalzemeAdi" class="form-control" placeholder="Adı" />
-                </div>
-                <div class="col-md-4">
-                    <InputText @bind-Value="malzemeKart.MalzemeMarka" class="form-control" placeholder="Marka" />
-                </div>
-                <div class="col-md-4">
-                    <MudButton Disabled="@_processing" OnClick="MalzemeBul" Variant="Variant.Filled" Color="Color.Info" StartIcon="@Icons.Material.Filled.FindInPage">
-                        @if (_processing)
-                        {
-                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                            <MudText Class="ms-2">Aranıyor...</MudText>
-                        }
-                        else
-                        {
-                            <MudText>Ara</MudText>
-                        }
-                    </MudButton>
+                <div class="row">
+                    <div class="col-md-4">
+                        <InputText @bind-Value="malzemeKart.MalzemeAdi" class="form-control" placeholder="Adı" />
+                    </div>
+                    <div class="col-md-4">
+                        <InputText @bind-Value="malzemeKart.MalzemeMarka" class="form-control" placeholder="Marka" />
+                    </div>
+                    <div class="col-md-4">
+                        <MudButton Disabled="@_processing" OnClick="MalzemeBul" Variant="Variant.Filled" Color="Color.Info" StartIcon="@Icons.Material.Filled.FindInPage">
+                            @if (_processing)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                <MudText Class="ms-2">Aranıyor...</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Ara</MudText>
+                            }
+                        </MudButton>
 
 
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</EditForm>
+    </EditForm>
 
 
-<MudTable Items="@malzemeKarts" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true" RowsPerPage="50">
-    <ToolBarContent>
-        <MudText Typo="Typo.h6">Malzeme Kart Listesi</MudText>
+    <MudTable Items="@malzemeKarts" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true" RowsPerPage="50">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Malzeme Kart Listesi</MudText>
 
-    </ToolBarContent>
-    <HeaderContent>
-        <MudTh>#</MudTh>
-        <MudTh>Kodu</MudTh>
-        <MudTh>Adı</MudTh>
-        <MudTh>Marka</MudTh>
-        <MudTh>Birim</MudTh>
-        <MudTh>Fiili Miktar</MudTh>
-        <MudTh>Rezerv Miktar</MudTh>
-        <MudTh>Öneri Sipariş Miktar</MudTh>
-        <MudTh>Satılabilir Miktar</MudTh>
-        <MudTh>Bekleyen Alım Sipariş Miktar</MudTh>
-        <MudTh>Bekleyen Alım Sipariş Tahmini Teslim Süresi</MudTh>
-        <MudTh>Satış Fiyatı</MudTh>
-        <MudTh>Satış Döviz</MudTh>
-        <MudTh>Alış Fiyatı</MudTh>
-        <MudTh>Alış Döviz</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd>
-            <MudFab Color="Color.Transparent" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => MalzemeKartSec(context.MalzemeRef))" />
-        </MudTd>
-        <MudTd DataLabel="Kodu">@context.MalzemeKodu</MudTd>
-        <MudTd DataLabel="Adı">@context.MalzemeAdi</MudTd>
-        <MudTd DataLabel="Marka">@context.MalzemeMarka</MudTd>
-        <MudTd DataLabel="Birim">@context.BirimKodu</MudTd>
-        <MudTd DataLabel="Fiili Miktar">@context.StokMiktari</MudTd>
-        <MudTd DataLabel="Rezerv Miktar">@context.RezervMiktari</MudTd>
-        <MudTd DataLabel="Öneri Sip.Miktar">@context.BekleyenOneriSatisSiparisMiktar</MudTd>
-        <MudTd DataLabel="Satılabilir Miktar">@context.StokMiktari2</MudTd>
-        <MudTd DataLabel="Bekleyen Alım Sipariş Miktar">@context.BekleyenAlimSiparisMiktar</MudTd>
-        <MudTd DataLabel="Bekleyen Alım Sipariş Tahmini Teslim">@context.BekleyenAlimSiparisTeslimTarihiFormatted</MudTd>
-        <MudTd DataLabel="Satış Fiyatı">@context.SatisFiyati</MudTd>
-        <MudTd DataLabel="Satış Döviz">@context.SatisFiyatiDoviz</MudTd>
-        <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyati</MudTd>
-        <MudTd DataLabel="Alış Döviz">@context.AlisFiyatiDoviz</MudTd>
-    </RowTemplate>
-    <PagerContent>
-        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
-    </PagerContent>
-</MudTable>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>#</MudTh>
+            <MudTh>Kodu</MudTh>
+            <MudTh>Adı</MudTh>
+            <MudTh>Marka</MudTh>
+            <MudTh>Birim</MudTh>
+            <MudTh>Fiili Miktar</MudTh>
+            <MudTh>Rezerv Miktar</MudTh>
+            <MudTh>Öneri Sipariş Miktar</MudTh>
+            <MudTh>Satılabilir Miktar</MudTh>
+            <MudTh>Bekleyen Alım Sipariş Miktar</MudTh>
+            <MudTh>Bekleyen Alım Sipariş Tahmini Teslim Süresi</MudTh>
+            <MudTh>Satış Fiyatı</MudTh>
+            <MudTh>Satış Döviz</MudTh>
+            <MudTh>Alış Fiyatı</MudTh>
+            <MudTh>Alış Döviz</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <MudFab Color="Color.Transparent" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => MalzemeKartSec(context.MalzemeRef))" />
+            </MudTd>
+            <MudTd DataLabel="Kodu">@context.MalzemeKodu</MudTd>
+            <MudTd DataLabel="Adı">@context.MalzemeAdi</MudTd>
+            <MudTd DataLabel="Marka">@context.MalzemeMarka</MudTd>
+            <MudTd DataLabel="Birim">@context.BirimKodu</MudTd>
+            <MudTd DataLabel="Fiili Miktar">@context.StokMiktari</MudTd>
+            <MudTd DataLabel="Rezerv Miktar">@context.RezervMiktari</MudTd>
+            <MudTd DataLabel="Öneri Sip.Miktar">@context.BekleyenOneriSatisSiparisMiktar</MudTd>
+            <MudTd DataLabel="Satılabilir Miktar">@context.StokMiktari2</MudTd>
+            <MudTd DataLabel="Bekleyen Alım Sipariş Miktar">@context.BekleyenAlimSiparisMiktar</MudTd>
+            <MudTd DataLabel="Bekleyen Alım Sipariş Tahmini Teslim">@context.BekleyenAlimSiparisTeslimTarihiFormatted</MudTd>
+            <MudTd DataLabel="Satış Fiyatı">@context.SatisFiyati</MudTd>
+            <MudTd DataLabel="Satış Döviz">@context.SatisFiyatiDoviz</MudTd>
+            <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyati</MudTd>
+            <MudTd DataLabel="Alış Döviz">@context.AlisFiyatiDoviz</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+        </PagerContent>
+    </MudTable>
 
+</div>
 
-
-@code
+    @code
 {
-    [CascadingParameter] IModalService modal { get; set; }
-    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
-    [CascadingParameter] ModalParameters modalParameters { get; set; }
+        [CascadingParameter] IModalService modal { get; set; }
+        [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+        [CascadingParameter] ModalParameters modalParameters { get; set; }
 
-    [Inject]
-    ILocalStorageService LocalStorageService { get; set; }
+        [Inject]
+        ILocalStorageService LocalStorageService { get; set; }
 
-    [Inject]
-    NavigationManager navigation { get; set; }
+        [Inject]
+        NavigationManager navigation { get; set; }
 
-    [Inject]
-    HttpClient httpClient { get; set; }
+        [Inject]
+        HttpClient httpClient { get; set; }
 
-    [Inject]
-    ISnackbar Snackbar { get; set; }
+        [Inject]
+        ISnackbar Snackbar { get; set; }
 
-    public List<MalzemeStokDto> malzemeKarts { get; set; }
-    public MalzemeStokRequestDto malzemeKart = new MalzemeStokRequestDto();
-    private bool _processing = false;
+        public List<MalzemeStokDto> malzemeKarts { get; set; }
+        public MalzemeStokRequestDto malzemeKart = new MalzemeStokRequestDto();
+        private bool _processing = false;
 
-    public async Task MalzemeKartSec(int logref)
-    {
-        try
+        public async Task MalzemeKartSec(int logref)
         {
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            var firma_no = selectedFirmaDonem.firma_no.Value;
-
-            var mkart = await httpClient.GetServiceResponseAsync<MalzemeKartDto>(UrlHelper.MalzemeKartGetir + "?logref=" + logref + "&firmaId=" + firma_no);
-
-            if (mkart != null)
+            try
             {
-                modalParameters = new ModalParameters();
-                modalParameters.Add("secim", mkart);
-                await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(mkart));
+                var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+                var firma_no = selectedFirmaDonem.firma_no.Value;
+
+                var mkart = await httpClient.GetServiceResponseAsync<MalzemeKartDto>(UrlHelper.MalzemeKartGetir + "?logref=" + logref + "&firmaId=" + firma_no);
+
+                if (mkart != null)
+                {
+                    modalParameters = new ModalParameters();
+                    modalParameters.Add("secim", mkart);
+                    await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(mkart));
+                }
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Error);
             }
         }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
-        }
-    }
 
-    public async Task MalzemeBul()
-    {
-        try
+        public async Task MalzemeBul()
         {
-            if (string.IsNullOrEmpty(malzemeKart.MalzemeAdi) && string.IsNullOrEmpty(malzemeKart.MalzemeMarka))
+            try
             {
-                throw new Exception(Utils.Mesajlar.MetinGir);
+                if (string.IsNullOrEmpty(malzemeKart.MalzemeAdi) && string.IsNullOrEmpty(malzemeKart.MalzemeMarka))
+                {
+                    throw new Exception(Utils.Mesajlar.MetinGir);
+                }
+
+                _processing = true;
+
+                var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+                var request = new MalzemeStokRequestDto();
+                request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+                request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+                if (!string.IsNullOrWhiteSpace(malzemeKart.MalzemeAdi))
+                    request.MalzemeAdi = '%' + malzemeKart.MalzemeAdi + '%';
+                if (!string.IsNullOrWhiteSpace(malzemeKart.MalzemeMarka))
+                    request.MalzemeMarka = '%' + malzemeKart.MalzemeMarka + '%';
+
+                malzemeKarts = await httpClient.PostGetServiceResponseAsync<List<MalzemeStokDto>, MalzemeStokRequestDto>(UrlHelper.MalzemeStokGetir, request);
+
             }
-
-            _processing = true;
-
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            var request = new MalzemeStokRequestDto();
-            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
-            request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
-            if (!string.IsNullOrWhiteSpace(malzemeKart.MalzemeAdi))
-                request.MalzemeAdi = '%' + malzemeKart.MalzemeAdi + '%';
-            if (!string.IsNullOrWhiteSpace(malzemeKart.MalzemeMarka))
-                request.MalzemeMarka = '%' + malzemeKart.MalzemeMarka + '%';
-
-            malzemeKarts = await httpClient.PostGetServiceResponseAsync<List<MalzemeStokDto>, MalzemeStokRequestDto>(UrlHelper.MalzemeStokGetir, request);
-
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Error);
+            }
+            finally
+            {
+                _processing = false;
+            }
         }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
-        }
-        finally
-        {
-            _processing = false;
-        }
+
     }
-
-}
