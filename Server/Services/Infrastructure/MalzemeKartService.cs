@@ -44,7 +44,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                         .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
             }
         }
-
         public async Task<List<MalzemeKartDto>> SearchMalzemeKart(MalzemeKartRequestDto request)
         {
             var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
@@ -56,8 +55,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                return await dbContext.V002Malzemelers.Where(x => 
-                (word == null || x.Adi.ToLower().Contains(word) || x.Kodu.ToLower().Contains(word))
+                return await dbContext.V002Malzemelers.Where(x => (x.Active == 0)
+                && (word == null || x.Adi.ToLower().Contains(word) || x.Kodu.ToLower().Contains(word))
                 && (marka == null || x.Descr.Contains(marka))
                     ).ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
             }
@@ -170,6 +169,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 p.Add("@MalzemeAdi", request.MalzemeAdi);
                 p.Add("@MalzemeMarka", request.MalzemeMarka);
                 p.Add("@TopRowCount", request.TopRowCount);
+                p.Add("@Active", 0);
 
                 var res = await db.QueryAsync<MalzemeStokDto>("GetMalzemeStokList", p, commandType: CommandType.StoredProcedure);
                 return res.ToList();
