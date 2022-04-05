@@ -12,6 +12,7 @@ using System.Data;
 using UmotaWebApp.Server.Data.Models;
 using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.ModelDto;
+using System.Data.Common;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
@@ -19,11 +20,13 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     {
         public IMapper Mapper { get; }
         public IConfiguration Configuration { get; }
+        private readonly DbConnection _sql;
 
-        public MalzemeKartService(IMapper mapper, IConfiguration configuration)
+        public MalzemeKartService(IMapper mapper, IConfiguration configuration, DbConnection sql)
         {
             Mapper = mapper;
             Configuration = configuration;
+            _sql = sql;
         }
 
         public async Task<MalzemeKartDto> GetMalzemeKart(int logref, string firmaId)
@@ -41,7 +44,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                         .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
             }
         }
-
         public async Task<List<MalzemeKartDto>> SearchMalzemeKart(MalzemeKartRequestDto request)
         {
             var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
@@ -53,8 +55,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                return await dbContext.V002Malzemelers.Where(x => 
-                (word == null || x.Adi.ToLower().Contains(word) || x.Kodu.ToLower().Contains(word))
+                return await dbContext.V002Malzemelers.Where(x => (x.Active == 0)
+                && (word == null || x.Adi.ToLower().Contains(word) || x.Kodu.ToLower().Contains(word))
                 && (marka == null || x.Descr.Contains(marka))
                     ).ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
             }
@@ -167,50 +169,27 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 p.Add("@MalzemeAdi", request.MalzemeAdi);
                 p.Add("@MalzemeMarka", request.MalzemeMarka);
                 p.Add("@TopRowCount", request.TopRowCount);
-                p.Add("@UmotaFirmaNo", request.UmotaFirmaNo);
-                p.Add("@UmotaKartlariGetir", request.UmotaKartlariGetir);
+                p.Add("@Active", 0);
 
                 var res = await db.QueryAsync<MalzemeStokDto>("GetMalzemeStokList", p, commandType: CommandType.StoredProcedure);
                 return res.ToList();
             }
         }
-        public async Task<IEnumerable<MalzemeBirimSetDto>> GetMalzemeBirimSetList(int logofirmno)
-        {
-            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
-            {
-                string LogoDbName = Configuration["LogoDbName"];
-                string LogoFirmaNo = logofirmno.ToString("000");
-                string sqlstring = "SELECT A.LOGICALREF BirimSetRef, A.CODE BirimSetKodu, B.LOGICALREF AnaBirimRef, B.CODE AnaBirimKodu from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_UNITSETF] A with(nolock) INNER JOIN " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_UNITSETL] B with(nolock) on (A.LOGICALREF = B.UNITSETREF AND B.MAINUNIT = 1)  where A.LOGICALREF > 4";
 
-                IEnumerable<MalzemeBirimSetDto> dbResponse;
-                dbResponse = await db.QueryAsync<MalzemeBirimSetDto>(sqlstring, commandType: CommandType.Text);
-                return dbResponse;
-            }
-        }
-        public async Task<IEnumerable<SpeCodesDto>> GetMalzemeGrupList(int logofirmno)
+        public async Task<MalzemeKartDto> SaveMalzemeKart(MalzemeKartRequestDto request)
         {
-            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
-            {
-                string LogoDbName = Configuration["LogoDbName"];
-                string LogoFirmaNo = logofirmno.ToString("000");
-                string sqlstring = "SELECT  LOGICALREF,  SPECODE,  DEFINITION_ from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_SPECODES] with(nolock) where CODETYPE = 4";
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
 
-                IEnumerable<SpeCodesDto> dbResponse;
-                dbResponse = await db.QueryAsync<SpeCodesDto>(sqlstring, commandType: CommandType.Text);
-                return dbResponse;
-            }
-        }
-        public async Task<IEnumerable<SpeCodesDto>> GetMalzemeMarkaList(int logofirmno)
-        {
-            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                string LogoDbName = Configuration["LogoDbName"];
-                string LogoFirmaNo = logofirmno.ToString("000");
-                string sqlstring = "SELECT  LOGICALREF,  CODE SPECODE,  DESCR DEFINITION_ from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_MARK] with(nolock)";
+                var malzKart = Mapper.Map<MalzKart>(request.MalzemeKart);
 
-                IEnumerable<SpeCodesDto> dbResponse;
-                dbResponse = await db.QueryAsync<SpeCodesDto>(sqlstring, commandType: CommandType.Text);
-                return dbResponse;
+                await dbContext.MalzKarts.AddAsync(malzKart);
+                await dbContext.SaveChangesAsync();
+
+                return Mapper.Map<MalzemeKartDto>(malzKart);
             }
         }
     }

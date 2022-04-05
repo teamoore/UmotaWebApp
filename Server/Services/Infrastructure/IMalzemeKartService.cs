@@ -13,5 +13,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<MalzemeFiyatDto> MalzemeFiyatGetir(MalzemeFiyatRequestDto request);
         public Task<MalzemeFiyatDto> MalzemeMaliyetGetir(MalzemeFiyatRequestDto request);
         public Task<List<MalzemeStokDto>> SearchMalzemeKartStoklu(MalzemeStokRequestDto request);
+        public Task<MalzemeKartDto> SaveMalzemeKart(MalzemeKartRequestDto request);
     }
 }

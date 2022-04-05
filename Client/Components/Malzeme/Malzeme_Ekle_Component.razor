@@ -1,0 +1,167 @@
+﻿ 
+    <div class="form">
+
+        <EditForm Model="malzeme">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Kodu</label>
+                        <InputText @bind-Value="malzeme.Kodu" class="form-control" disabled/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Adı</label>
+                        <InputText @bind-Value="malzeme.Adi" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Marka</label>
+                        <InputText @bind-Value="malzeme.Marka" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Birim</label>
+                        <InputText @bind-Value="malzeme.Birim" class="form-control" placeholder="kg,adet..." />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Birim Set</label>
+                        <InputText @bind-Value="malzeme.Birimset" class="form-control" placeholder="kg,adet..." />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Alış Fiyatı</label>
+                        <InputNumber @bind-Value="malzeme.Alfiyat" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Satış Fiyatı</label>
+                        <InputNumber @bind-Value="malzeme.Satfiyat" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+                    @if (_processing)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                        <MudText Class="ms-2">Kaydediliyor...</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Kaydet</MudText>
+                    }
+                </MudButton>
+                <CancelButtonComponent Caption="Vazgeç" OnClick="Close" />
+            </div>
+
+        </EditForm>
+    </div>
+ 
+
+@code {
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    private bool _processing = false;
+
+    public MalzemeKartDto malzeme = new MalzemeKartDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LogRefveKodUret();
+    }
+
+    public async Task ValidSubmit()
+    {
+        await SaveMalzemeKart();
+    }
+
+    public async Task SaveMalzemeKart()
+    {
+        try
+        {
+            _processing = true;
+            await LogRefveKodUret();
+            malzeme.Insdate = DateTime.Now;
+            malzeme.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            malzeme.Status = 0;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            var request = new MalzemeKartRequestDto();
+            request.MalzemeKart = malzeme;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostAsJsonAsync("/api/malzemekart/save", request);
+
+            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<MalzemeKartDto>>();
+            if (!response.Success)
+                throw new Exception(response.Message);
+
+            Snackbar.Add("Malzeme eklendi", severity: Severity.Success);
+
+            if (response.Value != null)
+            {
+                modalParameters = new ModalParameters();
+                modalParameters.Add("secim", response.Value);
+                await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(response.Value));
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task LogRefveKodUret()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma dönem seçilmedi");
+
+
+        var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=malz_kart&keyField=logref&firmaId=" + selectedFirmaDonem.firma_no.Value);
+        if (string.IsNullOrEmpty(result2) == false)
+        {
+            malzeme.Logref = Convert.ToInt32(result2) * -1;
+        }
+
+        var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=malz_kart&keyField=kodu&firmaId=" + selectedFirmaDonem.firma_no.Value);
+        if (string.IsNullOrEmpty(result) == false)
+        {
+            malzeme.Kodu =  result;
+        }
+    }
+
+    public Task Close()
+    {
+        return Task.CompletedTask;
+    }
+
+}
