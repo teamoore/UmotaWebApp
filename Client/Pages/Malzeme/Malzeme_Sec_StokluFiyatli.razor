@@ -137,6 +137,8 @@
                 var request = new MalzemeStokRequestDto();
                 request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
                 request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+                request.UmotaFirmaNo = selectedFirmaDonem.firma_no.Value;
+                request.UmotaKartlariGetir = 1;
                 if (!string.IsNullOrWhiteSpace(malzemeKart.MalzemeAdi))
                     request.MalzemeAdi = '%' + malzemeKart.MalzemeAdi + '%';
                 if (!string.IsNullOrWhiteSpace(malzemeKart.MalzemeMarka))
