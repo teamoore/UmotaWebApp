@@ -57,9 +57,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             str += @" <table style='width:100%;border:none !important;'>
   <tr>
 	<td>
-		<table style='width:400px;'>
+		<table style='width:100%;border:none;'>
           <tr>
-            <td>Teklif Tarihi:</td><td>" + teklif.TarihFormatted + @"</td>
+            <td style='width:90px;border:none;'>Teklif Tarihi:</td><td>" + teklif.TarihFormatted + @"</td>
           </tr>
 	      <tr>
             <td>Teklif No:</td><td>" + teklif.Teklifno + @"</td>
@@ -80,32 +80,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         <td>İlgili:</td><td>" + teklif.Temsilciadi + @"</td>
         </tr>";
 
-            //switch (teklifPdfType)
-            //{
-            //    case SharedEnums.TeklifPdfType.Iskontolu:
-            //        str += "<tr><td>İskonto Tutarı:</td><td>0.00</td></tr>";
-            //        break;
-            //    case SharedEnums.TeklifPdfType.Net:
-            //        str += @"<tr>
-            //                <td>Teklif Tutar:</td><td>" + teklif.Tutarmatrah + " " + teklif.Dovizdokuid + @"</td>
-            //                </tr>";
-            //        break;
-            //    case SharedEnums.TeklifPdfType.NetKdv:
-            //        str += @"<tr>
-            //                <td>Teklif Tutar + KDV:</td><td>" + teklif.Tutarmatrah + " " + teklif.Dovizdokuid + @"</td>
-            //                </tr>";
-            //        break;
-            //    default:
-            //        break;
-            //}
-
-            //str += @"<tr> <td>Genel Toplam:</td><td>" + teklif.Tutarmatrah + " " + teklif.Dovizdokuid + @"</td>
-            //                </tr>";
 
             str += @"</table>
 
 	</td>
-	<td><img style='height:150px;' src='"+ path + @"'></td>
+	<td style='width:200px;'><img style='height:150px;' src='"+ path + @"'></td>
   </tr>
   </table>
 <hr/>";
@@ -241,6 +220,10 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             }
 
+            if (string.IsNullOrEmpty(teklif.Notlar) == false)
+            {
+                str += "<p style='font-size:9pt;'>"+ teklif.Notlar +"</p>";
+            }
             str += "</div></body></html>";
 
             return str;
