@@ -667,7 +667,7 @@
         teklifDetay.Marka = mkart.Descr;
         teklifDetay.Mensei = mkart.Definition;
         teklifDetay.Ebat = mkart.Ebatt;
-        teklifDetay.Kdvyuz = mkart.Kdvyuz;
+        teklifDetay.Kdvyuz = mkart.Kdv.HasValue ? mkart.Kdv : mkart.Kdvyuz;
         teklifDetay.Ozelkod5 = mkart.Ozelkod5;
         if (mkart.Kodu.StartsWith("UMOTA"))
         {
@@ -701,6 +701,9 @@
             await FiyatGetir();
             await MaliyetGetir();
         }
+
+        if (teklifDetay.Miktar.HasValue)
+            CalculateTeklifDetay();
     }
 
     public async Task ValidSubmit()

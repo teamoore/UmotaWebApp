@@ -170,12 +170,13 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 p.Add("@MalzemeMarka", request.MalzemeMarka);
                 p.Add("@TopRowCount", request.TopRowCount);
                 p.Add("@Active", 0);
+                p.Add("@UmotaFirmaNo", request.UmotaFirmaNo);
+                p.Add("@UmotaKartlariGetir", request.UmotaKartlariGetir);
 
                 var res = await db.QueryAsync<MalzemeStokDto>("GetMalzemeStokList", p, commandType: CommandType.StoredProcedure);
                 return res.ToList();
             }
         }
-
         public async Task<MalzemeKartDto> SaveMalzemeKart(MalzemeKartRequestDto request)
         {
             var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
@@ -190,6 +191,45 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 await dbContext.SaveChangesAsync();
 
                 return Mapper.Map<MalzemeKartDto>(malzKart);
+            }
+        }
+        public async Task<IEnumerable<MalzemeBirimSetDto>> GetMalzemeBirimSetList(int logofirmno)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            {
+                string LogoDbName = Configuration["LogoDbName"];
+                string LogoFirmaNo = logofirmno.ToString("000");
+                string sqlstring = "SELECT A.LOGICALREF BirimSetRef, A.CODE BirimSetKodu, B.LOGICALREF AnaBirimRef, B.CODE AnaBirimKodu from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_UNITSETF] A with(nolock) INNER JOIN " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_UNITSETL] B with(nolock) on (A.LOGICALREF = B.UNITSETREF AND B.MAINUNIT = 1)  where A.LOGICALREF > 4";
+
+                IEnumerable<MalzemeBirimSetDto> dbResponse;
+                dbResponse = await db.QueryAsync<MalzemeBirimSetDto>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
+            }
+        }
+        public async Task<IEnumerable<SpeCodesDto>> GetMalzemeGrupList(int logofirmno)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            {
+                string LogoDbName = Configuration["LogoDbName"];
+                string LogoFirmaNo = logofirmno.ToString("000");
+                string sqlstring = "SELECT  LOGICALREF,  SPECODE,  DEFINITION_ from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_SPECODES] with(nolock) where CODETYPE = 4";
+
+                IEnumerable<SpeCodesDto> dbResponse;
+                dbResponse = await db.QueryAsync<SpeCodesDto>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
+            }
+        }
+        public async Task<IEnumerable<SpeCodesDto>> GetMalzemeMarkaList(int logofirmno)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            {
+                string LogoDbName = Configuration["LogoDbName"];
+                string LogoFirmaNo = logofirmno.ToString("000");
+                string sqlstring = "SELECT  LOGICALREF,  CODE SPECODE,  DESCR DEFINITION_ from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_MARK] with(nolock)";
+
+                IEnumerable<SpeCodesDto> dbResponse;
+                dbResponse = await db.QueryAsync<SpeCodesDto>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
             }
         }
     }

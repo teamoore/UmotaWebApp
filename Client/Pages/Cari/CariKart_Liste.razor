@@ -1,4 +1,4 @@
-﻿@page "/r_carilistef"
+﻿@page "/cari_kartf"
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="CreateCariKart" onDoneButtonClicked="HeaderSearch"
                  ShowButtons="false"
@@ -152,12 +152,12 @@
 
     public void CariKartGuncelle(int logref)
     {
-        navigation.NavigateTo("/r_carilistef_guncelle/" + logref);
+        navigation.NavigateTo("/cari_kartf_guncelle/" + logref);
     }
 
     public void CreateCariKart()
     {
-        navigation.NavigateTo("/r_carilistef_ekle");
+        navigation.NavigateTo("/cari_kartf_ekle");
     }
 
 }

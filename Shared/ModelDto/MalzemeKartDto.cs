@@ -51,5 +51,18 @@ namespace UmotaWebApp.Shared.ModelDto
         public string Ebatt { get; set; }
         public double? Kdvyuz { get; set; }
         public string Ozelkod5 { get; set; }
+
+        private double? _kdvNumber;
+        public double? KdvNumber
+        { 
+            get 
+            {
+                return (double?)this.Kdv;
+            }
+            set {
+                _kdvNumber = value;
+                this.Kdv = (byte?)_kdvNumber;
+            }
+        }
     }
 }
