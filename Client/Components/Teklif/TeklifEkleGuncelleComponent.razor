@@ -31,15 +31,21 @@
                         <label>Cari Kodu</label>
                         <InputText @bind-Value="teklif.Carikodu" class="form-control" placeholder="Cari Kodu" disabled />
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-8">
                         <label>Cari Adı</label>
-                        <InputText @bind-Value="teklif.Cariadi" class="form-control" placeholder="Cari Adı" disabled />
+                        <div class="row">
+                            <div class="col">
+                                <InputText @bind-Value="teklif.Cariadi" class="form-control" placeholder="Cari Adı" disabled />
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" IconColor="Color.Secondary" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Size=Size.Medium>Bul</MudButton>
+                                <MudButton Variant="Variant.Filled" IconColor="Color.Secondary" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Size=Size.Medium>Yeni Cari</MudButton>
+
+                            </div>
+                        </div>
+                        
                     </div>
-                    <div class="col-md-6">
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Medium>Bul</MudButton>
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Color="Color.Info" Size=Size.Medium>Yeni Cari</MudButton>
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="YeniKisiEkle" Color="Color.Info" Size=Size.Medium>Yeni Kişi</MudButton>
-                    </div>
+                    
                 </div>
 
             </div>
@@ -48,16 +54,25 @@
                 <div class="row">
                     <div class="col-md-4">
                         <label>Firma Yetkilisi</label>
-                        <InputSelect @bind-Value="teklif.IlgiliAdi" class="form-control">
-                            @if (KisiListesi != null)
-                            {
-                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                @foreach (var item in KisiListesi)
-                                {
-                                    <option value="@item.Tamadi">@item.Tamadi</option>
-                                }
-                            }
-                        </InputSelect>
+                        <div class="row">
+                            <div class="col">
+                                <InputSelect @bind-Value="teklif.IlgiliAdi" class="form-control">
+                                    @if (KisiListesi != null)
+                                    {
+                                        <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                        @foreach (var item in KisiListesi)
+                                        {
+                                            <option value="@item.Tamadi">@item.Tamadi</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-3">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="YeniKisiEkle" IconColor="Color.Secondary" Size=Size.Medium>Ekle</MudButton>
+                            </div>
+                        </div>
+
+                        
                     </div>
                     <div class="col-md-4">
                         <label>Satış Temsilcisi</label>
@@ -160,6 +175,25 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Teklif Sözleşmesi</label>
+                        <div class="row">
+                            <div class="col">
+                                <InputTextArea @bind-Value="teklif.Notlar" class="form-control" rows="8"></InputTextArea>
+                            </div>
+                            <div class="col-md-2">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DocumentScanner"
+                                           IconColor="Color.Secondary" Size="Size.Small" OnClick="VarolanSozlesme">Hazır Sözleşme</MudButton>
+
+                            </div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -262,6 +296,7 @@
         {
             teklif.Tarih = DateTime.Now;
             teklif.TeslimSekli = "MÜŞTERİ TESLİM";
+            this.teklif.Notlar = Utils.Consts.TeklifSozlesmesi;
         }
 
         await TeslimListesiCek();
@@ -272,6 +307,8 @@
         await DovizListesiGetir();
         await GetKisiListesi();
         loadingCompleted = true;
+
+
     }
 
     public async Task GetTeklif()
@@ -557,7 +594,7 @@
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
-            var result = await httpClient.GetServiceResponseAsync<List<PersonelDto>>("/api/helper/GetPersonelList?logofirmno="+selectedFirmaDonem.logo_firma.Value);
+            var result = await httpClient.GetServiceResponseAsync<List<PersonelDto>>("/api/helper/GetPersonelList?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
             if (result != null)
             {
                 PersonelListesi = result;
@@ -575,7 +612,7 @@
         try
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-            var result = await httpClient.GetServiceResponseAsync<List<OdemePlaniDto>>("/api/helper/GetOdemePlaniList?logofirmno="+selectedFirmaDonem.logo_firma.Value);
+            var result = await httpClient.GetServiceResponseAsync<List<OdemePlaniDto>>("/api/helper/GetOdemePlaniList?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
             if (result != null)
             {
                 OdemePlaniListesi = result;
@@ -685,5 +722,10 @@
 
             throw;
         }
+    }
+
+    public void VarolanSozlesme()
+    {
+        this.teklif.Notlar = Utils.Consts.TeklifSozlesmesi;
     }
 }

@@ -113,7 +113,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                         || x.Adres2.ToLower().Contains(word)
                         || x.Ilce.Contains(word)
                         || x.Web.Contains(word)
-                        || x.Kodu.Contains(word))
+                        || x.Kodu.Contains(word)))
                     .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider)
                     .OrderByDescending(x => x.Logref)
                     .ToListAsync();
