@@ -12,6 +12,7 @@ using System.Data;
 using UmotaWebApp.Server.Data.Models;
 using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.ModelDto;
+using System.Data.Common;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
@@ -19,11 +20,13 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     {
         public IMapper Mapper { get; }
         public IConfiguration Configuration { get; }
+        private readonly DbConnection _sql;
 
-        public MalzemeKartService(IMapper mapper, IConfiguration configuration)
+        public MalzemeKartService(IMapper mapper, IConfiguration configuration, DbConnection sql)
         {
             Mapper = mapper;
             Configuration = configuration;
+            _sql = sql;
         }
 
         public async Task<MalzemeKartDto> GetMalzemeKart(int logref, string firmaId)
@@ -170,6 +173,23 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
                 var res = await db.QueryAsync<MalzemeStokDto>("GetMalzemeStokList", p, commandType: CommandType.StoredProcedure);
                 return res.ToList();
+            }
+        }
+
+        public async Task<MalzemeKartDto> SaveMalzemeKart(MalzemeKartRequestDto request)
+        {
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var malzKart = Mapper.Map<MalzKart>(request.MalzemeKart);
+
+                await dbContext.MalzKarts.AddAsync(malzKart);
+                await dbContext.SaveChangesAsync();
+
+                return Mapper.Map<MalzemeKartDto>(malzKart);
             }
         }
     }

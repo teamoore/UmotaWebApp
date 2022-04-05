@@ -46,11 +46,17 @@
                                 <label>Malzeme Tanımı</label>
                                 <InputText @bind-Value="teklifDetay.Malzadi" class="form-control" placeholder="Stok Adı" disabled />
                             </div>
-                            <div class="col-md-2">
-                                <label>Malzemeler</label>
+                            <div class="col-md-6">
+                                <label>&nbsp;</label>
                                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
                                            OnClick="MalzemeListesiAc"
                                            Color="Color.Info" Size="Size.Medium">Bul</MudButton>
+
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Storefront"
+                                           OnClick="MalzemeEkle"
+                                           Color="Color.Secondary" Size="Size.Medium">Yeni Malzeme</MudButton>
+
+
                             </div>
                         </div>
                     </div>
@@ -494,7 +500,7 @@
     {
         get
         {
-            _isktopid = Math.Round((teklifDetay.Isktut1id.HasValue ? teklifDetay.Isktut1id.Value : 0) + (teklifDetay.Isktut2id.HasValue ? teklifDetay.Isktut2id.Value :0) + (teklifDetay.Isktut3id.HasValue ? teklifDetay.Isktut3id.Value : 0) + (teklifDetay.Isktut4id.HasValue ? teklifDetay.Isktut4id.Value : 0),2);
+            _isktopid = Math.Round((teklifDetay.Isktut1id.HasValue ? teklifDetay.Isktut1id.Value : 0) + (teklifDetay.Isktut2id.HasValue ? teklifDetay.Isktut2id.Value : 0) + (teklifDetay.Isktut3id.HasValue ? teklifDetay.Isktut3id.Value : 0) + (teklifDetay.Isktut4id.HasValue ? teklifDetay.Isktut4id.Value : 0), 2);
 
             return _isktopid;
         }
@@ -615,7 +621,7 @@
     {
         var opt = new ModalOptions();
         opt.ContentScrollable = true;
-        
+
 
         var form = modal.Show<Pages.Malzeme.Malzeme_Sec_StokluFiyatli>("Malzeme Seç", options: opt);
         var result = await form.Result;
@@ -624,52 +630,76 @@
         {
             if (result.Data != null)
             {
-                var mkart = (MalzemeKartDto)result.Data;
-                teklifDetay.LstokId = mkart.Logref;
-                teklifDetay.Malzadi = mkart.Adi;
-                teklifDetay.Malzkodu = mkart.Kodu;
-                teklifDetay.Birimkodu = mkart.Birimkodu;
-                teklifDetay.Unitsetllogref = mkart.Birimref;
-                teklifDetay.Unitsetref = mkart.Birimsetiref;
-                teklifDetay.Marka = mkart.Descr;
-                teklifDetay.Mensei = mkart.Definition;
-                teklifDetay.Ebat = mkart.Ebatt;
-                teklifDetay.Kdvyuz = mkart.Kdvyuz;
-                teklifDetay.Ozelkod5 = mkart.Ozelkod5;
-                if (mkart.Kodu.StartsWith("UMOTA"))
-                {
-                    teklifDetay.Fiyat = mkart.Satfiyat;
-                    switch (mkart.SatfiyatDov)
-                    {
-                        case "TL":
-                            teklifDetay.Dovizref = 160;
-                            break;
-                        case "USD":
-                            teklifDetay.Dovizref = 1;
-                            break;
-                        case "EUR":
-                            teklifDetay.Dovizref = 20;
-                            break;
-                        case "GBP":
-                            teklifDetay.Dovizref = 17;
-                            break;
-                        case "CHF":
-                            teklifDetay.Dovizref = 1;
-                            break;
-                        default:
-                            teklifDetay.Dovizref = 160;
-                            break;
-                    }
-                    teklifDetay.Maliyet1 = mkart.Alfiyat;
-                    teklifDetay.Maliyet2 = mkart.Alfiyat;
-                }
-                else
-                {
-                    await FiyatGetir();
-                    await MaliyetGetir();
-                }
+                await MalzemeDonusum(result.Data);
             }
 
+        }
+    }
+
+    public async Task MalzemeEkle()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+
+        var form = modal.Show<Components.Malzeme.Malzeme_Ekle_Component>("Malzeme Ekle", options: opt);
+        var result = await form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                await MalzemeDonusum(result.Data);
+            }
+
+        }
+    }
+
+    private async Task MalzemeDonusum(object data)
+    {
+        var mkart = (MalzemeKartDto)data;
+        teklifDetay.LstokId = mkart.Logref;
+        teklifDetay.Malzadi = mkart.Adi;
+        teklifDetay.Malzkodu = mkart.Kodu;
+        teklifDetay.Birimkodu = mkart.Birimkodu;
+        teklifDetay.Unitsetllogref = mkart.Birimref;
+        teklifDetay.Unitsetref = mkart.Birimsetiref;
+        teklifDetay.Marka = mkart.Descr;
+        teklifDetay.Mensei = mkart.Definition;
+        teklifDetay.Ebat = mkart.Ebatt;
+        teklifDetay.Kdvyuz = mkart.Kdvyuz;
+        teklifDetay.Ozelkod5 = mkart.Ozelkod5;
+        if (mkart.Kodu.StartsWith("UMOTA"))
+        {
+            teklifDetay.Fiyat = mkart.Satfiyat;
+            switch (mkart.SatfiyatDov)
+            {
+                case "TL":
+                    teklifDetay.Dovizref = 160;
+                    break;
+                case "USD":
+                    teklifDetay.Dovizref = 1;
+                    break;
+                case "EUR":
+                    teklifDetay.Dovizref = 20;
+                    break;
+                case "GBP":
+                    teklifDetay.Dovizref = 17;
+                    break;
+                case "CHF":
+                    teklifDetay.Dovizref = 1;
+                    break;
+                default:
+                    teklifDetay.Dovizref = 160;
+                    break;
+            }
+            teklifDetay.Maliyet1 = mkart.Alfiyat;
+            teklifDetay.Maliyet2 = mkart.Alfiyat;
+        }
+        else
+        {
+            await FiyatGetir();
+            await MaliyetGetir();
         }
     }
 
@@ -1119,7 +1149,7 @@
         {
             var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
-            var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi+ "?kullanicikodu="+kullanicikodu+"&yetkikodu="+ KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
+            var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
 
             maliyetGor = result == 1;
 
@@ -1132,4 +1162,6 @@
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
     }
+
+
 }

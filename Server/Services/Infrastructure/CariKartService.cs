@@ -114,7 +114,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                         || x.Ilce.Contains(word)
                         || x.Web.Contains(word)
                         || x.Kodu.Contains(word))
-                    .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider).ToListAsync();
+                    .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider)
+                    .OrderByDescending(x => x.Logref)
+                    .ToListAsync();
 
                 return results;
             }
