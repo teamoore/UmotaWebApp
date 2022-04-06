@@ -1,0 +1,24 @@
+﻿@page "/malzeme_kartf_ekle"
+
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+<Malzeme_Ekle_Component></Malzeme_Ekle_Component>
+
+@code
+{
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Malzeme Kart Ekle";
+        return Task.CompletedTask;
+    }
+
+    public void goBack()
+    {
+        navigation.NavigateTo("/malzeme_listef");
+    }
+}

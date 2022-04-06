@@ -29,6 +29,26 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             _sql = sql;
         }
 
+        public async Task<List<MalzemeKartDto>> GetMalzemeKarts(string firmaId)
+        {
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var results = await dbContext.MalzKarts.Where(x => x.Active == 0)
+                                        .Take(100)
+                                        .OrderByDescending(x => x.Logref)
+                                        .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
+
+                return results;
+            }
+        }
+
         public async Task<MalzemeKartDto> GetMalzemeKart(int logref, string firmaId)
         {
             if (string.IsNullOrEmpty(firmaId))
@@ -40,24 +60,23 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                return await dbContext.V002Malzemelers.Where(i => i.Logref == logref)
+                return await dbContext.MalzKarts.Where(i => i.Logref == logref)
                         .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).SingleOrDefaultAsync();
             }
         }
-        public async Task<List<MalzemeKartDto>> SearchMalzemeKart(MalzemeKartRequestDto request)
+        public async Task<List<MalzemeKartDto>> SearchMalzemeKarts(MalzemeKartRequestDto request)
         {
             var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
             var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
 
-            string word = request.MalzemeKart.Adi != null ? request.MalzemeKart.Adi.ToLower() : null;
-            string marka = request.MalzemeKart.Marka != null ? request.MalzemeKart.Marka.ToLower() : null;
-
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                return await dbContext.V002Malzemelers.Where(x => (x.Active == 0)
-                && (word == null || x.Adi.ToLower().Contains(word) || x.Kodu.ToLower().Contains(word))
-                && (marka == null || x.Descr.Contains(marka))
+                return await dbContext.MalzKarts.Where(x => (x.Active == 0)
+                && (request.MalzemeKodu == null || x.Kodu.ToLower().Contains(request.MalzemeKodu))
+                && (request.MalzemeAdi == null || x.Adi.ToLower().Contains(request.MalzemeAdi))
+                && (request.Marka == null || x.Marka.Contains(request.Marka))
+                && (request.SearchText == null || x.Kodu.Contains(request.SearchText) || x.Adi.Contains(request.SearchText) || x.Marka.Contains(request.SearchText))
                     ).ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
             }
         }
@@ -193,6 +212,25 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return Mapper.Map<MalzemeKartDto>(malzKart);
             }
         }
+        public async Task<MalzemeKartDto> UpdateMalzemeKart(MalzemeKartRequestDto request)
+        {
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var malzKart = await dbContext.MalzKarts.Where(x => x.Logref == request.MalzemeKart.Logref).SingleOrDefaultAsync();
+                if (malzKart == null)
+                    throw new Exception("Kart bulunamadı");
+
+                Mapper.Map(request.MalzemeKart, malzKart);
+                await dbContext.SaveChangesAsync();
+
+                return Mapper.Map<MalzemeKartDto>(malzKart);
+            }
+        }
+
         public async Task<IEnumerable<MalzemeBirimSetDto>> GetMalzemeBirimSetList(int logofirmno)
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))

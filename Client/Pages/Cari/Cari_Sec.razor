@@ -8,7 +8,7 @@
 
                 <div class="row">
                     <div class="col-md-4">
-                        <InputText @bind-Value="cari.Adi" class="form-control" />
+                        <InputText @bind-Value="cari.SearchText" class="form-control" />
                     </div>
                     <div class="col-md-8">
                         <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage"
@@ -81,9 +81,9 @@
                 [Inject]
                 ILocalStorageService LocalStorageService { get; set; }
 
-                public List<CariKartDto> cariler { get; set; }
+                public List<VCariKartDto> cariler { get; set; }
 
-                public CariKartDto cari = new CariKartDto();
+                public VCariKartsRequestDto cari = new VCariKartsRequestDto();
 
                 private string _searchString = "";
                 private bool _sortNameByLength;
@@ -95,8 +95,7 @@
 
                 private async Task LoadCariler()
                 {
-                    cariler = await httpClient.GetServiceResponseAsync<List<CariKartDto>>("/api/carikart/list");
-                    cariler = cariler.OrderByDescending(i => i.Insdate).ToList();
+                    cariler = await httpClient.GetServiceResponseAsync<List<VCariKartDto>>(UrlHelper.VCariKartListesi);
                 }
 
                 public async Task CariBul()
@@ -104,7 +103,7 @@
 
                     try
                     {
-                        if (string.IsNullOrEmpty(cari.Adi))
+                        if (string.IsNullOrEmpty(cari.SearchText))
                         {
                             throw new Exception(Utils.Mesajlar.MetinGir);
                         }
@@ -117,15 +116,14 @@
                         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
                         if (selectedFirmaDonem == null)
                             throw new Exception("Firma dönem seçilmedi");
-                        var request = new CariKartRequestDto();
-                        request.CariKart = cari;
-                        request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
-                        cariler = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartRequestDto>(UrlHelper.CariKartAra, request);
+                        cari.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+                        cariler = await httpClient.PostGetServiceResponseAsync<List<VCariKartDto>, VCariKartsRequestDto>(UrlHelper.VCariKartAra, cari);
 
                         if (cariler.Count == 0)
                         {
-                            ResultText = string.Format(@"'{0}' aradığınız cari bulunamadı", cari.Adi);
+                            ResultText = string.Format(@"'{0}' aradığınız cari bulunamadı", cari.SearchText);
                         }
                     }
                     catch (Exception ex)
@@ -149,12 +147,12 @@
                             throw new Exception("Firma dönem seçilmedi");
 
 
-                        var cari = await httpClient.GetServiceResponseAsync<CariKartDto>(UrlHelper.CariKartGetirLogRef + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.ToString());
+                        var cari = await httpClient.GetServiceResponseAsync<VCariKartDto>(UrlHelper.VCariKartGetir + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.ToString());
                         if (cari != null)
                         {
                             modalParameters = new ModalParameters();
                             modalParameters.Add("secim", cari);
-                            await ModalInstance.CloseAsync(ModalResult.Ok<CariKartDto>(cari));
+                            await ModalInstance.CloseAsync(ModalResult.Ok<VCariKartDto>(cari));
                         }
                     }
                     catch (Exception ex)

@@ -33,7 +33,7 @@ namespace UmotaWebApp.Server.Controllers
             {
                 return new ServiceResponse<List<CariKartDto>>()
                 {
-                    Value = await CariKartService.GetCariKartDtos(firmaId)
+                    Value = await CariKartService.GetCariKarts(firmaId)
                 };
             }
             catch (ApiException ex)
@@ -41,26 +41,6 @@ namespace UmotaWebApp.Server.Controllers
                 Logger.Log(LogLevel.Error, ex.Message);
 
                 var e = new ServiceResponse<List<CariKartDto>>();
-                e.SetException(ex);
-                return e;
-            }
-        }
-
-        [HttpGet("getByKod")]
-        public async Task<ServiceResponse<CariKartDto>> CariKartGetir(string kod, string firmaId)
-        {
-            try
-            {
-                return new ServiceResponse<CariKartDto>()
-                {
-                    Value = await CariKartService.GetCariKartByKod(kod, firmaId)
-                };
-            }
-            catch (ApiException ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<CariKartDto>();
                 e.SetException(ex);
                 return e;
             }
@@ -142,46 +122,6 @@ namespace UmotaWebApp.Server.Controllers
                 Logger.Log(LogLevel.Error, ex.Message);
 
                 var e = new ServiceResponse<List<CariKartDto>>();
-                e.SetException(ex);
-                return e;
-            }
-        }
-
-        [HttpGet("getkisiler")]
-        public async Task<ServiceResponse<List<KisilerDto>>> GetCariKartKisilerr(int cariref, string firmaId)
-        {
-            try
-            {
-                return new ServiceResponse<List<KisilerDto>>()
-                {
-                    Value = await CariKartService.GetCariKartKisiler(cariref, firmaId)
-                };
-            }
-            catch (ApiException ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<List<KisilerDto>>();
-                e.SetException(ex);
-                return e;
-            }
-        }
-
-        [HttpPost("savekisi")]
-        public async Task<ServiceResponse<KisilerDto>> KisiKaydet(KisilerRequestDto request)
-        {
-            try
-            {
-                return new ServiceResponse<KisilerDto>
-                {
-                    Value = await CariKartService.SaveCariKartKisi(request)
-                };
-            }
-            catch (ApiException ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<KisilerDto>();
                 e.SetException(ex);
                 return e;
             }

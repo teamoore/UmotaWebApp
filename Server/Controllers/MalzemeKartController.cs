@@ -26,6 +26,26 @@ namespace UmotaWebApp.Server.Controllers
             MalzemeKartService = malzemeKartService;
         }
 
+        [HttpGet("list")]
+        public async Task<ServiceResponse<List<MalzemeKartDto>>> MalzemeKartListele(string firmaId)
+        {
+            try
+            {
+                return new ServiceResponse<List<MalzemeKartDto>>()
+                {
+                    Value = await MalzemeKartService.GetMalzemeKarts(firmaId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<MalzemeKartDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
         [HttpPost("search")]
         public async Task<ServiceResponse<List<MalzemeKartDto>>> GetMalzemeKartSearchList(MalzemeKartRequestDto request)
         {
@@ -33,7 +53,7 @@ namespace UmotaWebApp.Server.Controllers
             {
                 return new ServiceResponse<List<MalzemeKartDto>>()
                 {
-                    Value = await MalzemeKartService.SearchMalzemeKart(request)
+                    Value = await MalzemeKartService.SearchMalzemeKarts(request)
                 };
             }
             catch (ApiException ex)
@@ -135,6 +155,26 @@ namespace UmotaWebApp.Server.Controllers
                 return new ServiceResponse<MalzemeKartDto>()
                 {
                     Value = await MalzemeKartService.SaveMalzemeKart(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<MalzemeKartDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("update")]
+        public async Task<ServiceResponse<MalzemeKartDto>> UpdateMalzemeKart(MalzemeKartRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<MalzemeKartDto>()
+                {
+                    Value = await MalzemeKartService.UpdateMalzemeKart(request)
                 };
             }
             catch (ApiException ex)

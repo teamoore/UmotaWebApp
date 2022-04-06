@@ -155,7 +155,7 @@
                     <MudText>Kaydet</MudText>
                 }
             </MudButton>
-            <CancelButtonComponent Caption="Vazgeç" OnClick="Close" />
+            <CancelButtonComponent Caption="Vazgeç" OnClick="goBackList" />
         </div>
 
     </EditForm>
@@ -163,6 +163,11 @@
 
 
 @code {
+    [Parameter]
+    public int? MalzemeKartRef { get; set; }
+    [Parameter]
+    public int? modalForm { get; set; }
+
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
     [CascadingParameter] ModalParameters modalParameters { get; set; }
@@ -181,14 +186,43 @@
     ILocalStorageService LocalStorageService { get; set; }
 
     private bool _processing = false;
+    private bool isUpdate = false;
 
     public MalzemeKartDto malzeme = new MalzemeKartDto();
     public IEnumerable<DovizDto> DovizListesi { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await FisNoAl();
+        if (MalzemeKartRef.HasValue)
+            isUpdate = true;
+
+        if (isUpdate)
+            await KartGetir();
+        else
+            await FisNoAl();
+
         await DovizListesiGetir();
+    }
+
+    public async Task KartGetir()
+    {
+        try
+        {
+            if (!MalzemeKartRef.HasValue)
+                return;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            malzeme = await httpClient.GetServiceResponseAsync<MalzemeKartDto>(UrlHelper.MalzemeKartGetir + "?logref=" + MalzemeKartRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
     }
 
     public async Task ValidSubmit()
@@ -217,40 +251,62 @@
         try
         {
             _processing = true;
-            await FisNoAl();
-            await RefNoAl();
-            malzeme.Insdate = DateTime.Now;
-            malzeme.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            malzeme.Status = 0;
-            malzeme.Active = 0;
-            malzeme.Logoref = 0;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (isUpdate)
+            {
+                malzeme.Upddate = DateTime.Now;
+                malzeme.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+                malzeme.Status = 1;
+
+            } else
+            {
+                await FisNoAl();
+                await RefNoAl();
+                malzeme.Insdate = DateTime.Now;
+                malzeme.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+                malzeme.Status = 0;
+                malzeme.Active = 0;
+                malzeme.Logoref = 0;
+            }
 
             var request = new MalzemeKartRequestDto();
             request.MalzemeKart = malzeme;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
-            var result = await httpClient.PostAsJsonAsync("/api/malzemekart/save", request);
-
-            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<MalzemeKartDto>>();
-            if (!response.Success)
-                throw new Exception(response.Message);
-
-            Snackbar.Add("Malzeme eklendi", severity: Severity.Success);
-
-            if (response.Value != null)
+            if (isUpdate)
             {
-                modalParameters = new ModalParameters();
-                modalParameters.Add("secim", response.Value);
-                await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(response.Value));
+                malzeme = await httpClient.PostGetServiceResponseAsync<MalzemeKartDto, MalzemeKartRequestDto>(UrlHelper.MalzemeKartUpdate, request);
+                Snackbar.Add("Malzeme güncellendi", severity: Severity.Success);
             }
+            else
+            {
+                malzeme = await httpClient.PostGetServiceResponseAsync<MalzemeKartDto, MalzemeKartRequestDto>(UrlHelper.MalzemeKartSave, request);
+                Snackbar.Add("Malzeme eklendi", severity: Severity.Success);
+            }
+
+            if (modalForm.HasValue)
+            {
+                var mkart = await httpClient.GetServiceResponseAsync<VMalzemeKartDto>(UrlHelper.VMalzemeKartGetir + "?logref=" + malzeme.Logref + "&firmaId=" + request.FirmaId);
+                await ModalInstance.CloseAsync(ModalResult.Ok<VMalzemeKartDto>(mkart));
+            }
+            else
+                await goBackList();
 
         }
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
         }
+    }
+
+    public async Task goBackList()
+    {
+        if (modalForm.HasValue)
+            await ModalInstance.CloseAsync();
+        else
+            navigation.NavigateTo("/malzeme_listef");
     }
 
     public async Task FisNoAl()

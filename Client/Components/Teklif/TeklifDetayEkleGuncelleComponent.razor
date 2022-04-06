@@ -641,8 +641,10 @@
         var opt = new ModalOptions();
         opt.ContentScrollable = true;
 
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
 
-        var form = modal.Show<Components.Malzeme.Malzeme_Ekle_Component>("Malzeme Ekle", options: opt);
+        var form = modal.Show<Components.Malzeme.Malzeme_Ekle_Component>("Malzeme Ekle", parameters: parameters, options: opt);
         var result = await form.Result;
 
         if (!result.Cancelled)
@@ -657,7 +659,7 @@
 
     private async Task MalzemeDonusum(object data)
     {
-        var mkart = (MalzemeKartDto)data;
+        var mkart = (VMalzemeKartDto)data;
         teklifDetay.LstokId = mkart.Logref;
         teklifDetay.Malzadi = mkart.Adi;
         teklifDetay.Malzkodu = mkart.Kodu;
@@ -667,7 +669,7 @@
         teklifDetay.Marka = mkart.Descr;
         teklifDetay.Mensei = mkart.Definition;
         teklifDetay.Ebat = mkart.Ebatt;
-        teklifDetay.Kdvyuz = mkart.Kdv.HasValue ? mkart.Kdv : mkart.Kdvyuz;
+        teklifDetay.Kdvyuz = mkart.Kdvyuz;
         teklifDetay.Ozelkod5 = mkart.Ozelkod5;
         if (mkart.Kodu.StartsWith("UMOTA"))
         {

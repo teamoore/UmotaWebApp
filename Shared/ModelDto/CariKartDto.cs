@@ -46,7 +46,5 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? Insdate { get; set; }
         public string Upduser { get; set; }
         public DateTime? Upddate { get; set; }
-        public byte? Caritip { get; set; }
-        public string Caritipadi { get; set; }
     }
 }

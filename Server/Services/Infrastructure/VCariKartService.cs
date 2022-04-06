@@ -12,19 +12,18 @@ using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
-
-    public class CariKartService : ICariKartService
+    public class VCariKartService : IVCariKartService
     {
         public IMapper Mapper { get; }
         public IConfiguration Configuration { get; }
 
-        public CariKartService(IConfiguration configuration,  IMapper mapper)
+        public VCariKartService(IConfiguration configuration, IMapper mapper)
         {
             Configuration = configuration;
             Mapper = mapper;
         }
-                
-        public async Task<List<CariKartDto>> GetCariKarts(string firmaId)
+
+        public async Task<List<VCariKartDto>> GetVCariKarts(string firmaId)
         {
             if (string.IsNullOrEmpty(firmaId))
                 throw new Exception("Firma Dönem seçimi yapınız");
@@ -35,15 +34,15 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                var results = await dbContext.CariKarts.Where(x => x.Active == 0)
+                var results = await dbContext.V001CariKarts.Where(x => x.Active == 0)
                                         .Take(100)
                                         .OrderByDescending(x => x.Logref)
-                                        .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider).ToListAsync();
+                                        .ProjectTo<VCariKartDto>(Mapper.ConfigurationProvider).ToListAsync();
 
                 return results;
             }
         }
-        public async Task<CariKartDto> SaveCariKart(CariKartRequestDto request)
+        public async Task<List<VCariKartDto>> SearchVCariKarts(VCariKartsRequestDto request)
         {
             var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
             var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
@@ -51,40 +50,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                var cariKart = Mapper.Map<CariKart>(request.CariKart);
-                await dbContext.CariKarts.AddAsync(cariKart);
-                await dbContext.SaveChangesAsync();
-                return Mapper.Map<CariKartDto>(cariKart);
-            }
-        }
-        public async Task<CariKartDto> UpdateCariKart(CariKartRequestDto request)
-        {
-            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
-            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
-            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
-            {
-                var cariKartRow = await dbContext.CariKarts.Where(x => x.Kodu == request.CariKart.Kodu).SingleOrDefaultAsync();
-                if (cariKartRow == null)
-                    throw new Exception("Cari kart bulunamadı");
-
-                Mapper.Map(request.CariKart, cariKartRow);
-                await dbContext.SaveChangesAsync();
-
-                return Mapper.Map<CariKartDto>(cariKartRow);
-            }
-        }
-        public async Task<List<CariKartDto>> SearchCariKarts(CariKartRequestDto request)
-        {
-            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
-            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
-            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
-            {
-                var word = request.CariKart.Adi.ToLower();
-                var results = await dbContext.CariKarts.Where(x => (x.Active == 0) &&
+                var word = request.SearchText.ToLower();
+                var results = await dbContext.V001CariKarts.Where(x => (x.Active == 0) &&
                         (x.Adi.ToLower().Contains(word)
                         || x.Adi2.ToLower().Contains(word)
                         || x.Adres1.ToLower().Contains(word)
@@ -92,15 +59,14 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                         || x.Ilce.Contains(word)
                         || x.Web.Contains(word)
                         || x.Kodu.Contains(word)))
-                    .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider)
+                    .ProjectTo<VCariKartDto>(Mapper.ConfigurationProvider)
                     .OrderByDescending(x => x.Logref)
                     .ToListAsync();
 
                 return results;
             }
         }
-
-        public async Task<CariKartDto> GetCariKart(int logref, string firmaId)
+        public async Task<VCariKartDto> GetVCariKart(int logref, string firmaId)
         {
             if (string.IsNullOrEmpty(firmaId))
                 throw new Exception("Firma Dönem seçimi yapınız");
@@ -111,11 +77,12 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                IQueryable<CariKartDto> qry = dbContext.CariKarts.Where(i => i.Logref == logref)
-                            .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider);
+                IQueryable<VCariKartDto> qry = dbContext.V001CariKarts.Where(i => i.Logref == logref)
+                            .ProjectTo<VCariKartDto>(Mapper.ConfigurationProvider);
 
                 return await qry.SingleOrDefaultAsync();
             }
         }
+
     }
 }

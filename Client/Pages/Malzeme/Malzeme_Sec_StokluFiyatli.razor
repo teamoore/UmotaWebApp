@@ -106,13 +106,13 @@
 
                 var firma_no = selectedFirmaDonem.firma_no.Value;
 
-                var mkart = await httpClient.GetServiceResponseAsync<MalzemeKartDto>(UrlHelper.MalzemeKartGetir + "?logref=" + logref + "&firmaId=" + firma_no);
+                var mkart = await httpClient.GetServiceResponseAsync<VMalzemeKartDto>(UrlHelper.VMalzemeKartGetir + "?logref=" + logref + "&firmaId=" + firma_no);
 
                 if (mkart != null)
                 {
                     modalParameters = new ModalParameters();
                     modalParameters.Add("secim", mkart);
-                    await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(mkart));
+                    await ModalInstance.CloseAsync(ModalResult.Ok<VMalzemeKartDto>(mkart));
                 }
             }
             catch (Exception ex)
