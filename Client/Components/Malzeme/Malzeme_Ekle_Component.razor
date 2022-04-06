@@ -62,6 +62,10 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-md-3">
+                    <label>KDV %</label>
+                    <InputNumber @bind-Value="malzeme.KdvNumber" class="form-control" />
+                </div>
+                <div class="col-md-3">
                     <label>Birim Seti Kodu</label>
                     <InputText @bind-Value="malzeme.Birimset" class="form-control" disabled />
                 </div>
@@ -75,10 +79,6 @@
                             <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="BirimSetiSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <label>KDV %</label>
-                    <InputNumber @bind-Value="malzeme.KdvNumber" class="form-control"/>
                 </div>
             </div>
         </div>

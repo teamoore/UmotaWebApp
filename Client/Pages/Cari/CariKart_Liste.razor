@@ -30,9 +30,12 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => CariKartGuncelle(context.Logref))" Size="Size.Medium" />
+            @if (context.Caritip == 1)
+            {
+                <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => CariKartGuncelle(context.Logref))" Size="Size.Medium" />
+            }
         </MudTd>
-        <MudTd DataLabel="Türü">@(context.Logref > 0 ? "Cari Hesap" : "Potansiyel")</MudTd>
+        <MudTd DataLabel="Türü">@context.Caritipadi</MudTd>
         <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
         <MudTd DataLabel="Ünvanı">@context.Adi</MudTd>
         <MudTd DataLabel="Tabela Ünvanı">@context.Adi2</MudTd>
@@ -42,7 +45,7 @@
         <MudTd DataLabel="Ülke">@context.Ulke</MudTd>
         <MudTd DataLabel="Telefon">@context.Tel1</MudTd>
         <MudTd DataLabel="E-posta">@context.Mail</MudTd>
-    </RowTemplate>
+        </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı"/>
     </PagerContent>
