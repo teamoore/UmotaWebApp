@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Server.Services.Consts;
 using UmotaWebApp.Shared.Enum;
@@ -222,7 +223,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             if (string.IsNullOrEmpty(teklif.Notlar) == false)
             {
-                str += "<p style='font-size:9pt;'>"+ teklif.Notlar +"</p>";
+                string result = Regex.Replace(teklif.Notlar, @"\r\n?|\n", "<br>");
+
+                str += "<p style='font-size:9pt;'>"+ result +"</p>";
             }
             str += "</div></body></html>";
 
