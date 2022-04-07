@@ -453,6 +453,9 @@
         if (string.IsNullOrWhiteSpace(malzeme.SatfiyatDov))
             err.Add("Satış fiyatı döviz boş geçilemez");
 
+        if (malzeme.Kdv == null || malzeme.Kdv == 0)
+            err.Add("KDV oranı boş geçilemez");
+
         if (err.Count > 0)
         {
             var ex = new ClientException("Boş geçilemez alanlar");

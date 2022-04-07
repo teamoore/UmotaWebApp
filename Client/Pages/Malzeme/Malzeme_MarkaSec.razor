@@ -2,9 +2,11 @@
 
 <div class="container">
 
-    <MudTable Items="@items" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
+    <MudTable Items="@items" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true"  Filter="new Func<SpeCodesDto,bool>(FilterFunc1)">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Malzeme Markaları</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Marka Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
             <MudTh>#</MudTh>
@@ -36,6 +38,21 @@
     HttpClient httpClient { get; set; }
 
     public List<SpeCodesDto> items { get; set; }
+
+    private string _searchString;
+    private bool _sortNameByLength;
+    private bool loadingCompleted = false;
+
+    private bool FilterFunc1(SpeCodesDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(SpeCodesDto element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.DEFINITION_ != null && element.DEFINITION_.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
 
     protected override async Task OnInitializedAsync()
     {

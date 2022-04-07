@@ -58,7 +58,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 db.Open();
 
                 var sql = "select top 100 *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
-                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " a with(nolock) where 1=1";
+                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " a with(nolock) where 1=1 and a.revizyon = 0";
 
                 var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, KullaniciYetkiKodlari.TumTeklifleriGorebilir);
                 if (tumTeklifleriGormeYetkisi == 0) 
@@ -118,7 +118,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 var p = new DynamicParameters();
 
                 var sql = "select *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
-                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId: request.FirmaId.ToString()) + " a with(nolock) where 1=1";
+                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId: request.FirmaId.ToString()) + " a with(nolock) where 1=1 and a.revizyon = 0";
 
                 var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(request.kullanicikodu, KullaniciYetkiKodlari.TumTeklifleriGorebilir);
                 if (tumTeklifleriGormeYetkisi == 0)
@@ -439,7 +439,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 if (teklifRow.Duruminfo.Equals(request.Teklif.Duruminfo) == false)
                     throw new ApiException("Teklifin Durumu sizden önce değiştirilmiş , işlem durudurulacak");
 
-                if (request.Teklif.Duruminfo == TeklifDurum.FinansalUygunlukBekleniyor && request.Teklif.NewDuruminfo == TeklifDurum.KesinSiparis)
+                var kullanici = SisKullaniciService.GetSisKullanici(request.Teklif.Upduser);
+
+                if (kullanici.Result.KullaniciYetkiKodu != "ADM" && request.Teklif.Duruminfo == TeklifDurum.FinansalUygunlukBekleniyor && request.Teklif.NewDuruminfo == TeklifDurum.KesinSiparis)
                 {
                     var teklif_finans_onay = await dbContext.TeklifFinansOnays
                         .Where(x => 
