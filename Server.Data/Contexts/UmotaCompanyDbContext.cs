@@ -78,6 +78,8 @@ namespace UmotaWebApp.Server.Data.Models
         public virtual DbSet<V042FiltreMontaj> V042FiltreMontajs { get; set; }
         public virtual DbSet<V050MalzKalite> V050MalzKalites { get; set; }
 
+        public virtual DbSet<Takvim> Takvims { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -658,6 +660,56 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasMaxLength(1000)
                     .IsUnicode(false)
                     .HasColumnName("yapilanlar");
+            });
+
+            modelBuilder.Entity<Takvim>(entity =>
+            {
+                entity.HasKey(e => e.Logref);
+
+                entity.ToTable("takvim");
+
+                entity.Property(e => e.Logref)
+                    .ValueGeneratedNever()
+                    .HasColumnName("logref");
+
+                entity.Property(e => e.CariRef).HasColumnName("cariref");
+
+                entity.Property(e => e.Baslik)
+                    .HasMaxLength(140)
+                    .IsUnicode(false)
+                    .HasColumnName("baslik");
+
+                entity.Property(e => e.Aciklama)
+                    .HasMaxLength(1000)
+                    .IsUnicode(false)
+                    .HasColumnName("aciklama");
+
+                entity.Property(e => e.Cari_Adi)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("cari_adi");
+
+                entity.Property(e => e.Cari_Kodu)
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("cari_kodu");
+
+                entity.Property(e => e.Yapildi)
+                    .HasColumnType("tinyint")
+                    .HasColumnName("yapildi");
+
+                entity.Property(e => e.Tarih)
+                    .HasColumnType("datetime")
+                    .HasColumnName("tarih");
+
+                entity.Property(e => e.Insdate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("insdate");
+
+                entity.Property(e => e.Insuser)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("insuser");
             });
 
             modelBuilder.Entity<FiltreHar>(entity =>
