@@ -62,10 +62,12 @@
         <MudTd DataLabel="Teslim Tarihi">@context.TeslimTarihiFormatted</MudTd>
         <MudTd DataLabel="Açıklama">@context.Aciklama1</MudTd>
         <MudTd DataLabel="Kaydı Giren">@context.Insuser</MudTd>
-        @if (menuSilmeYetkisi)
-        {
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
-        }
+        <MudTd>
+            @if (menuSilmeYetkisi)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
+            }
+        </MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />

@@ -42,7 +42,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 var results = await dbContext.MalzKarts.Where(x => x.Active == 0)
                                         .Take(100)
-                                        .OrderByDescending(x => x.Logref)
+                                        .OrderBy(x => x.Logref)
                                         .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
 
                 return results;
@@ -255,7 +255,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 string LogoDbName = Configuration["LogoDbName"];
                 string LogoFirmaNo = logofirmno.ToString("000");
-                string sqlstring = "SELECT  LOGICALREF,  SPECODE,  DEFINITION_ from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_SPECODES] with(nolock) where CODETYPE = 4";
+                string sqlstring = "SELECT  LOGICALREF,  SPECODE,  DEFINITION_ from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_SPECODES] with(nolock) where CODETYPE = 4 order by DEFINITION_";
 
                 IEnumerable<SpeCodesDto> dbResponse;
                 dbResponse = await db.QueryAsync<SpeCodesDto>(sqlstring, commandType: CommandType.Text);
@@ -268,7 +268,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 string LogoDbName = Configuration["LogoDbName"];
                 string LogoFirmaNo = logofirmno.ToString("000");
-                string sqlstring = "SELECT  LOGICALREF,  CODE SPECODE,  DESCR DEFINITION_ from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_MARK] with(nolock)";
+                string sqlstring = "SELECT  LOGICALREF,  CODE SPECODE,  DESCR DEFINITION_ from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_MARK] with(nolock) Order By DESCR";
 
                 IEnumerable<SpeCodesDto> dbResponse;
                 dbResponse = await db.QueryAsync<SpeCodesDto>(sqlstring, commandType: CommandType.Text);
