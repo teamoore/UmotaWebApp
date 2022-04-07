@@ -67,6 +67,7 @@ namespace UmotaWebApp.Server
             services.AddScoped<IDovizService, DovizService>();
             services.AddScoped<IFaaliyetService, FaaliyetService>();
             services.AddScoped<IPdfGenerator, PdfGeneratorService>();
+            services.AddScoped<ITakvimService, TakvimService>();
 
 
             var architectureFolder = (IntPtr.Size == 8) ? "64 bit" : "32 bit";

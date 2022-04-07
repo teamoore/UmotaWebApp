@@ -48,6 +48,7 @@ namespace UmotaWebApp.Server.Services.Extensions
             CreateMap<Faaliyet, FaaliyetDto>().ReverseMap();
             CreateMap<Kisiler, KisilerDto>().ReverseMap();
             CreateMap<V015Kisiler, KisilerDto>().ReverseMap();
+            CreateMap<Takvim, TakvimDto>().ReverseMap();
         }
     }
 
