@@ -30,7 +30,7 @@
 
                                     @foreach (var item in malzemeKarts)
                                         {
-                                        <option value="@item.Logref">[@(item.Kodu)] @(item.Adi) - Marka: @(string.IsNullOrEmpty(item.Descr) ? "(tanımsız)" : "("+ item.Descr +")") - Menşei: @(string.IsNullOrEmpty(item.Definition) ? "(tanımsız)" : "("+ item.Definition + ")")</option>
+                                        <option value="@item.Logref">[@(item.Kodu)] @(item.Adi) - Marka: @(string.IsNullOrEmpty(item.Marka) ? "(tanımsız)" : "("+ item.Marka +")") - Menşei: @(string.IsNullOrEmpty(item.Mensei) ? "(tanımsız)" : "("+ item.Mensei + ")")</option>
                                         }
                                 </InputSelect>
                             </div>

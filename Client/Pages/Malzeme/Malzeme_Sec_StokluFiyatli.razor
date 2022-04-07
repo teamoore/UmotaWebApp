@@ -106,13 +106,13 @@
 
                 var firma_no = selectedFirmaDonem.firma_no.Value;
 
-                var mkart = await httpClient.GetServiceResponseAsync<MalzemeKartDto>(UrlHelper.MalzemeKartGetir + "?logref=" + logref + "&firmaId=" + firma_no);
+                var mkart = await httpClient.GetServiceResponseAsync<VMalzemeKartDto>(UrlHelper.VMalzemeKartGetir + "?logref=" + logref + "&firmaId=" + firma_no);
 
                 if (mkart != null)
                 {
                     modalParameters = new ModalParameters();
                     modalParameters.Add("secim", mkart);
-                    await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(mkart));
+                    await ModalInstance.CloseAsync(ModalResult.Ok<VMalzemeKartDto>(mkart));
                 }
             }
             catch (Exception ex)
@@ -137,6 +137,8 @@
                 var request = new MalzemeStokRequestDto();
                 request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
                 request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+                request.UmotaFirmaNo = selectedFirmaDonem.firma_no.Value;
+                request.UmotaKartlariGetir = 1;
                 if (!string.IsNullOrWhiteSpace(malzemeKart.MalzemeAdi))
                     request.MalzemeAdi = '%' + malzemeKart.MalzemeAdi + '%';
                 if (!string.IsNullOrWhiteSpace(malzemeKart.MalzemeMarka))

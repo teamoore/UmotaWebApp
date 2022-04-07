@@ -67,6 +67,9 @@ namespace UmotaWebApp.Server
             services.AddScoped<IDovizService, DovizService>();
             services.AddScoped<IFaaliyetService, FaaliyetService>();
             services.AddScoped<IPdfGenerator, PdfGeneratorService>();
+            services.AddScoped<IVCariKartService, VCariKartService>();
+            services.AddScoped<IKisilerService, KisilerService>();
+            services.AddScoped<IVMalzemeKartService, VMalzemeKartService>();
 
 
             var architectureFolder = (IntPtr.Size == 8) ? "64 bit" : "32 bit";

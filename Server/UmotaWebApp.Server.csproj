@@ -64,7 +64,6 @@
   </None>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Media\Files\" />
     <Folder Include="Services\Extensions\" />
   </ItemGroup>
 </Project>

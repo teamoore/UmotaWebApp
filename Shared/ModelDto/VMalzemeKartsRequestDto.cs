@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace UmotaWebApp.Shared.ModelDto
 {
-    public class MalzemeKartRequestDto
+    public class VMalzemeKartsRequestDto
     {
-        public MalzemeKartDto MalzemeKart { get; set; }
         public short FirmaId { get; set; }
         public string MalzemeKodu { get; set; }
         public string MalzemeAdi { get; set; }

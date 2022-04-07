@@ -1,4 +1,4 @@
-﻿@page "/r_carilistef"
+﻿@page "/cari_kartf"
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="CreateCariKart" onDoneButtonClicked="HeaderSearch"
                  ShowButtons="false"
@@ -9,7 +9,7 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@cariler" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true" Filter="new Func<CariKartDto,bool>(FilterFunc1)">
+<MudTable Items="@cariler" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true" Filter="new Func<VCariKartDto,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="CreateCariKart" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         <MudSpacer />
@@ -19,7 +19,8 @@
         <MudTh>#</MudTh>
         <MudTh>Türü</MudTh>
         <MudTh>Kodu</MudTh>
-        <MudTh>Adı</MudTh>
+        <MudTh>Ünvanı</MudTh>
+        <MudTh>Tabela Ünvanı</MudTh>
         <MudTh>Adres 1</MudTh>
         <MudTh>İlçe</MudTh>
         <MudTh>Şehir</MudTh>
@@ -29,18 +30,22 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => CariKartGuncelle(context.Logref))" Size="Size.Medium" />
+            @if (context.Caritip == 1)
+            {
+                <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => CariKartGuncelle(context.Logref))" Size="Size.Medium" />
+            }
         </MudTd>
-        <MudTd DataLabel="Türü">@(context.Logref > 0 ? "Cari Hesap" : "Potansiyel")</MudTd>
+        <MudTd DataLabel="Türü">@context.Caritipadi</MudTd>
         <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
-        <MudTd DataLabel="Adı">@context.Adi</MudTd>
+        <MudTd DataLabel="Ünvanı">@context.Adi</MudTd>
+        <MudTd DataLabel="Tabela Ünvanı">@context.Adi2</MudTd>
         <MudTd DataLabel="Adres 1">@context.Adres1</MudTd>
         <MudTd DataLabel="İlçe">@context.Ilce</MudTd>
         <MudTd DataLabel="Şehir">@context.Il</MudTd>
         <MudTd DataLabel="Ülke">@context.Ulke</MudTd>
         <MudTd DataLabel="Telefon">@context.Tel1</MudTd>
         <MudTd DataLabel="E-posta">@context.Mail</MudTd>
-    </RowTemplate>
+        </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı"/>
     </PagerContent>
@@ -66,14 +71,14 @@
 
     public HeaderBarSearch header = new HeaderBarSearch();
 
-    public List<CariKartDto> cariler = new List<CariKartDto>();
+    public List<VCariKartDto> cariler = new List<VCariKartDto>();
     private string _searchString;
     private bool _sortNameByLength;
     private bool loadingCompleted = false;
 
-    private bool FilterFunc1(CariKartDto element) => FilterFunc(element, _searchString);
+    private bool FilterFunc1(VCariKartDto element) => FilterFunc(element, _searchString);
 
-    private bool FilterFunc(CariKartDto element, string searchString)
+    private bool FilterFunc(VCariKartDto element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
@@ -103,21 +108,17 @@
                 throw new Exception("Firma dönem seçilmedi");
 
 
-            var cariAramaObj = new CariKartDto();
-            cariAramaObj.Adi = header.SearchText;
-
-            var request = new CariKartRequestDto();
-            request.CariKart = cariAramaObj;
+            var request = new VCariKartsRequestDto();
+            request.SearchText = header.SearchText;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
-            var result = await httpClient.PostGetServiceResponseAsync<List<CariKartDto>, CariKartRequestDto>(UrlHelper.CariKartAra, request);
+            var result = await httpClient.PostGetServiceResponseAsync<List<VCariKartDto>, VCariKartsRequestDto>(UrlHelper.VCariKartAra, request);
             cariler = result;
             loadingCompleted = true;
 
             if (cariler == null || cariler.Count == 0)
             {                
-                Snackbar.Add(string.Format("{0} için sonuç bulunamadı", cariAramaObj.Adi), severity: Severity.Warning);
-                header.SearchText = string.Empty;
+                Snackbar.Add(string.Format("{0} için sonuç bulunamadı", header.SearchText), severity: Severity.Warning);
                 loadingCompleted = true;
             }
         }
@@ -138,8 +139,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma dönem seçilmedi");
 
-            cariler = await httpClient.GetServiceResponseAsync<List<CariKartDto>>(UrlHelper.CariKartListesi + "?firmaId=" + selectedFirmaDonem.firma_no.Value);
-            cariler = cariler.OrderByDescending(i => i.Insdate).ToList();
+            cariler = await httpClient.GetServiceResponseAsync<List<VCariKartDto>>(UrlHelper.VCariKartListesi + "?firmaId=" + selectedFirmaDonem.firma_no.Value);
             loadingCompleted = true;
         }
         catch (Exception)
@@ -150,12 +150,12 @@
 
     public void CariKartGuncelle(int logref)
     {
-        navigation.NavigateTo("/r_carilistef_guncelle/" + logref);
+        navigation.NavigateTo("/cari_kartf_guncelle/" + logref);
     }
 
     public void CreateCariKart()
     {
-        navigation.NavigateTo("/r_carilistef_ekle");
+        navigation.NavigateTo("/cari_kartf_ekle");
     }
 
 }

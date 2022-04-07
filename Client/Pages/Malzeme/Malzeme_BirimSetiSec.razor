@@ -1,0 +1,65 @@
+﻿@page "/malzeme_birimsetisec"
+
+<div class="container">
+
+    <MudTable Items="@items" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Malzeme Birim Setleri</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>#</MudTh>
+            <MudTh>Birim Seti Kodu</MudTh>
+            <MudTh>Ana Birim Kodu</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => Sec(context.BirimSetRef,context.AnaBirimRef,context.BirimSetKodu,context.AnaBirimKodu))" />
+            </MudTd>
+            <MudTd DataLabel="Birim Seti Kodu">@context.BirimSetKodu</MudTd>
+            <MudTd DataLabel="Ana Birim Kodu">@context.AnaBirimKodu</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+        </PagerContent>
+    </MudTable>
+</div>
+
+@code
+{
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    public List<MalzemeBirimSetDto> items { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadList();
+    }
+
+    private async Task LoadList()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        items = await httpClient.GetServiceResponseAsync<List<MalzemeBirimSetDto>>("/api/malzemekart/GetBirimSetList?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
+    }
+
+    public async Task Sec(int birimsetref, int birimref, string birimsetkodu, string birimkodu)
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        var res = new MalzemeBirimSetDto();
+        res.BirimSetRef = birimsetref;
+        res.AnaBirimRef = birimref;
+        res.BirimSetKodu = birimsetkodu;
+        res.AnaBirimKodu = birimkodu;
+
+        await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeBirimSetDto>(res));
+    }
+
+}

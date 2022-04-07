@@ -39,5 +39,7 @@ namespace UmotaWebApp.Server.Data.Models
         public DateTime? Insdate { get; set; }
         public string Upduser { get; set; }
         public DateTime? Upddate { get; set; }
+        public string TedarikciAdi { get; set; }
+        
     }
 }

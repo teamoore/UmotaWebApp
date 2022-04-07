@@ -1,11 +1,14 @@
-﻿@page "/cari_kartf_ekle"
+﻿@page "/malzeme_kartf_guncelle/{MalzemeKartRef:int}"
 
 <HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
 
-<CariKartEkleGuncelleComponent></CariKartEkleGuncelleComponent>
+<Malzeme_Ekle_Component MalzemeKartRef="MalzemeKartRef"></Malzeme_Ekle_Component>
 
 @code
 {
+    [Parameter]
+    public int? MalzemeKartRef { get; set; }
+
     [Inject]
     NavigationManager navigation { get; set; }
 
@@ -13,12 +16,14 @@
 
     protected override Task OnInitializedAsync()
     {
-        header.HeaderText = "Cari Kart Oluştur";
+        header.HeaderText = "Malzeme Kart Güncelle";
         return Task.CompletedTask;
     }
 
     public void goBack()
     {
-        navigation.NavigateTo("/cari_kartf");
+        navigation.NavigateTo("/malzeme_listef");
     }
+
+
 }
