@@ -40,7 +40,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? Insdate { get; set; }
         public string Upduser { get; set; }
         public DateTime? Upddate { get; set; }
-
         private double? _kdvNumber;
         public double? KdvNumber
         { 
@@ -53,5 +52,6 @@ namespace UmotaWebApp.Shared.ModelDto
                 this.Kdv = (byte?)_kdvNumber;
             }
         }
+        public string TedarikciAdi { get; set; }
     }
 }

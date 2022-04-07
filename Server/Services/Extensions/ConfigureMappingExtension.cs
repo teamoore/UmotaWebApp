@@ -37,6 +37,7 @@ namespace UmotaWebApp.Server.Services.Extensions
             CreateMap<Teklifdetay, TeklifDetayDto>().ReverseMap();
             CreateMap<V002Malzemeler, VMalzemeKartDto>().ReverseMap();
             //CreateMap<V002Malzemeler, MalzemeKartDto>().ForMember(dest => dest.Active, opt => opt.MapFrom(src => src.Active.HasValue ? (src.Active.Equals(1) ? byte.Parse("1") : byte.Parse("0")) : byte.Parse("0")));
+            CreateMap<MalzKart, MalzKartLog>().ReverseMap();
 
             CreateMap<Teklif, TeklifLog>().ReverseMap();
             CreateMap<Teklifdetay, TeklifdetayLog>().ReverseMap();

@@ -224,6 +224,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 if (malzKart == null)
                     throw new Exception("Kart bulunamadı");
 
+                // log dosyası
+                var malzKartLog = new MalzKartLog();
+                Mapper.Map(malzKart, malzKartLog);
+                await dbContext.MalzKartLogs.AddAsync(malzKartLog);
+
                 Mapper.Map(request.MalzemeKart, malzKart);
                 await dbContext.SaveChangesAsync();
 
