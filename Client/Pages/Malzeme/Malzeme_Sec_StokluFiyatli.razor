@@ -47,7 +47,14 @@
             <MudTh>Alım Sip. Termin</MudTh>
             <MudTh>Satış Fiyatı</MudTh>
             <MudTh>Satış Döviz</MudTh>
-            <MudTh>Alış Fiyatı</MudTh>
+            @if (@maliyetGorYonetici)
+            {
+                <MudTh>Alış Fiyatı 1</MudTh>
+            }
+            @if (@maliyetGorSatisci)
+            {
+                <MudTh>Alış Fiyatı 2</MudTh>
+            }
             <MudTh>Alış Döviz</MudTh>
         </HeaderContent>
         <RowTemplate>
@@ -64,9 +71,16 @@
             <MudTd DataLabel="Satılabilir Miktar">@context.StokMiktari2</MudTd>
             <MudTd DataLabel="Bekleyen Alım Sipariş Miktar">@context.BekleyenAlimSiparisMiktar</MudTd>
             <MudTd DataLabel="Bekleyen Alım Sipariş Tahmini Teslim">@context.BekleyenAlimSiparisTeslimTarihiFormatted</MudTd>
-            <MudTd DataLabel="Satış Fiyatı">@context.SatisFiyati</MudTd>
+            <MudTd DataLabel="Satış Fiyatı">@context.SatisFiyatiFormatted</MudTd>
             <MudTd DataLabel="Satış Döviz">@context.SatisFiyatiDoviz</MudTd>
-            <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyati</MudTd>
+            @if (@maliyetGorYonetici)
+            {
+                <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyatiFormatted</MudTd>
+            }
+            @if (@maliyetGorSatisci)
+            {
+                <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyati2Formatted</MudTd>
+            }
             <MudTd DataLabel="Alış Döviz">@context.AlisFiyatiDoviz</MudTd>
         </RowTemplate>
         <PagerContent>
@@ -97,6 +111,13 @@
         public List<MalzemeStokDto> malzemeKarts { get; set; }
         public MalzemeStokRequestDto malzemeKart = new MalzemeStokRequestDto();
         private bool _processing = false;
+        private bool maliyetGorYonetici = false;
+        private bool maliyetGorSatisci = false;
+
+        protected override async Task OnInitializedAsync()
+        {
+            await KullaniciYetkileriGetir();
+        }
 
         public async Task MalzemeKartSec(int logref)
         {
@@ -157,4 +178,23 @@
             }
         }
 
+        public async Task KullaniciYetkileriGetir()
+        {
+            try
+            {
+                var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+                var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
+
+                maliyetGorYonetici = result == 1;
+
+                result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet2GorebilsinPersonel);
+
+                maliyetGorSatisci = result == 1;
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Warning);
+            }
+        }
     }

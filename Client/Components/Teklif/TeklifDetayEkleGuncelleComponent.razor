@@ -145,33 +145,33 @@
                     </div>
 
 
-                    @if (@maliyetGor || maliyetGor2)
+                    @if (@maliyetGorYonetici || maliyetGorSatisci)
                     {
                         <div class="form-group">
                             <div class="row">
                                 <div class="col-md-2">
-                                    @if (@maliyetGor)
+                                    @if (@maliyetGorYonetici)
                                     {
                                         <label>Maliyet 1 Fiyat İD</label>
                                         <InputNumber @bind-Value="teklifDetay.Maliyet1id" class="form-control" disabled />
                                     }
                                 </div>
                                 <div class="col-md-2">
-                                    @if (@maliyetGor2)
+                                    @if (@maliyetGorSatisci)
                                     {
                                         <label>Maliyet 2 Fiyat İD</label>
                                         <InputNumber @bind-Value="teklifDetay.Maliyet2id" class="form-control" disabled />
                                     }
                                 </div>
                                 <div class="col-md-2">
-                                    @if (@maliyetGor)
+                                    @if (@maliyetGorYonetici)
                                     {
                                         <label>Maliyet 1 Tutar İD</label>
                                         <InputNumber @bind-Value="Maliyet1Topid" class="form-control" disabled />
                                     }
                                 </div>
                                 <div class="col-md-2">
-                                    @if (@maliyetGor2)
+                                    @if (@maliyetGorSatisci)
                                     {
                                         <label>Maliyet 2 Tutar İD</label>
                                         <InputNumber @bind-Value="Maliyet2Topid" class="form-control" disabled />
@@ -304,8 +304,8 @@
 
     public List<DovizDto> DovizListesi { get; set; }
 
-    private bool maliyetGor = false;
-    private bool maliyetGor2 = false;
+    private bool maliyetGorYonetici = false;
+    private bool maliyetGorSatisci = false;
 
     private int _dovizTuru = -1;
     public int DovizTuruBilgisi
@@ -1156,11 +1156,11 @@
 
             var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
 
-            maliyetGor = result == 1;
+            maliyetGorYonetici = result == 1;
 
             result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet2GorebilsinPersonel);
 
-            maliyetGor2 = result == 1;
+            maliyetGorSatisci = result == 1;
         }
         catch (Exception ex)
         {

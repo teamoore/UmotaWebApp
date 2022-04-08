@@ -21,12 +21,15 @@
         <MudTh>Alım Sip. Termin</MudTh>
         <MudTh>Satış Fiyatı</MudTh>
         <MudTh>Satış Döviz</MudTh>
-        <MudTh>Alış Fiyatı</MudTh>
+        @if (@maliyetGorYonetici)
+        {
+            <MudTh>Alış Fiyatı 1</MudTh>
+        }
+        @if (@maliyetGorSatisci)
+        {
+            <MudTh>Alış Fiyatı 2</MudTh>
+        }
         <MudTh>Alış Döviz</MudTh>
-        @*<MudTh>Yükseklik</MudTh>
-            <MudTh>En</MudTh>
-            <MudTh>Boy</MudTh>
-            <MudTh>Malzeme Grubu</MudTh>*@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Kodu">@context.MalzemeKodu</MudTd>
@@ -39,14 +42,17 @@
         <MudTd DataLabel="Satılabilir Miktar">@context.StokMiktari2</MudTd>
         <MudTd DataLabel="Alım Sip. Miktar">@context.BekleyenAlimSiparisMiktar</MudTd>
         <MudTd DataLabel="Alım Sip. Termin">@context.BekleyenAlimSiparisTeslimTarihiFormatted</MudTd>
-        <MudTd DataLabel="Satış Fiyatı">@context.SatisFiyati</MudTd>
+        <MudTd DataLabel="Satış Fiyatı">@context.SatisFiyatiFormatted</MudTd>
         <MudTd DataLabel="Satış Döviz">@context.SatisFiyatiDoviz</MudTd>
-        <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyati</MudTd>
+        @if (@maliyetGorYonetici)
+        {
+            <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyatiFormatted</MudTd>
+        }
+        @if (@maliyetGorSatisci)
+        {
+            <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyati2Formatted</MudTd>
+        }
         <MudTd DataLabel="Alış Döviz">@context.AlisFiyatiDoviz</MudTd>
-        @*<MudTd DataLabel="Yükseklik">@context.MalzemeEbatYukseklik</MudTd>
-            <MudTd DataLabel="En">@context.MalzemeEbatEn</MudTd>
-            <MudTd DataLabel="Boy">@context.MalzemeEbatBoy</MudTd>
-            <MudTd DataLabel="Malzeme Grubu">@context.MalzemeGrupAdi</MudTd>*@
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
@@ -77,6 +83,8 @@
     private string _searchString;
     private bool _sortNameByLength;
     private bool loadingCompleted = false;
+    private bool maliyetGorYonetici = false;
+    private bool maliyetGorSatisci = false;
 
     private bool FilterFunc1(MalzemeStokDto element) => FilterFunc(element, _searchString);
 
@@ -93,12 +101,12 @@
         return false;
     }
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         detayAraBar.HeaderText = "Stok Listesi";
+        await KullaniciYetkileriGetir();
 
         loadingCompleted = true;
-        return Task.CompletedTask;
     }
 
     public async Task Search()
@@ -161,6 +169,26 @@
         catch (Exception)
         {
             throw;
+        }
+    }
+
+    public async Task KullaniciYetkileriGetir()
+    {
+        try
+        {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
+
+            maliyetGorYonetici = result == 1;
+
+            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet2GorebilsinPersonel);
+
+            maliyetGorSatisci = result == 1;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
     }
 }
