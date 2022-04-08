@@ -26,15 +26,22 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 GlobalSettings = {
                         ColorMode = ColorMode.Color,
-                        
                         Orientation = Orientation.Portrait,
                         PaperSize = PaperKind.A4,
+                        Margins = new MarginSettings { Top = 18, Bottom = 18 },
                         },
                 Objects = {
                         new ObjectSettings() {
                             PagesCount = true,
+                            LoadSettings = new LoadSettings()
+                            {
+                                JSDelay = 2000
+                            },
                             HtmlContent = CreateHtml(teklif,teklifDetays,teklifPdfType),
-                            WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet= Path.Combine(Directory.GetCurrentDirectory(),"Media","css","bootstrap.min.css") },
+                            WebSettings = { 
+                                DefaultEncoding = "utf-8"
+                            },
+                            
                             HeaderSettings = { FontSize = 11, Right = "Page [page] of [toPage]", Line = true, Spacing = 2.812 }
                         }
                          }
@@ -47,18 +54,22 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         private string CreateHtml(TeklifDto teklif, List<TeklifDetayDto> teklifDetays, SharedEnums.TeklifPdfType teklifPdfType)
         {
+            var css = Environment.CurrentDirectory +  @"\Media\css\bootstrap.min.css";
+
             var str = "<html><head>" +
-                "<link href='" + Environment.CurrentDirectory + "\\Media\\css\\bootstrap.min.css' rel='stylesheet' type='text/css' media='screen'/>"
+                "<link href='"+ css +"' rel='stylesheet' type='text/css' media='screen'/>"
 
                 + "</head>" +
-                "<body><table style='width:100%;background-color:grey;text-align:center;color:white;font-weight:bold;'><tr><td>TEKLİF</td></tr></table><div class='container'>";
+                "<body style='font-family:Roboto,Arial;'>" +
+                @"<table style='width:100%;background-color:#4700D8;text-align:center;color:white;font-weight:bold;font-family:Roboto,Arial;'><tr><td>TEKLİF</td></tr></table><div class='container'>";
 
             var path = Environment.CurrentDirectory + "\\Media\\logo\\uno_logo.PNG";
 
-            str += @" <table style='width:100%;border:none !important;'>
+            str += @" <table class='table table-striped'>
   <tr>
 	<td>
-		<table style='width:100%;border:none;'>
+
+		<table class='table'>
           <tr>
             <td style='width:90px;border:none;'>Teklif Tarihi:</td><td>" + teklif.TarihFormatted + @"</td>
           </tr>
