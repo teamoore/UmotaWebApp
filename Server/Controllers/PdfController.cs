@@ -112,7 +112,9 @@ namespace UmotaWebApp.Server.Controllers
                     await fs.WriteAsync(pdfData, 0, pdfData.Length);
                     fs.Close();
 
-                    var message = new Message(new string[] { request.teklif.Mail }, "Uno Teklif", "Teklif ektedir.", pdfData);
+                    var subject = string.Format("Fiyat Teklifi {0}, {1}", request.teklif.Teklifno, request.teklif.Cariadi);
+
+                    var message = new Message(new string[] { request.teklif.Mail }, subject, subject, pdfData);
                     _emailSender.SendEmail(message);
                 }
 
