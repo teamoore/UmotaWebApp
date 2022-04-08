@@ -47,5 +47,27 @@ namespace UmotaWebApp.Shared.ModelDto
                 return this.BekleyenAlimSiparisTeslimTarihi.HasValue ? this.BekleyenAlimSiparisTeslimTarihi.Value.ToString("dd.MM.yyyy") : "-";
             }
         }
+        public double? AlisFiyati2 { get; set; }
+        public string SatisFiyatiFormatted
+        {
+            get
+            {
+                return this.SatisFiyati.HasValue ? String.Format("{0:N2}", this.SatisFiyati.Value) : "";
+            }
+        }
+        public string AlisFiyatiFormatted
+        {
+            get
+            {
+                return this.AlisFiyati.HasValue ? String.Format("{0:N2}", this.AlisFiyati.Value) : "";
+            }
+        }
+        public string AlisFiyati2Formatted
+        {
+            get
+            {
+                return this.AlisFiyati2.HasValue ? String.Format("{0:N2}", this.AlisFiyati2.Value) : "";
+            }
+        }
     }
 }
