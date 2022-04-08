@@ -47,6 +47,7 @@
                 {
                     <MudMenuItem OnClick="(() => TeklifDurumDegistir(context.Logref,1))">Durum Değiştir(Admin)</MudMenuItem>
                 }
+                <MudMenuItem OnClick="(() => TeklifDurumDetay(context.Logref))">Durum Geçmişi</MudMenuItem>
             </MudMenu>
         </MudTd>
         <MudTd DataLabel="Durum">@context.Duruminfo</MudTd>
@@ -310,4 +311,19 @@
         }
     }
 
+    public async Task TeklifDurumDetay(int logref)
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("teklifref", logref);
+
+        var teklifDurumForm = modal.Show<TeklifDurumDetayComponent>("Teklif Durum Geçmişi", parameters: parameters, options: opt);
+        var result = await teklifDurumForm.Result;
+
+        if (!result.Cancelled)
+        {
+        }
+    }
 }

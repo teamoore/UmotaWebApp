@@ -509,5 +509,23 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         }
 
+        public async Task<List<TeklifDurumDetayDto>> GetTeklifDurumDetay(int teklifref, string firmaId)
+        {
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var results = await dbContext.TeklifDurumDetays.Where(x => x.Teklifref == teklifref)
+                                        .OrderBy(x => x.Tarih)
+                                        .ProjectTo<TeklifDurumDetayDto>(Mapper.ConfigurationProvider).ToListAsync();
+
+                return results;
+            }
+        }
     }
 }

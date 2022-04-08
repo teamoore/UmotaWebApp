@@ -122,6 +122,18 @@
                     <a href="@_pdfPath" class="btn btn-outline-success" role="button" download="teklif">Dosyayı indir</a>
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AttachEmail" OnClick="PdfGonder" Color="Color.Secondary" Disabled="@_sendEmailDisabled">@_sendEmailText</MudButton>
                 }
+
+                <MudButtonGroup Color="Color.Secondary">
+                    <MudButton >Durum</MudButton>
+                    <MudMenu Icon="@Icons.Material.Filled.Update">
+                        <MudMenuItem OnClick="() => TeklifDurumDegistir(logref,null)">Durum Değiştir</MudMenuItem>
+                        @if (isAdmin)
+                        {
+                            <MudMenuItem OnClick="() => TeklifDurumDegistir(logref, 1)">Durum Değiştir (Admin)</MudMenuItem>
+                        }
+                        <MudMenuItem OnClick="() => TeklifDurumDetay(logref)">Durum Geçmişi</MudMenuItem>
+                        </MudMenu>
+                </MudButtonGroup>
             </div>
         </div>
 
@@ -230,6 +242,7 @@
 
     public List<TeklifDetayDto> teklifDetayList { get; set; }
 
+    private bool isAdmin = false;
     private bool maliyetGorYonetici = false;
     private bool maliyetGorSatisci = false;
 
@@ -385,13 +398,35 @@
         {
             var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
-            var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
+            var resultkul = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanicikodu);
 
-            maliyetGorYonetici = result == 1;
+            if (resultkul != null)
+            {
+                isAdmin = resultkul.KullaniciYetkiKodu.Equals("ADM");
+            }
 
-            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet2GorebilsinPersonel);
+            if (!isAdmin)
+            {
+                var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
 
-            maliyetGorSatisci = result == 1;
+                maliyetGorYonetici = result == 1;
+
+                if (!maliyetGorYonetici)
+                {
+                    result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet2GorebilsinPersonel);
+
+                    maliyetGorSatisci = result == 1;
+
+                } else
+                {
+                    maliyetGorSatisci = true;
+                }
+
+            } else
+            {
+                maliyetGorYonetici = true;
+                maliyetGorSatisci = true;
+            }
         }
         catch (Exception ex)
         {
@@ -473,6 +508,42 @@
             _pdfDisabled = false;
             _pdfButtonText = "Pdf Oluştur ve Gönder";
             Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task TeklifDurumDegistir(int logref, int? admin)
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("logRef", logref);
+
+        if (admin.HasValue)
+            parameters.Add("admin", admin.Value);
+
+        var teklifDurumForm = modal.Show<TeklifDurumDegistirComponent>("Durum Değiştir", parameters: parameters, options: opt);
+        var result = await teklifDurumForm.Result;
+
+        if (!result.Cancelled)
+        {
+            await LoadTeklifData();
+        }
+    }
+
+    public async Task TeklifDurumDetay(int logref)
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("teklifref", logref);
+
+        var teklifDurumForm = modal.Show<TeklifDurumDetayComponent>("Teklif Durum Geçmişi", parameters: parameters, options: opt);
+        var result = await teklifDurumForm.Result;
+
+        if (!result.Cancelled)
+        {
         }
     }
 }

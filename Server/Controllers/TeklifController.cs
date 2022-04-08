@@ -165,5 +165,26 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpGet("teklifdurumlist")]
+        public async Task<ServiceResponse<List<TeklifDurumDetayDto>>> TeklifDurumDetayListele(int teklifref, string firmaId)
+        {
+            try
+            {
+                return new ServiceResponse<List<TeklifDurumDetayDto>>()
+                {
+                    Value = await TeklifService.GetTeklifDurumDetay(teklifref, firmaId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<TeklifDurumDetayDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
     }
 }
