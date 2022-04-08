@@ -677,22 +677,19 @@
             switch (mkart.SatfiyatDov)
             {
                 case "TL":
-                    teklifDetay.Dovizref = 160;
+                    DovizTuruBilgisi = 160;
                     break;
                 case "USD":
-                    teklifDetay.Dovizref = 1;
+                    DovizTuruBilgisi = 1;
                     break;
                 case "EUR":
-                    teklifDetay.Dovizref = 20;
+                    DovizTuruBilgisi = 20;
                     break;
                 case "GBP":
-                    teklifDetay.Dovizref = 17;
-                    break;
-                case "CHF":
-                    teklifDetay.Dovizref = 1;
+                    DovizTuruBilgisi = 17;
                     break;
                 default:
-                    teklifDetay.Dovizref = 160;
+                    DovizTuruBilgisi = 160;
                     break;
             }
             teklifDetay.Maliyet1 = mkart.Alfiyat;
@@ -852,14 +849,7 @@
             if (result != null)
             {
                 teklifDetay.Fiyat = result.Fiyat;
-                teklifDetay.Dovizref = result.DovizRef;
-                if (teklifDetay.Dovizref == teklif.Dovizrefid)
-                    teklifDetay.Dovizkuru = teklif.Dovizkuruid;
-                else
-                if (teklifDetay.Dovizref == 160)
-                    teklifDetay.Dovizkuru = 1;
-                else
-                    await DovizKuruGetir();
+                DovizTuruBilgisi = result.DovizRef;
             }
         }
         catch (Exception ex)
@@ -891,10 +881,6 @@
                 teklifDetay.Maliyet1 = result.Fiyat;
                 teklifDetay.Maliyet2 = result.OzelFiyat;
             }
-            ////_DovizKuruState = "Güncel";
-
-            // this.StateHasChanged();
-
 
         }
         catch (Exception ex)
@@ -1081,8 +1067,7 @@
 
                 if (!IsUpdate)
                 {
-                    teklifDetay.Dovizref = teklif.Dovizrefid;
-                    teklifDetay.Dovizkuru = teklif.Dovizkuruid;
+                    DovizTuruBilgisi = teklif.Dovizrefid.Value;
                 }
 
             }
