@@ -26,15 +26,18 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 GlobalSettings = {
                         ColorMode = ColorMode.Color,
-                        
                         Orientation = Orientation.Portrait,
                         PaperSize = PaperKind.A4,
+                        Margins = new MarginSettings { Top = 18, Bottom = 18 },
                         },
                 Objects = {
                         new ObjectSettings() {
                             PagesCount = true,
                             HtmlContent = CreateHtml(teklif,teklifDetays,teklifPdfType),
-                            WebSettings = { DefaultEncoding = "utf-8", UserStyleSheet= Path.Combine(Directory.GetCurrentDirectory(),"Media","css","bootstrap.min.css") },
+                            WebSettings = { 
+                                DefaultEncoding = "utf-8"
+                            },
+                            
                             HeaderSettings = { FontSize = 11, Right = "Page [page] of [toPage]", Line = true, Spacing = 2.812 }
                         }
                          }
@@ -47,42 +50,29 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         private string CreateHtml(TeklifDto teklif, List<TeklifDetayDto> teklifDetays, SharedEnums.TeklifPdfType teklifPdfType)
         {
+            var css = Environment.CurrentDirectory +  @"\Media\css\bootstrap.min.css";
+
             var str = "<html><head>" +
-                "<link href='" + Environment.CurrentDirectory + "\\Media\\css\\bootstrap.min.css' rel='stylesheet' type='text/css' media='screen'/>"
+                "<link href='"+ css +"' rel='stylesheet' type='text/css' media='screen'/>"
 
                 + "</head>" +
-                "<body><table style='width:100%;background-color:grey;text-align:center;color:white;font-weight:bold;'><tr><td>TEKLİF</td></tr></table><div class='container'>";
+                "<body style='font-family:Roboto,Arial;'>" +
+                @"<table style='width:100%;background-color:#4700D8;text-align:center;color:white;font-weight:bold;font-family:Roboto,Arial;'><tr><td style='height:30px;'>TEKLİF</td></tr></table><div class='container'>";
 
             var path = Environment.CurrentDirectory + "\\Media\\logo\\uno_logo.PNG";
 
-            str += @" <table style='width:100%;border:none !important;'>
+            str += @" <table class='table table-striped'>
   <tr>
 	<td>
-		<table style='width:100%;border:none;'>
-          <tr>
-            <td style='width:90px;border:none;'>Teklif Tarihi:</td><td>" + teklif.TarihFormatted + @"</td>
-          </tr>
-	      <tr>
-            <td>Teklif No:</td><td>" + teklif.Teklifno + @"</td>
-          </tr>
-	      <tr>
-            <td>Revize No:</td><td>" + teklif.Revzno + @"</td>
-          </tr>
-          <tr>
-            <td>Firma:</td><td>" + teklif.Cariadi + @"</td>
-          </tr>
-        <tr>
-            <td>Sayın:</td><td>" + teklif.IlgiliAdi + @"</td>
-        </tr>
-        <tr>
-            <td>Proje Adı:</td><td>" + teklif.Proje + @"</td>
-        </tr>
-        <tr>
-        <td>İlgili:</td><td>" + teklif.Temsilciadi + @"</td>
-        </tr>";
-
-
-            str += @"</table>
+        <p><b>Firma : "+ teklif.Cariadi + @"</b><br>
+        <b>Sayın : "+ teklif.IlgiliAdi + @"</b><br><br>
+        <b>Teklif No    : " + teklif.Teklifno + @"</b><br>
+        <b>Revizo No    : " + teklif.Revzno + @"</b><br>
+        <b>Proje Adı    : " + teklif.Proje + @"</b><br>
+        <b>İlgili Adı   : " + teklif.Temsilciadi + @"</b><br>
+        </p>
+		";
+        str += @" 
 
 	</td>
 	<td style='width:200px;'><img style='height:150px;' src='"+ path + @"'></td>
@@ -152,40 +142,40 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
                 str += "<tr>";
                 str += Cell("");
-                str += Cell("TOPLAM BEDEL");
+                str += Cell("TOPLAM BEDEL",true);
                 str += Cell("");
                 str += Cell("");
                 str += Cell("");
                 str += Cell("");
                 str += Cell("");
-                str += Cell(teklif.Dovizdokuid);
-                str += Cell(toptutar);
+                str += Cell(teklif.Dovizdokuid,true);
+                str += Cell(toptutar,true);
                 str += "</tr>";
 
                 if (teklifPdfType == SharedEnums.TeklifPdfType.Iskontolu)
                 {
                     str += "<tr>";
                     str += Cell("");
-                    str += Cell("İSKONTO TOPLAMI");
+                    str += Cell("İSKONTO TOPLAMI",true);
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
-                    str += Cell(teklif.Dovizdokuid);
-                    str += Cell(topisktutar);
+                    str += Cell(teklif.Dovizdokuid,true);
+                    str += Cell(topisktutar,true);
                     str += "</tr>";
 
                     str += "<tr>";
                     str += Cell("");
-                    str += Cell("GENEL TOPLAM");
+                    str += Cell("GENEL TOPLAM",true);
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
-                    str += Cell(teklif.Dovizdokuid);
-                    str += Cell(toptutar-topisktutar);
+                    str += Cell(teklif.Dovizdokuid,true);
+                    str += Cell(toptutar-topisktutar,true);
                     str += "</tr>";
                 }
 
@@ -193,26 +183,26 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 {
                     str += "<tr>";
                     str += Cell("");
-                    str += Cell("KDV TOPLAMI");
+                    str += Cell("KDV TOPLAMI",true);
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
-                    str += Cell(teklif.Dovizdokuid);
-                    str += Cell(topkdvtutar);
+                    str += Cell(teklif.Dovizdokuid,true);
+                    str += Cell(topkdvtutar,true);
                     str += "</tr>";
 
                     str += "<tr>";
                     str += Cell("");
-                    str += Cell("GENEL TOPLAM");
+                    str += Cell("GENEL TOPLAM",true);
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
-                    str += Cell(teklif.Dovizdokuid);
-                    str += Cell(toptutar + topkdvtutar);
+                    str += Cell(teklif.Dovizdokuid,true);
+                    str += Cell(toptutar + topkdvtutar,true);
                     str += "</tr>";
                 }
 
@@ -225,27 +215,27 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 string result = Regex.Replace(teklif.Notlar, @"\r\n?|\n", "<br>");
 
-                str += "<p style='font-size:9pt;'>"+ result +"</p>";
+                str += "<STRONG>TEKLİF İLE İLGİLİ BİLGİLER</STRONG><p style='font-size:9pt;'>"+ result +"</p>";
             }
             str += "</div></body></html>";
 
             return str;
         }
 
-        private string Cell(double? td)
+        private string Cell(double? td,bool bold = false)
         {
             if (td.HasValue == false)
                 return "<td>0.00</td>";
 
-            return "<td>" + string.Format("{0:N2}", td.Value) + "</td>";
+            return bold ? "<td><b>" + string.Format("{0:N2}", td.Value) + "</b></td>" : "<td>" + string.Format("{0:N2}", td.Value) + "</td>";
         }
 
-        private string Cell(string td)
+        private string Cell(string td, bool bold = false)
         {
             if (string.IsNullOrEmpty(td))
                 return "<td></td>";
 
-            return "<td>"+ td +"</td>";
+            return bold ? "<td><b>" + td + "</b></td>" : "<td>"+ td +"</td>";
         }
 
 

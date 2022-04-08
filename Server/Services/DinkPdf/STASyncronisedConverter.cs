@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace UmotaWebApp.Server.Services
 {
-    public class STASynchronizedConverter : BasicConverter
+    public class STASynchronizedConverter : SynchronizedConverter
     {
         Thread conversionThread;
 
