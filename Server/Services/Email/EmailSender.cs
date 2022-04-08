@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using UmotaWebApp.Shared.Config;
 
@@ -22,7 +24,10 @@ namespace UmotaWebApp.Server.Services.Email
         {
             var emailMessage = CreateEmailMessage(message);
 
-            Send(emailMessage);
+            //Send(emailMessage);
+
+            var body = string.Format("<h2 style='color:red;'>{0}</h2>", message.Content);
+            Email(body, emailMessage.Subject, message.To[0].Address, message.Attachments);
         }
 
         private MimeMessage CreateEmailMessage(Message message)
@@ -45,7 +50,7 @@ namespace UmotaWebApp.Server.Services.Email
 
         private void Send(MimeMessage mailMessage)
         {
-            using (var client = new SmtpClient())
+            using (var client = new MailKit.Net.Smtp.SmtpClient())
             {
                 try
                 {
@@ -66,6 +71,40 @@ namespace UmotaWebApp.Server.Services.Email
                     client.Disconnect(true);
                     client.Dispose();
                 }
+            }
+        }
+
+        public void Email(string htmlString, string subject, string toMailAddress, byte[] attachment)
+        {
+            try
+            {
+                MailMessage message = new MailMessage();
+                var smtp = new  System.Net.Mail.SmtpClient();
+                message.From = new MailAddress(_emailConfig.From);
+                message.To.Add(new MailAddress(toMailAddress));
+                message.Subject = subject;
+                message.IsBodyHtml = true; //to make message body as html  
+                message.Body = htmlString;
+
+                var ms = new System.IO.MemoryStream(attachment);
+                var ct = new System.Net.Mime.ContentType(System.Net.Mime.MediaTypeNames.Application.Pdf);
+                var attach = new System.Net.Mail.Attachment(ms, ct);
+                attach.ContentDisposition.FileName = "teklif.pdf";
+                message.Attachments.Add(attach);
+
+
+                smtp.Port = _emailConfig.Port;
+                smtp.Host = _emailConfig.SmtpServer; //for gmail host  
+                smtp.EnableSsl = false;
+                smtp.UseDefaultCredentials = false;
+                smtp.Credentials = new NetworkCredential(_emailConfig.From, _emailConfig.Password);
+                smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+                
+                smtp.Send(message);
+            }
+            catch (Exception ex) 
+            {
+                throw ex; 
             }
         }
     }
