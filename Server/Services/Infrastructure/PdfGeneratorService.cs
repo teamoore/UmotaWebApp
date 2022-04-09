@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Text.RegularExpressions;
 using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Server.Services.Consts;
@@ -38,7 +39,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                                 DefaultEncoding = "utf-8"
                             },
                             
-                            HeaderSettings = { FontSize = 11, Right = "Page [page] of [toPage]", Line = true, Spacing = 2.812 }
+                            HeaderSettings = { FontSize = 11, Right = "Page [page] of [toPage]", Line = true, Spacing = 2.812 },
+                            FooterSettings = { FontSize = 9, Spacing = 2.8, FontName = "Roboto", Center = "Umota Yazılım - Logo Çözüm Ortağı - www.umota.com"}
                         }
                          }
             };
@@ -114,22 +116,22 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     switch (teklifPdfType)
                     {
                         case SharedEnums.TeklifPdfType.Iskontolu:
-                            str += Cell(item.Fiyatid);
-                            str += Cell(teklif.Dovizdokuid);
-                            str += Cell(item.Tutarid);
+                            str += Cell(item.Fiyatid,alignRight:true);
+                            str += Cell(teklif.Dovizdokuid, alignRight: true);
+                            str += Cell(item.Tutarid, alignRight: true);
                             toptutar += item.Tutarid.Value;
                             topisktutar += item.Isktut1id.Value + item.Isktut2id.Value + item.Isktut3id.Value + item.Isktut4id.Value;
                             break;
                         case SharedEnums.TeklifPdfType.Net:
-                            str += Cell(item.NetFiyatid);
-                            str += Cell(teklif.Dovizdokuid);
-                            str += Cell(item.Kdvmatrahid);
+                            str += Cell(item.NetFiyatid, alignRight: true);
+                            str += Cell(teklif.Dovizdokuid, alignRight: true);
+                            str += Cell(item.Kdvmatrahid, alignRight: true);
                             toptutar += item.Kdvmatrahid.Value;
                             break;
                         case SharedEnums.TeklifPdfType.NetKdv:
-                            str += Cell(item.NetFiyatid);
-                            str += Cell(teklif.Dovizdokuid);
-                            str += Cell(item.Kdvmatrahid);
+                            str += Cell(item.NetFiyatid, alignRight: true);
+                            str += Cell(teklif.Dovizdokuid, alignRight: true);
+                            str += Cell(item.Kdvmatrahid, alignRight: true);
                             toptutar += item.Kdvmatrahid.Value;
                             topkdvtutar += item.Kdvtutid.Value;
                             break;
@@ -148,8 +150,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 str += Cell("");
                 str += Cell("");
                 str += Cell("");
-                str += Cell(teklif.Dovizdokuid,true);
-                str += Cell(toptutar,true);
+                str += Cell(teklif.Dovizdokuid,true,true);
+                str += Cell(toptutar,true,true);
                 str += "</tr>";
 
                 if (teklifPdfType == SharedEnums.TeklifPdfType.Iskontolu)
@@ -162,8 +164,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
-                    str += Cell(teklif.Dovizdokuid,true);
-                    str += Cell(topisktutar,true);
+                    str += Cell(teklif.Dovizdokuid,true,true);
+                    str += Cell(topisktutar,true,true);
                     str += "</tr>";
 
                     str += "<tr>";
@@ -174,8 +176,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
-                    str += Cell(teklif.Dovizdokuid,true);
-                    str += Cell(toptutar-topisktutar,true);
+                    str += Cell(teklif.Dovizdokuid,true,true);
+                    str += Cell(toptutar-topisktutar,true,true);
                     str += "</tr>";
                 }
 
@@ -189,8 +191,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
-                    str += Cell(teklif.Dovizdokuid,true);
-                    str += Cell(topkdvtutar,true);
+                    str += Cell(teklif.Dovizdokuid,true,true);
+                    str += Cell(topkdvtutar,true,true);
                     str += "</tr>";
 
                     str += "<tr>";
@@ -201,8 +203,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     str += Cell("");
                     str += Cell("");
                     str += Cell("");
-                    str += Cell(teklif.Dovizdokuid,true);
-                    str += Cell(toptutar + topkdvtutar,true);
+                    str += Cell(teklif.Dovizdokuid,true,true);
+                    str += Cell(toptutar + topkdvtutar,true,true);
                     str += "</tr>";
                 }
 
@@ -222,20 +224,50 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             return str;
         }
 
-        private string Cell(double? td,bool bold = false)
+        private string Cell(double? td,bool bold = false, bool alignRight = false)
         {
+            var s = new StringBuilder();
+            
+            if (td.HasValue == false && alignRight)
+                return "<td style='text-align:right;'>0.00</td>";
+
             if (td.HasValue == false)
                 return "<td>0.00</td>";
 
-            return bold ? "<td><b>" + string.Format("{0:N2}", td.Value) + "</b></td>" : "<td>" + string.Format("{0:N2}", td.Value) + "</td>";
+            if (alignRight)
+                s.Append("<td style='text-align:right;'>");
+            else
+                s.Append("<td>");
+
+            if (bold)
+                s.Append("<b>" + string.Format("{0:N2}", td.Value) + "</b>");
+            else
+                s.Append(string.Format("{0:N2}", td.Value));
+            
+            s.Append("</td>");
+
+            return s.ToString();
         }
 
-        private string Cell(string td, bool bold = false)
+        private string Cell(string td, bool bold = false, bool alignRight = false)
         {
             if (string.IsNullOrEmpty(td))
                 return "<td></td>";
 
-            return bold ? "<td><b>" + td + "</b></td>" : "<td>"+ td +"</td>";
+            var s = new StringBuilder();
+            if (alignRight)
+                s.Append("<td style='text-align:right'>");
+            else
+                s.Append("<td>");
+
+            if (bold)
+                s.Append("<b>" + td + "</b>");
+            else
+                s.Append(td);
+
+            s.Append("</td>");
+
+            return s.ToString();
         }
 
 

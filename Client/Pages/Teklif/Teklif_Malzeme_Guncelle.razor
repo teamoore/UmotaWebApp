@@ -477,6 +477,9 @@
     {
         try
         {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
             _pdfDisabled = true;
             _sendEmailDisabled = true;
             _sendEmailText = "Gönderiliyor...";
@@ -486,6 +489,8 @@
             request.teklifDetays = this.teklifDetayList;
 
             request.PdfType = selectedPdfType;
+            request.Kullanici = kullanicikodu;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
             var result = await httpClient.PostAsJsonAsync<PdfGeneratorRequestDto>("/api/Pdf/CreateTeklifPdfDocumentSendMail", request);
             var response = await result.Content.ReadFromJsonAsync<ServiceResponse<PdfGenerateResponseDto>>();
@@ -496,6 +501,7 @@
                 Snackbar.Add(string.Format("Teklif {0} adresine gönderildi",
                     this.teklif.Mail), severity: Severity.Success);
                 _sendEmailText = "Gönderildi";
+                await LoadTeklifData();
             }
             else
             {
