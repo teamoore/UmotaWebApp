@@ -11,6 +11,7 @@ using UmotaWebApp.Server.Services.Infrastructure;
 using UmotaWebApp.Shared.Config;
 using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ServiceResponses;
+using UmotaWebApp.Shared.SharedConsts;
 
 namespace UmotaWebApp.Server.Controllers
 {
@@ -21,12 +22,14 @@ namespace UmotaWebApp.Server.Controllers
         private ILogger<PdfController> logger { get; }
         private IPdfGenerator pdf { get; set; }
         private IEmailSender _emailSender { get; set; }
+        private ITeklifService teklifService { get; set; }
 
-        public PdfController(ILogger<PdfController> logger, IPdfGenerator pdf, IEmailSender emailSender)
+        public PdfController(ILogger<PdfController> logger, IPdfGenerator pdf, IEmailSender emailSender, ITeklifService teklifService)
         {
             this.logger = logger;
             this.pdf = pdf;
             this._emailSender = emailSender;
+            this.teklifService = teklifService;
         }
 
         [HttpPost("CreateTeklifPdfDocument")]
@@ -117,6 +120,17 @@ namespace UmotaWebApp.Server.Controllers
                     var message = new Message(new string[] { request.teklif.Mail }, subject, subject, pdfData);
                     _emailSender.SendEmail(message);
                 }
+
+                //Müşteriye mail gönderildikten sonra teklif durumunu : Müşteri Onayı Bekleniyor a çek
+                request.teklif.NewDuruminfo = TeklifDurum.MusteriOnayiBekliyor;
+                request.teklif.Upduser = request.Kullanici;
+               
+                await teklifService.UpdateTeklifDurum(new TeklifRequestDto()
+                {
+                    Teklif = request.teklif,
+                    kullanicikodu = request.Kullanici,
+                    FirmaId = request.FirmaId
+                });
 
                 return new ServiceResponse<PdfGenerateResponseDto>()
                 {

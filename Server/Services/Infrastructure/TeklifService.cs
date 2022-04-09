@@ -437,7 +437,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     throw new ApiException("Teklif bulunamadı");
 
                 if (teklifRow.Duruminfo.Equals(request.Teklif.Duruminfo) == false)
-                    throw new ApiException("Teklifin Durumu sizden önce değiştirilmiş , işlem durudurulacak");
+                    throw new ApiException("Teklifin Durumu sizden önce değiştirilmiş , işlem durdurulacak");
 
                 var kullanici = SisKullaniciService.GetSisKullanici(request.Teklif.Upduser);
 
