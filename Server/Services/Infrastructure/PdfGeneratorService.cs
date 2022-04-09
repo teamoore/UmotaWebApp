@@ -40,7 +40,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                             },
                             
                             HeaderSettings = { FontSize = 11, Right = "Page [page] of [toPage]", Line = true, Spacing = 2.812 },
-                            FooterSettings = { FontSize = 9, Spacing = 2.8, FontName = "Roboto", Center = "Umota Yazılım - Logo Çözüm Ortağı - www.umota.com"}
+                            FooterSettings = { FontSize = 9, Spacing = 2.8, FontName = "Roboto", Center = "Uno Endüstriyel - www.unoendustriyel.com" }
                         }
                          }
             };
@@ -61,7 +61,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 "<body style='font-family:Roboto,Arial;'>" +
                 @"<table style='width:100%;background-color:#4700D8;text-align:center;color:white;font-weight:bold;font-family:Roboto,Arial;'><tr><td style='height:30px;'>TEKLİF</td></tr></table><div class='container'>";
 
-            var path = Environment.CurrentDirectory + "\\Media\\logo\\uno_logo.PNG";
+            var path = Environment.CurrentDirectory + "\\Media\\logo\\logo.jpeg";
 
             str += @" <table class='table table-striped'>
   <tr>
