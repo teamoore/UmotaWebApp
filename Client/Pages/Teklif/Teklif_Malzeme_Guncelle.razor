@@ -9,7 +9,7 @@
 
 <div class="card" style="width: 100%;">
     <div class="card-body">
-        <h5 class="card-title">Teklif Numarası : @teklif.Teklifno</h5>
+        <h5 class="card-title">Teklif Numarası : @teklif.Teklifno @teklif.Revzno</h5>
 
         <h6 class="card-subtitle mb-2 text-muted">
             Teklif Tarihi : @(teklif.Tarih.HasValue ? teklif.Tarih.Value.ToString("dd.MM.yyyy") : "")
@@ -533,7 +533,18 @@
 
         if (!result.Cancelled)
         {
-            await LoadTeklifData();
+            if (result.Data != null)
+            {
+                var durumSecim = (TeklifDto)result.Data;
+                if (durumSecim.Duruminfo.Equals(TeklifDurum.TeklifRevizyonda))
+                    navigation.NavigateTo("/stek_listef_detay/" + durumSecim.Logref,true);
+                else
+                    await LoadTeklifData();
+            }
+            else
+            {
+                await LoadTeklifData();
+            }
         }
     }
 

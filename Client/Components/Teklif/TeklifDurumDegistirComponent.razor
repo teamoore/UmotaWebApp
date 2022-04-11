@@ -30,7 +30,7 @@
                             }
                             else
                             {
-                                @if (teklif.Duruminfo == TeklifDurum.TeklifHazirlaniyor)
+                                @if (teklif.Duruminfo == TeklifDurum.TeklifHazirlaniyor || teklif.Duruminfo == TeklifDurum.TeklifRevizyonda)
                                 {
                                     <option value=@TeklifDurum.MusteriOnayiBekliyor>@TeklifDurum.TeklifMusteriyeGonderildi</option>
                                     <option value=@TeklifDurum.UnoTeklifiIptalEtti>@TeklifDurum.UnoTeklifiIptalEtti</option>
@@ -134,19 +134,20 @@
     {
         try
         {
-
-            teklif.Upddate = DateTime.Now;
-            teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            teklif.Status = 1;
-
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
+            teklif.Upddate = DateTime.Now;
+            teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklif.Status = 1;
+            teklif.Lfirma = selectedFirmaDonem.logo_firma.Value.ToString();
+
             var request = new TeklifRequestDto();
             request.Teklif = teklif;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
+            request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
             var result = await httpClient.PostAsJsonAsync(UrlHelper.TeklifDurumGuncelle, request);
 
@@ -156,8 +157,7 @@
 
             Snackbar.Add("Teklif Durumu güncellendi", severity: Severity.Success);
 
-
-            await ModalInstance.CloseAsync();
+            await ModalInstance.CloseAsync(ModalResult.Ok<TeklifDto>(response.Value));
         }
         catch (ClientException e)
         {

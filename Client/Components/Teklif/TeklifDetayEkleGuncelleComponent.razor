@@ -587,12 +587,8 @@
             throw new Exception("Firma dönem seçilmedi");
 
 
-        var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklifdetay&keyField=logref&firmaId=" + selectedFirmaDonem.firma_no.Value);
-        if (string.IsNullOrEmpty(result2) == false)
-        {
-            teklifDetay.Logref = Convert.ToInt32(result2);
-        }
-
+        var result2 = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=teklifdetay&firmaId=" + selectedFirmaDonem.firma_no.Value);
+        teklifDetay.Logref = result2;
     }
 
     public async Task DovizListesiGetir()

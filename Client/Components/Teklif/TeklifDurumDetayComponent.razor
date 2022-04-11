@@ -45,7 +45,7 @@
     {
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
-        items = await httpClient.GetServiceResponseAsync<List<TeklifDurumDetayDto>>(UrlHelper.TeklifDurumDetayList + "?teklifref=" + teklifref + "&firmaId=" + selectedFirmaDonem.logo_firma.Value);
+        items = await httpClient.GetServiceResponseAsync<List<TeklifDurumDetayDto>>(UrlHelper.TeklifDurumDetayList + "?teklifref=" + teklifref + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
     }
 
     public async Task Vazgec()

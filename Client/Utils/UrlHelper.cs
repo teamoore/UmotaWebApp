@@ -17,6 +17,7 @@ namespace UmotaWebApp.Client.Utils
         public const string TeklifAra = "/api/teklif/search";
         public const string TeklifGetir = "/api/teklif/get";
         public const string TeklifSil = "/api/teklif/delete";
+        public const string TeklifKaydetRevize = "/api/teklif/saverevize";
         public const string MalzemeKartListesi = "/api/malzemekart/list";
         public const string MalzemeKartAra = "/api/malzemekart/search";
         public const string MalzemeKartGetir = "/api/malzemekart/get";

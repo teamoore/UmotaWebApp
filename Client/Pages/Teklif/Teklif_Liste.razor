@@ -22,6 +22,7 @@
         <MudTh>#</MudTh>
         <MudTh>Durum</MudTh>
         <MudTh>Teklif No</MudTh>
+        <MudTh>Rvz No</MudTh>
         <MudTh>Tarih</MudTh>
         <MudTh>Cari Kodu</MudTh>
         <MudTh>Cari Adı</MudTh>
@@ -52,6 +53,7 @@
         </MudTd>
         <MudTd DataLabel="Durum">@context.Duruminfo</MudTd>
         <MudTd DataLabel="Teklif No">@context.Teklifno</MudTd>
+        <MudTd DataLabel="Rvz No">@context.Revzno</MudTd>
         <MudTd DataLabel="Tarih">@context.TarihFormatted</MudTd>
         <MudTd DataLabel="Cari Kodu">@context.Carikodu</MudTd>
         <MudTd DataLabel="Cari Adı">@context.Cariadi</MudTd>
@@ -238,7 +240,17 @@
 
         if (!result.Cancelled)
         {
-            await LoadTeklifler();
+            if (result.Data != null)
+            {
+                var durumSecim = (TeklifDto)result.Data;
+                if (durumSecim.Duruminfo.Equals(TeklifDurum.TeklifRevizyonda))
+                    navigation.NavigateTo("/stek_listef_detay/" + durumSecim.Logref);
+                else
+                    await LoadTeklifler();
+            } else
+            {
+                await LoadTeklifler();
+            }
         }
     }
 
@@ -324,6 +336,59 @@
 
         if (!result.Cancelled)
         {
+        }
+    }
+
+    public async Task TeklifKopyalaRevizeEt(int logref)
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        try
+        {
+            loadingCompleted = false;
+
+            var teklif = new TeklifDto();
+            teklif.Logref = logref;
+            teklif.Lfirma = selectedFirmaDonem.logo_firma.Value.ToString();
+            var request = new TeklifRequestDto();
+            request.Teklif = teklif;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+            request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.PostAsJsonAsync(UrlHelper.TeklifKaydetRevize, request);
+
+            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<TeklifDto>>();
+            if (!response.Success)
+                throw new Exception(response.Message);
+
+            //var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifRequestDto>(UrlHelper.TeklifKaydetRevize, request);
+
+            navigation.NavigateTo("/stek_listef_detay/" + response.Value.Logref);
+
+        }
+        catch (ApiException exx)
+        {
+            Snackbar.Add(exx.Message, severity: Severity.Warning);
+            return;
+        }
+        catch (ClientException e)
+        {
+            foreach (var item in e.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+        finally
+        {
+            loadingCompleted = true;
         }
     }
 }
