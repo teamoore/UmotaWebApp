@@ -64,7 +64,17 @@
 
 
     <div class="form-group">
-        <SaveButtonComponent Caption="Kaydet" OnClick="UpdateTeklifDurum" />
+        <MudButton Disabled="@_processing" OnClick="UpdateTeklifDurum" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Kaydediliyor...</MudText>
+            }
+            else
+            {
+                <MudText>Kaydet</MudText>
+            }
+        </MudButton>
         <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
     </div>
 
@@ -97,7 +107,7 @@
     public int? admin { get; set; }
 
     public bool isAdmin { get; set; }
-
+    private bool _processing = false;
     TeklifDto teklif = new TeklifDto();
 
     protected override async Task OnInitializedAsync()
@@ -139,6 +149,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
+            _processing = true;
             teklif.Upddate = DateTime.Now;
             teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklif.Status = 1;
@@ -170,6 +181,10 @@
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
         }
     }
 

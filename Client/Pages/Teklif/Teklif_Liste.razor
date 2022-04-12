@@ -339,7 +339,7 @@
         }
     }
 
-    public async Task TeklifKopyalaRevizeEt(int logref)
+    public async Task TeklifKopyalaRevizeEt(TeklifDto teklif)
     {
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
@@ -350,8 +350,6 @@
         {
             loadingCompleted = false;
 
-            var teklif = new TeklifDto();
-            teklif.Logref = logref;
             teklif.Lfirma = selectedFirmaDonem.logo_firma.Value.ToString();
             var request = new TeklifRequestDto();
             request.Teklif = teklif;

@@ -138,7 +138,7 @@
                                 <InputNumber @bind-Value="BirimFiyatNetid" class="form-control" placeholder="Net Fiyat İD" disabled />
                             </div>
                             <div class="col-md-2">
-                                <label>Toplam Tutar İD</label>
+                                <label>Net Fiyat Toplam İD</label>
                                 <InputNumber @bind-Value="teklifDetay.Kdvmatrahid" class="form-control" placeholder="Toplam Tutar İD" disabled />
                             </div>
                         </div>
@@ -196,20 +196,36 @@
                     <div class="form-group">
                         <div class="row">
                             <div class="col-md-2">
-                                <label>İsk-1 Tutar</label>
+                                <label>İsk-1 Tutar İD</label>
                                 <InputNumber @bind-Value="teklifDetay.Isktut1id" class="form-control" disabled />
                             </div>
                             <div class="col-md-2">
-                                <label>İsk-2 Tutar</label>
+                                <label>İsk-2 Tutar İD</label>
                                 <InputNumber @bind-Value="teklifDetay.Isktut2id" class="form-control" disabled />
                             </div>
                             <div class="col-md-2">
-                                <label>İsk-3 Tutar</label>
+                                <label>İsk-3 Tutar İD</label>
                                 <InputNumber @bind-Value="teklifDetay.Isktut3id" class="form-control" disabled />
                             </div>
                             <div class="col-md-2">
-                                <label>İsk-Genel Tutar</label>
+                                <label>İsk-Genel Tutar İD</label>
                                 <InputNumber @bind-Value="teklifDetay.Isktut4id" class="form-control" disabled />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2">
+                                @if (@maliyetGorYonetici)
+                                {
+                                    <label>Maliyet 1</label>
+                                    <InputNumber @bind-Value="teklifDetay.Maliyet1" class="form-control" disabled />
+                                }
+                                </div>
+                            <div class="col-md-2">
+                                @if (maliyetGorSatisci)
+                                {
+                                    <label>Maliyet 2</label>
+                                    <InputNumber @bind-Value="teklifDetay.Maliyet2" class="form-control" disabled />
+                                }
                             </div>
                         </div>
                     </div>
@@ -218,15 +234,15 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-md-2">
-                            <label>Toplam Tutar</label>
+                            <label>Toplam Tutar İD</label>
                             <InputNumber @bind-Value="teklifDetay.Tutarid" class="form-control" disabled />
                         </div>
                         <div class="col-md-2">
-                            <label>Iskonto Toplam Tutar</label>
+                            <label>Iskonto Toplam Tutar İD</label>
                             <InputNumber @bind-Value="IskTopid" class="form-control" disabled />
                         </div>
                         <div class="col-md-2">
-                            <label>KDV Mahrahı</label>
+                            <label>KDV Mahrahı İD</label>
                             <InputNumber @bind-Value="teklifDetay.Kdvmatrahid" class="form-control" disabled />
                         </div>
                         <div class="col-md-1">
@@ -234,11 +250,11 @@
                             <InputNumber @bind-Value="teklifDetay.Kdvyuz" class="form-control" disabled />
                         </div>
                         <div class="col-md-2">
-                            <label>KDV Tutarı</label>
+                            <label>KDV Tutarı İD</label>
                             <InputNumber @bind-Value="teklifDetay.Kdvtutid" class="form-control" disabled />
                         </div>
                         <div class="col-md-2">
-                            <label>Net Tutar</label>
+                            <label>Net Tutar İD</label>
                             <InputNumber @bind-Value="teklifDetay.Nettutarid" class="form-control" disabled />
                         </div>
                     </div>
