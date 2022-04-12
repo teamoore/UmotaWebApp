@@ -30,7 +30,7 @@
                             }
                             else
                             {
-                                @if (teklif.Duruminfo == TeklifDurum.TeklifHazirlaniyor)
+                                @if (teklif.Duruminfo == TeklifDurum.TeklifHazirlaniyor || teklif.Duruminfo == TeklifDurum.TeklifRevizyonda)
                                 {
                                     <option value=@TeklifDurum.MusteriOnayiBekliyor>@TeklifDurum.TeklifMusteriyeGonderildi</option>
                                     <option value=@TeklifDurum.UnoTeklifiIptalEtti>@TeklifDurum.UnoTeklifiIptalEtti</option>
@@ -64,7 +64,17 @@
 
 
     <div class="form-group">
-        <SaveButtonComponent Caption="Kaydet" OnClick="UpdateTeklifDurum" />
+        <MudButton Disabled="@_processing" OnClick="UpdateTeklifDurum" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Kaydediliyor...</MudText>
+            }
+            else
+            {
+                <MudText>Kaydet</MudText>
+            }
+        </MudButton>
         <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
     </div>
 
@@ -97,7 +107,7 @@
     public int? admin { get; set; }
 
     public bool isAdmin { get; set; }
-
+    private bool _processing = false;
     TeklifDto teklif = new TeklifDto();
 
     protected override async Task OnInitializedAsync()
@@ -134,19 +144,21 @@
     {
         try
         {
-
-            teklif.Upddate = DateTime.Now;
-            teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            teklif.Status = 1;
-
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
+            _processing = true;
+            teklif.Upddate = DateTime.Now;
+            teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklif.Status = 1;
+            teklif.Lfirma = selectedFirmaDonem.logo_firma.Value.ToString();
+
             var request = new TeklifRequestDto();
             request.Teklif = teklif;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
+            request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
             var result = await httpClient.PostAsJsonAsync(UrlHelper.TeklifDurumGuncelle, request);
 
@@ -156,8 +168,7 @@
 
             Snackbar.Add("Teklif Durumu güncellendi", severity: Severity.Success);
 
-
-            await ModalInstance.CloseAsync();
+            await ModalInstance.CloseAsync(ModalResult.Ok<TeklifDto>(response.Value));
         }
         catch (ClientException e)
         {
@@ -170,6 +181,10 @@
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
         }
     }
 

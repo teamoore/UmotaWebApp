@@ -186,5 +186,24 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpPost("saverevize")]
+        public async Task<ServiceResponse<TeklifDto>> SaveTeklifRevize(TeklifRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<TeklifDto>()
+                {
+                    Value = await TeklifService.TeklifKopyalaRevizeEt(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<TeklifDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }
