@@ -1,0 +1,27 @@
+﻿@page "/kullanici_ekle"
+
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+<Kullanici_Form OnVazgecClicked="goBackList"></Kullanici_Form>
+
+
+@code {
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Kullanıcı Ekle";
+        return Task.CompletedTask;
+    }
+
+    public void goBackList()
+    {
+        navigation.NavigateTo("/kullanici_liste");
+    }
+
+
+}

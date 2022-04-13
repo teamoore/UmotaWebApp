@@ -76,9 +76,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             var kullanici = await MasterDbContext.SisKullanicis.Where(x => x.KullaniciKodu == request.Kod && x.KullaniciSifre == hashedPassword)
               .ProjectTo<SisKullaniciDto>(Mapper.ConfigurationProvider).FirstOrDefaultAsync();
 
-
             if (kullanici == null)
                 throw new ApiException("Kullanıcı kodu ve/veya şifre hatalı girildi.");
+
+            if (kullanici.KullaniciIptal)
+                throw new ApiException("Kullanıcının sisteme girişi engellenmiş. Sistem yöneticinize başvurunuz.");
 
             var kullanici_donem_yetki = await MasterDbContext.SisFirmaDonemYetkis.Where(x => x.Kodu == kullanici.KullaniciKodu)
                 .ProjectTo<SisFirmaDonemYetkiDto>(Mapper.ConfigurationProvider).ToListAsync();
@@ -140,6 +142,35 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             }
 
+        }
+        public async Task<List<SisMenuProfilDto>> GetKullaniciGrupList()
+        {
+            return await MasterDbContext.SisMenuProfils
+                .ProjectTo<SisMenuProfilDto>(Mapper.ConfigurationProvider).ToListAsync();
+        }
+        public async Task<SisKullaniciDto> SaveKullanici(SisKullaniciRequestDto request)
+        {
+            request.SisKullanici.KullaniciSifre = SifreDegistir(request.SisKullanici.KullaniciSifre);
+            var kullanici = Mapper.Map<SisKullanici>(request.SisKullanici);
+
+            await MasterDbContext.SisKullanicis.AddAsync(kullanici);
+            await MasterDbContext.SaveChangesAsync();
+
+            return Mapper.Map<SisKullaniciDto>(kullanici);
+        }
+        public async Task<SisKullaniciDto> UpdateKullanici(SisKullaniciRequestDto request)
+        {
+            var kullanici = await MasterDbContext.SisKullanicis.Where(x => x.KullaniciKodu == request.SisKullanici.KullaniciKodu).SingleOrDefaultAsync();
+            if (kullanici == null)
+                throw new Exception("Kart bulunamadı");
+
+            if (!request.SisKullanici.KullaniciSifre.Equals(kullanici.KullaniciSifre))
+                request.SisKullanici.KullaniciSifre = SifreDegistir(request.SisKullanici.KullaniciSifre);
+
+            Mapper.Map(request.SisKullanici, kullanici);
+            await MasterDbContext.SaveChangesAsync();
+
+            return Mapper.Map<SisKullaniciDto>(kullanici);
         }
     }
 }

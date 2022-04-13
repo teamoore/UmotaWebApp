@@ -177,6 +177,9 @@
     [Parameter]
     public int? modalForm { get; set; }
 
+    [Parameter]
+    public EventCallback OnVazgecClicked { get; set; }
+
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
     [CascadingParameter] ModalParameters modalParameters { get; set; }

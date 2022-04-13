@@ -1,0 +1,28 @@
+﻿@page "/kullanici_guncelle/{text?}"
+
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+<Kullanici_Form OnVazgecClicked="goBackList" kullaniciKodu=@Text></Kullanici_Form>
+
+
+@code {
+    [Parameter]
+    public string? Text { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Kullanıcı Güncelle";
+        return Task.CompletedTask;
+    }
+
+    public void goBackList()
+    {
+        navigation.NavigateTo("/kullanici_liste");
+    }
+
+}

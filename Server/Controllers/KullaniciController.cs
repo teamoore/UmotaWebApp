@@ -132,5 +132,67 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpGet("gruplist")]
+        public async Task<ServiceResponse<List<SisMenuProfilDto>>> GetSisKullaniciGrupList()
+        {
+            try
+            {
+                return new ServiceResponse<List<SisMenuProfilDto>>()
+                {
+                    Value = await SisKullaniciService.GetKullaniciGrupList()
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<SisMenuProfilDto>>();
+                e.SetException(ex);
+                return e;
+            }
+
+        }
+
+        [HttpPost("save")]
+        public async Task<ServiceResponse<SisKullaniciDto>> KullaniciSave(SisKullaniciRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<SisKullaniciDto>()
+                {
+                    Value = await SisKullaniciService.SaveKullanici(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<SisKullaniciDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("update")]
+        public async Task<ServiceResponse<SisKullaniciDto>> KullaniciUpdate(SisKullaniciRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<SisKullaniciDto>()
+                {
+                    Value = await SisKullaniciService.UpdateKullanici(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<SisKullaniciDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
     }
 }

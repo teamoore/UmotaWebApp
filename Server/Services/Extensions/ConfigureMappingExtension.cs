@@ -51,6 +51,7 @@ namespace UmotaWebApp.Server.Services.Extensions
             CreateMap<Kisiler, KisilerDto>().ReverseMap();
             CreateMap<V015Kisiler, KisilerDto>().ReverseMap();
             CreateMap<TeklifDurumDetay, TeklifDurumDetayDto>().ReverseMap();
+            CreateMap<SisMenuProfil, SisMenuProfilDto>().ReverseMap();
         }
     }
 
