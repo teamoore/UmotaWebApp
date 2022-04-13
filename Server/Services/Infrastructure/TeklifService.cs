@@ -122,7 +122,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 var p = new DynamicParameters();
 
                 var sql = "select *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
-                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId: request.FirmaId.ToString()) + " a with(nolock) where 1=1 and a.revizyon = 0";
+                    " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId: request.FirmaId.ToString()) + " a with(nolock) where 1=1";
 
                 var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(request.kullanicikodu, KullaniciYetkiKodlari.TumTeklifleriGorebilir);
                 if (tumTeklifleriGormeYetkisi == 0)
@@ -168,6 +168,45 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 {
                     sql += " and a.tarih <= @bittar ";
                     p.Add("@bittar", value: request.BitisTarih, dbType: DbType.DateTime);
+                }
+
+                switch (request.Revizyon)
+                {
+                    case 0:
+                        sql += " and a.revizyon = 0 ";
+                        break;
+                    case 1:
+                        sql += " and a.revizyon = 1 ";
+                        break;
+                    case -1:
+                        break;
+                    default:
+                        sql += " and a.revizyon = 0 ";
+                        break;
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Cariadi))
+                {
+                    sql += " and a.cariadi like @cariadi ";
+                    p.Add("@cariadi", value: "%" +request.Cariadi + "%", dbType: DbType.String);
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Proje))
+                {
+                    sql += " and a.proje like @proje ";
+                    p.Add("@proje", value: "%" + request.Proje + "%", dbType: DbType.String);
+                }
+
+                if (request.Dovizrefid.HasValue && request.Dovizrefid > 0)
+                    sql += " and a.dovizrefid = " + request.Dovizrefid;
+
+                if (request.Personelref.HasValue && request.Personelref > 0)
+                    sql += " and a.lpersonelref = " + request.Personelref;
+
+                if (!string.IsNullOrWhiteSpace(request.Duruminfo))
+                {
+                    sql += " and a.duruminfo like @duruminfo ";
+                    p.Add("@duruminfo", value: request.Duruminfo, dbType: DbType.String);
                 }
 
                 sql += " order by insdate desc";

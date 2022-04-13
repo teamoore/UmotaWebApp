@@ -1,8 +1,8 @@
 ﻿@page "/stek_listef"
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif"
-                 ShowButtons="false"
-                 onDoneButtonClicked="TeklifAra" ShowSearchSection="_ShowSearchSection"></HeaderSearchBar>
+                 ShowButtons="false" ShowFilterButton="true"
+                 onDoneButtonClicked="TeklifAra" onFilterButtonClicked="TeklifDetayliAra" ShowSearchSection="_ShowSearchSection"></HeaderSearchBar>
 
 @if (loadingCompleted == false)
 {
@@ -387,6 +387,51 @@
         finally
         {
             loadingCompleted = true;
+        }
+    }
+
+    private async Task TeklifDetayliAra()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            var cariForm = modal.Show<Components.Teklif.TeklifDetayliAraComponent>("Detaylı Arama", opt);
+            var result = await cariForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    var request = (TeklifRequestDto)result.Data;
+
+                    loadingCompleted = false;
+
+                    request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+                    request.FirmaId = selectedFirmaDonem.firma_no.Value;
+                    request.SearchText = header.SearchText;
+
+                    var response = await httpClient.PostGetServiceResponseAsync<List<TeklifDto>, TeklifRequestDto>(UrlHelper.TeklifAra, request);
+                    if (response == null || response.Count == 0)
+                    {
+                        Snackbar.Add("Aradığınız kritere göre teklif bulunamadı.", severity: Severity.Warning);
+                        loadingCompleted = true;
+                        return;
+                    }
+                    loadingCompleted = true;
+                    teklifler = response;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
         }
     }
 }

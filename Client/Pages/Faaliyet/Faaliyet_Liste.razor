@@ -1,8 +1,8 @@
 ﻿@page "/faaliyet_listef"
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="YeniKayitEkle"
-                 ShowButtons="false"
-                 onDoneButtonClicked="FaaliyetAra" ShowSearchSection="_ShowSearchSection"></HeaderSearchBar>
+                 ShowButtons="false" ShowFilterButton="true"
+                 onDoneButtonClicked="FaaliyetAra" onFilterButtonClicked="FaaliyetDetayliAra"  ShowSearchSection="_ShowSearchSection"></HeaderSearchBar>
 
 @if (loadingCompleted == false)
 {
@@ -16,7 +16,7 @@
             <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         }
         <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Faaliyet Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        @*<MudTextField @bind-Value="_searchString" Placeholder="Faaliyet Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>*@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
@@ -205,7 +205,7 @@
         loadingCompleted = false;
 
         var request = new FaaliyetRequestDto();
-        request.Aranacak = header.SearchText;
+        request.SearchText = header.SearchText;
         request.FirmaId = selectedFirmaDonem.firma_no.Value;
         request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
@@ -291,5 +291,51 @@
         }
 
     }
+
+    private async Task FaaliyetDetayliAra()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            var cariForm = modal.Show<Components.Faaliyet.FaaliyetDetayliAraComponent>("Detaylı Arama", opt);
+            var result = await cariForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    var request = (FaaliyetRequestDto)result.Data;
+
+                    loadingCompleted = false;
+
+                    request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+                    request.FirmaId = selectedFirmaDonem.firma_no.Value;
+                    request.SearchText = header.SearchText;
+
+                    var response = await httpClient.PostGetServiceResponseAsync<List<FaaliyetDto>, FaaliyetRequestDto>(UrlHelper.FaaliyetAra, request);
+                    if (response == null || response.Count == 0)
+                    {
+                        Snackbar.Add("Aradığınız kriterlere göre kayıt bulunamadı.", severity: Severity.Warning);
+                        loadingCompleted = true;
+                        return;
+                    }
+                    loadingCompleted = true;
+                    listItems = response;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+    }
+
 
 }
