@@ -188,7 +188,8 @@ namespace UmotaWebApp.Server.Data.Models
 
             modelBuilder.Entity<SisKullanici>(entity =>
             {
-                entity.HasNoKey();
+                entity.HasKey(e => e.KullaniciKodu)
+                    .HasName("pk_sis_kullanici");
 
                 entity.ToTable("sis_kullanici");
 

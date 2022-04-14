@@ -23,8 +23,11 @@
 
                         <InputText @bind-Value="header.SearchText" class="form-control mr-sm-2" />
                         <button class="btn btn-outline-success my-2 my-sm-0" @onclick="SearchClicked">@ButonText</button>
-
-                    </EditForm>
+                        @if (ShowFilterButton)
+                        {   
+                            <button class="btn btn-outline-success my-2 my-sm-0 ml-1" @onclick="FilterClicked">Filtre</button>
+                        }
+                        </EditForm>
 
                 </li>
             </ul>
@@ -52,6 +55,9 @@
     [Parameter]
     public bool ShowButtons { get; set; }
 
+    [Parameter]
+    public bool ShowFilterButton { get; set; }
+
     public string ButonText = "Ara";
 
     [Parameter]
@@ -60,6 +66,8 @@
     [Parameter]
     public EventCallback onAddNewButtonClicked { get; set; }
 
+    [Parameter]
+    public EventCallback onFilterButtonClicked { get; set; }
 
     protected async Task SearchClicked()
     {
@@ -73,6 +81,10 @@
         await onAddNewButtonClicked.InvokeAsync();
     }
 
+    protected async Task FilterClicked()
+    {
+        await onFilterButtonClicked.InvokeAsync();
+    }
 
 
 }

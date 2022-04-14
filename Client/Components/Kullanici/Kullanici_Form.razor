@@ -1,0 +1,274 @@
+﻿
+<div class="form">
+
+    <EditForm Model="kullanici">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Kullanıcı Kodu</label>
+                    <InputText @bind-Value="kullanici.KullaniciKodu" class="form-control" Disabled="@isUpdate" />
+                </div>
+                <div class="col-md-4">
+                    <label>Kullanıcı Şifresi</label>
+                    <InputText @bind-Value="kullanici.KullaniciSifre" class="form-control" type="password" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Kullanıcı Adı</label>
+                    <InputText @bind-Value="kullanici.KullaniciAdi" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Yetki </label>
+                    <InputSelect @bind-Value="kullanici.KullaniciYetkiKodu" class="form-control">
+                        <option value="">@Utils.Mesajlar.Seciniz</option>
+                        <option value="STD">Standart</option>
+                        <option value="ADM">Admin</option>
+                    </InputSelect>
+                </div>
+                <div class="col-md-6">
+                    <label>Kullanıcı Grubu</label>
+                    <InputSelect class="form-control" @bind-Value="kullanici.KullaniciMenuProfil">
+                        @if (GrupListesi != null)
+                        {
+                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                            @foreach (var item in GrupListesi)
+                            {
+                                <option value="@item.ProfilId">@item.ProfilAdi</option>
+                            }
+                        }
+                    </InputSelect>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>E-posta Adresi</label>
+                    <InputText @bind-Value="kullanici.MailAdres" class="form-control" type="email" />
+                </div>
+                <div class="col-md-6">
+                    <label>E-posta Şifresi</label>
+                    <InputText @bind-Value="kullanici.MailSifre" class="form-control" type="password" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Logo Kullanıcı Adı</label>
+                    <InputText @bind-Value="kullanici.LogoUsername" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label>Logo Kullanıcı Şifresi</label>
+                    <InputText @bind-Value="kullanici.LogoPassword" class="form-control" type="password" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>
+                        İptal
+                        <InputCheckbox @bind-Value="kullanici.KullaniciIptal" class="form-control" />
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+                @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Kaydediliyor...</MudText>
+                }
+                else
+                {
+                    <MudText>Kaydet</MudText>
+                }
+            </MudButton>
+            <CancelButtonComponent Caption="Vazgeç" OnClick="goBackList" />
+        </div>
+
+    </EditForm>
+</div>
+
+
+@code {
+    [Parameter]
+    public string kullaniciKodu { get; set; }
+    [Parameter]
+    public int? modalForm { get; set; }
+    [Parameter]
+    public EventCallback OnVazgecClicked { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    private bool _processing = false;
+    private bool isUpdate = false;
+
+    public SisKullaniciDto kullanici = new SisKullaniciDto();
+    public List<SisMenuProfilDto> GrupListesi { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(kullaniciKodu))
+            isUpdate = true;
+
+        if (isUpdate)
+            await KayitGetir();
+
+        await GrupListesiGetir();
+    }
+
+    public async Task KayitGetir()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(kullaniciKodu))
+                return;
+
+            kullanici = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullaniciKodu);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task ValidSubmit()
+    {
+        await Kaydet();
+    }
+
+    public async Task Kaydet()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            if (!isUpdate)
+            {
+                kullanici.KullaniciIptal = false;
+                kullanici.KullaniciAktif = false;
+            }
+
+            var request = new SisKullaniciRequestDto();
+            request.SisKullanici = kullanici;
+
+            if (isUpdate)
+            {
+                kullanici = await httpClient.PostGetServiceResponseAsync<SisKullaniciDto, SisKullaniciRequestDto>(UrlHelper.KullaniciUpdate, request);
+                Snackbar.Add("Kullanıcı güncellendi", severity: Severity.Success);
+            }
+            else
+            {
+                kullanici = await httpClient.PostGetServiceResponseAsync<SisKullaniciDto, SisKullaniciRequestDto>(UrlHelper.KullaniciSave, request);
+                Snackbar.Add("Kullanıcı eklendi", severity: Severity.Success);
+            }
+
+            await goBackList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task goBackList()
+    {
+        if (modalForm.HasValue)
+            await ModalInstance.CloseAsync();
+        else
+            navigation.NavigateTo("/kullanici_liste");
+    }
+
+    public Task Close()
+    {
+        return Task.CompletedTask;
+    }
+
+    public async Task GrupListesiGetir()
+    {
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<List<SisMenuProfilDto>>(UrlHelper.GetKullaniciGrupListesi);
+            if (result != null)
+            {
+                GrupListesi = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public void SubmitValidation()
+    {
+        var err = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(kullanici.KullaniciKodu))
+            err.Add("Kullanıcı Kodu boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(kullanici.KullaniciAdi))
+            err.Add("Kullanıcı Adı boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(kullanici.KullaniciSifre))
+            err.Add("Kullanıcı şifresi boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(kullanici.KullaniciYetkiKodu))
+            err.Add("Yetki boş geçilemez");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Boş geçilemez alanlar");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
+
+}

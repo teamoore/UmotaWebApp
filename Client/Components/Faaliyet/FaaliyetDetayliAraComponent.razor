@@ -1,0 +1,149 @@
+﻿<EditForm Model="faaliyetrequest">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mt-12">
+        <div class="form">
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Başlangıç Tarih</label>
+                        <InputDate @bind-Value="faaliyetrequest.BaslangicTarih" class="form-control"></InputDate>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Bitiş Tarih</label>
+                        <InputDate @bind-Value="faaliyetrequest.BitisTarih" class="form-control"></InputDate>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Konu</label>
+                        <InputSelect @bind-Value="faaliyetrequest.Konu" class="form-control">
+                            @if (KonuListesi != null)
+                            {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                @foreach (var item in KonuListesi)
+                                {
+                                    <option value="@item.Adi">@item.Adi</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Giren</label>
+                        <InputText @bind-Value="faaliyetrequest.Giren" class="form-control" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Müşteri Adı</label>
+                        <InputText @bind-Value="faaliyetrequest.Cariadi" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Kişi Adı</label>
+                        <InputText @bind-Value="faaliyetrequest.Kisiadi" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-10">
+                        <label>Ürün Grubu</label>
+                        <InputSelect @bind-Value="faaliyetrequest.UrunGrubu" class="form-control">
+                            @if (UrunGrubuListesi != null)
+                            {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                @foreach (var item in UrunGrubuListesi)
+                                {
+                                    <option value="@item.Adi">@item.Adi</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Tamam" OnClick="Tamam" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+
+</EditForm>
+
+@code {
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    FaaliyetRequestDto faaliyetrequest = new FaaliyetRequestDto();
+    public List<SisSabitlerDetayDto> KonuListesi { get; set; }
+    public List<SisSabitlerDetayDto> UrunGrubuListesi { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetKonuListesi();
+        await GetUrunGrubuListesi();
+    }
+
+    private async Task Tamam()
+    {
+        await ModalInstance.CloseAsync(ModalResult.Ok<FaaliyetRequestDto>(faaliyetrequest));
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+
+    public async Task GetKonuListesi()
+    {
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<List<SisSabitlerDetayDto>>("/api/helper/GetSabitDetayList?tip=20");
+            if (result != null)
+            {
+                KonuListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+
+    public async Task GetUrunGrubuListesi()
+    {
+        try
+        {
+            var result = await httpClient.GetServiceResponseAsync<List<SisSabitlerDetayDto>>("/api/helper/GetSabitDetayList?tip=21");
+            if (result != null)
+            {
+                UrunGrubuListesi = result;
+            }
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+    }
+}

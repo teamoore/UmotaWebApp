@@ -14,5 +14,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         Task<SisKullaniciLoginResponseDto> Login(SisKullaniciLoginRequestDto request);
         public Task<int> GetKullaniciYetkisiByKullaniciKodu(string kullanicikodu, string yetkikodu);
         public Task<int> GetKullaniciMenuYetkisiByMenuAdi(string kullanicikodu, string menu_dfm, string hak_tipi);
+        public Task<List<SisMenuProfilDto>> GetKullaniciGrupList();
+        public Task<SisKullaniciDto> SaveKullanici(SisKullaniciRequestDto request);
+        public Task<SisKullaniciDto> UpdateKullanici(SisKullaniciRequestDto request);
     }
 }
