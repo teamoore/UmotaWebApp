@@ -1,0 +1,56 @@
+﻿<div class="container">
+
+    <MudTable Items="@items" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
+        <HeaderContent>
+            <MudTh>Tarih</MudTh>
+            <MudTh>Durum</MudTh>
+            <MudTh>Açıklama</MudTh>
+            <MudTh>Kullanıcı</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Tarih">@context.Tarih</MudTd>
+            <MudTd DataLabel="Durum">@context.Duruminfo</MudTd>
+            <MudTd DataLabel="Açıklama">@context.Aciklama</MudTd>
+            <MudTd DataLabel="Kullanıcı">@context.KullaniciKodu</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+        </PagerContent>
+    </MudTable>
+</div>
+
+
+@code
+{
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Parameter]
+    public int? teklifref { get; set; }
+
+    public List<TeklifDurumDetayDto> items { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadList();
+    }
+
+    private async Task LoadList()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        items = await httpClient.GetServiceResponseAsync<List<TeklifDurumDetayDto>>(UrlHelper.TeklifDurumDetayList + "?teklifref=" + teklifref + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+
+}

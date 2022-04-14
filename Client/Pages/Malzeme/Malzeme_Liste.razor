@@ -7,46 +7,45 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@stoklar" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeStokDto,bool>(FilterFunc1)">
+<MudTable Items="@list" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeKartDto,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="Ekle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+    </ToolBarContent>
     <HeaderContent>
+        <MudTh>#</MudTh>
         <MudTh>Kodu</MudTh>
         <MudTh>Adı</MudTh>
-        <MudTh>Marka</MudTh>
+        <MudTh>Adı 2</MudTh>
         <MudTh>Birim</MudTh>
-        <MudTh>Fiili Miktar</MudTh>
-        <MudTh>Rezerv Miktar</MudTh>
-        <MudTh>Öneri Sip. Miktar</MudTh>
-        <MudTh>Satılabilir Miktar</MudTh>
-        <MudTh>Alım Sip. Miktar</MudTh>
-        <MudTh>Alım Sip. Termin</MudTh>
+        <MudTh>Marka Kodu</MudTh>
+        <MudTh>Menşei</MudTh>
+        <MudTh>Grup Kodu</MudTh>
+        <MudTh>Tedarikçi</MudTh>
+        <MudTh>Kdv %</MudTh>
+        <MudTh>Maliyet Fiyatı</MudTh>
+        <MudTh>Maliyet Döviz</MudTh>
         <MudTh>Satış Fiyatı</MudTh>
         <MudTh>Satış Döviz</MudTh>
-        <MudTh>Alış Fiyatı</MudTh>
-        <MudTh>Alış Döviz</MudTh>
-        @*<MudTh>Yükseklik</MudTh>
-        <MudTh>En</MudTh>
-        <MudTh>Boy</MudTh>
-        <MudTh>Malzeme Grubu</MudTh>*@
+        <MudTh>Logo Kodu</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Kodu">@context.MalzemeKodu</MudTd>
-        <MudTd DataLabel="Adı">@context.MalzemeAdi</MudTd>
-        <MudTd DataLabel="Marka">@context.MalzemeMarka</MudTd>
-        <MudTd DataLabel="Birim">@context.BirimKodu</MudTd>
-        <MudTd DataLabel="Fiili Miktar">@context.StokMiktari</MudTd>
-        <MudTd DataLabel="Rezerv Miktar">@context.RezervMiktari</MudTd>
-        <MudTd DataLabel="Öneri Sip.Miktar">@context.BekleyenOneriSatisSiparisMiktar</MudTd>
-        <MudTd DataLabel="Satılabilir Miktar">@context.StokMiktari2</MudTd>
-        <MudTd DataLabel="Alım Sip. Miktar">@context.BekleyenAlimSiparisMiktar</MudTd>
-        <MudTd DataLabel="Alım Sip. Termin">@context.BekleyenAlimSiparisTeslimTarihiFormatted</MudTd>
-        <MudTd DataLabel="Satış Fiyatı">@context.SatisFiyati</MudTd>
-        <MudTd DataLabel="Satış Döviz">@context.SatisFiyatiDoviz</MudTd>
-        <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyati</MudTd>
-        <MudTd DataLabel="Alış Döviz">@context.AlisFiyatiDoviz</MudTd>
-        @*<MudTd DataLabel="Yükseklik">@context.MalzemeEbatYukseklik</MudTd>
-        <MudTd DataLabel="En">@context.MalzemeEbatEn</MudTd>
-        <MudTd DataLabel="Boy">@context.MalzemeEbatBoy</MudTd>
-        <MudTd DataLabel="Malzeme Grubu">@context.MalzemeGrupAdi</MudTd>*@
+        <MudTd>
+            <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Guncelle(context.Logref))" Size="Size.Medium" />
+        </MudTd>
+        <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
+        <MudTd DataLabel="Adı">@context.Adi</MudTd>
+        <MudTd DataLabel="Adı 2">@context.Adi3</MudTd>
+        <MudTd DataLabel="Birim">@context.Birim</MudTd>
+        <MudTd DataLabel="Marka">@context.Marka</MudTd>
+        <MudTd DataLabel="Menşei">@context.Mensei</MudTd>
+        <MudTd DataLabel="Grup">@context.Grupkodu</MudTd>
+        <MudTd DataLabel="Tedarakçi">@context.TedarikciAdi</MudTd>
+        <MudTd DataLabel="KDV">@context.Kdv</MudTd>
+        <MudTd DataLabel="Maliyet">@context.Alfiyat</MudTd>
+        <MudTd DataLabel="Maliyet Döviz">@context.AlfiyatDov</MudTd>
+        <MudTd DataLabel="Satış">@context.Satfiyat</MudTd>
+        <MudTd DataLabel="Satış Döviz">@context.SatfiyatDov</MudTd>
+        <MudTd DataLabel="Logo Kodu">@context.Logokodu</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
@@ -73,32 +72,32 @@
 
     public MalzemeStokRequestDto detayAraBar = new MalzemeStokRequestDto();
 
-    public List<MalzemeStokDto> stoklar = new List<MalzemeStokDto>();
+    public List<MalzemeKartDto> list = new List<MalzemeKartDto>();
     private string _searchString;
     private bool _sortNameByLength;
     private bool loadingCompleted = false;
 
-    private bool FilterFunc1(MalzemeStokDto element) => FilterFunc(element, _searchString);
+    private bool FilterFunc1(MalzemeKartDto element) => FilterFunc(element, _searchString);
 
-    private bool FilterFunc(MalzemeStokDto element, string searchString)
+    private bool FilterFunc(MalzemeKartDto element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.MalzemeAdi != null && element.MalzemeAdi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Adi != null && element.Adi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.MalzemeKodu != null && element.MalzemeKodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Kodu != null && element.Kodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.MalzemeMarka != null && element.MalzemeMarka.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Marka != null && element.Marka.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
-        detayAraBar.HeaderText = "Stok Listesi";
+        detayAraBar.HeaderText = "CRM Malzeme Listesi";
 
+        await LoadList();
         loadingCompleted = true;
-        return Task.CompletedTask;
     }
 
     public async Task Search()
@@ -110,23 +109,21 @@
                 throw new Exception("Firma dönem seçilmedi");
 
             loadingCompleted = false;
-            var request = new MalzemeStokRequestDto();
-            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
-            request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
-            //request.TopRowCount = 100;
+            var request = new MalzemeKartRequestDto();
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
             if (!string.IsNullOrWhiteSpace(detayAraBar.SearchText))
-                request.SearchText = '%' + detayAraBar.SearchText + '%';
+                request.SearchText = detayAraBar.SearchText;
             if (!string.IsNullOrWhiteSpace(detayAraBar.MalzemeMarka))
-                request.MalzemeMarka = '%' + detayAraBar.MalzemeMarka + '%';
+                request.Marka = detayAraBar.MalzemeMarka;
             if (!string.IsNullOrWhiteSpace(detayAraBar.MalzemeAdi))
-                request.MalzemeAdi = '%' + detayAraBar.MalzemeAdi + '%';
+                request.MalzemeAdi = detayAraBar.MalzemeAdi;
             if (!string.IsNullOrWhiteSpace(detayAraBar.MalzemeKodu))
-                request.MalzemeKodu = '%' + detayAraBar.MalzemeKodu + '%';
+                request.MalzemeKodu = detayAraBar.MalzemeKodu;
 
-            var result = await httpClient.PostGetServiceResponseAsync<List<MalzemeStokDto>, MalzemeStokRequestDto>(UrlHelper.MalzemeStokGetir, request);
-            stoklar = result;
+            var result = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+            list = result;
 
-            if (stoklar == null || stoklar.Count == 0)
+            if (list == null || list.Count == 0)
             {
                 Snackbar.Add("Veri bulunamadı", severity: Severity.Warning);
             }
@@ -150,12 +147,7 @@
                 throw new Exception("Firma dönem seçilmedi");
 
             loadingCompleted = false;
-            var request = new MalzemeStokRequestDto();
-            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
-            request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
-            request.TopRowCount = 100;
-            var result = await httpClient.PostGetServiceResponseAsync<List<MalzemeStokDto>, MalzemeStokRequestDto>(UrlHelper.MalzemeStokGetir, request);
-            stoklar = result;
+            list = await httpClient.GetServiceResponseAsync<List<MalzemeKartDto>>(UrlHelper.MalzemeKartListesi + "?firmaId=" + selectedFirmaDonem.firma_no.Value);
             loadingCompleted = true;
         }
         catch (Exception)
@@ -163,4 +155,15 @@
             throw;
         }
     }
+
+    public void Guncelle(int logref)
+    {
+        navigation.NavigateTo("/malzeme_kartf_guncelle/" + logref);
+    }
+
+    public void Ekle()
+    {
+        navigation.NavigateTo("/malzeme_kartf_ekle");
+    }
+
 }

@@ -1,8 +1,8 @@
 ﻿@page "/stek_listef"
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif"
-                 ShowButtons="false"
-                 onDoneButtonClicked="TeklifAra" ShowSearchSection="_ShowSearchSection"></HeaderSearchBar>
+                 ShowButtons="false" ShowFilterButton="true"
+                 onDoneButtonClicked="TeklifAra" onFilterButtonClicked="TeklifDetayliAra" ShowSearchSection="_ShowSearchSection"></HeaderSearchBar>
 
 @if (loadingCompleted == false)
 {
@@ -22,6 +22,7 @@
         <MudTh>#</MudTh>
         <MudTh>Durum</MudTh>
         <MudTh>Teklif No</MudTh>
+        <MudTh>Rvz No</MudTh>
         <MudTh>Tarih</MudTh>
         <MudTh>Cari Kodu</MudTh>
         <MudTh>Cari Adı</MudTh>
@@ -47,10 +48,12 @@
                 {
                     <MudMenuItem OnClick="(() => TeklifDurumDegistir(context.Logref,1))">Durum Değiştir(Admin)</MudMenuItem>
                 }
+                <MudMenuItem OnClick="(() => TeklifDurumDetay(context.Logref))">Durum Geçmişi</MudMenuItem>
             </MudMenu>
         </MudTd>
         <MudTd DataLabel="Durum">@context.Duruminfo</MudTd>
         <MudTd DataLabel="Teklif No">@context.Teklifno</MudTd>
+        <MudTd DataLabel="Rvz No">@context.Revzno</MudTd>
         <MudTd DataLabel="Tarih">@context.TarihFormatted</MudTd>
         <MudTd DataLabel="Cari Kodu">@context.Carikodu</MudTd>
         <MudTd DataLabel="Cari Adı">@context.Cariadi</MudTd>
@@ -62,10 +65,12 @@
         <MudTd DataLabel="Teslim Tarihi">@context.TeslimTarihiFormatted</MudTd>
         <MudTd DataLabel="Açıklama">@context.Aciklama1</MudTd>
         <MudTd DataLabel="Kaydı Giren">@context.Insuser</MudTd>
-        @if (menuSilmeYetkisi)
-        {
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
-        }
+        <MudTd>
+            @if (menuSilmeYetkisi)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
+            }
+        </MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
@@ -235,7 +240,17 @@
 
         if (!result.Cancelled)
         {
-            await LoadTeklifler();
+            if (result.Data != null)
+            {
+                var durumSecim = (TeklifDto)result.Data;
+                if (durumSecim.Duruminfo.Equals(TeklifDurum.TeklifRevizyonda))
+                    navigation.NavigateTo("/stek_listef_detay/" + durumSecim.Logref);
+                else
+                    await LoadTeklifler();
+            } else
+            {
+                await LoadTeklifler();
+            }
         }
     }
 
@@ -308,4 +323,115 @@
         }
     }
 
+    public async Task TeklifDurumDetay(int logref)
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("teklifref", logref);
+
+        var teklifDurumForm = modal.Show<TeklifDurumDetayComponent>("Teklif Durum Geçmişi", parameters: parameters, options: opt);
+        var result = await teklifDurumForm.Result;
+
+        if (!result.Cancelled)
+        {
+        }
+    }
+
+    public async Task TeklifKopyalaRevizeEt(TeklifDto teklif)
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        try
+        {
+            loadingCompleted = false;
+
+            teklif.Lfirma = selectedFirmaDonem.logo_firma.Value.ToString();
+            var request = new TeklifRequestDto();
+            request.Teklif = teklif;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+            request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.PostAsJsonAsync(UrlHelper.TeklifKaydetRevize, request);
+
+            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<TeklifDto>>();
+            if (!response.Success)
+                throw new Exception(response.Message);
+
+            //var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifRequestDto>(UrlHelper.TeklifKaydetRevize, request);
+
+            navigation.NavigateTo("/stek_listef_detay/" + response.Value.Logref);
+
+        }
+        catch (ApiException exx)
+        {
+            Snackbar.Add(exx.Message, severity: Severity.Warning);
+            return;
+        }
+        catch (ClientException e)
+        {
+            foreach (var item in e.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+        finally
+        {
+            loadingCompleted = true;
+        }
+    }
+
+    private async Task TeklifDetayliAra()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            var cariForm = modal.Show<Components.Teklif.TeklifDetayliAraComponent>("Detaylı Arama", opt);
+            var result = await cariForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    var request = (TeklifRequestDto)result.Data;
+
+                    loadingCompleted = false;
+
+                    request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+                    request.FirmaId = selectedFirmaDonem.firma_no.Value;
+                    request.SearchText = header.SearchText;
+
+                    var response = await httpClient.PostGetServiceResponseAsync<List<TeklifDto>, TeklifRequestDto>(UrlHelper.TeklifAra, request);
+                    if (response == null || response.Count == 0)
+                    {
+                        Snackbar.Add("Aradığınız kritere göre teklif bulunamadı.", severity: Severity.Warning);
+                        loadingCompleted = true;
+                        return;
+                    }
+                    loadingCompleted = true;
+                    teklifler = response;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+    }
 }

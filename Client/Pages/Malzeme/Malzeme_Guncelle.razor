@@ -1,0 +1,29 @@
+﻿@page "/malzeme_kartf_guncelle/{MalzemeKartRef:int}"
+
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+<Malzeme_Ekle_Component MalzemeKartRef="MalzemeKartRef"></Malzeme_Ekle_Component>
+
+@code
+{
+    [Parameter]
+    public int? MalzemeKartRef { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Malzeme Kart Güncelle";
+        return Task.CompletedTask;
+    }
+
+    public void goBack()
+    {
+        navigation.NavigateTo("/malzeme_listef");
+    }
+
+
+}

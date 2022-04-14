@@ -16,5 +16,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<List<TeklifDto>> SearchTeklif(TeklifRequestDto request);
         public Task<TeklifDto> UpdateTeklifDurum(TeklifRequestDto dto);
         public Task<bool> DeleteTeklif(int logref, string firmaId, string kullanici);
+        public Task<List<TeklifDurumDetayDto>> GetTeklifDurumDetay(int teklifref, string firmaId);
+        public Task<TeklifDto> TeklifKopyalaRevizeEt(TeklifRequestDto request);
     }
 }

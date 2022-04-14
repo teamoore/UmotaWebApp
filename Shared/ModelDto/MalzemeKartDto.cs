@@ -40,16 +40,18 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? Insdate { get; set; }
         public string Upduser { get; set; }
         public DateTime? Upddate { get; set; }
-        public int? Birimsetiref { get; set; }
-        public int? Birimref { get; set; }
-        public string Birimkodu { get; set; }
-        public string Descr { get; set; }
-        public string Definition { get; set; }
-        public double? Width { get; set; }
-        public double? Length { get; set; }
-        public double? Height { get; set; }
-        public string Ebatt { get; set; }
-        public double? Kdvyuz { get; set; }
-        public string Ozelkod5 { get; set; }
+        private double? _kdvNumber;
+        public double? KdvNumber
+        { 
+            get 
+            {
+                return (double?)this.Kdv;
+            }
+            set {
+                _kdvNumber = value;
+                this.Kdv = (byte?)_kdvNumber;
+            }
+        }
+        public string TedarikciAdi { get; set; }
     }
 }

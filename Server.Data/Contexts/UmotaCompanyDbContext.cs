@@ -1464,6 +1464,11 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasColumnName("upduser");
 
                 entity.Property(e => e.Yukseklik).HasColumnName("yukseklik");
+
+                entity.Property(e => e.TedarikciAdi)
+                    .HasMaxLength(250)
+                    .IsUnicode(false)
+                    .HasColumnName("tedarikciadi");
             });
 
             modelBuilder.Entity<MalzKartLog>(entity =>
@@ -1593,6 +1598,11 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasColumnName("upduser");
 
                 entity.Property(e => e.Yukseklik).HasColumnName("yukseklik");
+
+                entity.Property(e => e.TedarikciAdi)
+                    .HasMaxLength(250)
+                    .IsUnicode(false)
+                    .HasColumnName("tedarikciadi");
             });
 
             modelBuilder.Entity<Refno>(entity =>

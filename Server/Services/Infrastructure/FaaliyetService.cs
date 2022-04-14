@@ -78,33 +78,116 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         }
         public async Task<List<FaaliyetDto>> SearchFaaliyet(FaaliyetRequestDto request)
         {
-            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
-            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
-            optionsBuilder.UseSqlServer(connectionstring);
-
-            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(request.FirmaId.ToString())))
             {
-                var word = request.Aranacak.ToLower();
-                var tumFaaliyetleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(request.kullanicikodu, KullaniciYetkiKodlari.TumFaaliyetleriGorebilir);
+                db.Open();
+                var p = new DynamicParameters();
 
-                return await dbContext.V020Faaliyets.Where(x => 
-                (x.Yapilanlar.ToLower().Contains(word)
-                || x.Grup1.ToLower().Contains(word)
-                || x.Grup2.ToLower().Contains(word)
-                || x.Grup3.ToLower().Contains(word)
-                || x.Grup4.ToLower().Contains(word)
-                || x.Grup5.ToLower().Contains(word)
-                || x.Malzemeadi.ToLower().Contains(word)
-                || x.Malzemekodu.ToLower().Contains(word)
-                || x.Giren.ToLower().Contains(word)
-                || x.Cariadi.ToLower().Contains(word)
-                || x.Carikodu.ToLower().Contains(word)
-                || x.Konu.ToLower().Contains(word)
-                || x.Kisiadi.ToLower().Contains(word))
-                && (tumFaaliyetleriGormeYetkisi == 1 || x.Insuser == request.kullanicikodu)
-                ).OrderByDescending(x => x.Tarih
-                ).ProjectTo<FaaliyetDto>(Mapper.ConfigurationProvider).ToListAsync();
+                var sql = "select *, islem_sayisi IslemSayisi" +
+                    " from " + Configuration.GetUmotaObjectName("v020_faaliyet", firmaId: request.FirmaId.ToString()) + " a with(nolock) where 1=1";
+
+                var tumFaaliyetleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(request.kullanicikodu, KullaniciYetkiKodlari.TumFaaliyetleriGorebilir);
+                if (tumFaaliyetleriGormeYetkisi == 0)
+                {
+                    sql += " and insuser = '" + request.kullanicikodu + "'";
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.SearchText))
+                {
+                    sql += " and(";
+                    sql += "    a.cariadi like @SearchText ";
+                    sql += " or a.carikodu like @SearchText ";
+                    sql += " or a.konu like @SearchText ";
+                    sql += " or a.kisiadi like @SearchText ";
+                    sql += " or a.kisiadi2 like @SearchText ";
+                    sql += " or a.kisiadi3 like @SearchText ";
+                    sql += " or a.kisiadi4 like @SearchText ";
+                    sql += " or a.kisiadi5 like @SearchText ";
+                    sql += " or a.giren like @SearchText ";
+                    sql += " or a.grup1 like @SearchText ";
+                    sql += " or a.grup2 like @SearchText ";
+                    sql += " or a.grup3 like @SearchText ";
+                    sql += " or a.grup4 like @SearchText ";
+                    sql += " or a.grup5 like @SearchText ";
+                    sql += " or a.yapilanlar like @SearchText ";
+                    sql += " )";
+
+                    p.Add("@SearchText", value: "%" + request.SearchText + "%", dbType: DbType.String);
+                }
+
+                if (request.BaslangicTarih != null)
+                {
+                    sql += " and a.tarih >= @bastar ";
+                    p.Add("@bastar", value: request.BaslangicTarih, dbType: DbType.DateTime);
+                }
+
+                if (request.BitisTarih != null)
+                {
+                    var bittar = request.BitisTarih.Value.AddHours(23).AddMinutes(59);
+                    sql += " and a.tarih <= @bittar ";
+                    p.Add("@bittar", value: request.BitisTarih.Value.AddHours(23).AddMinutes(59), dbType: DbType.DateTime);
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Cariadi))
+                {
+                    sql += " and a.cariadi like @cariadi ";
+                    p.Add("@cariadi", value: "%" + request.Cariadi + "%", dbType: DbType.String);
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Kisiadi))
+                {
+                    sql += " and (a.kisiadi like @kisiadi or a.kisiadi2 like @kisiadi or a.kisiadi3 like @kisiadi or a.kisiadi4 like @kisiadi or a.kisiadi5 like @kisiadi) ";
+                    p.Add("@kisiadi", value: "%" + request.Kisiadi + "%", dbType: DbType.String);
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.Konu))
+                {
+                    sql += " and a.konu like @konu ";
+                    p.Add("@konu", value: request.Konu, dbType: DbType.String);
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.UrunGrubu))
+                {
+                    sql += " and (a.grup1 like @grup or a.grup2 like @grup or a.grup3 like @grup or a.grup4 like @grup or a.grup5 like @grup) ";
+                    p.Add("@grup", value: "%" + request.UrunGrubu + "%", dbType: DbType.String);
+                }
+
+                sql += " order by insdate desc";
+                var result = await db.QueryAsync<FaaliyetDto>(sql, p, commandType: CommandType.Text);
+
+                db.Close();
+
+                return result.ToList();
+
             }
+
+            //var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            //var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            //optionsBuilder.UseSqlServer(connectionstring);
+
+            //using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            //{
+            //    var word = request.Aranacak.ToLower();
+            //    var tumFaaliyetleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(request.kullanicikodu, KullaniciYetkiKodlari.TumFaaliyetleriGorebilir);
+
+            //    return await dbContext.V020Faaliyets.Where(x => 
+            //    (x.Yapilanlar.ToLower().Contains(word)
+            //    || x.Grup1.ToLower().Contains(word)
+            //    || x.Grup2.ToLower().Contains(word)
+            //    || x.Grup3.ToLower().Contains(word)
+            //    || x.Grup4.ToLower().Contains(word)
+            //    || x.Grup5.ToLower().Contains(word)
+            //    || x.Malzemeadi.ToLower().Contains(word)
+            //    || x.Malzemekodu.ToLower().Contains(word)
+            //    || x.Giren.ToLower().Contains(word)
+            //    || x.Cariadi.ToLower().Contains(word)
+            //    || x.Carikodu.ToLower().Contains(word)
+            //    || x.Konu.ToLower().Contains(word)
+            //    || x.Kisiadi.ToLower().Contains(word))
+            //    && (tumFaaliyetleriGormeYetkisi == 1 || x.Insuser == request.kullanicikodu)
+            //    ).OrderByDescending(x => x.Tarih
+            //    ).ProjectTo<FaaliyetDto>(Mapper.ConfigurationProvider).ToListAsync();
+            //}
 
         }
         public async Task<FaaliyetDto> SaveFaaliyet(FaaliyetRequestDto request)

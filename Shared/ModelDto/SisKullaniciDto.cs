@@ -20,5 +20,13 @@ namespace UmotaWebApp.Shared.ModelDto
         public string LogoUsername { get; set; }
         public string LogoPassword { get; set; }
         public string WebSifre { get; set; }
+        public string KullaniciMenuProfilAdi { get; set; }
+        public string KullaniciYetkiAdi
+        {
+            get
+            {
+                return this.KullaniciYetkiKodu == "ADM" ? "Admin" : "Standart";
+            }
+        }
     }
 }

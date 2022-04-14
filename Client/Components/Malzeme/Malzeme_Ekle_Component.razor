@@ -1,75 +1,185 @@
-﻿ 
-    <div class="form">
+﻿
+<div class="form">
 
-        <EditForm Model="malzeme">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>Kodu</label>
-                        <InputText @bind-Value="malzeme.Kodu" class="form-control" disabled/>
+    <EditForm Model="malzeme">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Kodu</label>
+                    <InputText @bind-Value="malzeme.Kodu" class="form-control" disabled />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Adı</label>
+                    <InputText @bind-Value="malzeme.Adi" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label>Adı 2</label>
+                    <InputText @bind-Value="malzeme.Adi3" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Malzeme Grubu</label>
+                    <div class="row">
+                        <div class="col">
+                            <InputText @bind-Value="malzeme.Grupkodu" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-3">
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="GrupSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label>Menşei</label>
+                    <InputText @bind-Value="malzeme.Mensei" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label>Marka</label>
+                    <div class="row">
+                        <div class="col">
+                            <InputText @bind-Value="malzeme.Marka" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-3">
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="MarkaSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>Adı</label>
-                        <InputText @bind-Value="malzeme.Adi" class="form-control" />
-                    </div>
-                    <div class="col-md-6">
-                        <label>Marka</label>
-                        <InputText @bind-Value="malzeme.Marka" class="form-control" />
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-3">
+                    <label>KDV %</label>
+                    <InputNumber @bind-Value="malzeme.KdvNumber" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>Birim Seti Kodu</label>
+                    <InputText @bind-Value="malzeme.Birimset" class="form-control" disabled />
+                </div>
+                <div class="col-md-3">
+                    <label>Ana Birim Kodu</label>
+                    <div class="row">
+                        <div class="col">
+                            <InputText @bind-Value="malzeme.Birim" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-3">
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="BirimSetiSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>Birim</label>
-                        <InputText @bind-Value="malzeme.Birim" class="form-control" placeholder="kg,adet..." />
-                    </div>
-                    <div class="col-md-6">
-                        <label>Birim Set</label>
-                        <InputText @bind-Value="malzeme.Birimset" class="form-control" placeholder="kg,adet..." />
-                    </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-3">
+                    <label>En</label>
+                    <InputNumber @bind-Value="malzeme.En" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>Boy</label>
+                    <InputNumber @bind-Value="malzeme.Boy" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>Yükseklik</label>
+                    <InputNumber @bind-Value="malzeme.Yukseklik" class="form-control" />
+                </div>
+                <div class="col-md-3">
+                    <label>Hacim</label>
+                    <InputNumber @bind-Value="malzeme.Hacim" class="form-control" />
                 </div>
             </div>
+        </div>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-6">
-                        <label>Alış Fiyatı</label>
-                        <InputNumber @bind-Value="malzeme.Alfiyat" class="form-control" />
-                    </div>
-                    <div class="col-md-6">
-                        <label>Satış Fiyatı</label>
-                        <InputNumber @bind-Value="malzeme.Satfiyat" class="form-control" />
-                    </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-8">
+                    <label>Tedarikçi Adı</label>
+                    <InputText @bind-Value="malzeme.TedarikciAdi" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label>Logo Kodu</label>
+                    <InputText @bind-Value="malzeme.Logokodu" class="form-control" />
                 </div>
             </div>
+        </div>
 
-            <div class="form-group">
-                <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
-                    @if (_processing)
-                    {
-                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                        <MudText Class="ms-2">Kaydediliyor...</MudText>
-                    }
-                    else
-                    {
-                        <MudText>Kaydet</MudText>
-                    }
-                </MudButton>
-                <CancelButtonComponent Caption="Vazgeç" OnClick="Close" />
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Maliyet Fiyatı</label>
+                    <InputNumber @bind-Value="malzeme.Alfiyat" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label>Döviz</label>
+                    <InputSelect class="form-control" @bind-Value="malzeme.AlfiyatDov">
+                        @if (DovizListesi != null)
+                        {
+                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                            @foreach (var item in DovizListesi)
+                            {
+                                <option value="@item.CURCODE">@item.CURCODE</option>
+                            }
+                        }
+                    </InputSelect>
+                </div>
+                <div class="col-md-4">
+                    <label>Satış Fiyatı</label>
+                    <InputNumber @bind-Value="malzeme.Satfiyat" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label>Döviz</label>
+                    <InputSelect class="form-control" @bind-Value="malzeme.SatfiyatDov">
+                        @if (DovizListesi != null)
+                        {
+                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                            @foreach (var item in DovizListesi)
+                            {
+                                <option value="@item.CURCODE">@item.CURCODE</option>
+                            }
+                        }
+                    </InputSelect>
+                </div>
             </div>
+        </div>
 
-        </EditForm>
-    </div>
- 
+        <div class="form-group">
+            <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+                @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Kaydediliyor...</MudText>
+                }
+                else
+                {
+                    <MudText>Kaydet</MudText>
+                }
+            </MudButton>
+            <CancelButtonComponent Caption="Vazgeç" OnClick="goBackList" />
+        </div>
+
+    </EditForm>
+</div>
+
 
 @code {
+    [Parameter]
+    public int? MalzemeKartRef { get; set; }
+    [Parameter]
+    public int? modalForm { get; set; }
+
+    [Parameter]
+    public EventCallback OnVazgecClicked { get; set; }
+
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
     [CascadingParameter] ModalParameters modalParameters { get; set; }
@@ -88,12 +198,43 @@
     ILocalStorageService LocalStorageService { get; set; }
 
     private bool _processing = false;
+    private bool isUpdate = false;
 
     public MalzemeKartDto malzeme = new MalzemeKartDto();
+    public IEnumerable<DovizDto> DovizListesi { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await LogRefveKodUret();
+        if (MalzemeKartRef.HasValue)
+            isUpdate = true;
+
+        if (isUpdate)
+            await KartGetir();
+        else
+            await FisNoAl();
+
+        await DovizListesiGetir();
+    }
+
+    public async Task KartGetir()
+    {
+        try
+        {
+            if (!MalzemeKartRef.HasValue)
+                return;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            malzeme = await httpClient.GetServiceResponseAsync<MalzemeKartDto>(UrlHelper.MalzemeKartGetir + "?logref=" + MalzemeKartRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
     }
 
     public async Task ValidSubmit()
@@ -105,32 +246,65 @@
     {
         try
         {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
             _processing = true;
-            await LogRefveKodUret();
-            malzeme.Insdate = DateTime.Now;
-            malzeme.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            malzeme.Status = 0;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (isUpdate)
+            {
+                malzeme.Upddate = DateTime.Now;
+                malzeme.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+                malzeme.Status = 1;
+
+            } else
+            {
+                await FisNoAl();
+                await RefNoAl();
+                malzeme.Insdate = DateTime.Now;
+                malzeme.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+                malzeme.Status = 0;
+                malzeme.Active = 0;
+                malzeme.Logoref = 0;
+            }
 
             var request = new MalzemeKartRequestDto();
             request.MalzemeKart = malzeme;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
-            var result = await httpClient.PostAsJsonAsync("/api/malzemekart/save", request);
-
-            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<MalzemeKartDto>>();
-            if (!response.Success)
-                throw new Exception(response.Message);
-
-            Snackbar.Add("Malzeme eklendi", severity: Severity.Success);
-
-            if (response.Value != null)
+            if (isUpdate)
             {
-                modalParameters = new ModalParameters();
-                modalParameters.Add("secim", response.Value);
-                await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(response.Value));
+                malzeme = await httpClient.PostGetServiceResponseAsync<MalzemeKartDto, MalzemeKartRequestDto>(UrlHelper.MalzemeKartUpdate, request);
+                Snackbar.Add("Malzeme güncellendi", severity: Severity.Success);
             }
+            else
+            {
+                malzeme = await httpClient.PostGetServiceResponseAsync<MalzemeKartDto, MalzemeKartRequestDto>(UrlHelper.MalzemeKartSave, request);
+                Snackbar.Add("Malzeme eklendi", severity: Severity.Success);
+            }
+
+            if (modalForm.HasValue)
+            {
+                var mkart = await httpClient.GetServiceResponseAsync<VMalzemeKartDto>(UrlHelper.VMalzemeKartGetir + "?logref=" + malzeme.Logref + "&firmaId=" + request.FirmaId);
+                await ModalInstance.CloseAsync(ModalResult.Ok<VMalzemeKartDto>(mkart));
+            }
+            else
+                await goBackList();
 
         }
         catch (Exception ex)
@@ -139,29 +313,159 @@
         }
     }
 
-    public async Task LogRefveKodUret()
+    public async Task goBackList()
+    {
+        if (modalForm.HasValue)
+            await ModalInstance.CloseAsync();
+        else
+            navigation.NavigateTo("/malzeme_listef");
+    }
+
+    public async Task FisNoAl()
     {
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
         if (selectedFirmaDonem == null)
             throw new Exception("Firma dönem seçilmedi");
 
-
-        var result2 = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=malz_kart&keyField=logref&firmaId=" + selectedFirmaDonem.firma_no.Value);
-        if (string.IsNullOrEmpty(result2) == false)
-        {
-            malzeme.Logref = Convert.ToInt32(result2) * -1;
-        }
-
         var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=malz_kart&keyField=kodu&firmaId=" + selectedFirmaDonem.firma_no.Value);
         if (string.IsNullOrEmpty(result) == false)
         {
-            malzeme.Kodu =  result;
+            malzeme.Kodu = result;
         }
     }
 
     public Task Close()
     {
         return Task.CompletedTask;
+    }
+
+    public async Task DovizListesiGetir()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<IEnumerable<DovizDto>>(UrlHelper.DovizListesi + "?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
+            if (result != null)
+            {
+                DovizListesi = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task RefNoAl()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=malz_kart&firmaId=" + selectedFirmaDonem.firma_no.Value);
+        malzeme.Logref = result * -1;
+    }
+
+    public async Task BirimSetiSec()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var Form = modal.Show<Pages.Malzeme.Malzeme_BirimSetiSec>("Birim Seti Seç", opt);
+        var result = await Form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (MalzemeBirimSetDto)result.Data;
+                malzeme.Birim = Secim.AnaBirimKodu;
+                malzeme.Birimset = Secim.BirimSetKodu;
+                malzeme.Unitsetref = Secim.BirimSetRef;
+                malzeme.Unitsetllogref = Secim.AnaBirimRef;
+            }
+
+        }
+    }
+
+    public async Task GrupSec()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var Form = modal.Show<Pages.Malzeme.Malzeme_GrupSec>("Grup Seç", opt);
+        var result = await Form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (SpeCodesDto)result.Data;
+                malzeme.Grupkodu = Secim.SPECODE;
+            }
+
+        }
+    }
+
+    public async Task MarkaSec()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var Form = modal.Show<Pages.Malzeme.Malzeme_MarkaSec>("Marka Seç", opt);
+        var result = await Form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (SpeCodesDto)result.Data;
+                malzeme.Marka = Secim.SPECODE;
+            }
+
+        }
+    }
+
+    public void SubmitValidation()
+    {
+        var err = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(malzeme.Kodu))
+            err.Add("Kodu boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(malzeme.Adi))
+            err.Add("Adı boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(malzeme.Birim))
+            err.Add("Birim boş geçilemez");
+
+        if (malzeme.Alfiyat == null || malzeme.Alfiyat == 0)
+            err.Add("Maliyet Fiyatı boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(malzeme.AlfiyatDov))
+            err.Add("Alış fiyatı döviz boş geçilemez");
+
+        if (malzeme.Satfiyat == null || malzeme.Satfiyat == 0)
+            err.Add("Satış Fiyatı boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(malzeme.SatfiyatDov))
+            err.Add("Satış fiyatı döviz boş geçilemez");
+
+        if (malzeme.Kdv == null || malzeme.Kdv == 0)
+            err.Add("KDV oranı boş geçilemez");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Boş geçilemez alanlar");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
     }
 
 }

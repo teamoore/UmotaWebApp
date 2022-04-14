@@ -10,5 +10,9 @@ namespace UmotaWebApp.Shared.ModelDto
     {
         public MalzemeKartDto MalzemeKart { get; set; }
         public short FirmaId { get; set; }
+        public string MalzemeKodu { get; set; }
+        public string MalzemeAdi { get; set; }
+        public string Marka { get; set; }
+        public string SearchText { get; set; }
     }
 }

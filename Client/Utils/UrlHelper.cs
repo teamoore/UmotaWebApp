@@ -13,24 +13,30 @@ namespace UmotaWebApp.Client.Utils
         public const string TeklifKaydet = "/api/teklif/save";
         public const string TeklifGuncelle = "/api/teklif/update";
         public const string TeklifDurumGuncelle = "/api/teklif/updatedurum";
+        public const string TeklifDurumDetayList = "/api/teklif/teklifdurumlist";
         public const string TeklifAra = "/api/teklif/search";
         public const string TeklifGetir = "/api/teklif/get";
         public const string TeklifSil = "/api/teklif/delete";
+        public const string TeklifKaydetRevize = "/api/teklif/saverevize";
+        public const string MalzemeKartListesi = "/api/malzemekart/list";
         public const string MalzemeKartAra = "/api/malzemekart/search";
         public const string MalzemeKartGetir = "/api/malzemekart/get";
+        public const string VMalzemeKartGetir = "/api/vmalzemekart/get";
         public const string MalzemeFiyatGetir = "/api/malzemekart/fiyatgetir";
         public const string MalzemeMaliyetGetir = "/api/malzemekart/maliyetgetir";
         public const string MalzemeStokGetir = "/api/malzemekart/stokgetir";
+        public const string MalzemeKartSave = "/api/malzemekart/save";
+        public const string MalzemeKartUpdate = "/api/malzemekart/update";
         public const string TeklifDetayGetir = "/api/teklifdetay/get";
         public const string CariKartAra = "/api/carikart/search";
         public const string CariKartGetir = "/api/carikart/getByKod";
-        public const string CariKartKisiGetir = "/api/carikart/getkisiler";
         public const string CariKartGetirLogRef = "/api/carikart/get";
         public const string CariKartListesi = "/api/carikart/list";
         public const string CariKartKaydet = "/api/carikart/save";
         public const string CariKartGuncelle = "/api/carikart/update";
-        public const string CariKartKisiKaydet = "/api/carikart/savekisi";
-        public const string CariKartKisiGuncelle = "/api/carikart/updatekisi";
+        public const string CariKartKisiGetir = "/api/kisiler/getcarikisiler";
+        public const string CariKartKisiKaydet = "/api/kisiler/savekisi";
+        public const string CariKartKisiGuncelle = "/api/kisiler/updatekisi";
         public const string RefNoAl = "/api/helper/RefNoAl";
         public const string CariSektorList = "/api/helper/GetCariSektorList";
         public const string DovizListesi = "/api/doviz/GetDovizList";
@@ -45,5 +51,12 @@ namespace UmotaWebApp.Client.Utils
         public const string FaaliyetGuncelle = "/api/faaliyet/update";
         public const string FaaliyetSil = "/api/faaliyet/delete";
         public const string CariFaaliyetSayisi = "/api/faaliyet/getcarifaaliyetsayisi";
+        public const string VCariKartListesi = "/api/vcarikart/list";
+        public const string VCariKartAra = "/api/vcarikart/search";
+        public const string VCariKartGetir = "/api/vcarikart/get";
+        public const string GetKullaniciListesi = "/api/kullanici/list";
+        public const string GetKullaniciGrupListesi = "/api/kullanici/gruplist";
+        public const string KullaniciSave = "/api/kullanici/save";
+        public const string KullaniciUpdate = "/api/kullanici/update";
     }
 }

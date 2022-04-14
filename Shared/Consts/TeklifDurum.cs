@@ -19,5 +19,6 @@ namespace UmotaWebApp.Shared.SharedConsts
         public const string FinansalUygunlukVer = "Finansal Uygunluk Ver";
         public const string KesinSiparis = "Kesin Sipariş";
         public const string KesinSipLogoyaAktarildi = "Kesin Sipariş Logoya Aktarıldı";
+        public const string TeklifRevizyonda = "Teklif Revizyonda";
     }
 }

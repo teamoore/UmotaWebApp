@@ -9,7 +9,7 @@
 
 <div class="card" style="width: 100%;">
     <div class="card-body">
-        <h5 class="card-title">Teklif Numarası : @teklif.Teklifno</h5>
+        <h5 class="card-title">Teklif Numarası : @teklif.Teklifno @teklif.Revzno</h5>
 
         <h6 class="card-subtitle mb-2 text-muted">
             Teklif Tarihi : @(teklif.Tarih.HasValue ? teklif.Tarih.Value.ToString("dd.MM.yyyy") : "")
@@ -55,7 +55,7 @@
                             <td style="text-align:right">@(Helper.FormattedDouble(teklif.Tutarmatrah)) @(teklif.Dovizdokuid)</td>
                         </tr>
 
-                        @if (maliyetGor)
+                        @if (maliyetGorYonetici)
                         {
                             <tr>
                                 <td>Maliyet 1 Toplam</td>
@@ -63,7 +63,7 @@
                             </tr>
                         }
 
-                        @if (maliyetGor2)
+                        @if (maliyetGorSatisci)
                         {
                             <tr>
                                 <td>Maliyet 2 Toplam</td>
@@ -122,6 +122,18 @@
                     <a href="@_pdfPath" class="btn btn-outline-success" role="button" download="teklif">Dosyayı indir</a>
                     <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AttachEmail" OnClick="PdfGonder" Color="Color.Secondary" Disabled="@_sendEmailDisabled">@_sendEmailText</MudButton>
                 }
+
+                <MudButtonGroup Color="Color.Secondary">
+                    <MudButton >Durum</MudButton>
+                    <MudMenu Icon="@Icons.Material.Filled.Update">
+                        <MudMenuItem OnClick="() => TeklifDurumDegistir(logref,null)">Durum Değiştir</MudMenuItem>
+                        @if (isAdmin)
+                        {
+                            <MudMenuItem OnClick="() => TeklifDurumDegistir(logref, 1)">Durum Değiştir (Admin)</MudMenuItem>
+                        }
+                        <MudMenuItem OnClick="() => TeklifDurumDetay(logref)">Durum Geçmişi</MudMenuItem>
+                        </MudMenu>
+                </MudButtonGroup>
             </div>
         </div>
 
@@ -131,7 +143,7 @@
 
 
 
-<MudTable Items="@teklifDetayList" Dense="true" Hover="true" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
+<MudTable Items="@teklifDetayList" RowsPerPage="100" Dense="true" Hover="true" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="TeklifDetayEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         <MudSpacer />
@@ -149,11 +161,11 @@
         <MudTh>Birim</MudTh>
         <MudTh>Net Fiyat</MudTh>
         <MudTh>Tutar</MudTh>
-        @if (@maliyetGor)
+        @if (@maliyetGorYonetici)
         {
             <MudTh>Maliyet 1 Toplam </MudTh>
         }
-        @if (@maliyetGor2)
+        @if (@maliyetGorSatisci)
         {
             <MudTh>Maliyet 2 Toplam </MudTh>
         }
@@ -176,18 +188,18 @@
         <MudTd DataLabel="Birim">@context.Birimkodu</MudTd>
         <MudTd DataLabel="Net Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.NetFiyatid.Value))</MudTd>
         <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Kdvmatrahid))</MudTd>
-        @if (@maliyetGor)
+        @if (@maliyetGorYonetici)
         {
             <MudTd DataLabel="Maliyet 1 Toplam" Style="text-align:right">@(Helper.FormattedDouble(context.Maliyet1id * context.Miktar))</MudTd>
         }
-        @if (@maliyetGor2)
+        @if (@maliyetGorSatisci)
         {
             <MudTd DataLabel="Maliyet 2 Toplam" Style="text-align:right">@(Helper.FormattedDouble(context.Maliyet2id * context.Miktar))</MudTd>
         }
-        <MudTd DataLabel="İsk-1 %">@context.Iskyuz1</MudTd>
-        <MudTd DataLabel="İsk-2 %">@context.Iskyuz2</MudTd>
-        <MudTd DataLabel="İsk-3 %">@context.Iskyuz3</MudTd>
-        <MudTd DataLabel="Genel %">@context.Iskyuz4</MudTd>
+        <MudTd DataLabel="İsk-1 %">@(Helper.FormattedDouble(context.Iskyuz1))</MudTd>
+        <MudTd DataLabel="İsk-2 %">@(Helper.FormattedDouble(context.Iskyuz2))</MudTd>
+        <MudTd DataLabel="İsk-3 %">@(Helper.FormattedDouble(context.Iskyuz3))</MudTd>
+        <MudTd DataLabel="Genel %">@(Helper.FormattedDouble(context.Iskyuz4))</MudTd>
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
         </MudTd>
@@ -230,8 +242,9 @@
 
     public List<TeklifDetayDto> teklifDetayList { get; set; }
 
-    private bool maliyetGor = false;
-    private bool maliyetGor2 = false;
+    private bool isAdmin = false;
+    private bool maliyetGorYonetici = false;
+    private bool maliyetGorSatisci = false;
 
     private string _searchString = "";
     private bool _sortNameByLength;
@@ -385,13 +398,35 @@
         {
             var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
-            var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
+            var resultkul = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanicikodu);
 
-            maliyetGor = result == 1;
+            if (resultkul != null)
+            {
+                isAdmin = resultkul.KullaniciYetkiKodu.Equals("ADM");
+            }
 
-            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet2GorebilsinPersonel);
+            if (!isAdmin)
+            {
+                var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet1GorebilsinYoNETiCi);
 
-            maliyetGor2 = result == 1;
+                maliyetGorYonetici = result == 1;
+
+                if (!maliyetGorYonetici)
+                {
+                    result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanicikodu + "&yetkikodu=" + KullaniciYetkiKodlari.TeklifteMaliyet2GorebilsinPersonel);
+
+                    maliyetGorSatisci = result == 1;
+
+                } else
+                {
+                    maliyetGorSatisci = true;
+                }
+
+            } else
+            {
+                maliyetGorYonetici = true;
+                maliyetGorSatisci = true;
+            }
         }
         catch (Exception ex)
         {
@@ -442,6 +477,9 @@
     {
         try
         {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
             _pdfDisabled = true;
             _sendEmailDisabled = true;
             _sendEmailText = "Gönderiliyor...";
@@ -451,6 +489,8 @@
             request.teklifDetays = this.teklifDetayList;
 
             request.PdfType = selectedPdfType;
+            request.Kullanici = kullanicikodu;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
             var result = await httpClient.PostAsJsonAsync<PdfGeneratorRequestDto>("/api/Pdf/CreateTeklifPdfDocumentSendMail", request);
             var response = await result.Content.ReadFromJsonAsync<ServiceResponse<PdfGenerateResponseDto>>();
@@ -461,6 +501,7 @@
                 Snackbar.Add(string.Format("Teklif {0} adresine gönderildi",
                     this.teklif.Mail), severity: Severity.Success);
                 _sendEmailText = "Gönderildi";
+                await LoadTeklifData();
             }
             else
             {
@@ -473,6 +514,53 @@
             _pdfDisabled = false;
             _pdfButtonText = "Pdf Oluştur ve Gönder";
             Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task TeklifDurumDegistir(int logref, int? admin)
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("logRef", logref);
+
+        if (admin.HasValue)
+            parameters.Add("admin", admin.Value);
+
+        var teklifDurumForm = modal.Show<TeklifDurumDegistirComponent>("Durum Değiştir", parameters: parameters, options: opt);
+        var result = await teklifDurumForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var durumSecim = (TeklifDto)result.Data;
+                if (durumSecim.Duruminfo.Equals(TeklifDurum.TeklifRevizyonda))
+                    navigation.NavigateTo("/stek_listef_detay/" + durumSecim.Logref);
+                else
+                    await LoadTeklifData();
+            }
+            else
+            {
+                await LoadTeklifData();
+            }
+        }
+    }
+
+    public async Task TeklifDurumDetay(int logref)
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("teklifref", logref);
+
+        var teklifDurumForm = modal.Show<TeklifDurumDetayComponent>("Teklif Durum Geçmişi", parameters: parameters, options: opt);
+        var result = await teklifDurumForm.Result;
+
+        if (!result.Cancelled)
+        {
         }
     }
 }

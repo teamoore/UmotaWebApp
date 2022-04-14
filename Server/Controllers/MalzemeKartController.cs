@@ -26,6 +26,26 @@ namespace UmotaWebApp.Server.Controllers
             MalzemeKartService = malzemeKartService;
         }
 
+        [HttpGet("list")]
+        public async Task<ServiceResponse<List<MalzemeKartDto>>> MalzemeKartListele(string firmaId)
+        {
+            try
+            {
+                return new ServiceResponse<List<MalzemeKartDto>>()
+                {
+                    Value = await MalzemeKartService.GetMalzemeKarts(firmaId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<MalzemeKartDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
         [HttpPost("search")]
         public async Task<ServiceResponse<List<MalzemeKartDto>>> GetMalzemeKartSearchList(MalzemeKartRequestDto request)
         {
@@ -33,7 +53,7 @@ namespace UmotaWebApp.Server.Controllers
             {
                 return new ServiceResponse<List<MalzemeKartDto>>()
                 {
-                    Value = await MalzemeKartService.SearchMalzemeKart(request)
+                    Value = await MalzemeKartService.SearchMalzemeKarts(request)
                 };
             }
             catch (ApiException ex)
@@ -106,6 +126,7 @@ namespace UmotaWebApp.Server.Controllers
             }
 
         }
+
         [HttpPost("stokgetir")]
         public async Task<ServiceResponse<List<MalzemeStokDto>>> GetMalzemeKartSearchListStoklu(MalzemeStokRequestDto request)
         {
@@ -141,6 +162,86 @@ namespace UmotaWebApp.Server.Controllers
                 Logger.Log(LogLevel.Error, ex.Message);
 
                 var e = new ServiceResponse<MalzemeKartDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("update")]
+        public async Task<ServiceResponse<MalzemeKartDto>> UpdateMalzemeKart(MalzemeKartRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<MalzemeKartDto>()
+                {
+                    Value = await MalzemeKartService.UpdateMalzemeKart(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<MalzemeKartDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("GetBirimSetList")]
+        public async Task<ServiceResponse<IEnumerable<MalzemeBirimSetDto>>> GetBirimSetList(int logofirmno)
+        {
+            try
+            {
+                return new ServiceResponse<IEnumerable<MalzemeBirimSetDto>>()
+                {
+                    Value = await MalzemeKartService.GetMalzemeBirimSetList(logofirmno)
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<IEnumerable<MalzemeBirimSetDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("GetGrupList")]
+        public async Task<ServiceResponse<IEnumerable<SpeCodesDto>>> GetGrupList(int logofirmno)
+        {
+            try
+            {
+                return new ServiceResponse<IEnumerable<SpeCodesDto>>()
+                {
+                    Value = await MalzemeKartService.GetMalzemeGrupList(logofirmno)
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<IEnumerable<SpeCodesDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("GetMarkaList")]
+        public async Task<ServiceResponse<IEnumerable<SpeCodesDto>>> GetMarkaist(int logofirmno)
+        {
+            try
+            {
+                return new ServiceResponse<IEnumerable<SpeCodesDto>>()
+                {
+                    Value = await MalzemeKartService.GetMalzemeMarkaList(logofirmno)
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<IEnumerable<SpeCodesDto>>();
                 e.SetException(ex);
                 return e;
             }

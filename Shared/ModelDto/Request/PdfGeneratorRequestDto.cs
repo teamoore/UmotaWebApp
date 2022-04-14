@@ -11,7 +11,8 @@ namespace UmotaWebApp.Shared.ModelDto
     {
         public TeklifDto teklif { get; set; }
         public List<TeklifDetayDto> teklifDetays { get; set; }
-
         public SharedEnums.TeklifPdfType PdfType { get; set; }
+        public string Kullanici { get; set; }
+        public short FirmaId { get; set; }
     }
 }
