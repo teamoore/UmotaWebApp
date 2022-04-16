@@ -10,5 +10,7 @@ namespace UmotaWebApp.Shared.ModelDto
     {
         public string User { get; set; }
         public short FirmaId { get; set; }
+
+        public TakvimDto Takvim { get; set; }
     }
 }

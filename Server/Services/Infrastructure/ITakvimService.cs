@@ -9,5 +9,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     public interface ITakvimService
     {
         public Task<List<TakvimDto>> GetTakvimInformation(TakvimRequestDto request);
+
+        public Task<TakvimDto> SaveTakvim(TakvimRequestDto request);
+
+        public Task<TakvimDto> UpdateTakvim(TakvimRequestDto request);
     }
 }

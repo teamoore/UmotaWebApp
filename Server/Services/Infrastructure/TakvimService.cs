@@ -38,5 +38,34 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return results;
             }
         }
+
+        public async Task<TakvimDto> SaveTakvim(TakvimRequestDto request)
+        {
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var takvim = Mapper.Map<Takvim>(request.Takvim);
+
+                await dbContext.Takvims.AddAsync(takvim);
+                await dbContext.SaveChangesAsync();
+
+                return Mapper.Map<TakvimDto>(takvim);
+            }
+        }
+
+        public Task<TakvimDto> UpdateTakvim(TakvimRequestDto request)
+        {
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                return Task.FromResult<TakvimDto>(null);
+            }
+        }
     }
 }
