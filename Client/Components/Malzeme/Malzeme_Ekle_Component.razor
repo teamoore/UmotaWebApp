@@ -39,17 +39,23 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <label>Menşei</label>
-                    <InputText @bind-Value="malzeme.Mensei" class="form-control" />
+                    <MudAutocomplete T="string" Label="Menşei" @bind-Value="malzeme.Mensei" SearchFunc="@UlkeAra"
+                                     ResetValueOnEmptyText="@resetValueOnEmptyText"
+                                     CoerceText="@coerceText" CoerceValue="@coerceValue"
+                                     AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                                     />
+
                 </div>
                 <div class="col-md-4">
-                    <label>Marka</label>
                     <div class="row">
                         <div class="col">
-                            <InputText @bind-Value="malzeme.Marka" class="form-control" disabled />
-                        </div>
-                        <div class="col-md-3">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="OpenDialog" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
+                            <MudAutocomplete T="SpeCodesDto" Label="Marka" @bind-Value="malzeme.SpecCodes" SearchFunc="@MalzemeAra"
+                                             ResetValueOnEmptyText="@resetValueOnEmptyText"
+                                             CoerceText="@coerceText" CoerceValue="@coerceValue"
+                                             AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" 
+                                             ToStringFunc="@(e=> e==null?null : $"{e.DEFINITION_} ({e.SPECODE})")"
+                                             />
+
                         </div>
                     </div>
                 </div>
@@ -203,6 +209,30 @@
     private bool _processing = false;
     private bool isUpdate = false;
 
+    private bool resetValueOnEmptyText;
+    private bool coerceText;
+    private bool coerceValue;
+
+    private string[] speccodes =
+{
+        "Alabama", "Alaska", "American Samoa", "Arizona",
+        "Arkansas", "California", "Colorado", "Connecticut",
+        "Delaware", "District of Columbia", "Federated States of Micronesia",
+        "Florida", "Georgia", "Guam", "Hawaii", "Idaho",
+        "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
+        "Louisiana", "Maine", "Marshall Islands", "Maryland",
+        "Massachusetts", "Michigan", "Minnesota", "Mississippi",
+        "Missouri", "Montana", "Nebraska", "Nevada",
+        "New Hampshire", "New Jersey", "New Mexico", "New York",
+        "North Carolina", "North Dakota", "Northern Mariana Islands", "Ohio",
+        "Oklahoma", "Oregon", "Palau", "Pennsylvania", "Puerto Rico",
+        "Rhode Island", "South Carolina", "South Dakota", "Tennessee",
+        "Texas", "Utah", "Vermont", "Virgin Island", "Virginia",
+        "Washington", "West Virginia", "Wisconsin", "Wyoming",
+    };
+
+    public List<SpeCodesDto> specCodeItems { get; set; }
+
     public MalzemeKartDto malzeme = new MalzemeKartDto();
     public IEnumerable<DovizDto> DovizListesi { get; set; }
 
@@ -217,6 +247,15 @@
             await FisNoAl();
 
         await DovizListesiGetir();
+    }
+
+    private async Task LoadSpecCodeList()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        specCodeItems = await httpClient.GetServiceResponseAsync<List<SpeCodesDto>>("/api/malzemekart/GetMarkaList?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
+
+        speccodes = specCodeItems.Select(i => i.DEFINITION_).ToArray();
     }
 
     public async Task KartGetir()
@@ -287,9 +326,12 @@
                 malzeme.Logoref = 0;
             }
 
+            malzeme.Marka = malzeme.SpecCodes.DEFINITION_;
+
             var request = new MalzemeKartRequestDto();
             request.MalzemeKart = malzeme;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
 
             if (isUpdate)
             {
@@ -319,16 +361,6 @@
 
     public async Task goBackList()
     {
-        // teklif detay eklerken buraya yönlenmiş
-        var teklifdetay_processing =  await LocalStorageService.ContainKeyAsync("teklifdetay_processing");
-        if (teklifdetay_processing)
-        {
-            var td = await LocalStorageService.GetItemAsync<TeklifDetayDto>("teklifdetay_processing");
-            await LocalStorageService.RemoveItemAsync("teklifdetay_processing");
-            navigation.NavigateTo("/stek_listef_detay/" + td.Teklifref.ToString());
-            return;
-        }
-
         if (modalForm.HasValue)
             await ModalInstance.CloseAsync();
         else
@@ -489,6 +521,29 @@
 
             throw ex;
         }
+    }
+
+    private async Task<IEnumerable<string>> UlkeAra(string value)
+    {
+        await Task.Delay(1);
+
+        if (string.IsNullOrEmpty(value))
+            return new string[0];
+        return Consts.Ulkeler.Where(x => x.Contains(value, StringComparison.CurrentCultureIgnoreCase));
+    }
+
+    private async Task<IEnumerable<SpeCodesDto>> MalzemeAra(string value)
+    {
+        if (specCodeItems == null)
+            await LoadSpecCodeList();
+
+        if (string.IsNullOrEmpty(value))
+            return new SpeCodesDto[0];
+
+        var result = specCodeItems.Where(x => string.IsNullOrEmpty(x.DEFINITION_) == false
+        && x.DEFINITION_.Contains(value, StringComparison.CurrentCultureIgnoreCase));
+
+        return result;
     }
 
 }

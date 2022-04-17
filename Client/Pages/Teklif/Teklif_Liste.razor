@@ -198,6 +198,7 @@
                 throw new Exception("Firma Dönem Seçili değil");
 
             loadingCompleted = false;
+            this.StateHasChanged();
 
             var request = new TeklifRequestDto();
             request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);

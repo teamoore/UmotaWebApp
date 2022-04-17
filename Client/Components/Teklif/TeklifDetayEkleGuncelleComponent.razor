@@ -53,7 +53,7 @@
                                            Color="Color.Info" Size="Size.Medium">Bul</MudButton>
 
                                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Storefront"
-                                           OnClick="YeniMalzemeEkle"
+                                           OnClick="MalzemeEkle"
                                            Color="Color.Secondary" Size="Size.Medium">Yeni Malzeme</MudButton>
 
 
@@ -670,11 +670,6 @@
         }
     }
 
-    public async Task YeniMalzemeEkle()
-    {
-        await LocalStorageService.SetItemAsync("teklifdetay_processing",this.teklifDetay);
-        navigation.NavigateTo("malzeme_kartf_ekle");
-    }
 
     private async Task MalzemeDonusum(object data)
     {
