@@ -670,8 +670,9 @@
         }
     }
 
-    public void YeniMalzemeEkle()
+    public async Task YeniMalzemeEkle()
     {
+        await LocalStorageService.SetItemAsync("teklifdetay_processing",this.teklifDetay);
         navigation.NavigateTo("malzeme_kartf_ekle");
     }
 

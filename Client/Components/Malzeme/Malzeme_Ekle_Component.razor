@@ -319,6 +319,16 @@
 
     public async Task goBackList()
     {
+        // teklif detay eklerken buraya yönlenmiş
+        var teklifdetay_processing =  await LocalStorageService.ContainKeyAsync("teklifdetay_processing");
+        if (teklifdetay_processing)
+        {
+            var td = await LocalStorageService.GetItemAsync<TeklifDetayDto>("teklifdetay_processing");
+            await LocalStorageService.RemoveItemAsync("teklifdetay_processing");
+            navigation.NavigateTo("/stek_listef_detay/" + td.Teklifref.ToString());
+            return;
+        }
+
         if (modalForm.HasValue)
             await ModalInstance.CloseAsync();
         else
@@ -420,7 +430,7 @@
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         options.CloseButton = true;
-        
+
         DialogService.Show<Pages.Malzeme.Malzeme_MarkaSec>("Marka Seçimi", options);
     }
 
