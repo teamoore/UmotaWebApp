@@ -213,24 +213,6 @@
     private bool coerceText;
     private bool coerceValue;
 
-    private string[] speccodes =
-{
-        "Alabama", "Alaska", "American Samoa", "Arizona",
-        "Arkansas", "California", "Colorado", "Connecticut",
-        "Delaware", "District of Columbia", "Federated States of Micronesia",
-        "Florida", "Georgia", "Guam", "Hawaii", "Idaho",
-        "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
-        "Louisiana", "Maine", "Marshall Islands", "Maryland",
-        "Massachusetts", "Michigan", "Minnesota", "Mississippi",
-        "Missouri", "Montana", "Nebraska", "Nevada",
-        "New Hampshire", "New Jersey", "New Mexico", "New York",
-        "North Carolina", "North Dakota", "Northern Mariana Islands", "Ohio",
-        "Oklahoma", "Oregon", "Palau", "Pennsylvania", "Puerto Rico",
-        "Rhode Island", "South Carolina", "South Dakota", "Tennessee",
-        "Texas", "Utah", "Vermont", "Virgin Island", "Virginia",
-        "Washington", "West Virginia", "Wisconsin", "Wyoming",
-    };
-
     public List<SpeCodesDto> specCodeItems { get; set; }
 
     public MalzemeKartDto malzeme = new MalzemeKartDto();
@@ -255,7 +237,7 @@
 
         specCodeItems = await httpClient.GetServiceResponseAsync<List<SpeCodesDto>>("/api/malzemekart/GetMarkaList?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
 
-        speccodes = specCodeItems.Select(i => i.DEFINITION_).ToArray();
+        specCodeItems = specCodeItems.OrderBy(x => x.DEFINITION_).ToList();
     }
 
     public async Task KartGetir()
@@ -326,7 +308,7 @@
                 malzeme.Logoref = 0;
             }
 
-            malzeme.Marka = malzeme.SpecCodes.DEFINITION_;
+            malzeme.Marka = malzeme.SpecCodes.SPECODE;
 
             var request = new MalzemeKartRequestDto();
             request.MalzemeKart = malzeme;
@@ -534,16 +516,27 @@
 
     private async Task<IEnumerable<SpeCodesDto>> MalzemeAra(string value)
     {
-        if (specCodeItems == null)
-            await LoadSpecCodeList();
+        try
+        {
+            if (specCodeItems == null)
+                await LoadSpecCodeList();
 
-        if (string.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value))
+                return new SpeCodesDto[0];
+
+            var result = specCodeItems.Where(x => string.IsNullOrEmpty(x.DEFINITION_) == false
+            && (
+            x.DEFINITION_.Contains(value, StringComparison.CurrentCultureIgnoreCase)
+            || x.SPECODE.Contains(value, StringComparison.CurrentCultureIgnoreCase)
+            ));
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
             return new SpeCodesDto[0];
-
-        var result = specCodeItems.Where(x => string.IsNullOrEmpty(x.DEFINITION_) == false
-        && x.DEFINITION_.Contains(value, StringComparison.CurrentCultureIgnoreCase));
-
-        return result;
+        }
     }
 
 }
