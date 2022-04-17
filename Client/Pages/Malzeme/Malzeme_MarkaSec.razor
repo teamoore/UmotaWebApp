@@ -1,8 +1,8 @@
 ﻿@page "/malzeme_markasec"
+@inject IJSRuntime jsRuntime
 
 <div class="container">
-
-    <MudTable Items="@items" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true"  Filter="new Func<SpeCodesDto,bool>(FilterFunc1)">
+    <MudTable Items="@items" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<SpeCodesDto,bool>(FilterFunc1)">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Malzeme Markaları</MudText>
             <MudSpacer />
@@ -38,6 +38,8 @@
     HttpClient httpClient { get; set; }
 
     public List<SpeCodesDto> items { get; set; }
+
+    public SpeCodesDto marka = new SpeCodesDto();
 
     private string _searchString;
     private bool _sortNameByLength;
@@ -76,6 +78,11 @@
         res.DEFINITION_ = adi;
 
         await ModalInstance.CloseAsync(ModalResult.Ok<SpeCodesDto>(res));
+    }
+
+    public async Task Focus(string elementId)
+    {
+        await jsRuntime.InvokeVoidAsync("focusElement", elementId);
     }
 
 }

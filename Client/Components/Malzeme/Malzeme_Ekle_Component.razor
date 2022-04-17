@@ -1,4 +1,5 @@
-﻿
+﻿@page "/yeni_malzeme"
+
 <div class="form">
 
     <EditForm Model="malzeme">
@@ -48,7 +49,7 @@
                             <InputText @bind-Value="malzeme.Marka" class="form-control" disabled />
                         </div>
                         <div class="col-md-3">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="MarkaSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="OpenDialog" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
                         </div>
                     </div>
                 </div>
@@ -184,6 +185,8 @@
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
     [CascadingParameter] ModalParameters modalParameters { get; set; }
 
+    [Inject]
+    IDialogService DialogService { get; set; }
 
     [Inject]
     NavigationManager navigation { get; set; }
@@ -272,7 +275,8 @@
                 malzeme.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
                 malzeme.Status = 1;
 
-            } else
+            }
+            else
             {
                 await FisNoAl();
                 await RefNoAl();
@@ -412,12 +416,21 @@
         }
     }
 
+    private void OpenDialog()
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        options.CloseButton = true;
+        
+        DialogService.Show<Pages.Malzeme.Malzeme_MarkaSec>("Marka Seçimi", options);
+    }
+
     public async Task MarkaSec()
     {
         var opt = new ModalOptions();
         opt.ContentScrollable = true;
+        opt.FocusFirstElement = false;
 
-        var Form = modal.Show<Pages.Malzeme.Malzeme_MarkaSec>("Marka Seç", opt);
+        var Form = modal.Show<Pages.Malzeme.Malzeme_MarkaSec>("Marka Seç", options: opt);
         var result = await Form.Result;
 
         if (!result.Cancelled)
