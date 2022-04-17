@@ -402,16 +402,18 @@
             var opt = new ModalOptions();
             opt.ContentScrollable = true;
 
+
             var cariForm = modal.Show<Components.Teklif.TeklifDetayliAraComponent>("Detaylı Arama", opt);
             var result = await cariForm.Result;
 
             if (!result.Cancelled)
             {
+                loadingCompleted = false;
+                this.StateHasChanged();
+
                 if (result.Data != null)
                 {
                     var request = (TeklifRequestDto)result.Data;
-
-                    loadingCompleted = false;
 
                     request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
                     request.FirmaId = selectedFirmaDonem.firma_no.Value;
