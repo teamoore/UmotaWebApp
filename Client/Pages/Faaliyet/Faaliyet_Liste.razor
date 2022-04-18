@@ -203,6 +203,7 @@
             throw new Exception("Firma Dönem Seçili değil");
 
         loadingCompleted = false;
+        this.StateHasChanged();
 
         var request = new FaaliyetRequestDto();
         request.SearchText = header.SearchText;
@@ -314,6 +315,7 @@
                     var request = (FaaliyetRequestDto)result.Data;
 
                     loadingCompleted = false;
+                    this.StateHasChanged();
 
                     request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
                     request.FirmaId = selectedFirmaDonem.firma_no.Value;

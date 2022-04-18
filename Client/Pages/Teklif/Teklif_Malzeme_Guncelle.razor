@@ -537,7 +537,15 @@
             {
                 var durumSecim = (TeklifDto)result.Data;
                 if (durumSecim.Duruminfo.Equals(TeklifDurum.TeklifRevizyonda))
-                    navigation.NavigateTo("/stek_listef_detay/" + durumSecim.Logref);
+                {
+                    this.loadingCompleted = false;
+                    this.StateHasChanged();
+
+                    this.logref = durumSecim.Logref;
+                    await LoadTeklifData();
+                    await LoadTeklifDetayData();
+                    this.loadingCompleted = true;
+                }                
                 else
                     await LoadTeklifData();
             }

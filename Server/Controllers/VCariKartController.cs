@@ -86,5 +86,24 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpGet("adreslist")]
+        public async Task<ServiceResponse<List<SevkAdresDto>>> GetCariKartSevkAdress(string firmaId, int cariref)
+        {
+            try
+            {
+                return new ServiceResponse<List<SevkAdresDto>>()
+                {
+                    Value = await VCariKartService.GetCariKartSevkAdresList(firmaId, cariref)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<SevkAdresDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

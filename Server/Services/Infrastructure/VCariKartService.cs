@@ -83,6 +83,24 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return await qry.SingleOrDefaultAsync();
             }
         }
+        public async Task<List<SevkAdresDto>> GetCariKartSevkAdresList(string firmaId, int cariref)
+        {
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
 
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var results = await dbContext.V004Sevkadres.Where(x => x.Clientref == cariref)
+                                        .Take(100)
+                                        .OrderByDescending(x => x.Logref)
+                                        .ProjectTo<SevkAdresDto>(Mapper.ConfigurationProvider).ToListAsync();
+
+                return results;
+            }
+        }
     }
 }
