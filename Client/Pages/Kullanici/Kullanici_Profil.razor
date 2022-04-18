@@ -1,0 +1,159 @@
+﻿@page "/kullanici_profil"
+
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+<div class="form">
+
+    <EditForm Model="kullanici">
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-3">
+                    <label>E-posta Adresi</label>
+                    <InputText @bind-Value="kullanici.MailAdres" class="form-control" type="email" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-3">
+                    <label>E-posta Şifresi</label>
+                    <InputText @bind-Value="kullanici.MailSifre" class="form-control" type="password" />
+                </div>
+                <div class="col-md-3">
+                    <label>E-posta Şifresi (Tekrar)</label>
+                    <InputText @bind-Value="_sifreTekrar" class="form-control" type="password" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+                @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Kaydediliyor...</MudText>
+                }
+                else
+                {
+                    <MudText>Kaydet</MudText>
+                }
+            </MudButton>
+            <CancelButtonComponent Caption="Vazgeç" OnClick="goBackList" />
+        </div>
+
+    </EditForm>
+</div>
+
+@code {
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    public SisKullaniciDto kullanici = new SisKullaniciDto();
+    private bool _processing = false;
+    public HeaderBarSearch header = new HeaderBarSearch();
+    private string _sifreTekrar;
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Kullanıcı Profil";
+        await KayitGetir();
+
+    }
+
+    public async Task ValidSubmit()
+    {
+        await Kaydet();
+    }
+
+    public async Task Kaydet()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            var request = new SisKullaniciRequestDto();
+            request.SisKullanici = kullanici;
+
+
+            kullanici = await httpClient.PostGetServiceResponseAsync<SisKullaniciDto, SisKullaniciRequestDto>(UrlHelper.KullaniciUpdate, request);
+
+            _processing = false;
+
+            Snackbar.Add("Kullanıcı bilgileri güncellendi", severity: Severity.Success);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public void SubmitValidation()
+    {
+        var err = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(kullanici.MailAdres))
+            err.Add("Mail Adresi boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(kullanici.MailSifre))
+            err.Add("Şifre boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(kullanici.MailSifre) == false && kullanici.MailSifre != _sifreTekrar)
+            err.Add("Şifre hatalı girildi, tekrar giriniz");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Boş geçilemez alanlar");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
+
+    public async Task KayitGetir()
+    {
+        try
+        {
+            var kullaniciKodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            kullanici = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullaniciKodu);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public void goBackList()
+    {
+        navigation.NavigateTo("/");
+    }
+}
