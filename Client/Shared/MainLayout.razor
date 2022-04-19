@@ -30,13 +30,21 @@
         <MudSpacer />
         <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="ShowDonemFirmalar">@_selectedFirma</MudButton>
         <MudText Typo="Typo.h5" Class="ml-3">&nbsp;</MudText>
-        <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="KullaniciProfil">
+        @*<MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="KullaniciProfil">
             @_avatarName
-        </MudButton>
-        
-        <MudIconButton Icon="@Icons.Material.Filled.Logout" OnClick="NavigateToExit"></MudIconButton>
-        @*<MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />*@
+        </MudButton>*@
 
+        @*<MudIconButton Icon="@Icons.Material.Filled.Logout" OnClick="NavigateToExit"></MudIconButton>*@
+        @*<MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />*@
+        <MudMenu FullWidth="true">
+            <ActivatorContent>
+                <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary" Variant="Variant.Filled">@_avatarName</MudChip>
+            </ActivatorContent>
+            <ChildContent>
+                <MudMenuItem OnClick="KullaniciProfil">Profil</MudMenuItem>
+                <MudMenuItem OnClick="NavigateToExit">Çıkış</MudMenuItem>
+            </ChildContent>
+        </MudMenu>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Variant="DrawerVariant.Temporary">
         <NavMenu2 />
@@ -89,6 +97,7 @@
             loginStr = loginStr.Replace("\"", "");
 
             _avatarName = loginStr.ToUpper().Substring(0, 1);
+            _avatarName = loginStr;
 
             var selectedFirmaDonem = await localStorage.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
