@@ -7,6 +7,7 @@ namespace UmotaWebApp.Client.Utils
 {
     public class Consts
     {
+        #region ülkeler
         public static string[] Ulkeler = { "Rusya",
 "Antarktika",
 "Kanada",
@@ -264,6 +265,8 @@ namespace UmotaWebApp.Client.Utils
 "Mercan Denizi Adaları (Avustralya)",
 "Monako",
 "Vatikan","İngiltere"};
+        #endregion
+
         public const string KullaniciKodu = "kullanicikodu";
         public const string FirmaDonem = "firmaNo";
         public const string FirmaDonemYetki = "firmadonemyetki";

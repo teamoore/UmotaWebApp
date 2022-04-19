@@ -54,6 +54,7 @@ namespace UmotaWebApp.Client.Utils
         public const string VCariKartListesi = "/api/vcarikart/list";
         public const string VCariKartAra = "/api/vcarikart/search";
         public const string VCariKartGetir = "/api/vcarikart/get";
+        public const string VCariKartAdresListesi = "/api/vcarikart/adreslist";
         public const string GetKullaniciListesi = "/api/kullanici/list";
         public const string GetKullaniciGrupListesi = "/api/kullanici/gruplist";
         public const string KullaniciSave = "/api/kullanici/save";

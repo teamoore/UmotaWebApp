@@ -118,6 +118,7 @@
                 throw new Exception("Firma dönem seçilmedi");
 
             loadingCompleted = false;
+            this.StateHasChanged();
             var request = new MalzemeStokRequestDto();
             request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
             request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;

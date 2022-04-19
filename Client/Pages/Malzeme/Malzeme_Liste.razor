@@ -109,6 +109,7 @@
                 throw new Exception("Firma dönem seçilmedi");
 
             loadingCompleted = false;
+            this.StateHasChanged();
             var request = new MalzemeKartRequestDto();
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
             if (!string.IsNullOrWhiteSpace(detayAraBar.SearchText))

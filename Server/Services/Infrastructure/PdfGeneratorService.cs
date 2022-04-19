@@ -69,7 +69,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         <p><b>Firma : " + teklif.Cariadi + @"</b><br>
         <b>Sayın : "+ teklif.IlgiliAdi + @"</b><br><br>
         <b>Teklif No  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: " + teklif.Teklifno + @"</b><br>
-        <b>Revizo No    &nbsp;&nbsp;&nbsp;: " + teklif.Revzno + @"</b><br>
+        <b>Revize No    &nbsp;&nbsp;&nbsp;: " + teklif.Revzno + @"</b><br>
         <b>Teklif Tarihi&nbsp;&nbsp;: " + teklif.TarihFormatted + @"</b><br>
         <b>Teslim Tarihi: " + teklif.TeslimTarihiFormatted + @"</b><br>
         <b>Proje Adı  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: " + teklif.Proje + @"</b><br>

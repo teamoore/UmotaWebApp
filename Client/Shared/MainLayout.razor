@@ -30,7 +30,10 @@
         <MudSpacer />
         <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="ShowDonemFirmalar">@_selectedFirma</MudButton>
         <MudText Typo="Typo.h5" Class="ml-3">&nbsp;</MudText>
-        <MudAvatar Color="Color.Tertiary">@_avatarName</MudAvatar>
+        <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="KullaniciProfil">
+            @_avatarName
+        </MudButton>
+        
         <MudIconButton Icon="@Icons.Material.Filled.Logout" OnClick="NavigateToExit"></MudIconButton>
         @*<MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />*@
 
@@ -126,6 +129,11 @@
                 kullanici.KullaniciAdi, kullanici.MailAdres, kullanici.KullaniciYetkiKodu, kullanici.SonGirisTarihi.Value);
             await modalManager.ShowMessageAsync("Kullanıcı Bilgi", bilgi);
         }
+    }
+
+    public void KullaniciProfil()
+    {
+        NavigationManager.NavigateTo("/kullanici_profil");
     }
 
 
