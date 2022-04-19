@@ -2,6 +2,12 @@
 
 <HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
 
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
 <div class="form">
 
     <EditForm Model="kullanici">
@@ -64,12 +70,12 @@
     private bool _processing = false;
     public HeaderBarSearch header = new HeaderBarSearch();
     private string _sifreTekrar;
+    private bool loadingCompleted { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         header.HeaderText = "Kullanıcı Profil";
         await KayitGetir();
-
     }
 
     public async Task ValidSubmit()
@@ -96,7 +102,7 @@
         }
 
         try
-        {
+        {            
             _processing = true;
 
             var request = new SisKullaniciRequestDto();
@@ -129,6 +135,9 @@
         if (string.IsNullOrWhiteSpace(kullanici.MailSifre) == false && kullanici.MailSifre != _sifreTekrar)
             err.Add("Şifre hatalı girildi, tekrar giriniz");
 
+        if (!string.IsNullOrWhiteSpace(kullanici.MailAdres) && kullanici.MailAdres.IsValidEmail() == false)
+            err.Add("Geçersiz mail adresi girilemez");
+
         if (err.Count > 0)
         {
             var ex = new ClientException("Boş geçilemez alanlar");
@@ -142,9 +151,13 @@
     {
         try
         {
+            loadingCompleted = false;
+
             var kullaniciKodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
             kullanici = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullaniciKodu);
+
+            loadingCompleted = true;
         }
         catch (Exception ex)
         {

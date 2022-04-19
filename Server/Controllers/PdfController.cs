@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Server.Services.Email;
 using UmotaWebApp.Server.Services.Infrastructure;
-using UmotaWebApp.Shared.Config;
 using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ServiceResponses;
 using UmotaWebApp.Shared.SharedConsts;
@@ -23,13 +20,15 @@ namespace UmotaWebApp.Server.Controllers
         private IPdfGenerator pdf { get; set; }
         private IEmailSender _emailSender { get; set; }
         private ITeklifService teklifService { get; set; }
+        private ISisKullaniciService sisKullaniciService { get; set;}
 
-        public PdfController(ILogger<PdfController> logger, IPdfGenerator pdf, IEmailSender emailSender, ITeklifService teklifService)
+        public PdfController(ILogger<PdfController> logger, IPdfGenerator pdf, IEmailSender emailSender, ITeklifService teklifService, ISisKullaniciService sisKullaniciService)
         {
             this.logger = logger;
             this.pdf = pdf;
             this._emailSender = emailSender;
             this.teklifService = teklifService;
+            this.sisKullaniciService = sisKullaniciService;
         }
 
         [HttpPost("CreateTeklifPdfDocument")]
@@ -118,6 +117,18 @@ namespace UmotaWebApp.Server.Controllers
                     var subject = string.Format("Fiyat Teklifi {0}, {1}", request.teklif.Teklifno, request.teklif.Cariadi);
 
                     var message = new Message(new string[] { request.teklif.Mail }, subject, subject, pdfData);
+                    var kullaniciDto = await sisKullaniciService.GetSisKullanici(request.Kullanici);
+
+                    if (kullaniciDto == null)
+                        throw new Exception("Gönderen Kullanıcı bulunamadı");
+                    if (kullaniciDto.MailAdres.IsValidEmail() == false)
+                        throw new Exception("Gönderici mail adresi geçersizdir, lütfen email adresinizi güncelleyiniz");
+                    if (string.IsNullOrEmpty(kullaniciDto.MailSifre))
+                        throw new Exception("Gönderici mail şifresi boş olamaz, lütfen email şifrenizi güncelleyiniz");
+
+                    message.From = kullaniciDto.MailAdres;
+                    message.SmtpPassword = kullaniciDto.MailSifre;
+
                     _emailSender.SendEmail(message);
                 }
 

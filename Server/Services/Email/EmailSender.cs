@@ -27,7 +27,7 @@ namespace UmotaWebApp.Server.Services.Email
             //Send(emailMessage);
 
             var body = string.Format("<h2 style='color:red;'>{0}</h2>", message.Content);
-            Email(body, emailMessage.Subject, message.To[0].Address, message.Attachments);
+            Email(body, emailMessage.Subject, message.To[0].Address, message.Attachments, message.From, message.SmtpPassword);
         }
 
         private MimeMessage CreateEmailMessage(Message message)
@@ -74,13 +74,13 @@ namespace UmotaWebApp.Server.Services.Email
             }
         }
 
-        public void Email(string htmlString, string subject, string toMailAddress, byte[] attachment)
+        public void Email(string htmlString, string subject, string toMailAddress, byte[] attachment, string from, string password)
         {
             try
             {
                 MailMessage message = new MailMessage();
                 var smtp = new  System.Net.Mail.SmtpClient();
-                message.From = new MailAddress(_emailConfig.From);
+                message.From = new MailAddress(from); //new MailAddress(_emailConfig.From);
                 message.To.Add(new MailAddress(toMailAddress));
                 message.Subject = subject;
                 message.IsBodyHtml = true; //to make message body as html  
@@ -97,7 +97,7 @@ namespace UmotaWebApp.Server.Services.Email
                 smtp.Host = _emailConfig.SmtpServer; //for gmail host  
                 smtp.EnableSsl = false;
                 smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential(_emailConfig.From, _emailConfig.Password);
+                smtp.Credentials = new NetworkCredential(from, password);
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                 
                 smtp.Send(message);
