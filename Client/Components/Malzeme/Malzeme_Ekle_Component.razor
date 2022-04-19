@@ -39,7 +39,7 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <MudAutocomplete T="string" Label="Menşei" @bind-Value="malzeme.Mensei" SearchFunc="@UlkeAra"
+                    <MudAutocomplete T="string" Label="Menşei" Placeholder="@malzeme.Mensei" @bind-Value="malzeme.Mensei" SearchFunc="@UlkeAra"
                                      ResetValueOnEmptyText="@resetValueOnEmptyText"
                                      CoerceText="@coerceText" CoerceValue="@coerceValue"
                                      AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
@@ -49,7 +49,7 @@
                 <div class="col-md-4">
                     <div class="row">
                         <div class="col">
-                            <MudAutocomplete T="SpeCodesDto" Label="Marka" @bind-Value="malzeme.SpecCodes" SearchFunc="@MalzemeAra"
+                            <MudAutocomplete T="SpeCodesDto" Label="Marka" Placeholder="@malzeme.Marka"  @bind-Value="malzeme.SpecCodes" SearchFunc="@MalzemeAra"
                                              ResetValueOnEmptyText="@resetValueOnEmptyText"
                                              CoerceText="@coerceText" CoerceValue="@coerceValue"
                                              AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" 
@@ -453,7 +453,7 @@
         var opt = new ModalOptions();
         opt.ContentScrollable = true;
         opt.FocusFirstElement = false;
-
+        
         var Form = modal.Show<Pages.Malzeme.Malzeme_MarkaSec>("Marka Seç", options: opt);
         var result = await Form.Result;
 
