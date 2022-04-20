@@ -8,6 +8,9 @@ namespace UmotaWebApp.Client.Utils
     {
         public static string MinimizeString(this string str, int? length = null)
         {
+            if (string.IsNullOrEmpty(str))
+                return string.Empty;
+
             var len = 100;
 
             if (length.HasValue)

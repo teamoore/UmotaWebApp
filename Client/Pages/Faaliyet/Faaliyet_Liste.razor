@@ -9,7 +9,7 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@listItems" Dense="true" Hover="true" RowsPerPage="100" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<FaaliyetDto,bool>(FilterFunc1)">
+<MudTable Items="@listItems" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<FaaliyetDto,bool>(FilterFunc1)">
     <ToolBarContent>
         @if (menuEklemeYetkisi)
         {
