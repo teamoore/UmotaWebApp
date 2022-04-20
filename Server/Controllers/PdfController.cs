@@ -135,6 +135,7 @@ namespace UmotaWebApp.Server.Controllers
                 //Müşteriye mail gönderildikten sonra teklif durumunu : Müşteri Onayı Bekleniyor a çek
                 request.teklif.NewDuruminfo = TeklifDurum.MusteriOnayiBekliyor;
                 request.teklif.Upduser = request.Kullanici;
+                request.teklif.TeklifDurumAciklama = "Teklif " + request.teklif.Mail + " adresine gönderildi.";
                
                 await teklifService.UpdateTeklifDurum(new TeklifRequestDto()
                 {

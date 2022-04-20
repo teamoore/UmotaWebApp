@@ -7,7 +7,7 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@stoklar" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeStokDto,bool>(FilterFunc1)">
+<MudTable Items="@stoklar" FixedHeader="true" Height="500px"  RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeStokDto,bool>(FilterFunc1)">
     <HeaderContent>
         <MudTh>Kodu</MudTh>
         <MudTh>Adı</MudTh>
