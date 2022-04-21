@@ -409,11 +409,11 @@
 
             if (!result.Cancelled)
             {
-                loadingCompleted = false;
-                this.StateHasChanged();
-
                 if (result.Data != null)
                 {
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+
                     var request = (TeklifRequestDto)result.Data;
 
                     request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
