@@ -26,7 +26,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
             {
-                var sql = @"  select lpersoneladi as PersonelAdi,sum([tutarmatrahtl]) as MatrahTutar
+                var sql = @"  select top 10 lpersoneladi as PersonelAdi,sum([tutarmatrahtl]) as MatrahTutar
                               from [UmotaUnoPazar_001].[dbo].[v029_teklif]
                               where lpersoneladi is not null ";
                 if (year != null)
