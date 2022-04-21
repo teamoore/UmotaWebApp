@@ -4,11 +4,16 @@
     <div class="row">
         <div class="col-sm-12 my-5">
             <RadzenChart>
-                <RadzenBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
-                <RadzenBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
+
+                <RadzenBarSeries Data="@personelSatisGenel" CategoryProperty="PersonelAdi" Title="Tüm" LineType="LineType.Dashed" ValueProperty="MatrahTutar" />
+
+                <RadzenBarSeries Data="@personelSatisBuSene" CategoryProperty="PersonelAdi" Title="2022" LineType="LineType.Dashed" ValueProperty="MatrahTutar" />
+
+                <RadzenBarSeries Data="@personelSatisGecenSene" CategoryProperty="PersonelAdi" Title="2021" LineType="LineType.Dashed" ValueProperty="MatrahTutar" />
+
                 <RadzenValueAxis Formatter="@FormatAsUSD">
                     <RadzenGridLines Visible="true" />
-                    <RadzenAxisTitle Text="Revenue in USD" />
+                    <RadzenAxisTitle Text="Teklif Matrah Tutarı" />
                 </RadzenValueAxis>
                 <RadzenBarOptions Radius="5" />
             </RadzenChart>
@@ -18,7 +23,56 @@
 
 
 @code {
- 
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPersonelTeklif();
+    }
+
+    public async Task LoadPersonelTeklif()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<IEnumerable<PersonelTeklifSatisDto>>(UrlHelper.DashboardPersonelTeklifSatis
+                + "?firmaId=" + selectedFirmaDonem.firma_no);
+
+            var resultThisYear = await httpClient.GetServiceResponseAsync<IEnumerable<PersonelTeklifSatisDto>>(UrlHelper.DashboardPersonelTeklifSatis
+    + "?firmaId=" + selectedFirmaDonem.firma_no + "&year=" + DateTime.Now.Year);
+
+            var resultPrevYear = await httpClient.GetServiceResponseAsync<IEnumerable<PersonelTeklifSatisDto>>(UrlHelper.DashboardPersonelTeklifSatis
++ "?firmaId=" + selectedFirmaDonem.firma_no + "&year=" + DateTime.Now.AddYears(-1).Year);
+
+            personelSatisGenel = (List<PersonelTeklifSatisDto>)result;
+            personelSatisBuSene = (List<PersonelTeklifSatisDto>)resultThisYear;
+            personelSatisGecenSene = (List<PersonelTeklifSatisDto>)resultPrevYear;
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public List<PersonelTeklifSatisDto> personelSatisGenel = new List<PersonelTeklifSatisDto>();
+    public List<PersonelTeklifSatisDto> personelSatisBuSene = new List<PersonelTeklifSatisDto>();
+    public List<PersonelTeklifSatisDto> personelSatisGecenSene = new List<PersonelTeklifSatisDto>();
 
     class DataItem
     {
@@ -28,7 +82,7 @@
 
     string FormatAsUSD(object value)
     {
-        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("tr-TR"));
     }
 
     DataItem[] revenue2019 = new DataItem[]
@@ -53,7 +107,7 @@
         Quarter = "Q4",
         Revenue = 294000
     },
-        };
+            };
 
     DataItem[] revenue2020 = new DataItem[] {
     new DataItem

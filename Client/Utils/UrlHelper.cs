@@ -59,5 +59,6 @@ namespace UmotaWebApp.Client.Utils
         public const string GetKullaniciGrupListesi = "/api/kullanici/gruplist";
         public const string KullaniciSave = "/api/kullanici/save";
         public const string KullaniciUpdate = "/api/kullanici/update";
+        public const string DashboardPersonelTeklifSatis = "/api/Dashboard/personelteklif";
     }
 }
