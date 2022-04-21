@@ -150,6 +150,8 @@
                 throw new Exception("Firma Dönem Seçili değil");
 
             _processing = true;
+            this.StateHasChanged();
+  
             teklif.Upddate = DateTime.Now;
             teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklif.Status = 1;
