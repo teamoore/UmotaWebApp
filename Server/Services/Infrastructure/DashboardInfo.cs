@@ -24,7 +24,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             if (string.IsNullOrEmpty(firmaId))
                 throw new Exception("Firma Dönem seçimi yapınız");
 
-            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
+            using (SqlConnection db = new(Configuration.GetUmotaConnectionString(firmaId)))
             {
                 var sql = @"  select lpersoneladi as PersonelAdi,sum([tutarmatrahtl]) as MatrahTutar
                               from [UmotaUnoPazar_001].[dbo].[v029_teklif]
