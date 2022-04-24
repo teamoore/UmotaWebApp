@@ -7,10 +7,24 @@
 
                 <RadzenBarSeries Data="@personelSatisGenel" CategoryProperty="PersonelAdi" Title="Tüm" LineType="LineType.Dashed" ValueProperty="MatrahTutar" />
 
+
+                <RadzenValueAxis Formatter="@FormatAsUSD">
+                    <RadzenGridLines Visible="true" />
+                    <RadzenAxisTitle Text="Teklif Matrah Tutarı" />
+                </RadzenValueAxis>
+                <RadzenBarOptions Radius="5" />
+            </RadzenChart>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 my-5">
+            <RadzenChart>
+
+ 
                 <RadzenBarSeries Data="@personelSatisBuSene" CategoryProperty="PersonelAdi" Title="2022" LineType="LineType.Dashed" ValueProperty="MatrahTutar" />
 
-                <RadzenBarSeries Data="@personelSatisGecenSene" CategoryProperty="PersonelAdi" Title="2021" LineType="LineType.Dashed" ValueProperty="MatrahTutar" />
-
+  
                 <RadzenValueAxis Formatter="@FormatAsUSD">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Teklif Matrah Tutarı" />
