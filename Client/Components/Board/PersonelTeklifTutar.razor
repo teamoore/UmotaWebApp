@@ -1,38 +1,49 @@
 ﻿@using System.Globalization
 
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
 <div class="container">
-    <div class="row">
-        <div class="col-sm-12 my-5">
-            <RadzenChart>
+    @if (_stepName == "step1")
+    {
+        <div class="row">
+            <div class="col-sm-12">
+                <RadzenChart>
 
-                <RadzenBarSeries Data="@personelSatisGenel" CategoryProperty="PersonelAdi" Title="Tüm" LineType="LineType.Dashed" ValueProperty="MatrahTutar" />
+                    <RadzenBarSeries Data="@personelSatisGenel" CategoryProperty="PersonelAdi" Title="Tüm" LineType="LineType.Dashed" ValueProperty="MatrahTutar" />
 
 
-                <RadzenValueAxis Formatter="@FormatAsUSD">
-                    <RadzenGridLines Visible="true" />
-                    <RadzenAxisTitle Text="Teklif Matrah Tutarı" />
-                </RadzenValueAxis>
-                <RadzenBarOptions Radius="5" />
-            </RadzenChart>
+                    <RadzenValueAxis Formatter="@FormatAsUSD">
+                        <RadzenGridLines Visible="true" />
+                        <RadzenAxisTitle Text="Teklif Matrah Tutarı" />
+                    </RadzenValueAxis>
+                    <RadzenBarOptions Radius="5" />
+                </RadzenChart>
+            </div>
         </div>
-    </div>
 
-    <div class="row">
-        <div class="col-sm-12 my-5">
-            <RadzenChart>
-
- 
-                <RadzenBarSeries Data="@personelSatisBuSene" CategoryProperty="PersonelAdi" Title="2022" LineType="LineType.Dashed" ValueProperty="MatrahTutar" />
-
-  
-                <RadzenValueAxis Formatter="@FormatAsUSD">
-                    <RadzenGridLines Visible="true" />
-                    <RadzenAxisTitle Text="Teklif Matrah Tutarı" />
-                </RadzenValueAxis>
-                <RadzenBarOptions Radius="5" />
-            </RadzenChart>
+        <div class="row">
+            <div class="col-sm-12" style="text-align:right">
+                <MudButton Variant="Variant.Filled" Disabled="!loadingCompleted" EndIcon="@Icons.Material.Filled.SkipNext" Color="Color.Primary" OnClick="DevamEt">Devam Et</MudButton>
+            </div>
         </div>
-    </div>
+    }
+
+    @if (_stepName == "step2")
+    {
+        <div class="row">
+            <div class="col-sm-12" style="text-align:center">
+                 
+                <MudText Typo="Typo.h4">@MusteriOnayiBekliyorTeklifSayisi adet <strong>Müşteri Onayı Bekliyor</strong> durumunda teklifiniz bulunmaktadır.</MudText>
+     
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="TekliflerimeGit">Satış Teklifleri</MudButton>
+
+            </div>
+        </div>
+    }
+
 </div>
 
 
@@ -50,8 +61,15 @@
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
+    private bool loadingCompleted = false;
+    private int MusteriOnayiBekliyorTeklifSayisi = 0;
+    private string _stepName = "step1";
+    public List<PersonelTeklifSatisDto> personelSatisGenel = new List<PersonelTeklifSatisDto>();
+
+
     protected override async Task OnInitializedAsync()
     {
+        await LoadMusteriOnayiBekliyorData();
         await LoadPersonelTeklif();
     }
 
@@ -59,6 +77,8 @@
     {
         try
         {
+            loadingCompleted = false;
+
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
             if (selectedFirmaDonem == null)
@@ -67,16 +87,9 @@
             var result = await httpClient.GetServiceResponseAsync<IEnumerable<PersonelTeklifSatisDto>>(UrlHelper.DashboardPersonelTeklifSatis
                 + "?firmaId=" + selectedFirmaDonem.firma_no);
 
-            var resultThisYear = await httpClient.GetServiceResponseAsync<IEnumerable<PersonelTeklifSatisDto>>(UrlHelper.DashboardPersonelTeklifSatis
-    + "?firmaId=" + selectedFirmaDonem.firma_no + "&year=" + DateTime.Now.Year);
-
-            var resultPrevYear = await httpClient.GetServiceResponseAsync<IEnumerable<PersonelTeklifSatisDto>>(UrlHelper.DashboardPersonelTeklifSatis
-+ "?firmaId=" + selectedFirmaDonem.firma_no + "&year=" + DateTime.Now.AddYears(-1).Year);
 
             personelSatisGenel = (List<PersonelTeklifSatisDto>)result;
-            personelSatisBuSene = (List<PersonelTeklifSatisDto>)resultThisYear;
-            personelSatisGecenSene = (List<PersonelTeklifSatisDto>)resultPrevYear;
-
+            loadingCompleted = true;
         }
         catch (Exception ex)
         {
@@ -84,14 +97,50 @@
         }
     }
 
-    public List<PersonelTeklifSatisDto> personelSatisGenel = new List<PersonelTeklifSatisDto>();
-    public List<PersonelTeklifSatisDto> personelSatisBuSene = new List<PersonelTeklifSatisDto>();
-    public List<PersonelTeklifSatisDto> personelSatisGecenSene = new List<PersonelTeklifSatisDto>();
-
-    class DataItem
+    public async Task LoadMusteriOnayiBekliyorData()
     {
-        public string Quarter { get; set; }
-        public double Revenue { get; set; }
+        try
+        {
+            loadingCompleted = false;
+  
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+
+            var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.ReportMusteriOnayiBekliyor
+    + "?firmaId=" + selectedFirmaDonem.firma_no + "&kullanici=" + kullanicikodu);
+
+            MusteriOnayiBekliyorTeklifSayisi = result;
+
+            loadingCompleted = true;
+
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("401"))
+            {
+                navigation.NavigateTo("/login");
+                return;
+            }
+
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+
+    private void DevamEt()
+    {
+        _stepName = "step2";
+        this.StateHasChanged();
+    }
+
+    private void TekliflerimeGit()
+    {
+        navigation.NavigateTo("/stek_listef");
+        return;
     }
 
     string FormatAsUSD(object value)
@@ -99,51 +148,5 @@
         return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("tr-TR"));
     }
 
-    DataItem[] revenue2019 = new DataItem[]
-    {
-    new DataItem
-    {
-        Quarter = "Q1",
-        Revenue = 234000
-    },
-    new DataItem
-    {
-        Quarter = "Q2",
-        Revenue = 284000
-    },
-    new DataItem
-    {
-        Quarter = "Q3",
-        Revenue = 274000
-    },
-    new DataItem
-    {
-        Quarter = "Q4",
-        Revenue = 294000
-    },
-            };
 
-    DataItem[] revenue2020 = new DataItem[] {
-    new DataItem
-    {
-    Quarter = "Q1",
-    Revenue = 254000
-    },
-    new DataItem
-    {
-    Quarter = "Q2",
-    Revenue = 324000
-    },
-    new DataItem
-    {
-    Quarter = "Q3",
-    Revenue = 354000
-    },
-    new DataItem
-    {
-    Quarter = "Q4",
-    Revenue = 394000
-    },
-
-    };
 }

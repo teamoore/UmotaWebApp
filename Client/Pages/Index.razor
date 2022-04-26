@@ -1,30 +1,41 @@
 ﻿@page "/"
 
+    <h1>UNO Endüstriyel CRM</h1>
 
-<h1>UNO Endüstriyel CRM</h1>
+    versiyon 0.1.2
 
-versiyon 0.1.2
+    @code {
 
-<UmotaWebApp.Client.Components.Board.PersonelTeklifTutar></UmotaWebApp.Client.Components.Board.PersonelTeklifTutar>
+        [CascadingParameter]
+        public Task<AuthenticationState> AuthState { get; set; }
 
-@code {
+        [Inject]
+        NavigationManager NavigationManager { get; set; }
 
-    [CascadingParameter]
-    public Task<AuthenticationState> AuthState { get; set; }
-
-    [Inject]
-    NavigationManager NavigationManager { get; set; }
+        [Inject]
+        MudBlazor.IDialogService DialogService { get; set; }
 
 
-    protected async override Task OnInitializedAsync()
-    {
-        var authState = await AuthState;
-
-        if (!authState.User.Identity.IsAuthenticated)
+        protected async override Task OnInitializedAsync()
         {
-            NavigationManager.NavigateTo("login");
+            var authState = await AuthState;
+
+            if (!authState.User.Identity.IsAuthenticated)
+            {
+                NavigationManager.NavigateTo("login");
+            }
+
+            OpenDialog();
         }
- 
+
+        private void OpenDialog()
+        {
+            var options = new MudBlazor.DialogOptions { CloseOnEscapeKey = true };
+            options.CloseButton = false;
+            options.DisableBackdropClick = true;
+            options.FullWidth = true;
+
+            DialogService.Show<UmotaWebApp.Client.Components.Board.PersonelTeklifTutar>("Personel Teklif Raporu", options);
+        }
     }
-}
 
