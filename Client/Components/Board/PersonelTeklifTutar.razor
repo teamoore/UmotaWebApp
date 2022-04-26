@@ -12,12 +12,12 @@
             <div class="col-sm-12">
                 <RadzenChart>
 
-                    <RadzenBarSeries Data="@personelSatisGenel" CategoryProperty="PersonelAdi" Title="Tüm" LineType="LineType.Dashed" ValueProperty="MatrahTutar" />
+                    <RadzenBarSeries Data="@personelSatisGenel" CategoryProperty="PersonelAdi" Title="Bu Yıl" LineType="LineType.Dashed"  ValueProperty="MatrahTutar" />
 
 
                     <RadzenValueAxis Formatter="@FormatAsUSD">
                         <RadzenGridLines Visible="true" />
-                        <RadzenAxisTitle Text="Teklif Matrah Tutarı" />
+                        <RadzenAxisTitle Text="Tutarsal TL" />
                     </RadzenValueAxis>
                     <RadzenBarOptions Radius="5" />
                 </RadzenChart>
@@ -61,6 +61,8 @@
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
     private bool loadingCompleted = false;
     private int MusteriOnayiBekliyorTeklifSayisi = 0;
     private string _stepName = "step1";
@@ -85,7 +87,7 @@
                 throw new Exception("Firma Dönem Seçili değil");
 
             var result = await httpClient.GetServiceResponseAsync<IEnumerable<PersonelTeklifSatisDto>>(UrlHelper.DashboardPersonelTeklifSatis
-                + "?firmaId=" + selectedFirmaDonem.firma_no);
+                + "?firmaId=" + selectedFirmaDonem.firma_no + "&year="+DateTime.Now.Year);
 
 
             personelSatisGenel = (List<PersonelTeklifSatisDto>)result;
@@ -102,7 +104,7 @@
         try
         {
             loadingCompleted = false;
-  
+
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
             var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
@@ -133,13 +135,19 @@
 
     private void DevamEt()
     {
-        _stepName = "step2";
-        this.StateHasChanged();
+        if (MusteriOnayiBekliyorTeklifSayisi > 0)
+        {
+            _stepName = "step2";
+            this.StateHasChanged();
+        } else
+        {
+            MudDialog.Cancel();
+        }
     }
 
     private void TekliflerimeGit()
     {
-        navigation.NavigateTo("/stek_listef");
+        navigation.NavigateTo("/stek_listef/Müşteri%20Onayı%20Bekliyor");
         return;
     }
 

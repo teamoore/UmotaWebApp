@@ -1,4 +1,4 @@
-﻿@page "/stek_listef"
+﻿@page "/stek_listef/{duruminfo?}"
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif"
                  ShowButtons="false" ShowFilterButton="true"
@@ -79,6 +79,8 @@
 
 
 @code {
+    [Parameter]
+    public string? duruminfo { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
@@ -168,7 +170,7 @@
             loadingCompleted = false;
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
             var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>(UrlHelper.TeklifListesi + "?firmaId=" + selectedFirmaDonem.firma_no + "&kullanicikodu=" + kullanicikodu);
+            teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>(UrlHelper.TeklifListesi + "?firmaId=" + selectedFirmaDonem.firma_no + "&kullanicikodu=" + kullanicikodu + "&duruminfo=" + duruminfo);
             loadingCompleted = true;
             teklifler = teklifler.OrderByDescending(i => i.Insdate).ToList();
         }

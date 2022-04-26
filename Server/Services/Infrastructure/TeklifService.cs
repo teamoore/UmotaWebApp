@@ -55,7 +55,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             }
         }
 
-        public async Task<List<TeklifDto>> GetTeklifDtos(string firmaId, string kullanicikodu)
+        public async Task<List<TeklifDto>> GetTeklifDtos(string firmaId, string kullanicikodu, string duruminfo)
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
             {
@@ -63,6 +63,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
                 var sql = "select top 100 *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
                     " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " a with(nolock) where 1=1 and a.revizyon = 0";
+
+                if (!string.IsNullOrWhiteSpace(duruminfo))
+                    sql += " and duruminfo = '" + duruminfo + "'";
 
                 var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, KullaniciYetkiKodlari.TumTeklifleriGorebilir);
                 if (tumTeklifleriGormeYetkisi == 0) 

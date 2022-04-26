@@ -32,9 +32,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 db.Open();
 
                 var sql = "select count(1) as cnt from " +
-                   Configuration.GetUmotaObjectName("v009_teklif", firmaId: firmaId) + " a with(nolock) where a.duruminfo = 'Müşteri Onayı Bekliyor' ";
+                   Configuration.GetUmotaObjectName("v009_teklif", firmaId: firmaId) + " a with(nolock) where a.duruminfo = '" + Shared.SharedConsts.TeklifDurum.MusteriOnayiBekliyor + "'";
 
-                sql += " and [lpersoneladi] = '" + kullanici + "'";
+                sql += " and [insuser] = '" + kullanici + "' and revizyon = 0";
 
                 var result = await db.ExecuteScalarAsync<int>(sql, commandType: CommandType.Text);
 
