@@ -1,23 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@*<MudThemeProvider />
-
-    <div class="page">
-        <div class="sidebar">
-            <NavMenu />
-        </div>
-
-        <div class="main">
-            <div class="top-row px-4">
-                <button type="button" class="btn btn-primary" @onclick="ShowKullaniciKart">@loginStr</button>
-                <button type="button" class="btn btn-warning" @onclick="NavigateToExit">Çıkış</button>
-            </div>
-
-            <div class="content px-4">
-                @Body
-            </div>
-        </div>
-    </div>*@
-
 
 <MudThemeProvider />
 <MudSnackbarProvider />
@@ -30,12 +11,6 @@
         <MudSpacer />
         <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="ShowDonemFirmalar">@_selectedFirma</MudButton>
         <MudText Typo="Typo.h5" Class="ml-3">&nbsp;</MudText>
-        @*<MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="KullaniciProfil">
-            @_avatarName
-        </MudButton>*@
-
-        @*<MudIconButton Icon="@Icons.Material.Filled.Logout" OnClick="NavigateToExit"></MudIconButton>*@
-        @*<MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End" />*@
         <MudMenu FullWidth="true">
             <ActivatorContent>
                 <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary" Variant="Variant.Filled">@_avatarName</MudChip>
@@ -96,8 +71,7 @@
             loginStr = await localStorage.GetItemAsStringAsync("kullanicikodu");
             loginStr = loginStr.Replace("\"", "");
 
-            _avatarName = loginStr.ToUpper().Substring(0, 1);
-            _avatarName = loginStr;
+            _avatarName = loginStr.ToUpper().ClearCharacters();
 
             var selectedFirmaDonem = await localStorage.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 

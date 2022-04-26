@@ -308,8 +308,10 @@ ve dış ünitelerin koyulacağı yerdeki demir taşıyıcı karkaslar alıcı t
         {
             var cleanStr = str.Replace("'", "");
             cleanStr = cleanStr.Replace("\"", "");
+            cleanStr = cleanStr.Replace(@"\U0130", "I");
             
             return cleanStr;
         }
+
     }
 }
