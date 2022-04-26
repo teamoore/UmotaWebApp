@@ -273,8 +273,14 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     {
                         teklifDetay.Iskyuz4 = request.Teklif.Gniskoran;
 
-                        await CalculateTeklifDetay(request.Teklif, teklifDetay);
-
+                        try
+                        {
+                            await CalculateTeklifDetay(request.Teklif, teklifDetay);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        
                         if (teklifDetay.Tutarid.HasValue)
                             toplamTutarID += teklifDetay.Tutarid.Value;
 
@@ -478,7 +484,14 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                         teklifDetay.Iskyuz3 = Detay.Iskyuz3;
                         teklifDetay.Iskyuz4 = Detay.Iskyuz4;
 
-                        await CalculateTeklifDetay(request.Teklif, teklifDetay);
+                        try
+                        {
+                            await CalculateTeklifDetay(request.Teklif, teklifDetay);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        
 
                         if (teklifDetay.Tutarid.HasValue)
                             toplamTutarID += teklifDetay.Tutarid.Value;
@@ -749,8 +762,14 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     teklifDetay.Iskyuz3 = Detay.Iskyuz3;
                     teklifDetay.Iskyuz4 = Detay.Iskyuz4;
 
-                    await CalculateTeklifDetay(request.Teklif, teklifDetay);
-
+                    try
+                    {
+                        await CalculateTeklifDetay(request.Teklif, teklifDetay);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    
                     if (teklifDetay.Tutarid.HasValue)
                         toplamTutarID += teklifDetay.Tutarid.Value;
 
@@ -950,15 +969,21 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 teklifDetay.Maliyet2id = teklifDetay.Maliyet2.Value;
             }
             else
-            if (teklif.Dovizkuruid.HasValue)
             {
-                teklifDetay.Maliyet1id = Math.Round(teklifDetay.Maliyet1.Value * teklifDetay.Dovizkuru.Value / teklif.Dovizkuruid.Value, 2);
-                teklifDetay.Maliyet2id = Math.Round(teklifDetay.Maliyet2.Value * teklifDetay.Dovizkuru.Value / teklif.Dovizkuruid.Value, 2);
-            }
-            else
-            {
-                teklifDetay.Maliyet1id = 0;
-                teklifDetay.Maliyet2id = 0;
+                if (teklif.Dovizkuruid.HasValue && teklifDetay.Dovizkuru.HasValue)
+                {
+                    if (teklifDetay.Maliyet1.HasValue)
+                        teklifDetay.Maliyet1id = Math.Round(teklifDetay.Maliyet1.Value * teklifDetay.Dovizkuru.Value / teklif.Dovizkuruid.Value, 2);
+
+                    if (teklifDetay.Maliyet2.HasValue)
+                        teklifDetay.Maliyet2id = Math.Round(teklifDetay.Maliyet2.Value * teklifDetay.Dovizkuru.Value / teklif.Dovizkuruid.Value, 2);
+                }
+                else
+                {
+                    teklifDetay.Maliyet1id = 0;
+                    teklifDetay.Maliyet2id = 0;
+                }
+
             }
 
 
