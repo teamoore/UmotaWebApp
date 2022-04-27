@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ServiceResponses;
+using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Controllers
 {
@@ -40,6 +41,26 @@ namespace UmotaWebApp.Server.Controllers
                 Logger.Log(LogLevel.Error, ex.Message);
 
                 var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("caridurumraporu")]
+        public async Task<ServiceResponse<List<CariDurumRaporuDto>>> CariDurumRaporuGetir(CariDurumRaporuRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<List<CariDurumRaporuDto>>()
+                {
+                    Value = await TeklifReportService.CariDurumRaporu(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<CariDurumRaporuDto>>();
                 e.SetException(ex);
                 return e;
             }

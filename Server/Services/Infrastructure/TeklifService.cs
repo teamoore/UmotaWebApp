@@ -65,21 +65,27 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " a with(nolock) where 1=1 and a.revizyon = 0";
 
                 if (!string.IsNullOrWhiteSpace(duruminfo))
-                    sql += " and duruminfo = '" + duruminfo + "'";
-
-                var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, KullaniciYetkiKodlari.TumTeklifleriGorebilir);
-                if (tumTeklifleriGormeYetkisi == 0) 
                 {
-                    var kesinSiparisleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, KullaniciYetkiKodlari.KesinSiparisleriGorebilir);
-                    string kullanici_tanimlari = Configuration.GetUmotaObjectName("kullanici_tanimlari", firmaId: firmaId);
-                    sql += " and (";
-                    sql += "    (insuser = '" + kullanicikodu + "')";
-                    sql += " or exists (select aa.logref from " + kullanici_tanimlari + " aa with(nolock) where aa.teklifinsuserkodu = a.insuser and aa.kullanici_kodu = '" + kullanicikodu + "')";
-                    sql += " or exists (select aa.logref from " + kullanici_tanimlari + " aa with(nolock) where aa.plasiyerkodu = a.temsilciadi COLLATE TURKISH_CI_AS and aa.kullanici_kodu = '" + kullanicikodu + "')";
-                    if (kesinSiparisleriGormeYetkisi == 1)
-                        sql += " or (duruminfo = '"+ TeklifDurum.KesinSiparis +"') or  (duruminfo = '"+ TeklifDurum.KesinSipLogoyaAktarildi +"')";
-                    sql += " )";
+                    sql += " and duruminfo = '" + duruminfo + "'";
+                    sql += " and insuser = '" + kullanicikodu + "'";
+                } 
+                else
+                {
+                    var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, KullaniciYetkiKodlari.TumTeklifleriGorebilir);
+                    if (tumTeklifleriGormeYetkisi == 0)
+                    {
+                        var kesinSiparisleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, KullaniciYetkiKodlari.KesinSiparisleriGorebilir);
+                        string kullanici_tanimlari = Configuration.GetUmotaObjectName("kullanici_tanimlari", firmaId: firmaId);
+                        sql += " and (";
+                        sql += "    (insuser = '" + kullanicikodu + "')";
+                        sql += " or exists (select aa.logref from " + kullanici_tanimlari + " aa with(nolock) where aa.teklifinsuserkodu = a.insuser and aa.kullanici_kodu = '" + kullanicikodu + "')";
+                        sql += " or exists (select aa.logref from " + kullanici_tanimlari + " aa with(nolock) where aa.plasiyerkodu = a.temsilciadi COLLATE TURKISH_CI_AS and aa.kullanici_kodu = '" + kullanicikodu + "')";
+                        if (kesinSiparisleriGormeYetkisi == 1)
+                            sql += " or (duruminfo = '" + TeklifDurum.KesinSiparis + "') or  (duruminfo = '" + TeklifDurum.KesinSipLogoyaAktarildi + "')";
+                        sql += " )";
+                    }
                 }
+
 
                 sql += " order by insdate desc";
                 var result = await db.QueryAsync<TeklifDto>(sql, commandType: CommandType.Text);

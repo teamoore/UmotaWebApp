@@ -307,7 +307,8 @@
                 malzeme.Logoref = 0;
             }
 
-            malzeme.Marka = malzeme.SpecCodes.SPECODE;
+            if (malzeme.SpecCodes != null)
+                malzeme.Marka = malzeme.SpecCodes.SPECODE;
 
             var request = new MalzemeKartRequestDto();
             request.MalzemeKart = malzeme;

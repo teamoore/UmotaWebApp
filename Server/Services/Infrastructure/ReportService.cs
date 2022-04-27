@@ -9,6 +9,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Extensions;
+using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
@@ -44,5 +45,23 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             }
         }
+        public async Task<List<CariDurumRaporuDto>> CariDurumRaporu(CariDurumRaporuRequestDto request)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                var p = new DynamicParameters();
+                p.Add("@LogoFirmaNo", request.LogoFirmaNo);
+                p.Add("@LogoDonemNo", request.LogoDonemNo);
+                p.Add("@BaslangicCariKodu", request.BaslangicCariKodu);
+                p.Add("@BitisCariKodu", request.BitisCariKodu);
+                p.Add("@BakiyeSecimi", request.BakiyeSecimi);
+                p.Add("@RaporTarihi", request.RaporTarihi);
+                p.Add("@SearchText", request.SearchText);
+
+                var res = await db.QueryAsync<CariDurumRaporuDto>("UmotaRaporSP_CariDurum", p, commandType: CommandType.StoredProcedure);
+                return res.ToList();
+            }
+        }
+
     }
 }
