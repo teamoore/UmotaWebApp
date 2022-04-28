@@ -151,7 +151,7 @@
         if (selectedFirmaDonem == null)
             throw new Exception("Firma dönem seçilmedi");
 
-        var result = await httpClient.GetServiceResponseAsync<string>(UrlHelper.FisNoAlLogo +"?table=MARK&keyField=CODE&firmaId=" + selectedFirmaDonem.firma_no.Value);
+        var result = await httpClient.GetServiceResponseAsync<string>(UrlHelper.FisNoAlLogo +"?table=MARK&keyField=CODE&firmaId=" + selectedFirmaDonem.logo_firma.Value);
         if (string.IsNullOrEmpty(result) == false)
         {
             record.SPECODE = result;
