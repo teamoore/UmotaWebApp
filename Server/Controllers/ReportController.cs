@@ -45,26 +45,5 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
-
-        [HttpPost("caridurumraporu")]
-        public async Task<ServiceResponse<List<CariDurumRaporuDto>>> CariDurumRaporuGetir(CariDurumRaporuRequestDto request)
-        {
-            try
-            {
-                return new ServiceResponse<List<CariDurumRaporuDto>>()
-                {
-                    Value = await TeklifReportService.CariDurumRaporu(request)
-                };
-            }
-            catch (ApiException ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<List<CariDurumRaporuDto>>();
-                e.SetException(ex);
-                return e;
-            }
-        }
-
     }
 }

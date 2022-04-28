@@ -61,6 +61,9 @@ namespace UmotaWebApp.Client.Utils
         public const string KullaniciUpdate = "/api/kullanici/update";
         public const string DashboardPersonelTeklifSatis = "/api/Dashboard/personelteklif";
         public const string ReportMusteriOnayiBekliyor = "/api/Report/KacAdetMusteriOnayiBekliyorTeklifVar";
-        public const string CariDurumRaporu = "/api/Report/caridurumraporu";
+        public const string CariDurumRaporu = "/api/carirapor/caridurumraporu";
+        public const string CariHesapEkstresi = "/api/carirapor/carihesapekstresi";
+        public const string GetMarkaList = "/api/malzemekart/GetMarkaList";
+        public const string SaveMalzemeMarka = "/api/malzemekart/savemarka";
     }
 }

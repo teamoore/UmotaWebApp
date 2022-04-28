@@ -246,5 +246,25 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("savemarka")]
+        public async Task<ServiceResponse<SpeCodesDto>> InsertMalzemeMarka(SpeCodesDto request)
+        {
+            try
+            {
+                return new ServiceResponse<SpeCodesDto>()
+                {
+                    Value = await MalzemeKartService.SaveMalzemeMarka(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<SpeCodesDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

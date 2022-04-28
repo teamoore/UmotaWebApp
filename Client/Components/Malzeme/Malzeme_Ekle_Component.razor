@@ -39,26 +39,38 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <MudAutocomplete T="string" Label="Menşei" Placeholder="@malzeme.Mensei" @bind-Value="malzeme.Mensei" SearchFunc="@UlkeAra"
-                                     ResetValueOnEmptyText="@resetValueOnEmptyText"
-                                     CoerceText="@coerceText" CoerceValue="@coerceValue"
-                                     AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
-                                     />
-
+                    @*<MudAutocomplete T="string" Label="Menşei" Placeholder="@malzeme.Mensei" @bind-Value="malzeme.Mensei" SearchFunc="@UlkeAra"
+                        ResetValueOnEmptyText="@resetValueOnEmptyText"
+                        CoerceText="@coerceText" CoerceValue="@coerceValue"
+                        AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />*@
+                    <label>Menşei</label>
+                    <InputText @bind-Value="malzeme.Mensei" class="form-control" />
                 </div>
-                <div class="col-md-4">
+
+                @*<div class="col-md-4">
                     <div class="row">
                         <div class="col">
-                            <MudAutocomplete T="SpeCodesDto" Label="Marka" Placeholder="@malzeme.Marka"  @bind-Value="malzeme.SpecCodes" SearchFunc="@MalzemeAra"
+                            <MudAutocomplete T="SpeCodesDto" Label="Marka" Placeholder="@malzeme.Marka" @bind-Value="malzeme.SpecCodes" SearchFunc="@MalzemeAra"
                                              ResetValueOnEmptyText="@resetValueOnEmptyText"
                                              CoerceText="@coerceText" CoerceValue="@coerceValue"
-                                             AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" 
-                                             ToStringFunc="@(e=> e==null?null : $"{e.DEFINITION_} ({e.SPECODE})")"
-                                             />
+                                             AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
+                                             ToStringFunc="@(e=> e==null?null : $"{e.DEFINITION_} ({e.SPECODE})")" />
+                        </div>
+                    </div>
+                </div>*@
 
+                <div class="col-md-4">
+                    <label>Marka</label>
+                    <div class="row">
+                        <div class="col">
+                            <InputText @bind-Value="malzeme.Marka" class="form-control" disabled />
+                        </div>
+                        <div class="col-md-3">
+                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="MarkaSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -452,7 +464,6 @@
     {
         var opt = new ModalOptions();
         opt.ContentScrollable = true;
-        opt.FocusFirstElement = false;
 
         var Form = modal.Show<Pages.Malzeme.Malzeme_MarkaSec>("Marka Seç", options: opt);
         var result = await Form.Result;

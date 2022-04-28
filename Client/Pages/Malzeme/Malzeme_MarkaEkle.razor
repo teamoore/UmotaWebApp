@@ -1,0 +1,135 @@
+﻿
+<div class="form">
+
+    <EditForm Model="record">
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-8">
+                    <label>Marka Kodu</label>
+                    <InputText @bind-Value="record.SPECODE" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-12">
+                    <label>Açıklama</label>
+                    <InputText @bind-Value="record.DEFINITION_" class="form-control" />
+                </div>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+                @if (_processing)
+                {
+                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                    <MudText Class="ms-2">Kaydediliyor...</MudText>
+                }
+                else
+                {
+                    <MudText>Kaydet</MudText>
+                }
+            </MudButton>
+            <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+        </div>
+
+    </EditForm>
+</div>
+
+
+@code {
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    private bool _processing = false;
+
+    public SpeCodesDto record = new SpeCodesDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    public async Task ValidSubmit()
+    {
+        await Kaydet();
+    }
+
+    public async Task Kaydet()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            record.logofirmno = selectedFirmaDonem.logo_firma.Value;
+
+            record = await httpClient.PostGetServiceResponseAsync<SpeCodesDto, SpeCodesDto>(UrlHelper.SaveMalzemeMarka, record);
+            Snackbar.Add("Marka eklendi", severity: Severity.Success);
+
+            await ModalInstance.CloseAsync(ModalResult.Ok<SpeCodesDto>(record));
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+
+    public void SubmitValidation()
+    {
+        var err = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(record.SPECODE))
+            err.Add("Marka Kodu boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(record.DEFINITION_))
+            err.Add("Açıklama boş geçilemez");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Boş geçilemez alanlar");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
+
+}

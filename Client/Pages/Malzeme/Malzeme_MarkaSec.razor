@@ -1,13 +1,39 @@
 ﻿@page "/malzeme_markasec"
-@inject IJSRuntime jsRuntime
 
 <div class="container">
+    <EditForm Model="cari" OnValidSubmit="LoadList">
+        <div class="form">
+
+            <div class="form-group">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <InputText @bind-Value="_searchString" class="form-control" />
+                    </div>
+                    <div class="col-md-8">
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
+                                   OnClick="LoadList" Color="Color.Info" Size="Size.Medium">Bul</MudButton>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
+                                   OnClick="EkleSec" Color="Color.Secondary" Size="Size.Medium">Ekle</MudButton>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </EditForm>
+
+    @if (!loadingCompleted)
+    {
+        <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+    }
+
     <MudTable Items="@items" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<SpeCodesDto,bool>(FilterFunc1)">
-        <ToolBarContent>
+        @*<ToolBarContent>
             <MudText Typo="Typo.h6">Malzeme Markaları</MudText>
             <MudSpacer />
             <MudTextField @bind-Value="_searchString" Placeholder="Marka Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-        </ToolBarContent>
+        </ToolBarContent>*@
         <HeaderContent>
             <MudTh>#</MudTh>
             <MudTh>Kodu</MudTh>
@@ -15,7 +41,7 @@
         </HeaderContent>
         <RowTemplate>
             <MudTd>
-                <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => Sec(context.LOGICALREF,context.SPECODE,context.DEFINITION_))" />
+                <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => Sec(context))" />
             </MudTd>
             <MudTd DataLabel="Kodu">@context.SPECODE</MudTd>
             <MudTd DataLabel="Adı">@context.DEFINITION_</MudTd>
@@ -40,6 +66,7 @@
     public List<SpeCodesDto> items { get; set; }
 
     public SpeCodesDto marka = new SpeCodesDto();
+    public VCariKartsRequestDto cari = new VCariKartsRequestDto();
 
     private string _searchString;
     private bool _sortNameByLength;
@@ -64,25 +91,32 @@
     private async Task LoadList()
     {
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-        items = await httpClient.GetServiceResponseAsync<List<SpeCodesDto>>("/api/malzemekart/GetMarkaList?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
+        loadingCompleted = false;
+        items = await httpClient.GetServiceResponseAsync<List<SpeCodesDto>>(UrlHelper.GetMarkaList +"?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
+        loadingCompleted = true;
     }
 
-    public async Task Sec(int logref, string kodu, string adi)
+    public async Task Sec(SpeCodesDto secim)
     {
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-        var res = new SpeCodesDto();
-        res.LOGICALREF = logref;
-        res.SPECODE = kodu;
-        res.DEFINITION_ = adi;
-
-        await ModalInstance.CloseAsync(ModalResult.Ok<SpeCodesDto>(res));
+        await ModalInstance.CloseAsync(ModalResult.Ok<SpeCodesDto>(secim));
     }
 
-    public async Task Focus(string elementId)
+    private async Task EkleSec()
     {
-        await jsRuntime.InvokeVoidAsync("focusElement", elementId);
-    }
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
 
+        var Form = modal.Show<Pages.Malzeme.Malzeme_MarkaEkle>("Marka Ekle", options: opt);
+        var result = await Form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (SpeCodesDto)result.Data;
+                await ModalInstance.CloseAsync(ModalResult.Ok<SpeCodesDto>(Secim));
+            }
+
+        }
+    }
 }

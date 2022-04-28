@@ -15,5 +15,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public int BakiyeSecimi { get; set; }
         public DateTime? RaporTarihi { get; set; }
         public string SearchText { get; set; }
+        public string CariAdi { get; set; }
     }
 }

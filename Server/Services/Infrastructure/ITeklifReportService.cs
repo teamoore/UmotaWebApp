@@ -9,6 +9,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     public interface ITeklifReportService
     {
         public Task<int> KacAdetMusteriOnayiBekliyorTeklifVar(string firmaId,string kullanici);
-        public Task<List<CariDurumRaporuDto>> CariDurumRaporu(CariDurumRaporuRequestDto request);
+       
     }
 }

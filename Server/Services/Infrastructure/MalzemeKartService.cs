@@ -275,5 +275,32 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return dbResponse;
             }
         }
+        public async Task<SpeCodesDto> SaveMalzemeMarka(SpeCodesDto request)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            {
+                string LogoDbName = Configuration["LogoDbName"];
+                string LogoFirmaNo = request.logofirmno.ToString("000");
+                string tblName = LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_MARK]";
+                string sqlstring = "SELECT  LOGICALREF,  CODE SPECODE,  DESCR DEFINITION_ from " + tblName + " with(nolock) Order By DESCR";
+
+                sqlstring = "IF NOT EXISTS( SELECT LOGICALREF From "+tblName+" Where CODE LIKE @CODE ) " +
+                   "INSERT INTO "+tblName+" (" +
+                "   [CODE],[DESCR],[SPECODE],[CYPHCODE]"+
+                "  ,[CAPIBLOCK_CREATEDBY],[CAPIBLOCK_CREADEDDATE],[CAPIBLOCK_CREATEDHOUR],[CAPIBLOCK_CREATEDMIN],[CAPIBLOCK_CREATEDSEC]"+
+                "  ,[CAPIBLOCK_MODIFIEDBY],[CAPIBLOCK_MODIFIEDHOUR],[CAPIBLOCK_MODIFIEDMIN],[CAPIBLOCK_MODIFIEDSEC]"+
+                "  ,[SITEID],[RECSTATUS],[ORGLOGICREF])"+
+                " VALUES ( @CODE, @DESCR, '', '', 1, GetDate(), DATEPART(hour,GetDate()), DATEPART(minute,GetDate()), DATEPART(second,GetDate()), 0, 0, 0, 0, 0, 1, 0 )";
+
+                var p = new DynamicParameters();
+                p.Add("@CODE", request.SPECODE);
+                p.Add("@DESCR", request.DEFINITION_);
+
+                await db.ExecuteAsync(sqlstring, p, commandType: CommandType.Text);
+
+                return request;
+            }
+
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "/r_caridurumf"
+﻿@page "/r_carihesap_ekstresi2f"
 
 <HeaderSearchBar header="header"
                  ShowButtons="false" ShowFilterButton="true"
@@ -14,34 +14,32 @@
     <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
 }
 
-<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<CariDurumRaporuDto,bool>(FilterFunc1)">
+<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<CariHesapEkstresiDto,bool>(FilterFunc1)">
     <HeaderContent>
-        <MudTh>Cari Grup</MudTh>
-        <MudTh>Özel Kod3</MudTh>
-        <MudTh>Özel Kod3 Açıklama</MudTh>
-        <MudTh>Cari Kodu</MudTh>
-        <MudTh>Cari Adı</MudTh>
-        <MudTh>Bakiye</MudTh>
-        <MudTh>Ortalama Vade</MudTh>
-        <MudTh>Ortlama Gün</MudTh>
-        <MudTh>Son Fatura Tutarı</MudTh>
-        <MudTh>Son Fatura Tarihi</MudTh>
-        <MudTh>Kaç gün geçmiş</MudTh>
-        <MudTh>Batak</MudTh>
+        <MudTh>Tarih</MudTh>
+        <MudTh>İşlem</MudTh>
+        <MudTh>Belge No</MudTh>
+        <MudTh>Açıklama</MudTh>
+        <MudTh>Borç Tutarı TL</MudTh>
+        <MudTh>Alacak Tutarı TL</MudTh>
+        <MudTh>Bakiye TL</MudTh>
+        <MudTh>#</MudTh>
+        <MudTh>İşlem Dövizi</MudTh>
+        <MudTh>Döviz Tutarı</MudTh>
+        <MudTh>Döviz Kuru</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Cari Grup">@context.carigrup</MudTd>
-        <MudTd DataLabel="Özel Kod3">@context.specode3</MudTd>
-        <MudTd DataLabel="Özel Kod3 Açıklama">@context.specode3adi</MudTd>
-        <MudTd DataLabel="Cari Kodu">@context.carikodu</MudTd>
-        <MudTd DataLabel="Cari Adı">@context.cariadi</MudTd>
-        <MudTd DataLabel="Bakiye" Style="text-align:right">@context.bakiyeFormatted</MudTd>
-        <MudTd DataLabel="Ortlama Vade">@context.ortalamavadeFormatted</MudTd>
-        <MudTd DataLabel="Ortlama Gün">@context.ortalamagun</MudTd>
-        <MudTd DataLabel="Son Fatura Tutarı" Style="text-align:right">@context.sonfattutarFormatted</MudTd>
-        <MudTd DataLabel="Son Fatura Tarihi">@context.sonfattarFormatted</MudTd>
-        <MudTd DataLabel="Kaç gün geçmiş">@context.kacgungecmis</MudTd>
-        <MudTd DataLabel="Batak">@context.specode4</MudTd>
+        <MudTd DataLabel="Tarih">@context.tarihFormatted</MudTd>
+        <MudTd DataLabel="İşlem">@context.fisturadi</MudTd>
+        <MudTd DataLabel="Belge No">@context.belgeno</MudTd>
+        <MudTd DataLabel="Açıklama">@context.aciklama</MudTd>
+        <MudTd DataLabel="Borç Tutarı TL" Style="text-align:right">@context.borctutFormatted</MudTd>
+        <MudTd DataLabel="Alacak Tutarı TL" Style="text-align:right">@context.alacaktutFormatted</MudTd>
+        <MudTd DataLabel="Bakiye TL" Style="text-align:right">@context.bakiyeFormatted</MudTd>
+        <MudTd DataLabel="">@context.bakod</MudTd>
+        <MudTd DataLabel="İşlem Dövizi">@context.dovizkodu</MudTd>
+        <MudTd DataLabel="Döviz Tutarı" Style="text-align:right">@context.doviztutarFormatted</MudTd>
+        <MudTd DataLabel="Doviz Kuru">@context.dovizkuru</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
@@ -69,7 +67,7 @@
 
     public HeaderBarSearch header = new HeaderBarSearch();
 
-    public List<CariDurumRaporuDto> items = new List<CariDurumRaporuDto>();
+    public List<CariHesapEkstresiDto> items = new List<CariHesapEkstresiDto>();
 
     private string _searchString;
     private bool _sortNameByLength;
@@ -77,28 +75,22 @@
     private bool sayfayiGormeYetkisi = true;
     private bool isAdmin = true;
 
-    private bool FilterFunc1(CariDurumRaporuDto element) => FilterFunc(element, _searchString);
+    private bool FilterFunc1(CariHesapEkstresiDto element) => FilterFunc(element, _searchString);
 
-    private bool FilterFunc(CariDurumRaporuDto element, string searchString)
+    private bool FilterFunc(CariHesapEkstresiDto element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.cariadi != null && element.cariadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.fisturadi != null && element.fisturadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.carikodu != null && element.carikodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.specode3 != null && element.specode3.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.specode3adi != null && element.specode3adi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.specode4 != null && element.specode4.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.aciklama != null && element.aciklama.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        header.HeaderText = "Cari Durum Raporu";
+        header.HeaderText = "Cari Hesap Ekstresi";
         await KullaniciYetkileriGetir();
 
         await Rapor();
@@ -120,7 +112,7 @@
             opt.ContentScrollable = true;
 
 
-            var filterForm = modal.Show<Pages.CariRapor.CariDurumRaporuFilters>("Rapor Seçenekleri", opt);
+            var filterForm = modal.Show<Pages.CariRapor.CariHesapEkstresiFilters>("Rapor Seçenekleri", opt);
             var result = await filterForm.Result;
 
             if (!result.Cancelled)
@@ -130,16 +122,12 @@
                     loadingCompleted = false;
                     this.StateHasChanged();
 
-                    var request = (CariDurumRaporuRequestDto)result.Data;
+                    var request = (CariHesapEkstresiRequestDto)result.Data;
 
                     request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
                     request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
-                    if (!string.IsNullOrWhiteSpace(header.SearchText))
-                        request.SearchText = '%' + header.SearchText + '%';
-                    if (!string.IsNullOrWhiteSpace(request.CariAdi))
-                        request.CariAdi = '%' + request.CariAdi + '%';
 
-                    var response = await httpClient.PostGetServiceResponseAsync<List<CariDurumRaporuDto>, CariDurumRaporuRequestDto>(UrlHelper.CariDurumRaporu, request);
+                    var response = await httpClient.PostGetServiceResponseAsync<List<CariHesapEkstresiDto>, CariHesapEkstresiRequestDto>(UrlHelper.CariHesapEkstresi, request);
                     if (response == null || response.Count == 0)
                     {
                         Snackbar.Add("Aradığınız kritere göre kayıt bulunamadı.", severity: Severity.Warning);
@@ -174,7 +162,7 @@
                 }
                 else
                 {
-                    var yetki = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanicikodu + "&menu_dfm=r_caridurumf&hak_tipi=sel");
+                    var yetki = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanicikodu + "&menu_dfm=r_carihesap_ekstresi2f&hak_tipi=sel");
                     sayfayiGormeYetkisi = yetki == 1;
                 }
             }
