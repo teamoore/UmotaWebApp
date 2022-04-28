@@ -34,7 +34,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                var results = await dbContext.V001CariKarts.Where(x => x.Active == 0)
+                var results = await dbContext.V001CariKarts.Where(x => (x.Active == 0) && (x.Kodu.StartsWith("120") || x.Kodu.StartsWith("320")))
                                         .Take(100)
                                         .OrderByDescending(x => x.Logref)
                                         .ProjectTo<VCariKartDto>(Mapper.ConfigurationProvider).ToListAsync();
@@ -51,7 +51,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
                 var word = request.SearchText.ToLower();
-                var results = await dbContext.V001CariKarts.Where(x => (x.Active == 0) &&
+                var results = await dbContext.V001CariKarts.Where(x => (x.Active == 0) && (x.Kodu.StartsWith("120") || x.Kodu.StartsWith("320")) &&
                         (x.Adi.ToLower().Contains(word)
                         || x.Adi2.ToLower().Contains(word)
                         || x.Adres1.ToLower().Contains(word)
@@ -83,6 +83,24 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return await qry.SingleOrDefaultAsync();
             }
         }
+        public async Task<List<SevkAdresDto>> GetCariKartSevkAdresList(string firmaId, int cariref)
+        {
+            if (string.IsNullOrEmpty(firmaId))
+                throw new Exception("Firma Dönem seçimi yapınız");
 
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId);
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var results = await dbContext.V004Sevkadres.Where(x => x.Clientref == cariref)
+                                        .Take(100)
+                                        .OrderByDescending(x => x.Logref)
+                                        .ProjectTo<SevkAdresDto>(Mapper.ConfigurationProvider).ToListAsync();
+
+                return results;
+            }
+        }
     }
 }

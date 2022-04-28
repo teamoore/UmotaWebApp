@@ -13,5 +13,9 @@ namespace UmotaWebApp.Client.Utils.ClientEnums
             Marka = 1,
             Adi = 2
         }
+        public enum KullaniciMenuProfil
+        {
+            Satis = 3
+        }
     }
 }

@@ -1,0 +1,68 @@
+﻿@page "/cari_adres_liste/{CariKartRef:int}"
+
+<div class="container">
+
+    <MudTable Items="@items" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Sevk Adresleri</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>#</MudTh>
+            <MudTh>Kodu</MudTh>
+            <MudTh>Açıklama</MudTh>
+            <MudTh>Adres S1</MudTh>
+            <MudTh>Adres S2</MudTh>
+            <MudTh>İlçe</MudTh>
+            <MudTh>İl</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => Sec(context))" />
+            </MudTd>
+            <MudTd DataLabel="Kodu">@context.Sevkkodu</MudTd>
+            <MudTd DataLabel="Açıklama">@context.SevkEdilecekBayiAdi</MudTd>
+            <MudTd DataLabel="Adres S1">@context.Sevkadres1</MudTd>
+            <MudTd DataLabel="Adres S2">@context.Sevkadres2</MudTd>
+            <MudTd DataLabel="İlçe">@context.Ilce</MudTd>
+            <MudTd DataLabel="İl">@context.Il</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+        </PagerContent>
+    </MudTable>
+</div>
+
+@code
+{
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Parameter]
+    public int? CariKartRef { get; set; }
+
+    public List<SevkAdresDto> items { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadList();
+    }
+
+    private async Task LoadList()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        items = await httpClient.GetServiceResponseAsync<List<SevkAdresDto>>(UrlHelper.VCariKartAdresListesi + "?firmaId=" + selectedFirmaDonem.firma_no.Value + "&cariref= " + CariKartRef);
+    }
+
+    public async Task Sec(SevkAdresDto sevkadres)
+    {
+        await ModalInstance.CloseAsync(ModalResult.Ok<SevkAdresDto>(sevkadres));
+    }
+
+}

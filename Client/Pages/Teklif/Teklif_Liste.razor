@@ -1,4 +1,4 @@
-﻿@page "/stek_listef"
+﻿@page "/stek_listef/{duruminfo?}"
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif"
                  ShowButtons="false" ShowFilterButton="true"
@@ -9,7 +9,7 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@teklifler" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true" Filter="new Func<TeklifDto,bool>(FilterFunc1)">
+<MudTable Items="@teklifler" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true" Filter="new Func<TeklifDto,bool>(FilterFunc1)">
     <ToolBarContent>
         @if (menuEklemeYetkisi)
         {
@@ -79,6 +79,8 @@
 
 
 @code {
+    [Parameter]
+    public string? duruminfo { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
@@ -168,7 +170,7 @@
             loadingCompleted = false;
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
             var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>(UrlHelper.TeklifListesi + "?firmaId=" + selectedFirmaDonem.firma_no + "&kullanicikodu=" + kullanicikodu);
+            teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>(UrlHelper.TeklifListesi + "?firmaId=" + selectedFirmaDonem.firma_no + "&kullanicikodu=" + kullanicikodu + "&duruminfo=" + duruminfo);
             loadingCompleted = true;
             teklifler = teklifler.OrderByDescending(i => i.Insdate).ToList();
         }
@@ -198,6 +200,7 @@
                 throw new Exception("Firma Dönem Seçili değil");
 
             loadingCompleted = false;
+            this.StateHasChanged();
 
             var request = new TeklifRequestDto();
             request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
@@ -402,6 +405,7 @@
             var opt = new ModalOptions();
             opt.ContentScrollable = true;
 
+
             var cariForm = modal.Show<Components.Teklif.TeklifDetayliAraComponent>("Detaylı Arama", opt);
             var result = await cariForm.Result;
 
@@ -409,9 +413,10 @@
             {
                 if (result.Data != null)
                 {
-                    var request = (TeklifRequestDto)result.Data;
-
                     loadingCompleted = false;
+                    this.StateHasChanged();
+
+                    var request = (TeklifRequestDto)result.Data;
 
                     request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
                     request.FirmaId = selectedFirmaDonem.firma_no.Value;

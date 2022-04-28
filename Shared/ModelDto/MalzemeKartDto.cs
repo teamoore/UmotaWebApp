@@ -53,5 +53,7 @@ namespace UmotaWebApp.Shared.ModelDto
             }
         }
         public string TedarikciAdi { get; set; }
+
+        public SpeCodesDto SpecCodes { get; set; }
     }
 }

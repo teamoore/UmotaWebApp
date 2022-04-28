@@ -55,7 +55,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             }
         }
 
-        public async Task<List<TeklifDto>> GetTeklifDtos(string firmaId, string kullanicikodu)
+        public async Task<List<TeklifDto>> GetTeklifDtos(string firmaId, string kullanicikodu, string duruminfo)
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
             {
@@ -63,6 +63,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
                 var sql = "select top 100 *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
                     " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId:firmaId) + " a with(nolock) where 1=1 and a.revizyon = 0";
+
+                if (!string.IsNullOrWhiteSpace(duruminfo))
+                    sql += " and duruminfo = '" + duruminfo + "'";
 
                 var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(kullanicikodu, KullaniciYetkiKodlari.TumTeklifleriGorebilir);
                 if (tumTeklifleriGormeYetkisi == 0) 
@@ -273,8 +276,14 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     {
                         teklifDetay.Iskyuz4 = request.Teklif.Gniskoran;
 
-                        await CalculateTeklifDetay(request.Teklif, teklifDetay);
-
+                        try
+                        {
+                            await CalculateTeklifDetay(request.Teklif, teklifDetay);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        
                         if (teklifDetay.Tutarid.HasValue)
                             toplamTutarID += teklifDetay.Tutarid.Value;
 
@@ -478,7 +487,14 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                         teklifDetay.Iskyuz3 = Detay.Iskyuz3;
                         teklifDetay.Iskyuz4 = Detay.Iskyuz4;
 
-                        await CalculateTeklifDetay(request.Teklif, teklifDetay);
+                        try
+                        {
+                            await CalculateTeklifDetay(request.Teklif, teklifDetay);
+                        }
+                        catch (Exception)
+                        {
+                        }
+                        
 
                         if (teklifDetay.Tutarid.HasValue)
                             toplamTutarID += teklifDetay.Tutarid.Value;
@@ -749,8 +765,14 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     teklifDetay.Iskyuz3 = Detay.Iskyuz3;
                     teklifDetay.Iskyuz4 = Detay.Iskyuz4;
 
-                    await CalculateTeklifDetay(request.Teklif, teklifDetay);
-
+                    try
+                    {
+                        await CalculateTeklifDetay(request.Teklif, teklifDetay);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                    
                     if (teklifDetay.Tutarid.HasValue)
                         toplamTutarID += teklifDetay.Tutarid.Value;
 
@@ -950,15 +972,21 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 teklifDetay.Maliyet2id = teklifDetay.Maliyet2.Value;
             }
             else
-            if (teklif.Dovizkuruid.HasValue)
             {
-                teklifDetay.Maliyet1id = Math.Round(teklifDetay.Maliyet1.Value * teklifDetay.Dovizkuru.Value / teklif.Dovizkuruid.Value, 2);
-                teklifDetay.Maliyet2id = Math.Round(teklifDetay.Maliyet2.Value * teklifDetay.Dovizkuru.Value / teklif.Dovizkuruid.Value, 2);
-            }
-            else
-            {
-                teklifDetay.Maliyet1id = 0;
-                teklifDetay.Maliyet2id = 0;
+                if (teklif.Dovizkuruid.HasValue && teklifDetay.Dovizkuru.HasValue)
+                {
+                    if (teklifDetay.Maliyet1.HasValue)
+                        teklifDetay.Maliyet1id = Math.Round(teklifDetay.Maliyet1.Value * teklifDetay.Dovizkuru.Value / teklif.Dovizkuruid.Value, 2);
+
+                    if (teklifDetay.Maliyet2.HasValue)
+                        teklifDetay.Maliyet2id = Math.Round(teklifDetay.Maliyet2.Value * teklifDetay.Dovizkuru.Value / teklif.Dovizkuruid.Value, 2);
+                }
+                else
+                {
+                    teklifDetay.Maliyet1id = 0;
+                    teklifDetay.Maliyet2id = 0;
+                }
+
             }
 
 

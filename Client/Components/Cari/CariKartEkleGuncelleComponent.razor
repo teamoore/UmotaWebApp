@@ -367,6 +367,9 @@
         if (string.IsNullOrWhiteSpace(cariModel.Ozelkod3))
             err.Add("Sektör boş geçilemez");
 
+        if (string.IsNullOrWhiteSpace(cariModel.Ilce) || string.IsNullOrWhiteSpace(cariModel.Il) || string.IsNullOrWhiteSpace(cariModel.Ulke))
+            err.Add("Adres bilgilerini tam doldurunuz (Ülke/Şehir/İlçe)");
+
         if (err.Count > 0)
         {
             var ex = new ClientException("Boş geçilemez alanlar");

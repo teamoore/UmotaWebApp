@@ -70,6 +70,8 @@ namespace UmotaWebApp.Server
             services.AddScoped<IVCariKartService, VCariKartService>();
             services.AddScoped<IKisilerService, KisilerService>();
             services.AddScoped<IVMalzemeKartService, VMalzemeKartService>();
+            services.AddScoped<IDashboardInfo, DashboardInfo>();
+            services.AddScoped<ITeklifReportService, ReportService>();
             services.AddScoped<ITakvimService, TakvimService>();
 
 

@@ -40,7 +40,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                var results = await dbContext.MalzKarts.Where(x => x.Active == 0)
+                var results = await dbContext.MalzKarts.Where(x => x.Active == 0 && x.Status < 2)
                                         .Take(100)
                                         .OrderBy(x => x.Logref)
                                         .ProjectTo<MalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
@@ -72,7 +72,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                return await dbContext.MalzKarts.Where(x => (x.Active == 0)
+                return await dbContext.MalzKarts.Where(x => (x.Active == 0 && x.Status < 2)
                 && (request.MalzemeKodu == null || x.Kodu.ToLower().Contains(request.MalzemeKodu))
                 && (request.MalzemeAdi == null || x.Adi.ToLower().Contains(request.MalzemeAdi))
                 && (request.Marka == null || x.Marka.Contains(request.Marka))

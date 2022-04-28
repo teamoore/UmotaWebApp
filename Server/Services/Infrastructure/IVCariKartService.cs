@@ -11,5 +11,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<List<VCariKartDto>> GetVCariKarts(string firmaId);
         public Task<VCariKartDto> GetVCariKart(int logref, string firmaId);
         public Task<List<VCariKartDto>> SearchVCariKarts(VCariKartsRequestDto request);
+        public Task<List<SevkAdresDto>> GetCariKartSevkAdresList(string firmaId, int cariref);
     }
 }

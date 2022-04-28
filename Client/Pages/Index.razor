@@ -1,9 +1,8 @@
 ﻿@page "/"
 
-
 <h1>UNO Endüstriyel CRM</h1>
 
-versiyon 0.1.2
+    versiyon 0.1.2
 
 @code {
 
@@ -12,6 +11,15 @@ versiyon 0.1.2
 
     [Inject]
     NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    MudBlazor.IDialogService DialogService { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
 
 
     protected async override Task OnInitializedAsync()
@@ -22,7 +30,33 @@ versiyon 0.1.2
         {
             NavigationManager.NavigateTo("login");
         }
- 
+
+        await OpenDialog();
+
+    }
+
+    private async Task OpenDialog()
+    {
+        var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+        if (!string.IsNullOrWhiteSpace(kullanicikodu))
+        {
+            var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanicikodu);
+
+            if (result != null)
+            {
+                if (result.KullaniciMenuProfil == (int)Enums.KullaniciMenuProfil.Satis)
+                {
+                    var options = new MudBlazor.DialogOptions { CloseOnEscapeKey = true };
+                    options.CloseButton = false;
+                    options.DisableBackdropClick = true;
+                    options.FullWidth = true;
+
+                    DialogService.Show<UmotaWebApp.Client.Components.Board.PersonelTeklifTutar>("Satış Temsilcileri Kesin Sipariş Durumu", options);
+                }
+            }
+        }
+
+
     }
 }
 

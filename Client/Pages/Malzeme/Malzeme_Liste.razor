@@ -7,7 +7,7 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@list" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeKartDto,bool>(FilterFunc1)">
+<MudTable Items="@list" RowsPerPage="100" FixedHeader="true" Height="500px" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeKartDto,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="Ekle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
     </ToolBarContent>
@@ -109,6 +109,7 @@
                 throw new Exception("Firma dönem seçilmedi");
 
             loadingCompleted = false;
+            this.StateHasChanged();
             var request = new MalzemeKartRequestDto();
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
             if (!string.IsNullOrWhiteSpace(detayAraBar.SearchText))

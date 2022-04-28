@@ -7,7 +7,7 @@
         <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
     }
 
-    <div class="mt-12">
+    <div class="mt-5">
         <div class="form">
             <div class="form-group">
 
@@ -43,9 +43,9 @@
 
                             </div>
                         </div>
-                        
+
                     </div>
-                    
+
                 </div>
 
             </div>
@@ -72,7 +72,7 @@
                             </div>
                         </div>
 
-                        
+
                     </div>
                     <div class="col-md-4">
                         <label>Satış Temsilcisi</label>
@@ -166,34 +166,101 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-8">
-                        <label>Açıklama</label>
-                        <InputTextArea @bind-Value="teklif.Aciklama1" class="form-control"></InputTextArea>
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-8">
-                        <label>Teklif Sözleşmesi</label>
+            <MudTabs Elevation="2" Rounded="true" Centered="false" Class="my-6">
+                <MudTabPanel Icon="@Icons.Material.Filled.DocumentScanner" Text="Teklif Şartları" BadgeColor="Color.Error">
+                    <br />
+                    <div class="form-group">
                         <div class="row">
-                            <div class="col">
-                                <InputTextArea @bind-Value="teklif.Notlar" class="form-control" rows="8"></InputTextArea>
-                            </div>
-                            <div class="col-md-2">
-                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DocumentScanner"
-                                           IconColor="Color.Secondary" Size="Size.Small" OnClick="VarolanSozlesme">Hazır Sözleşme</MudButton>
-
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col">
+                                        <InputTextArea @bind-Value="teklif.Notlar" class="form-control" rows="8"></InputTextArea>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DocumentScanner"
+                                                   IconColor="Color.Secondary" Size="Size.Small" OnClick="VarolanSozlesme">Hazır Sözleşme</MudButton>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        
-                        
                     </div>
-                </div>
-            </div>
+                </MudTabPanel>
+                <MudTabPanel Icon="@Icons.Material.Filled.LocationCity" Text="Sevk Adresi" BadgeColor="Color.Success">
+                    <br />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Adres Kodu</label>
+                                <div class="row">
+                                    <div class="col">
+                                        <InputText @bind-Value="teklif.Sevkkodu" class="form-control" disabled />
+                                    </div>
+                                    <div class="col-md-3">
+                                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.LocationCity"
+                                                   IconColor="Color.Secondary" Size="Size.Small" OnClick="SevkAdresiSec">Sevk Adresi</MudButton>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <label>Adres Açıklaması</label>
+                                <InputText @bind-Value="teklif.SevkEdilecekBayiAdi" class="form-control" disabled />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <label>Adres S1</label>
+                                <InputText @bind-Value="teklif.Sevkadres1" class="form-control" disabled />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <label>Adres S2</label>
+                                <InputText @bind-Value="teklif.Sevkadres2" class="form-control" disabled />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label>İlçe</label>
+                                <InputText @bind-Value="teklif.Ilce" class="form-control" disabled />
+                            </div>
+                            <div class="col-md-4">
+                                <label>İl</label>
+                                <InputText @bind-Value="teklif.Il" class="form-control" disabled />
+                            </div>
+                        </div>
+                    </div>
+
+                </MudTabPanel>
+                <MudTabPanel Icon="@Icons.Material.Filled.Description" Text="Açıklamalar" BadgeColor="Color.Success">
+                    <br />
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <InputText @bind-Value="teklif.Aciklama1" class="form-control"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <InputText @bind-Value="teklif.Aciklama2" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <InputText @bind-Value="teklif.Aciklama3" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <InputText @bind-Value="teklif.Aciklama4" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                </MudTabPanel>
+            </MudTabs>
+
         </div>
     </div>
 
@@ -693,6 +760,15 @@
         if (string.IsNullOrEmpty(teklif.IlgiliAdi))
             err.Add("Firma yetkilisi boş geçilemez");
 
+        if (teklif.Lpersonelref == null)
+            err.Add("Satış temsilcisi boş geçilemez");
+
+        if (teklif.TeslimTarihi == null)
+            err.Add("Teslim tarihi boş geçilemez");
+
+        if (teklif.Dovizrefid == null)
+            err.Add("Teklif para birimi boş geçilemez");
+
         if (err.Count > 0)
         {
             var ex = new ClientException("Teklif Hatası");
@@ -727,5 +803,33 @@
     public void VarolanSozlesme()
     {
         this.teklif.Notlar = Utils.Consts.TeklifSozlesmesi;
+    }
+
+    public async Task SevkAdresiSec()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("CariKartRef", teklif.Cariref);
+
+        var Form = modal.Show<Pages.Cari.Cari_AdresSec>("Adres Seç", parameters: parameters, options: opt);
+        var result = await Form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (SevkAdresDto)result.Data;
+                teklif.Carisevkadrref = Secim.Logref;
+                teklif.SevkEdilecekBayiAdi = Secim.SevkEdilecekBayiAdi;
+                teklif.Sevkkodu = Secim.Sevkkodu;
+                teklif.Sevkadres1 = Secim.Sevkadres1;
+                teklif.Sevkadres2 = Secim.Sevkadres2;
+                teklif.Ilce = Secim.Ilce;
+                teklif.Il = Secim.Il;
+            }
+
+        }
     }
 }

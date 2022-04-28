@@ -9,7 +9,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 {
     public interface ITeklifService
     {
-        public Task<List<TeklifDto>> GetTeklifDtos(string firmaId, string kullanicikodu);
+        public Task<List<TeklifDto>> GetTeklifDtos(string firmaId, string kullanicikodu, string duruminfo);
         public Task<TeklifDto> GetTeklifByRef(int logref, string firmaId);
         public Task<TeklifDto> SaveTeklif(TeklifRequestDto request);
         public Task<TeklifDto> UpdateTeklif(TeklifRequestDto request);
