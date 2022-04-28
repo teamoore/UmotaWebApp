@@ -184,5 +184,28 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpGet("FisNoAlLogo")]
+        public async Task<ServiceResponse<string>> LogoFisNoAl(string table, string keyField, int firmaId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(table))
+                    throw new ApiException("tablo adı boş geldi.Ref üretilemedi !");
+
+                return new ServiceResponse<string>()
+                {
+                    Value = await RefService.FisNoAlLogo(table, keyField, firmaId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<string>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

@@ -61,6 +61,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        await FisNoAl();
     }
 
     public async Task ValidSubmit()
@@ -97,14 +98,26 @@
 
             record.logofirmno = selectedFirmaDonem.logo_firma.Value;
 
-            record = await httpClient.PostGetServiceResponseAsync<SpeCodesDto, SpeCodesDto>(UrlHelper.SaveMalzemeMarka, record);
-            Snackbar.Add("Marka eklendi", severity: Severity.Success);
+            var result = await httpClient.PostAsJsonAsync(UrlHelper.SaveMalzemeMarka, record);
 
+            var response = await result.Content.ReadFromJsonAsync<ServiceResponse<SpeCodesDto>>();
+            if (!response.Success)
+                throw new Exception(response.Message);
+
+            //record = await httpClient.PostGetServiceResponseAsync<SpeCodesDto, SpeCodesDto>(UrlHelper.SaveMalzemeMarka, record);
+
+            Snackbar.Add("Marka eklendi", severity: Severity.Success);
             await ModalInstance.CloseAsync(ModalResult.Ok<SpeCodesDto>(record));
+        }
+        catch (ApiException exx)
+        {
+            Snackbar.Add(exx.Message, severity: Severity.Warning);
+            return;
         }
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
+            _processing = false;
         }
     }
 
@@ -129,6 +142,19 @@
             ex.ErrorList = err;
 
             throw ex;
+        }
+    }
+
+    public async Task FisNoAl()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma dönem seçilmedi");
+
+        var result = await httpClient.GetServiceResponseAsync<string>(UrlHelper.FisNoAlLogo +"?table=MARK&keyField=CODE&firmaId=" + selectedFirmaDonem.firma_no.Value);
+        if (string.IsNullOrEmpty(result) == false)
+        {
+            record.SPECODE = result;
         }
     }
 

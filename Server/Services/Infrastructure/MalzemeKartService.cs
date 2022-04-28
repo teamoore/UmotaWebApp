@@ -12,6 +12,7 @@ using System.Data;
 using UmotaWebApp.Server.Data.Models;
 using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.ModelDto;
+using UmotaWebApp.Shared.CustomException;
 using System.Data.Common;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
@@ -282,7 +283,16 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 string LogoDbName = Configuration["LogoDbName"];
                 string LogoFirmaNo = request.logofirmno.ToString("000");
                 string tblName = LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_MARK]";
-                string sqlstring = "SELECT  LOGICALREF,  CODE SPECODE,  DESCR DEFINITION_ from " + tblName + " with(nolock) Order By DESCR";
+
+                string sqlstring = "select count(1) as cnt from " + tblName + " a with(nolock) where a.CODE = '" + request.SPECODE + "'";
+                var say = await db.ExecuteScalarAsync<int>(sqlstring, commandType: CommandType.Text);
+                if (say > 0)
+                    throw new ApiException("Marka kodu mevcut");
+
+                sqlstring = "select count(1) as cnt from " + tblName + " a with(nolock) where a.DESCR = '" + request.DEFINITION_ + "'";
+                say = await db.ExecuteScalarAsync<int>(sqlstring, commandType: CommandType.Text);
+                if (say > 0)
+                    throw new ApiException("Marka Adı mevcut");
 
                 sqlstring = "IF NOT EXISTS( SELECT LOGICALREF From "+tblName+" Where CODE LIKE @CODE ) " +
                    "INSERT INTO "+tblName+" (" +

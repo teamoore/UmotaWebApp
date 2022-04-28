@@ -65,5 +65,6 @@ namespace UmotaWebApp.Client.Utils
         public const string CariHesapEkstresi = "/api/carirapor/carihesapekstresi";
         public const string GetMarkaList = "/api/malzemekart/GetMarkaList";
         public const string SaveMalzemeMarka = "/api/malzemekart/savemarka";
+        public const string FisNoAlLogo = "/api/helper/fisnoallogo";
     }
 }
