@@ -15,6 +15,8 @@
                                    OnClick="LoadList" Color="Color.Info" Size="Size.Medium">Bul</MudButton>
                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
                                    OnClick="EkleSec" Color="Color.Secondary" Size="Size.Medium">Ekle</MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   OnClick="Vazgec" Color="Color.Dark" Size="Size.Medium">Vazgeç</MudButton>
                     </div>
                 </div>
 
@@ -118,5 +120,10 @@
             }
 
         }
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
     }
 }

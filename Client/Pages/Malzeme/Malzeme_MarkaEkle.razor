@@ -1,6 +1,11 @@
 ﻿
 <div class="form">
 
+    @if (!loadingCompleted)
+    {
+        <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+    }
+
     <EditForm Model="record">
 
         <div class="form-group">
@@ -56,12 +61,14 @@
     ISnackbar Snackbar { get; set; }
 
     private bool _processing = false;
+    private bool loadingCompleted = false;
 
     public SpeCodesDto record = new SpeCodesDto();
 
     protected override async Task OnInitializedAsync()
     {
         await FisNoAl();
+        loadingCompleted = true;
     }
 
     public async Task ValidSubmit()
@@ -151,7 +158,7 @@
         if (selectedFirmaDonem == null)
             throw new Exception("Firma dönem seçilmedi");
 
-        var result = await httpClient.GetServiceResponseAsync<string>(UrlHelper.FisNoAlLogo +"?table=MARK&keyField=CODE&firmaId=" + selectedFirmaDonem.logo_firma.Value);
+        var result = await httpClient.GetServiceResponseAsync<string>(UrlHelper.FisNoAlLogo +"?table=MARK&keyField=CODE&firmaId=" + selectedFirmaDonem.firma_no.Value + "&logofirmaId=" + selectedFirmaDonem.logo_firma.Value);
         if (string.IsNullOrEmpty(result) == false)
         {
             record.SPECODE = result;

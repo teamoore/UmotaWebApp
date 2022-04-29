@@ -186,7 +186,7 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("FisNoAlLogo")]
-        public async Task<ServiceResponse<string>> LogoFisNoAl(string table, string keyField, int firmaId)
+        public async Task<ServiceResponse<string>> LogoFisNoAl(string table, string keyField, int firmaId, int logofirmaId)
         {
             try
             {
@@ -195,7 +195,7 @@ namespace UmotaWebApp.Server.Controllers
 
                 return new ServiceResponse<string>()
                 {
-                    Value = await RefService.FisNoAlLogo(table, keyField, firmaId)
+                    Value = await RefService.FisNoAlLogo(table, keyField, firmaId, logofirmaId)
                 };
             }
             catch (ApiException ex)
