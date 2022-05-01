@@ -24,6 +24,26 @@ namespace UmotaWebApp.Server.Controllers
             this.takvimService = takvimService;
         }
 
+        [HttpPost("save")]
+        public async Task<ServiceResponse<TakvimDto>> TakvimBilgileriniKaydet(TakvimRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<TakvimDto>()
+                {
+                    Value = await takvimService.SaveTakvim(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<TakvimDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
         [HttpPost("list")]
         public async Task<ServiceResponse<List<TakvimDto>>> TakvimBilgileriniGetir(TakvimRequestDto request)
         {

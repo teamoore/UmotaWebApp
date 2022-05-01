@@ -669,7 +669,6 @@ namespace UmotaWebApp.Server.Data.Models
                 entity.ToTable("takvim");
 
                 entity.Property(e => e.Logref)
-                    .ValueGeneratedNever()
                     .HasColumnName("logref");
 
                 entity.Property(e => e.CariRef).HasColumnName("cariref");
@@ -710,6 +709,10 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasMaxLength(15)
                     .IsUnicode(false)
                     .HasColumnName("insuser");
+
+                entity.Property(e => e.Status)
+                .HasColumnType("tinyint")
+                .HasColumnName("status");
             });
 
             modelBuilder.Entity<FiltreHar>(entity =>

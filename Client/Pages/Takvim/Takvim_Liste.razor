@@ -1,0 +1,39 @@
+﻿@page "/takvim_listef"
+
+<HeaderSearchBar header="header" onAddNewButtonClicked="YeniTakvim"
+                 ShowButtons="true" ShowFilterButton="false"
+                 ShowSearchSection="false"></HeaderSearchBar>
+
+@code {
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Personel Takvimi";
+
+        return Task.CompletedTask;
+    }
+
+    private void YeniTakvim()
+    { }
+}

@@ -61,5 +61,6 @@ namespace UmotaWebApp.Client.Utils
         public const string KullaniciUpdate = "/api/kullanici/update";
         public const string DashboardPersonelTeklifSatis = "/api/Dashboard/personelteklif";
         public const string ReportMusteriOnayiBekliyor = "/api/Report/KacAdetMusteriOnayiBekliyorTeklifVar";
+        public const string TakvimKaydet = "/api/Takvim/save";
     }
 }
