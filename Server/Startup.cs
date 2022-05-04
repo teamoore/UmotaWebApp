@@ -74,6 +74,7 @@ namespace UmotaWebApp.Server
             services.AddScoped<ITeklifReportService, ReportService>();
             services.AddScoped<ITakvimService, TakvimService>();
 
+            services.AddScoped<ICariRaporService, CariRaporService>();
 
             var architectureFolder = (IntPtr.Size == 8) ? "64 bit" : "32 bit";
             var wkHtmlToPdfPath = Path.Combine(Environment.CurrentDirectory, $"wkhtmltox\\v0.12.4\\{architectureFolder}\\libwkhtmltox");

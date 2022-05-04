@@ -1,0 +1,180 @@
+﻿@page "/r_carihesap_ekstresi2f"
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="true"
+                 onFilterButtonClicked="Rapor" ShowSearchSection="false"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+@if (sayfayiGormeYetkisi == false)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
+}
+
+<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<CariHesapEkstresiDto,bool>(FilterFunc1)">
+    <HeaderContent>
+        <MudTh>Tarih</MudTh>
+        <MudTh>İşlem</MudTh>
+        <MudTh>Belge No</MudTh>
+        <MudTh>Açıklama</MudTh>
+        <MudTh>Borç Tutarı TL</MudTh>
+        <MudTh>Alacak Tutarı TL</MudTh>
+        <MudTh>Bakiye TL</MudTh>
+        <MudTh>#</MudTh>
+        <MudTh>İşlem Dövizi</MudTh>
+        <MudTh>Döviz Tutarı</MudTh>
+        <MudTh>Döviz Kuru</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Tarih">@context.tarihFormatted</MudTd>
+        <MudTd DataLabel="İşlem">@context.fisturadi</MudTd>
+        <MudTd DataLabel="Belge No">@context.belgeno</MudTd>
+        <MudTd DataLabel="Açıklama">@context.aciklama</MudTd>
+        <MudTd DataLabel="Borç Tutarı TL" Style="text-align:right">@context.borctutFormatted</MudTd>
+        <MudTd DataLabel="Alacak Tutarı TL" Style="text-align:right">@context.alacaktutFormatted</MudTd>
+        <MudTd DataLabel="Bakiye TL" Style="text-align:right">@context.bakiyeFormatted</MudTd>
+        <MudTd DataLabel="">@context.bakod</MudTd>
+        <MudTd DataLabel="İşlem Dövizi">@context.dovizkodu</MudTd>
+        <MudTd DataLabel="Döviz Tutarı" Style="text-align:right">@context.doviztutarFormatted</MudTd>
+        <MudTd DataLabel="Doviz Kuru">@context.dovizkuru</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
+@code
+{
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public List<CariHesapEkstresiDto> items = new List<CariHesapEkstresiDto>();
+
+    private string _searchString;
+    private bool _sortNameByLength;
+    private bool loadingCompleted = true;
+    private bool sayfayiGormeYetkisi = true;
+    private bool isAdmin = true;
+
+    private bool FilterFunc1(CariHesapEkstresiDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(CariHesapEkstresiDto element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.fisturadi != null && element.fisturadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.aciklama != null && element.aciklama.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Cari Hesap Ekstresi";
+        await KullaniciYetkileriGetir();
+
+        await Rapor();
+    }
+
+    public async Task Rapor()
+    {
+        if (!sayfayiGormeYetkisi)
+            return;
+
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+
+            var filterForm = modal.Show<Pages.CariRapor.CariHesapEkstresiFilters>("Rapor Seçenekleri", opt);
+            var result = await filterForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+
+                    var request = (CariHesapEkstresiRequestDto)result.Data;
+
+                    request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+                    request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+
+                    var response = await httpClient.PostGetServiceResponseAsync<List<CariHesapEkstresiDto>, CariHesapEkstresiRequestDto>(UrlHelper.CariHesapEkstresi, request);
+                    if (response == null || response.Count == 0)
+                    {
+                        Snackbar.Add("Aradığınız kritere göre kayıt bulunamadı.", severity: Severity.Warning);
+                        loadingCompleted = true;
+                        return;
+                    }
+                    loadingCompleted = true;
+                    items = response;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task KullaniciYetkileriGetir()
+    {
+        try
+        {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanicikodu);
+
+            if (result != null)
+            {
+                isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
+                if (isAdmin)
+                {
+                    sayfayiGormeYetkisi = true;
+                }
+                else
+                {
+                    var yetki = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanicikodu + "&menu_dfm=r_carihesap_ekstresi2f&hak_tipi=sel");
+                    sayfayiGormeYetkisi = yetki == 1;
+                }
+            }
+            else
+            {
+                isAdmin = false;
+                sayfayiGormeYetkisi = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+}

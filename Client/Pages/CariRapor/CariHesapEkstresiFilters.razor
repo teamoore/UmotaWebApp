@@ -1,0 +1,103 @@
+﻿<EditForm Model="raporrequest">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mt-12">
+        <div class="form">
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Başlangıç Tarihi</label>
+                        <InputDate @bind-Value="raporrequest.BaslangicTarih" class="form-control"></InputDate>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Bitiş Tarihi</label>
+                        <InputDate @bind-Value="raporrequest.BitisTarih" class="form-control"></InputDate>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-10">
+                        <label>Cari Kodu</label>
+                        <div class="row">
+                            <div class="col">
+                                <InputText @bind-Value="raporrequest.CariKodu" class="form-control" placeholder="Cari Kodu" />
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" IconColor="Color.Secondary" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Size=Size.Medium>Bul</MudButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Tamam" OnClick="Tamam" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+
+</EditForm>
+
+@code {
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    CariHesapEkstresiRequestDto raporrequest = new CariHesapEkstresiRequestDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    private async Task Tamam()
+    {
+        await ModalInstance.CloseAsync(ModalResult.Ok<CariHesapEkstresiRequestDto>(raporrequest));
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+
+    public async Task CariListesiAc()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (VCariKartDto)result.Data;
+                raporrequest.CariKodu = cariSecim.Kodu;
+            }
+
+        }
+    }
+
+}

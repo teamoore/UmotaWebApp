@@ -11,5 +11,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public int LOGICALREF { get; set; }
         public string SPECODE { get; set; }
         public string DEFINITION_ { get; set; }
+        public int logofirmno { get; set; }
     }
 }

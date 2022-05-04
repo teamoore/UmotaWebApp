@@ -1,0 +1,99 @@
+﻿<EditForm Model="raporrequest">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mt-12">
+        <div class="form">
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Rapor Tarihi</label>
+                        <InputDate @bind-Value="raporrequest.RaporTarihi" class="form-control"></InputDate>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Bakiye Durumu</label>
+                        <InputSelect @bind-Value="raporrequest.BakiyeSecimi" class="form-control">
+                            <option value=0>Borç Bakiye Verenler</option>
+                            <option value=1>Alacak Bakiye Verenler</option>
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Başlangıç Cari Kodu</label>
+                        <InputText @bind-Value="raporrequest.BaslangicCariKodu" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Bitiş Cari Kodu</label>
+                        <InputText @bind-Value="raporrequest.BitisCariKodu" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Cari Adı</label>
+                        <InputText @bind-Value="raporrequest.CariAdi" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Tamam" OnClick="Tamam" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+
+</EditForm>
+
+@code {
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    CariDurumRaporuRequestDto raporrequest = new CariDurumRaporuRequestDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        raporrequest.BakiyeSecimi = 0;
+        raporrequest.RaporTarihi = DateTime.Now;
+    }
+
+    private async Task Tamam()
+    {
+        await ModalInstance.CloseAsync(ModalResult.Ok<CariDurumRaporuRequestDto>(raporrequest));
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+
+}

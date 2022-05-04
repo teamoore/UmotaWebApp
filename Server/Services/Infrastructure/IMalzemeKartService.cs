@@ -19,5 +19,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<IEnumerable<MalzemeBirimSetDto>> GetMalzemeBirimSetList(int logofirmno);
         public Task<IEnumerable<SpeCodesDto>> GetMalzemeGrupList(int logofirmno);
         public Task<IEnumerable<SpeCodesDto>> GetMalzemeMarkaList(int logofirmno);
+        public Task<SpeCodesDto> SaveMalzemeMarka(SpeCodesDto request);
     }
 }

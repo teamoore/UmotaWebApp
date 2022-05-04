@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ServiceResponses;
+using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Controllers
 {
@@ -44,6 +45,5 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
-
     }
 }

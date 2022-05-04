@@ -9,6 +9,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Extensions;
+using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {

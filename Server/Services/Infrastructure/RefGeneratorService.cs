@@ -103,5 +103,25 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return dbResponse;
             }
         }
+        public async Task<string> FisNoAlLogo(string table, string keyField, int firmaId, int logofirmaId)
+        {
+            if (firmaId < 1)
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId.ToString())))
+            {
+                string LogoDbName = Configuration["LogoDbName"];
+                string LogoFirmaNo = logofirmaId.ToString("000");
+                string tblName = LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_"+ table + "]";
+
+                var result = await db.QueryFirstAsync<string>("select dbo.GenerateNewCode(isnull((select max(" +
+                                    keyField
+                                    + ") from " + tblName + "),'00000')) as value"
+                                    , commandType: CommandType.Text);
+                return result;
+            }
+
+
+        }
     }
 }

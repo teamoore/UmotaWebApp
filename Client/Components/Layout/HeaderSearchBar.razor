@@ -14,20 +14,23 @@
             </ul>
         }
 
-        @if (ShowSearchSection)
+        @if (ShowSearchSection || ShowFilterButton)
         {
 
             <ul class="nav navbar-nav ms-auto">
                 <li>
                     <EditForm Model="header" class="form-inline my-2 my-lg-0">
 
-                        <InputText @bind-Value="header.SearchText" class="form-control mr-sm-2" />
-                        <button class="btn btn-outline-success my-2 my-sm-0" @onclick="SearchClicked">@ButonText</button>
+                        @if (ShowSearchSection)
+                        {
+                            <InputText @bind-Value="header.SearchText" class="form-control mr-sm-2" />
+                            <button class="btn btn-outline-success my-2 my-sm-0" @onclick="SearchClicked">@ButonText</button>
+                        }
                         @if (ShowFilterButton)
-                        {   
+                        {
                             <button class="btn btn-outline-success my-2 my-sm-0 ml-1" @onclick="FilterClicked">Filtre</button>
                         }
-                        </EditForm>
+                    </EditForm>
 
                 </li>
             </ul>

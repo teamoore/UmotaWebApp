@@ -12,6 +12,7 @@ using System.Data;
 using UmotaWebApp.Server.Data.Models;
 using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.ModelDto;
+using UmotaWebApp.Shared.CustomException;
 using System.Data.Common;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
@@ -274,6 +275,42 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 dbResponse = await db.QueryAsync<SpeCodesDto>(sqlstring, commandType: CommandType.Text);
                 return dbResponse;
             }
+        }
+        public async Task<SpeCodesDto> SaveMalzemeMarka(SpeCodesDto request)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            {
+                string LogoDbName = Configuration["LogoDbName"];
+                string LogoFirmaNo = request.logofirmno.ToString("000");
+                string tblName = LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_MARK]";
+
+                string sqlstring = "select count(1) as cnt from " + tblName + " a with(nolock) where a.CODE = '" + request.SPECODE + "'";
+                var say = await db.ExecuteScalarAsync<int>(sqlstring, commandType: CommandType.Text);
+                if (say > 0)
+                    throw new ApiException("Marka kodu mevcut");
+
+                sqlstring = "select count(1) as cnt from " + tblName + " a with(nolock) where a.DESCR = '" + request.DEFINITION_ + "'";
+                say = await db.ExecuteScalarAsync<int>(sqlstring, commandType: CommandType.Text);
+                if (say > 0)
+                    throw new ApiException("Marka Adı mevcut");
+
+                sqlstring = "IF NOT EXISTS( SELECT LOGICALREF From "+tblName+" Where CODE LIKE @CODE ) " +
+                   "INSERT INTO "+tblName+" (" +
+                "   [CODE],[DESCR],[SPECODE],[CYPHCODE]"+
+                "  ,[CAPIBLOCK_CREATEDBY],[CAPIBLOCK_CREADEDDATE],[CAPIBLOCK_CREATEDHOUR],[CAPIBLOCK_CREATEDMIN],[CAPIBLOCK_CREATEDSEC]"+
+                "  ,[CAPIBLOCK_MODIFIEDBY],[CAPIBLOCK_MODIFIEDHOUR],[CAPIBLOCK_MODIFIEDMIN],[CAPIBLOCK_MODIFIEDSEC]"+
+                "  ,[SITEID],[RECSTATUS],[ORGLOGICREF])"+
+                " VALUES ( @CODE, @DESCR, '', '', 1, GetDate(), DATEPART(hour,GetDate()), DATEPART(minute,GetDate()), DATEPART(second,GetDate()), 0, 0, 0, 0, 0, 1, 0 )";
+
+                var p = new DynamicParameters();
+                p.Add("@CODE", request.SPECODE);
+                p.Add("@DESCR", request.DEFINITION_);
+
+                await db.ExecuteAsync(sqlstring, p, commandType: CommandType.Text);
+
+                return request;
+            }
+
         }
     }
 }
