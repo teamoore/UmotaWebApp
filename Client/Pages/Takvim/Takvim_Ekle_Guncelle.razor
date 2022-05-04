@@ -1,4 +1,4 @@
-﻿@page "/takvim_ekle_guncelle"
+﻿@page "/takvim_ekle_guncelle/{takvimLogRef:int}"
 
 <EditForm Model="takvim">
 
@@ -87,6 +87,9 @@
 
 
 @code {
+
+    [Parameter]
+    public int? takvimLogRef { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }

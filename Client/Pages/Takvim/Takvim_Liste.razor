@@ -92,8 +92,6 @@
         {
             loadingCompleted = false;
 
-            await Task.Delay(3000);
-
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
             var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 

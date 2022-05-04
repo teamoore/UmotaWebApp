@@ -63,5 +63,46 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("update")]
+        public async Task<ServiceResponse<TakvimDto>> TakvimBilgileriniGuncelle(TakvimRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<TakvimDto>()
+                {
+                    Value = await takvimService.UpdateTakvim(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<TakvimDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("get")]
+        public async Task<ServiceResponse<TakvimDto>> TakvimBilgiGetir(short firmaId, int logref)
+        {
+            try
+            {
+                return new ServiceResponse<TakvimDto>()
+                {
+                    Value = await takvimService.GetTakvim(firmaId,logref)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<TakvimDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
     }
 }

@@ -34,7 +34,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 var results = await dbContext.Takvims.Where(x => x.Insuser == request.User)
                                 .OrderByDescending(x => x.Tarih)
-                                .Where(x => x.Tarih > DateTime.Now.AddDays(-30))
+                                .Where(x => x.Tarih > DateTime.Now.AddDays(-30)
+                                && x.Status == 0)                                
                                 .ProjectTo<TakvimDto>(Mapper.ConfigurationProvider).ToListAsync();
                 return results;
             }
@@ -57,7 +58,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             }
         }
 
-        public Task<TakvimDto> UpdateTakvim(TakvimRequestDto request)
+        public async Task<TakvimDto> UpdateTakvim(TakvimRequestDto request)
         {
             var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
             var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
@@ -65,7 +66,30 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                return Task.FromResult<TakvimDto>(null);
+                var takvimRow = await dbContext.Takvims.Where(x => x.Logref == request.Takvim.Logref).SingleOrDefaultAsync();
+                if (takvimRow == null)
+                    throw new Exception("Takvim kaydı bulunamadı");
+
+                Mapper.Map(request.Takvim, takvimRow);
+                await dbContext.SaveChangesAsync();
+
+                return Mapper.Map<TakvimDto>(takvimRow);
+            }
+        }
+
+        public async Task<TakvimDto> GetTakvim(short firmaId, int logref)
+        {
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var results = await dbContext.Takvims.Where(x => x.Logref == logref)
+                    .ProjectTo<TakvimDto>(Mapper.ConfigurationProvider)
+                    .SingleOrDefaultAsync();
+
+                return results;
             }
         }
     }

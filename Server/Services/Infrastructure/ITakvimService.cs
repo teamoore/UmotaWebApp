@@ -12,6 +12,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public Task<TakvimDto> SaveTakvim(TakvimRequestDto request);
 
+        public Task<TakvimDto> GetTakvim(short firmaId, int logref);
+
         public Task<TakvimDto> UpdateTakvim(TakvimRequestDto request);
     }
 }

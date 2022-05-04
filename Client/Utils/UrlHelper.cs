@@ -68,5 +68,6 @@ namespace UmotaWebApp.Client.Utils
         public const string FisNoAlLogo = "/api/helper/fisnoallogo";
         public const string TakvimKaydet = "/api/Takvim/save";
         public const string TakvimListesi = "/api/Takvim/list";
+        public const string TakvimGuncelle = "/api/Takvim/update";
     }
 }
