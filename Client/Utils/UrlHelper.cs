@@ -67,5 +67,6 @@ namespace UmotaWebApp.Client.Utils
         public const string SaveMalzemeMarka = "/api/malzemekart/savemarka";
         public const string FisNoAlLogo = "/api/helper/fisnoallogo";
         public const string TakvimKaydet = "/api/Takvim/save";
+        public const string TakvimListesi = "/api/Takvim/list";
     }
 }

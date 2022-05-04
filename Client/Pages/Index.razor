@@ -37,23 +37,35 @@
 
     private async Task OpenDialog()
     {
-        var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-        if (!string.IsNullOrWhiteSpace(kullanicikodu))
+        try
         {
-            var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanicikodu);
-
-            if (result != null)
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            if (!string.IsNullOrWhiteSpace(kullanicikodu))
             {
-                if (result.KullaniciMenuProfil == (int)Enums.KullaniciMenuProfil.Satis)
-                {
-                    var options = new MudBlazor.DialogOptions { CloseOnEscapeKey = true };
-                    options.CloseButton = false;
-                    options.DisableBackdropClick = true;
-                    options.FullWidth = true;
+                var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanicikodu);
 
-                    DialogService.Show<UmotaWebApp.Client.Components.Board.PersonelTeklifTutar>("Satış Temsilcileri Kesin Sipariş Durumu", options);
+                if (result != null)
+                {
+                    if (result.KullaniciMenuProfil == (int)Enums.KullaniciMenuProfil.Satis)
+                    {
+                        var options = new MudBlazor.DialogOptions { CloseOnEscapeKey = true };
+                        options.CloseButton = false;
+                        options.DisableBackdropClick = true;
+                        options.FullWidth = true;
+
+                        DialogService.Show<UmotaWebApp.Client.Components.Board.PersonelTeklifTutar>("Satış Temsilcileri Kesin Sipariş Durumu", options);
+                    }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            if (ex.Message.Contains("401"))
+            {
+                NavigationManager.NavigateTo("login");
+                return;
+            }
+
         }
 
 

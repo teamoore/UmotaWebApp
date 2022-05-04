@@ -1,6 +1,6 @@
 ﻿@page "/takvim_ekle_guncelle"
 
-<EditForm Model="takvim" OnValidSubmit="ValidSubmit">
+<EditForm Model="takvim">
 
     @if (loadingCompleted == false)
     {
@@ -17,23 +17,48 @@
                         <label>Tarih</label>
                         <InputDate @bind-Value="takvim.Tarih" class="form-control"></InputDate>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-3">
-                        <label>Saat</label>
                         <MudTimePicker Label="Saat" Editable="true" @bind-Time="takvim.Saat" />
                     </div>
                 </div>
+            </div>
+            <div class="form-group">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-2">
+                        <label>Cari Kodu</label>
+                        <InputText @bind-Value="takvim.Cari_Kodu" class="form-control" placeholder="Cari Kodu" disabled />
+                    </div>
+                    <div class="col-md-8">
+                        <label>Cari Adı</label>
+                        <div class="row">
+                            <div class="col">
+                                <InputText @bind-Value="takvim.Cari_Adi" class="form-control" placeholder="Cari Adı" disabled />
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" IconColor="Color.Secondary" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Size=Size.Medium>Bul</MudButton>
+                                <MudButton Variant="Variant.Filled" IconColor="Color.Secondary" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Size=Size.Medium>Yeni Cari</MudButton>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
                         <label>Başlık</label>
                         <InputText @bind-Value="takvim.Baslik" class="form-control"></InputText>
                     </div>
                 </div>
+            </div>
+            <div class="form-group">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-6">
                         <label>Açıklama</label>
-                        <InputText @bind-Value="takvim.Aciklama" class="form-control"></InputText>
+                        <InputTextArea rows="5" @bind-Value="takvim.Aciklama" class="form-control"></InputTextArea>
                     </div>
                 </div>
 
@@ -91,9 +116,9 @@
         await SaveRecord();
     }
 
-    public Task Vazgec()
+    private void Vazgec()
     {
-        return Task.CompletedTask;
+        navigation.NavigateTo("/takvim_listef");
     }
 
     private async Task SaveRecord()
@@ -158,9 +183,11 @@
         if (string.IsNullOrWhiteSpace(takvim.Baslik))
             err.Add("Başlık boş geçilemez");
 
-        if (string.IsNullOrWhiteSpace(takvim.Aciklama))
-            err.Add("Başlık boş geçilemez");
+        if (takvim.Tarih == null)
+            err.Add("Tarih boş geçilemez");
 
+        if (takvim.Saat == null)
+            err.Add("Saat boş geçilemez");
 
         if (err.Count > 0)
         {
@@ -175,5 +202,49 @@
     {
         loadingCompleted = true;
         return base.OnInitializedAsync();
+    }
+
+    public async Task CariListesiAc()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (VCariKartDto)result.Data;
+                takvim.Cari_Adi= cariSecim.Adi;
+                takvim.Cari_Kodu= cariSecim.Kodu;
+                takvim.CariRef= cariSecim.Logref;
+            }
+
+        }
+    }
+
+    public async Task YeniCariEkle()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+
+        var cariForm = modal.Show<CariKartEkleGuncelleComponent>("Yeni Cari Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (CariKartDto)result.Data;
+                takvim.Cari_Adi = cariSecim.Adi;
+                takvim.Cari_Kodu= cariSecim.Kodu;
+                takvim.CariRef = cariSecim.Logref;
+            }
+        }
     }
 }
