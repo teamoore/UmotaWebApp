@@ -34,6 +34,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 var results = await dbContext.Takvims.Where(x => x.Insuser == request.User)
                                 .OrderByDescending(x => x.Tarih)
+                                .Where(x => x.Tarih > DateTime.Now.AddDays(-30))
                                 .ProjectTo<TakvimDto>(Mapper.ConfigurationProvider).ToListAsync();
                 return results;
             }
