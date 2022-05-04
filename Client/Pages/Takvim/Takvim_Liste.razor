@@ -70,14 +70,13 @@
     ISnackbar Snackbar { get; set; }
 
     [Inject]
-    ILocalStorageService LocalStorageService { get; set; }
+    TakvimHelper TakvimHelper { get; set; }
 
     public HeaderBarSearch header = new HeaderBarSearch();
 
     public List<TakvimDto> takvimler = new List<TakvimDto>();
 
     private bool loadingCompleted = true;
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -92,14 +91,7 @@
         {
             loadingCompleted = false;
 
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-
-            var request = new TakvimRequestDto();
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
-            request.User = kullanicikodu;
-
-            takvimler = await httpClient.PostGetServiceResponseAsync<List<TakvimDto>, TakvimRequestDto>(UrlHelper.TakvimListesi, request);
+            this.takvimler = await TakvimHelper.LoadTakvimler();
 
             loadingCompleted = true;
 
@@ -115,8 +107,23 @@
         navigation.NavigateTo("/takvim_ekle_guncelle/" + logref);
     }
 
-    public void Sil(int logref)
+    public async Task Sil(int logref)
     {
+        try
+        {
+            loadingCompleted = false;
+
+            var takvim = await TakvimHelper.LoadTakvim(logref);
+
+            await TakvimHelper.DeleteTakvim(takvim);
+
+            loadingCompleted = true;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+
     }
 
     private void YeniTakvim()

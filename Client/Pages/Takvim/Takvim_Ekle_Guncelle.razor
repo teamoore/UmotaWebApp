@@ -109,6 +109,9 @@
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
+    [Inject]
+    TakvimHelper TakvimHelper { get; set; }
+
     public TakvimDto takvim = new TakvimDto();
 
     private bool loadingCompleted = false;
@@ -116,7 +119,12 @@
 
     public async Task ValidSubmit()
     {
-        await SaveRecord();
+        var isUpdate = this.takvimLogRef.HasValue;
+
+        if (!isUpdate)
+            await SaveRecord();
+        else
+            await UpdateRecord();
     }
 
     private void Vazgec()
@@ -124,14 +132,20 @@
         navigation.NavigateTo("/takvim_listef");
     }
 
+    public async Task LoadTakvim()
+    {
+        try
+        {            
+            this.takvim = await TakvimHelper.LoadTakvim(this.takvimLogRef.Value);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
     private async Task SaveRecord()
     {
-
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-        if (selectedFirmaDonem == null)
-            throw new Exception("Firma Dönem Seçili değil");
-
         try
         {
             SubmitValidation();
@@ -151,18 +165,47 @@
         try
         {
             _processing = true;
-            takvim.Insdate = DateTime.Now;
-            takvim.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
-            takvim.Tarih = takvim.Tarih.Value.ChangeTime(takvim.Saat);
-            takvim.Status = 0;
+            await TakvimHelper.SaveTakvim(takvim);
 
+            Snackbar.Add("Takvim kaydı eklendi.", severity: Severity.Success);
 
-            var request = new TakvimRequestDto();
-            request.Takvim = takvim;
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+            navigation.NavigateTo("/takvim_listef");
 
-            var result = await httpClient.PostGetServiceResponseAsync<TakvimDto, TakvimRequestDto>(UrlHelper.TakvimKaydet, request);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    private async Task UpdateRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            await TakvimHelper.UpdateTakvim(takvim);
 
             Snackbar.Add("Takvim güncellendi", severity: Severity.Success);
 
@@ -201,10 +244,14 @@
         }
     }
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
+        var isUpdate = this.takvimLogRef.HasValue;
+
         loadingCompleted = true;
-        return base.OnInitializedAsync();
+
+        if (isUpdate)
+            await LoadTakvim();
     }
 
     public async Task CariListesiAc()

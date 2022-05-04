@@ -13,6 +13,7 @@ using UmotaWebApp.Client.Utils;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
 using MudBlazor;
+using UmotaWebApp.Client.ServiceHelpers;
 
 namespace UmotaWebApp.Client
 {
@@ -28,6 +29,8 @@ namespace UmotaWebApp.Client
             builder.Services.AddBlazoredModal();
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddScoped<ModalManager>();
+            builder.Services.AddScoped<TakvimHelper>();
+            builder.Services.AddScoped<Radzen.DialogService>();
             builder.Services.AddScoped<Helper>();
             builder.Services.AddAuthorizationCore();
 
