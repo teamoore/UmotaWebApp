@@ -1,0 +1,303 @@
+﻿@page "/takvim_ekle_guncelle/{takvimLogRef:int}"
+@page "/takvim_ekle_guncelle"
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="false"
+                 ShowSearchSection="false"></HeaderSearchBar>
+
+
+<EditForm Model="takvim">
+
+    @if (loadingCompleted == false)
+    {
+        <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+    }
+
+    <div class="mt-5">
+        <div class="form">
+            <div class="form-group">
+
+                <div class="row">
+
+                    <div class="col-md-3">
+                        <label>Tarih</label>
+                        <InputDate @bind-Value="takvim.Tarih" class="form-control"></InputDate>
+                    </div>
+                    <div class="col-md-3">
+                        <MudTimePicker Label="Saat" Editable="true" @bind-Time="takvim.Saat" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-2">
+                        <label>Cari Kodu</label>
+                        <InputText @bind-Value="takvim.Cari_Kodu" class="form-control" placeholder="Cari Kodu" disabled />
+                    </div>
+                    <div class="col-md-8">
+                        <label>Cari Adı</label>
+                        <div class="row">
+                            <div class="col">
+                                <InputText @bind-Value="takvim.Cari_Adi" class="form-control" placeholder="Cari Adı" disabled />
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" IconColor="Color.Secondary" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Size=Size.Medium>Bul</MudButton>
+                                <MudButton Variant="Variant.Filled" IconColor="Color.Secondary" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Size=Size.Medium>Yeni Cari</MudButton>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Başlık</label>
+                        <InputText @bind-Value="takvim.Baslik" class="form-control"></InputText>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Açıklama</label>
+                        <InputTextArea rows="5" @bind-Value="takvim.Aciklama" class="form-control"></InputTextArea>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+                    @if (_processing)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                        <MudText Class="ms-2">Kaydediliyor...</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Kaydet</MudText>
+                    }
+                </MudButton>
+                <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+            </div>
+        </div>
+    </div>
+
+
+
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public int? takvimLogRef { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    TakvimHelper TakvimHelper { get; set; }
+
+    public TakvimDto takvim = new TakvimDto();
+
+    private bool loadingCompleted = false;
+    private bool _processing = false;
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public async Task ValidSubmit()
+    {
+        var isUpdate = this.takvimLogRef.HasValue;
+
+        if (!isUpdate)
+            await SaveRecord();
+        else
+            await UpdateRecord();
+    }
+
+    private void Vazgec()
+    {
+        navigation.NavigateTo("/takvim_listef");
+    }
+
+    public async Task LoadTakvim()
+    {
+        try
+        {
+            this.takvim = await TakvimHelper.LoadTakvim(this.takvimLogRef.Value);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    private async Task SaveRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            await TakvimHelper.SaveTakvim(takvim);
+
+            Snackbar.Add("Takvim kaydı eklendi.", severity: Severity.Success);
+
+            navigation.NavigateTo("/takvim_listef");
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    private async Task UpdateRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            await TakvimHelper.UpdateTakvim(takvim);
+
+            Snackbar.Add("Takvim güncellendi", severity: Severity.Success);
+
+            navigation.NavigateTo("/takvim_listef");
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    public void SubmitValidation()
+    {
+        var err = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(takvim.Baslik))
+            err.Add("Başlık boş geçilemez");
+
+        if (takvim.Tarih == null)
+            err.Add("Tarih boş geçilemez");
+
+        if (takvim.Saat == null)
+            err.Add("Saat boş geçilemez");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Kayıt Hatası");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Personel Takvimi";
+
+        var isUpdate = this.takvimLogRef.HasValue;
+
+        loadingCompleted = true;
+
+        if (isUpdate)
+            await LoadTakvim();
+    }
+
+    public async Task CariListesiAc()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (VCariKartDto)result.Data;
+                takvim.Cari_Adi = cariSecim.Adi;
+                takvim.Cari_Kodu = cariSecim.Kodu;
+                takvim.CariRef = cariSecim.Logref;
+            }
+
+        }
+    }
+
+    public async Task YeniCariEkle()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+
+        var cariForm = modal.Show<CariKartEkleGuncelleComponent>("Yeni Cari Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (CariKartDto)result.Data;
+                takvim.Cari_Adi = cariSecim.Adi;
+                takvim.Cari_Kodu = cariSecim.Kodu;
+                takvim.CariRef = cariSecim.Logref;
+            }
+        }
+    }
+}

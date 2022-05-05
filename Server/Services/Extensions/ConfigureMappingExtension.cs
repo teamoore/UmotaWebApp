@@ -53,6 +53,7 @@ namespace UmotaWebApp.Server.Services.Extensions
             CreateMap<TeklifDurumDetay, TeklifDurumDetayDto>().ReverseMap();
             CreateMap<SisMenuProfil, SisMenuProfilDto>().ReverseMap();
             CreateMap<V004Sevkadre, SevkAdresDto>().ReverseMap();
+            CreateMap<Takvim, TakvimDto>().ReverseMap();
         }
     }
 

@@ -1,0 +1,137 @@
+﻿@page "/takvim_listef"
+
+<HeaderSearchBar header="header" onAddNewButtonClicked="YeniTakvim"
+                 ShowButtons="true" ShowFilterButton="false"
+                 ShowSearchSection="false"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+<MudTable Items="@takvimler" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
+    <ToolBarContent>
+
+        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" Title="Yeni Ekle" OnClick="YeniTakvim" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+      
+
+        <MudIconButton Icon="@Icons.Material.Filled.Schedule" Title="Takvim Görünümü"  OnClick="TakvimScheduler" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Medium" />
+        <MudSpacer />
+
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>Tarih</MudTh>
+        <MudTh>Cari Adı</MudTh>
+        <MudTh>Başlık</MudTh>
+        <MudTh>Açıklama</MudTh>
+        <MudTh>Kaydı Giren</MudTh>
+        <MudTh>#</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
+
+                <MudMenuItem OnClick="(() => TakvimDetay(context.Logref))">Değiştir</MudMenuItem>
+
+
+            </MudMenu>
+        </MudTd>
+        <MudTd>@context.Tarih</MudTd>
+        <MudTd>@context.Cari_Adi</MudTd>
+        <MudTd>@context.Baslik</MudTd>
+        <MudTd>@context.Aciklama</MudTd>
+        <MudTd>@context.Insuser</MudTd>
+
+        <MudTd>
+
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
+
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
+@code {
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    TakvimHelper TakvimHelper { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public List<TakvimDto> takvimler = new List<TakvimDto>();
+
+    private bool loadingCompleted = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Personel Takvimi";
+
+        await LoadTakvimler();
+    }
+
+    private async Task LoadTakvimler()
+    {
+        try
+        {
+            loadingCompleted = false;
+
+            this.takvimler = await TakvimHelper.LoadTakvimler();
+
+            loadingCompleted = true;
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public void TakvimDetay(int logref)
+    {
+        navigation.NavigateTo("/takvim_ekle_guncelle/" + logref);
+    }
+
+    public async Task Sil(int logref)
+    {
+        try
+        {
+            loadingCompleted = false;
+
+            var takvim = await TakvimHelper.LoadTakvim(logref);
+
+            await TakvimHelper.DeleteTakvim(takvim);
+
+            loadingCompleted = true;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+
+    }
+
+    private void YeniTakvim()
+    {
+        navigation.NavigateTo("/takvim_ekle_guncelle");
+    }
+
+    private void TakvimScheduler()
+    {
+        navigation.NavigateTo("/takvim_listef_scheduler");
+    }
+}
