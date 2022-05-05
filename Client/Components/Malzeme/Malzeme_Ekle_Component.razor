@@ -3,188 +3,174 @@
 <div class="form">
 
     <EditForm Model="malzeme">
-        <div class="form-group">
-            <div class="row">
-                <div class="col-md-6">
-                    <label>Kodu</label>
-                    <InputText @bind-Value="malzeme.Kodu" class="form-control" disabled />
-                </div>
-            </div>
-        </div>
 
-        <div class="form-group">
-            <div class="row">
-                <div class="col-md-6">
-                    <label>Adı</label>
-                    <InputText @bind-Value="malzeme.Adi" class="form-control" />
-                </div>
-                <div class="col-md-6">
-                    <label>Adı 2</label>
-                    <InputText @bind-Value="malzeme.Adi3" class="form-control" />
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="row">
-                <div class="col-md-4">
-                    <label>Malzeme Grubu</label>
-                    <div class="row">
-                        <div class="col">
-                            <InputText @bind-Value="malzeme.Grupkodu" class="form-control" disabled />
+        <MudGrid class="mt-1">
+            <MudItem xs="12" sm="6">
+                <MudCard>
+                    <MudCardContent>
+                        <div>
+                            <label>Kodu</label>
+                            <InputText @bind-Value="malzeme.Kodu" class="form-control" disabled />
                         </div>
-                        <div class="col-md-3">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="GrupSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
+                        <div class="mt-3">
+                            <label>Adı</label>
+                            <InputText @bind-Value="malzeme.Adi" class="form-control" />
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    @*<MudAutocomplete T="string" Label="Menşei" Placeholder="@malzeme.Mensei" @bind-Value="malzeme.Mensei" SearchFunc="@UlkeAra"
-                        ResetValueOnEmptyText="@resetValueOnEmptyText"
-                        CoerceText="@coerceText" CoerceValue="@coerceValue"
-                        AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" />*@
-                    <label>Menşei</label>
-                    <InputText @bind-Value="malzeme.Mensei" class="form-control" />
-                </div>
-
-                @*<div class="col-md-4">
-                    <div class="row">
-                        <div class="col">
-                            <MudAutocomplete T="SpeCodesDto" Label="Marka" Placeholder="@malzeme.Marka" @bind-Value="malzeme.SpecCodes" SearchFunc="@MalzemeAra"
-                                             ResetValueOnEmptyText="@resetValueOnEmptyText"
-                                             CoerceText="@coerceText" CoerceValue="@coerceValue"
-                                             AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary"
-                                             ToStringFunc="@(e=> e==null?null : $"{e.DEFINITION_} ({e.SPECODE})")" />
+                        <div class="mt-3">
+                            <label>Adı 2</label>
+                            <InputText @bind-Value="malzeme.Adi3" class="form-control" />
                         </div>
-                    </div>
-                </div>*@
 
-                <div class="col-md-4">
-                    <label>Marka</label>
-                    <div class="row">
-                        <div class="col">
-                            <InputText @bind-Value="malzeme.Marka" class="form-control" disabled />
+                        <div class="mt-3">
+                            <label>Malzeme Grubu</label>
+                            <div class="row">
+                                <div class="col">
+                                    <InputText @bind-Value="malzeme.Grupkodu" class="form-control" disabled />
+                                </div>
+                                <div class="col-md-3">
+                                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="GrupSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="MarkaSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
+                        <div class="mt-3">
+                            <label>Marka</label>
+                            <div class="row">
+                                <div class="col">
+                                    <InputText @bind-Value="malzeme.Marka" class="form-control" disabled />
+                                </div>
+                                <div class="col-md-3">
+                                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="MarkaSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
 
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="row">
-                <div class="col-md-3">
-                    <label>KDV %</label>
-                    <InputNumber @bind-Value="malzeme.KdvNumber" class="form-control" />
-                </div>
-                <div class="col-md-3">
-                    <label>Birim Seti Kodu</label>
-                    <InputText @bind-Value="malzeme.Birimset" class="form-control" disabled />
-                </div>
-                <div class="col-md-3">
-                    <label>Ana Birim Kodu</label>
-                    <div class="row">
-                        <div class="col">
-                            <InputText @bind-Value="malzeme.Birim" class="form-control" disabled />
+                        <div class="mt-3">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Birim Seti Kodu</label>
+                                    <InputText @bind-Value="malzeme.Birimset" class="form-control" disabled />
+                                </div>
+                                <div class="col-md-7">
+                                    <label>Ana Birim Kodu</label>
+                                    <div class="row">
+                                        <div class="col">
+                                            <InputText @bind-Value="malzeme.Birim" class="form-control" disabled />
+                                        </div>
+                                        <div class="col-md-3">
+                                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="BirimSetiSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-3">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Search" OnClick="BirimSetiSec" IconColor="Color.Secondary" Size=Size.Small>Seç</MudButton>
+
+                        <div class="form-group mt-3">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label>KDV %</label>
+                                    <InputNumber @bind-Value="malzeme.KdvNumber" class="form-control" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Menşei</label>
+                                    <InputText @bind-Value="malzeme.Mensei" class="form-control" />
+                                </div>
+                                <div class="col-md-5">
+                                    <label>Tedarikçi Adı</label>
+                                    <InputText @bind-Value="malzeme.TedarikciAdi" class="form-control" />
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div class="form-group">
-            <div class="row">
-                <div class="col-md-3">
-                    <label>En</label>
-                    <InputNumber @bind-Value="malzeme.En" class="form-control" />
-                </div>
-                <div class="col-md-3">
-                    <label>Boy</label>
-                    <InputNumber @bind-Value="malzeme.Boy" class="form-control" />
-                </div>
-                <div class="col-md-3">
-                    <label>Yükseklik</label>
-                    <InputNumber @bind-Value="malzeme.Yukseklik" class="form-control" />
-                </div>
-                <div class="col-md-3">
-                    <label>Hacim</label>
-                    <InputNumber @bind-Value="malzeme.Hacim" class="form-control" />
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="row">
-                <div class="col-md-8">
-                    <label>Tedarikçi Adı</label>
-                    <InputText @bind-Value="malzeme.TedarikciAdi" class="form-control" />
-                </div>
-                <div class="col-md-4">
-                    <label>Logo Kodu</label>
-                    <InputText @bind-Value="malzeme.Logokodu" class="form-control" />
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="row">
-                <div class="col-md-4">
-                    <label>Maliyet Fiyatı</label>
-                    <InputNumber @bind-Value="malzeme.Alfiyat" class="form-control" />
-                </div>
-                <div class="col-md-2">
-                    <label>Döviz</label>
-                    <InputSelect class="form-control" @bind-Value="malzeme.AlfiyatDov">
-                        @if (DovizListesi != null)
-                        {
-                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                            @foreach (var item in DovizListesi)
-                            {
-                                <option value="@item.CURCODE">@item.CURCODE</option>
-                            }
-                        }
-                    </InputSelect>
-                </div>
-                <div class="col-md-4">
-                    <label>Satış Fiyatı</label>
-                    <InputNumber @bind-Value="malzeme.Satfiyat" class="form-control" />
-                </div>
-                <div class="col-md-2">
-                    <label>Döviz</label>
-                    <InputSelect class="form-control" @bind-Value="malzeme.SatfiyatDov">
-                        @if (DovizListesi != null)
-                        {
-                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                            @foreach (var item in DovizListesi)
-                            {
-                                <option value="@item.CURCODE">@item.CURCODE</option>
-                            }
-                        }
-                    </InputSelect>
-                </div>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
-                @if (_processing)
-                {
-                    <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                    <MudText Class="ms-2">Kaydediliyor...</MudText>
-                }
-                else
-                {
-                    <MudText>Kaydet</MudText>
-                }
-            </MudButton>
-            <CancelButtonComponent Caption="Vazgeç" OnClick="goBackList" />
-        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12" sm="6">
+                <MudCard>
+                    <MudCardContent>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label>En</label>
+                                    <InputNumber @bind-Value="malzeme.En" class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Boy</label>
+                                    <InputNumber @bind-Value="malzeme.Boy" class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Yükseklik</label>
+                                    <InputNumber @bind-Value="malzeme.Yukseklik" class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Hacim</label>
+                                    <InputNumber @bind-Value="malzeme.Hacim" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <label>Alış Fiyatı</label>
+                                    <InputNumber @bind-Value="malzeme.Alfiyat" class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Döviz</label>
+                                    <InputSelect class="form-control" @bind-Value="malzeme.AlfiyatDov">
+                                        @if (DovizListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in DovizListesi)
+                                            {
+                                                <option value="@item.CURCODE">@item.CURCODE</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Satış Fiyatı</label>
+                                    <InputNumber @bind-Value="malzeme.Satfiyat" class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Döviz</label>
+                                    <InputSelect class="form-control" @bind-Value="malzeme.SatfiyatDov">
+                                        @if (DovizListesi != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in DovizListesi)
+                                            {
+                                                <option value="@item.CURCODE">@item.CURCODE</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label>Logo Kodu</label>
+                                    <InputText @bind-Value="malzeme.Logokodu" class="form-control" />
+                                </div>
+                            </div>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            <MudItem xs="12">
+                <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+                    @if (_processing)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                        <MudText Class="ms-2">Kaydediliyor...</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Kaydet</MudText>
+                    }
+                </MudButton>
+                <CancelButtonComponent Caption="Vazgeç" OnClick="goBackList" />
+            </MudItem>
+        </MudGrid>
 
     </EditForm>
 </div>

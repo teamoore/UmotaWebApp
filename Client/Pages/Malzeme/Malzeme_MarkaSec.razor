@@ -12,16 +12,15 @@
                     </div>
                     <div class="col-md-8">
                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
-                                   OnClick="LoadList" Color="Color.Info" Size="Size.Medium">Bul</MudButton>
+                                   OnClick="LoadList" Color="Color.Primary" Size="Size.Medium">Bul</MudButton>
                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
-                                   OnClick="EkleSec" Color="Color.Secondary" Size="Size.Medium">Ekle</MudButton>
+                                   OnClick="EkleSec" Color="Color.Tertiary" Size="Size.Medium">Ekle</MudButton>
                         <MudButton Variant="Variant.Filled"
-                                   OnClick="Vazgec" Color="Color.Dark" Size="Size.Medium">Vazgeç</MudButton>
+                                   OnClick="Vazgec" Color="Color.Secondary" Size="Size.Medium">Vazgeç</MudButton>
                     </div>
                 </div>
 
             </div>
-
         </div>
     </EditForm>
 
@@ -43,7 +42,7 @@
         </HeaderContent>
         <RowTemplate>
             <MudTd>
-                <MudFab Color="Color.Primary" StartIcon="@Icons.Material.Filled.Add" Size="Size.Small" OnClick="(() => Sec(context))" />
+                <MudFab Color="Color.Primary" StartIcon="@Icons.Filled.Add" Size="Size.Small" OnClick="(() => Sec(context))" />
             </MudTd>
             <MudTd DataLabel="Kodu">@context.SPECODE</MudTd>
             <MudTd DataLabel="Adı">@context.DEFINITION_</MudTd>

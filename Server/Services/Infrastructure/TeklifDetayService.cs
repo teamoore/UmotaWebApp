@@ -236,7 +236,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 db.Open();
 
                 var sql = "select coalesce(max(sipnosira),'00000') as sipnosira from " +
-                    Configuration.GetUmotaObjectName("TeklifDetay", firmaId: firmaId) + " where teklifref=" + teklifRef;
+                    Configuration.GetUmotaObjectName("teklifdetay", firmaId: firmaId) + " where teklifref=" + teklifRef + " and status < 2";
 
                 var result = await db.ExecuteScalarAsync<string>("select dbo.GenerateNewCode(isnull(("+ sql +"),'00000')) as value"
                     , commandType: CommandType.Text);

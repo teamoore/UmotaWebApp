@@ -65,8 +65,35 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<List<SisKullaniciDto>> GetSisKullaniciList()
         {
-            return await MasterDbContext.SisKullanicis
-                .ProjectTo<SisKullaniciDto>(Mapper.ConfigurationProvider).ToListAsync();
+            var query = from h in MasterDbContext.SisKullanicis
+                        join y in MasterDbContext.SisMenuProfils on h.KullaniciMenuProfil equals y.ProfilId into ps
+                        from y in ps.DefaultIfEmpty()
+                            //where h.Id < 7
+                        orderby (h.KullaniciKodu)
+                        select new
+                        {
+                            KullaniciKodu = h.KullaniciKodu,
+                            KullaniciAdi = h.KullaniciAdi,
+                            KullaniciYetkiKodu = h.KullaniciYetkiKodu,
+                            KullaniciMenuProfil = h.KullaniciMenuProfil,
+                            MailAdres = h.MailAdres,
+                            LogoUsername = h.LogoUsername,
+                            KullaniciMenuProfilAdi = y.ProfilAdi
+                        };
+
+            return await query.Select(p => new SisKullaniciDto
+            {
+                KullaniciKodu = p.KullaniciKodu,
+                KullaniciAdi = p.KullaniciAdi,
+                KullaniciYetkiKodu = p.KullaniciYetkiKodu,
+                KullaniciMenuProfil = p.KullaniciMenuProfil,
+                MailAdres = p.MailAdres,
+                LogoUsername = p.LogoUsername,
+                KullaniciMenuProfilAdi = p.KullaniciMenuProfilAdi
+            }).ToListAsync();
+
+            //return await MasterDbContext.SisKullanicis
+            //    .ProjectTo<SisKullaniciDto>(Mapper.ConfigurationProvider).ToListAsync();
         }
 
         public async Task<SisKullaniciLoginResponseDto> Login(SisKullaniciLoginRequestDto request)
