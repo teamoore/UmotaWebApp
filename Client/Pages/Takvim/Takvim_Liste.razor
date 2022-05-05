@@ -12,8 +12,10 @@
 <MudTable Items="@takvimler" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
     <ToolBarContent>
 
-        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTakvim" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" Title="Yeni Ekle" OnClick="YeniTakvim" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+      
 
+        <MudIconButton Icon="@Icons.Material.Filled.Schedule" Title="Takvim Görünümü"  OnClick="TakvimScheduler" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Medium" />
         <MudSpacer />
 
     </ToolBarContent>
@@ -62,9 +64,6 @@
 
     [Inject]
     NavigationManager navigation { get; set; }
-
-    [Inject]
-    HttpClient httpClient { get; set; }
 
     [Inject]
     ISnackbar Snackbar { get; set; }
@@ -129,5 +128,10 @@
     private void YeniTakvim()
     {
         navigation.NavigateTo("/takvim_ekle_guncelle");
+    }
+
+    private void TakvimScheduler()
+    {
+        navigation.NavigateTo("/takvim_listef_scheduler");
     }
 }

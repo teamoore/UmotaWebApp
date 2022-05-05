@@ -24,5 +24,13 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? Insdate { get; set; }
         public string Upduser { get; set; }
         public DateTime? Upddate { get; set; }
+
+        public DateTime? TarihEnd
+        {
+            get
+            {
+                return this.Tarih.HasValue ? this.Tarih.Value.AddHours(1) : null;
+            }
+        }
     }
 }
