@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.ModelDto;
+using UmotaWebApp.Shared.ModelDto.Request;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
@@ -45,5 +46,28 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             }
         }
+        public async Task<List<SiparisRaporuDto>> SiparisRaporu(SiparisRaporuRequestDto request)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                var p = new DynamicParameters();
+                p.Add("@LogoFirmaNo", request.LogoFirmaNo);
+                p.Add("@LogoDonemNo", request.LogoDonemNo);
+                p.Add("@SipNo", request.SipNo);
+                p.Add("@CariKodu", request.CariKodu);
+                p.Add("@CariAdi", request.CariAdi);
+                p.Add("@MalzemeKodu", request.MalzemeKodu);
+                p.Add("@MalzemeAdi", request.MalzemeAdi);
+                p.Add("@BaslangicTarih", request.BaslangicTarih);
+                p.Add("@BitisTarih", request.BitisTarih);
+                p.Add("@OnayDurum", request.OnayDurumu);
+                p.Add("@SiparisTuru", request.SiparisTuru);
+                p.Add("@SadeceBekleyenler", request.SadeceBekleyenler);
+
+                var res = await db.QueryAsync<SiparisRaporuDto>("UmotaRaporSP_SiparisDurum", p, commandType: CommandType.StoredProcedure);
+                return res.ToList();
+            }
+        }
+
     }
 }

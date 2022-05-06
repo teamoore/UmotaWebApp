@@ -11,7 +11,7 @@
                         <InputText @bind-Value="malzemeKart.Adi" class="form-control" placeholder="Adı" />
                     </div>
                     <div class="col-md-4">
-                        <InputText @bind-Value="malzemeKart.Marka" class="form-control" placeholder="Marka" />
+                        <InputText @bind-Value="malzemeKart.Descr" class="form-control" placeholder="Marka" />
                     </div>
                     <div class="col-md-4">
                         <MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Filled.FindInPage"
@@ -24,17 +24,12 @@
 
 
             <MudTable Items="@malzemeKarts" RowsPerPage="5"  FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
-                <ToolBarContent>
-                    <MudText Typo="Typo.h6">Malzeme Kart Listesi</MudText>
-
-                </ToolBarContent>
                 <HeaderContent>
                     <MudTh>#</MudTh>
                     <MudTh>Kodu</MudTh>
                     <MudTh>Adı</MudTh>
                     <MudTh>Marka</MudTh>
                     <MudTh>Menşei</MudTh>
-
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd>
@@ -42,8 +37,8 @@
                     </MudTd>
                     <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
                     <MudTd DataLabel="Adı">@context.Adi</MudTd>
-                    <MudTd DataLabel="Marka">@context.Marka</MudTd>
-                    <MudTd DataLabel="Menşei">@context.Mensei</MudTd>
+                    <MudTd DataLabel="Marka">@context.Descr</MudTd>
+                    <MudTd DataLabel="Menşei">@context.Definition</MudTd>
                 </RowTemplate>
                 <PagerContent>
                     <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
@@ -76,9 +71,9 @@
     [Inject]
     ISnackbar Snackbar { get; set; }
 
-    public List<MalzemeKartDto> malzemeKarts { get; set; }
+    public List<VMalzemeKartDto> malzemeKarts { get; set; }
 
-    public MalzemeKartDto malzemeKart = new MalzemeKartDto();
+    public VMalzemeKartDto malzemeKart = new VMalzemeKartDto();
 
     public string ResultText { get; set; }
     public string ButonText = "Ara";
@@ -87,31 +82,19 @@
     private bool _sortNameByLength;
     private bool _searchStarted = false;
 
-    private async Task LoadMalzemeKartList()
-    {
-        _searchStarted = true;
-        malzemeKarts = await httpClient.GetServiceResponseAsync<List<MalzemeKartDto>>("/api/malzemekart/list");
-        _searchStarted = false;
-    }
-
-
     public async Task MalzemeKartSec(int logref)
     {
         try
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
-            var request = new MalzemeKartRequestDto();
-            request.MalzemeKart = malzemeKart;
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
-
-            var mkart = await httpClient.GetServiceResponseAsync<MalzemeKartDto>(UrlHelper.MalzemeKartGetir + "?logref=" + logref + "&firmaId=" + request.FirmaId);
+            var mkart = await httpClient.GetServiceResponseAsync<VMalzemeKartDto>(UrlHelper.VMalzemeKartGetir + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
             if (mkart != null)
             {
                 modalParameters = new ModalParameters();
                 modalParameters.Add("secim", mkart);
-                await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeKartDto>(mkart));
+                await ModalInstance.CloseAsync(ModalResult.Ok<VMalzemeKartDto>(mkart));
             }
         }
         catch (Exception ex)
@@ -124,7 +107,7 @@
     {
         try
         {
-            if (string.IsNullOrEmpty(malzemeKart.Adi) && string.IsNullOrEmpty(malzemeKart.Marka))
+            if (string.IsNullOrEmpty(malzemeKart.Adi) && string.IsNullOrEmpty(malzemeKart.Descr))
             {
                 throw new Exception(Utils.Mesajlar.MetinGir);
             }
@@ -134,11 +117,12 @@
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
-            var request = new MalzemeKartRequestDto();
-            request.MalzemeKart = malzemeKart;
+            var request = new VMalzemeKartsRequestDto();
+            request.MalzemeAdi = malzemeKart.Adi;
+            request.Marka = malzemeKart.Descr;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
-            malzemeKarts = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+            malzemeKarts = await httpClient.PostGetServiceResponseAsync<List<VMalzemeKartDto>, VMalzemeKartsRequestDto>(UrlHelper.VMalzemeKartListesi, request);
 
         }
         catch (Exception ex)

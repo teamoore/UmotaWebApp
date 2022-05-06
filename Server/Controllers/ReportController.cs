@@ -9,6 +9,7 @@ using UmotaWebApp.Server.Services.Infrastructure;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ServiceResponses;
 using UmotaWebApp.Shared.ModelDto;
+using UmotaWebApp.Shared.ModelDto.Request;
 
 namespace UmotaWebApp.Server.Controllers
 {
@@ -41,6 +42,26 @@ namespace UmotaWebApp.Server.Controllers
                 Logger.Log(LogLevel.Error, ex.Message);
 
                 var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("siparisraporu")]
+        public async Task<ServiceResponse<List<SiparisRaporuDto>>> SiparisRaporuGetir(SiparisRaporuRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<List<SiparisRaporuDto>>()
+                {
+                    Value = await TeklifReportService.SiparisRaporu(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<SiparisRaporuDto>>();
                 e.SetException(ex);
                 return e;
             }
