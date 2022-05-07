@@ -22,6 +22,7 @@ namespace UmotaWebApp.Client.Utils
         public const string MalzemeKartAra = "/api/malzemekart/search";
         public const string MalzemeKartGetir = "/api/malzemekart/get";
         public const string VMalzemeKartGetir = "/api/vmalzemekart/get";
+        public const string VMalzemeKartListesi = "/api/vmalzemekart/search";
         public const string MalzemeFiyatGetir = "/api/malzemekart/fiyatgetir";
         public const string MalzemeMaliyetGetir = "/api/malzemekart/maliyetgetir";
         public const string MalzemeStokGetir = "/api/malzemekart/stokgetir";
@@ -70,5 +71,6 @@ namespace UmotaWebApp.Client.Utils
         public const string TakvimListesi = "/api/Takvim/list";
         public const string TakvimGuncelle = "/api/Takvim/update";
         public const string TakvimGetir = "/api/Takvim/get";
+        public const string SiparisRaporu = "/api/Report/siparisraporu";
     }
 }
