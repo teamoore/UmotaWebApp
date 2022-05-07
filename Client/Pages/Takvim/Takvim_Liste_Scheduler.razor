@@ -70,7 +70,7 @@
         try
         {
             loadingCompleted = false;
-            appointments = await TakvimHelper.LoadTakvimler();
+            appointments = await TakvimHelper.LoadRecords();
             loadingCompleted = true;
         }
         catch (Exception ex)
@@ -93,8 +93,6 @@
             args.Attributes["style"] = "background: rgba(255,220,40,.2);";
         }
     }
-
-
 
     void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<TakvimDto> args)
     {

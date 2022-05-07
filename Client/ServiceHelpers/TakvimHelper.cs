@@ -8,7 +8,7 @@ using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Client.ServiceHelpers
 {
-    public class TakvimHelper
+    public class TakvimHelper : IDataHelper<TakvimDto>
     {
         public HttpClient httpClient { get; set; }
         public ILocalStorageService LocalStorageService { get; set; }
@@ -19,7 +19,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
             LocalStorageService = localStorageService;
         }
 
-        public async Task<TakvimDto> LoadTakvim(int logref)
+        public async Task<TakvimDto> LoadRecord(int logref)
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
@@ -31,7 +31,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return result;
         }
 
-        public async Task<List<TakvimDto>> LoadTakvimler()
+        public async Task<List<TakvimDto>> LoadRecords()
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
             var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
@@ -46,7 +46,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return takvimler;
         }
 
-        public async Task<TakvimDto> SaveTakvim(TakvimDto takvim)
+        public async Task<TakvimDto> SaveRecord(TakvimDto takvim)
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
@@ -68,7 +68,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return result;
         }
 
-        public async Task<TakvimDto> UpdateTakvim(TakvimDto takvim)
+        public async Task<TakvimDto> UpdateRecord(TakvimDto takvim)
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
@@ -90,7 +90,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return result;
         }
 
-        public async Task<TakvimDto> DeleteTakvim(TakvimDto takvim)
+        public async Task<TakvimDto> DeleteRecord(TakvimDto takvim)
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
@@ -111,5 +111,6 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             return result;
         }
+
     }
 }

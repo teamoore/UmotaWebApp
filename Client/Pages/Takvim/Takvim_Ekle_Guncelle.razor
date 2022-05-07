@@ -71,6 +71,15 @@
             </div>
 
             <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <MudSwitch @bind-Checked="takvim.YapildiMi" Label="Yapıldı" Color="Color.Success" />
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
                     @if (_processing)
                     {
@@ -96,6 +105,9 @@
 
     [Parameter]
     public int? takvimLogRef { get; set; }
+
+    [Parameter]
+    public int? modalForm { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
@@ -126,18 +138,28 @@
             await SaveRecord();
         else
             await UpdateRecord();
+
+        await SaveCompleted();
     }
 
-    private void Vazgec()
+    private async Task Vazgec()
     {
-        navigation.NavigateTo("/takvim_listef");
+        await SaveCompleted();
     }
 
-    public async Task LoadTakvim()
+    private async Task SaveCompleted()
+    {
+        if (modalForm.HasValue)
+            await ModalInstance.CloseAsync();
+        else
+            navigation.NavigateTo("/takvim_listef");
+    }
+
+    public async Task LoadRecord()
     {
         try
         {
-            this.takvim = await TakvimHelper.LoadTakvim(this.takvimLogRef.Value);
+            this.takvim = await TakvimHelper.LoadRecord(this.takvimLogRef.Value);
         }
         catch (Exception ex)
         {
@@ -167,12 +189,9 @@
         {
             _processing = true;
 
-            await TakvimHelper.SaveTakvim(takvim);
+            await TakvimHelper.SaveRecord(takvim);
 
             Snackbar.Add("Takvim kaydı eklendi.", severity: Severity.Success);
-
-            navigation.NavigateTo("/takvim_listef");
-
         }
         catch (Exception ex)
         {
@@ -206,11 +225,9 @@
         {
             _processing = true;
 
-            await TakvimHelper.UpdateTakvim(takvim);
+            await TakvimHelper.UpdateRecord(takvim);
 
             Snackbar.Add("Takvim güncellendi", severity: Severity.Success);
-
-            navigation.NavigateTo("/takvim_listef");
 
         }
         catch (Exception ex)
@@ -254,7 +271,7 @@
         loadingCompleted = true;
 
         if (isUpdate)
-            await LoadTakvim();
+            await LoadRecord();
     }
 
     public async Task CariListesiAc()

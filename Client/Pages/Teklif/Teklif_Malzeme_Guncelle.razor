@@ -143,7 +143,7 @@
 
 
 
-<MudTable Items="@teklifDetayList" FixedHeader="true" Height="280px"  RowsPerPage="100" Dense="true" Hover="true" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
+<MudTable Items="@teklifDetayList" FixedHeader="true" Height="280px" RowsPerPage="1000" Dense="true" Hover="true" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="TeklifDetayEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         <MudSpacer />

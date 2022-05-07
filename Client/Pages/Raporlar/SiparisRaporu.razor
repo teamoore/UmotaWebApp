@@ -1,0 +1,200 @@
+﻿@page "/r_bekleyen_siparislerf"
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="true"
+                 onFilterButtonClicked="Rapor" ShowSearchSection="false"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+@if (sayfayiGormeYetkisi == false)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
+}
+
+<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<SiparisRaporuDto,bool>(FilterFunc1)">
+    <HeaderContent>
+        <MudTh>Sipariş No</MudTh>
+        <MudTh>Onay Durumu</MudTh>
+        <MudTh>Cari Kodu</MudTh>
+        <MudTh>Cari Adı</MudTh>
+        <MudTh>Satış Temsilcisi</MudTh>
+        <MudTh>Proje</MudTh>
+        <MudTh>Malzeme Kodu</MudTh>
+        <MudTh>Malzeme Adı</MudTh>
+        <MudTh>Sipariş Miktarı</MudTh>
+        <MudTh>Bekleyen Miktar</MudTh>
+        <MudTh>Bekleyen Tutar</MudTh>
+        <MudTh>Sipariş Tarihi</MudTh>
+        <MudTh>Teslimat Tarihi</MudTh>
+        <MudTh>Teslimat Ayı</MudTh>
+        <MudTh>Geçen Gün</MudTh>
+        <MudTh>Şehir</MudTh>
+        <MudTh>İlçe</MudTh>
+        <MudTh>Stok Miktarı</MudTh>
+        <MudTh>Rezerv Miktarı</MudTh>
+        <MudTh>Arıza Depo</MudTh>
+        <MudTh>2.el Depo</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.siparisno</MudTd>
+        <MudTd>@context.onay</MudTd>
+        <MudTd>@context.carikodu</MudTd>
+        <MudTd>@context.caritanim</MudTd>
+        <MudTd>@context.satici</MudTd>
+        <MudTd>@context.siparisbelgeno</MudTd>
+        <MudTd>@context.malzkodu</MudTd>
+        <MudTd>@context.malztanim</MudTd>
+        <MudTd Style="text-align:right">@context.miktar</MudTd>
+        <MudTd Style="text-align:right">@context.kalanmiktar</MudTd>
+        <MudTd Style="text-align:right">@context.bekleyentutarFormatted</MudTd>
+        <MudTd>@context.siparistarihiFormatted</MudTd>
+        <MudTd>@context.teslimattarihiFormatted</MudTd>
+        <MudTd>@context.teslimatay</MudTd>
+        <MudTd>@context.gecensure</MudTd>
+        <MudTd>@context.ili</MudTd>
+        <MudTd>@context.ilcesi</MudTd>
+        <MudTd Style="text-align:right">@context.stokmik</MudTd>
+        <MudTd Style="text-align:right">@context.rezerv</MudTd>
+        <MudTd Style="text-align:right">@context.stokmikariza</MudTd>
+        <MudTd Style="text-align:right">@context.stokmik2el</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
+@code
+{
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public List<SiparisRaporuDto> items = new List<SiparisRaporuDto>();
+
+    private string _searchString;
+    private bool _sortNameByLength;
+    private bool loadingCompleted = true;
+    private bool sayfayiGormeYetkisi = true;
+    private bool isAdmin = true;
+
+    private bool FilterFunc1(SiparisRaporuDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(SiparisRaporuDto element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.siparisno != null && element.siparisno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.siparisbelgeno != null && element.siparisbelgeno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Sipariş Durum Raporu";
+        await KullaniciYetkileriGetir();
+
+        await Rapor();
+    }
+
+    public async Task Rapor()
+    {
+        if (!sayfayiGormeYetkisi)
+            return;
+
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+
+            var filterForm = modal.Show<Pages.Raporlar.SiparisRaporuFilters>("Rapor Seçenekleri", opt);
+            var result = await filterForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+
+                    var request = (SiparisRaporuRequestDto)result.Data;
+
+                    request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+                    request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+
+                    var response = await httpClient.PostGetServiceResponseAsync<List<SiparisRaporuDto>, SiparisRaporuRequestDto>(UrlHelper.SiparisRaporu, request);
+                    if (response == null || response.Count == 0)
+                    {
+                        Snackbar.Add("Aradığınız kritere göre kayıt bulunamadı.", severity: Severity.Warning);
+                        loadingCompleted = true;
+                        return;
+                    }
+                    loadingCompleted = true;
+                    items = response;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task KullaniciYetkileriGetir()
+    {
+        try
+        {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanicikodu);
+
+            if (result != null)
+            {
+                isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
+                if (isAdmin)
+                {
+                    sayfayiGormeYetkisi = true;
+                }
+                else
+                {
+                    var yetki = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanicikodu + "&menu_dfm=r_bekleyen_siparislerf&hak_tipi=sel");
+                    sayfayiGormeYetkisi = yetki == 1;
+                }
+            }
+            else
+            {
+                isAdmin = false;
+                sayfayiGormeYetkisi = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+}

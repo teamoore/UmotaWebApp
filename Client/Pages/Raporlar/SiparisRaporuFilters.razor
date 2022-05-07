@@ -1,0 +1,185 @@
+﻿<EditForm Model="raporrequest">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mt-12">
+        <div class="form">
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Başlangıç Tarihi</label>
+                        <InputDate @bind-Value="raporrequest.BaslangicTarih" class="form-control"></InputDate>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Bitiş Tarihi</label>
+                        <InputDate @bind-Value="raporrequest.BitisTarih" class="form-control"></InputDate>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Sipariş No</label>
+                        <InputText @bind-Value="raporrequest.SipNo" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Sipariş Türü</label>
+                        <InputSelect @bind-Value="raporrequest.SiparisTuru" class="form-control">
+                            <option value=1>Satış</option>
+                            <option value=2>Alış</option>
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Cari Kodu</label>
+                        <div class="row">
+                            <div class="col">
+                                <InputText @bind-Value="raporrequest.CariKodu" class="form-control" placeholder="Cari Kodu" />
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" IconColor="Color.Secondary" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Size=Size.Medium>Bul</MudButton>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Cari Adı</label>
+                        <InputText @bind-Value="raporrequest.CariAdi" class="form-control" />
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Malzeme Kodu</label>
+                        <div class="row">
+                            <div class="col">
+                                <InputText @bind-Value="raporrequest.MalzemeKodu" class="form-control" placeholder="Malzeme Kodu" />
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" IconColor="Color.Secondary" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="MalzemeListesiAc" Size=Size.Medium>Bul</MudButton>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Malzeme Adı</label>
+                        <InputText @bind-Value="raporrequest.MalzemeAdi" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Sipariş Durumu</label>
+                        <InputSelect @bind-Value="raporrequest.SadeceBekleyenler" class="form-control">
+                            <option value=0>Hepsi</option>
+                            <option value=1>Sadece Bekleyenler</option>
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Onay Durumu</label>
+                        <InputSelect @bind-Value="raporrequest.OnayDurumu" class="form-control">
+                            <option value=0>Hepsi</option>
+                            <option value=1>Öneri</option>
+                            <option value=4>Sevk Edilebilir</option>
+                            <option value=2>Sevk Edilemez</option>
+                        </InputSelect>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Tamam" OnClick="Tamam" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+
+</EditForm>
+
+@code {
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    SiparisRaporuRequestDto raporrequest = new SiparisRaporuRequestDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        raporrequest.OnayDurumu = 0;
+        raporrequest.SiparisTuru = 1;
+        raporrequest.SadeceBekleyenler = 1;
+    }
+
+    private async Task Tamam()
+    {
+        await ModalInstance.CloseAsync(ModalResult.Ok<SiparisRaporuRequestDto>(raporrequest));
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+
+    public async Task CariListesiAc()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (VCariKartDto)result.Data;
+                raporrequest.CariKodu = cariSecim.Kodu;
+            }
+
+        }
+    }
+
+    public async Task MalzemeListesiAc()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Malzeme.Malzeme_Sec>("Malzeme Seç", opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (VMalzemeKartDto)result.Data;
+                raporrequest.MalzemeKodu = Secim.Kodu;
+            }
+
+        }
+    }
+}
