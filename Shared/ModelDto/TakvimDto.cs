@@ -32,5 +32,23 @@ namespace UmotaWebApp.Shared.ModelDto
                 return this.Tarih.HasValue ? this.Tarih.Value.AddHours(1) : null;
             }
         }
+
+        private bool _yapildiMi = false;
+        public bool YapildiMi
+        {
+            get 
+            {
+                if (Yapildi.HasValue && Yapildi.Value == 1)
+                    _yapildiMi = true;
+
+                return _yapildiMi;
+            }
+            set 
+            {
+                _yapildiMi = value;
+
+                this.Yapildi = _yapildiMi ? byte.Parse("1") : byte.Parse("0");
+            }
+        }
     }
 }

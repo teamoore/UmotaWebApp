@@ -81,16 +81,16 @@
     {
         header.HeaderText = "Personel Takvimi";
 
-        await LoadTakvimler();
+        await LoadRecords();
     }
 
-    private async Task LoadTakvimler()
+    private async Task LoadRecords()
     {
         try
         {
             loadingCompleted = false;
 
-            this.takvimler = await TakvimHelper.LoadTakvimler();
+            this.takvimler = await TakvimHelper.LoadRecords();
 
             loadingCompleted = true;
 
@@ -112,9 +112,9 @@
         {
             loadingCompleted = false;
 
-            var takvim = await TakvimHelper.LoadTakvim(logref);
+            var takvim = await TakvimHelper.LoadRecord(logref);
 
-            await TakvimHelper.DeleteTakvim(takvim);
+            await TakvimHelper.DeleteRecord(takvim);
 
             loadingCompleted = true;
         }

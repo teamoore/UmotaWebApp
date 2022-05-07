@@ -58,7 +58,7 @@
                         <label>Cari Adı</label>
                         <InputText @bind-Value="recordDto.Cariadi" class="form-control" placeholder="Cari Adı" disabled />
                     </div>
-                    <div class="col-md-4">                        
+                    <div class="col-md-4">
                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Medium>Bul</MudButton>
                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Color="Color.Info" Size=Size.Medium>Yeni Cari</MudButton>
                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="YeniKisiEkle" Color="Color.Info" Size=Size.Medium>Yeni Kişi</MudButton>
@@ -66,190 +66,173 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-md-4">
-                    <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
-                        <tbody>
-                            <tr>
-                                <td>İlgili Kişi 1</td>
-                                <td>
-                                    <InputSelect @bind-Value="recordDto.Kisiref" class="form-control">
-                                        @if (KisiListesi != null)
-                                        {
-                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                            @foreach (var item in KisiListesi)
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
+                            <tbody>
+                                <tr>
+                                    <td>İlgili Kişi 1</td>
+                                    <td>
+                                        <InputSelect @bind-Value="recordDto.Kisiref" class="form-control">
+                                            @if (KisiListesi != null)
                                             {
-                                                <option value="@item.Logref">@item.Tamadi</option>
+                                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                                @foreach (var item in KisiListesi)
+                                                {
+                                                    <option value="@item.Logref">@item.Tamadi</option>
+                                                }
                                             }
-                                        }
-                                    </InputSelect>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>İlgili Kişi 2</td>
-                                <td>
-                                    <InputSelect @bind-Value="recordDto.Kisiref2" class="form-control">
-                                        @if (KisiListesi != null)
-                                        {
-                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                            @foreach (var item in KisiListesi)
+                                        </InputSelect>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>İlgili Kişi 2</td>
+                                    <td>
+                                        <InputSelect @bind-Value="recordDto.Kisiref2" class="form-control">
+                                            @if (KisiListesi != null)
                                             {
-                                                <option value="@item.Logref">@item.Tamadi</option>
+                                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                                @foreach (var item in KisiListesi)
+                                                {
+                                                    <option value="@item.Logref">@item.Tamadi</option>
+                                                }
                                             }
-                                        }
-                                    </InputSelect>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>İlgili Kişi 3</td>
-                                <td>
-                                    <InputSelect @bind-Value="recordDto.Kisiref3" class="form-control">
-                                        @if (KisiListesi != null)
-                                        {
-                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                            @foreach (var item in KisiListesi)
+                                        </InputSelect>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>İlgili Kişi 3</td>
+                                    <td>
+                                        <InputSelect @bind-Value="recordDto.Kisiref3" class="form-control">
+                                            @if (KisiListesi != null)
                                             {
-                                                <option value="@item.Logref">@item.Tamadi</option>
+                                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                                @foreach (var item in KisiListesi)
+                                                {
+                                                    <option value="@item.Logref">@item.Tamadi</option>
+                                                }
                                             }
-                                        }
-                                    </InputSelect>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>İlgili Kişi 4</td>
-                                <td>
-                                    <InputSelect @bind-Value="recordDto.Kisiref4" class="form-control">
-                                        @if (KisiListesi != null)
-                                        {
-                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                            @foreach (var item in KisiListesi)
+                                        </InputSelect>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>İlgili Kişi 4</td>
+                                    <td>
+                                        <InputSelect @bind-Value="recordDto.Kisiref4" class="form-control">
+                                            @if (KisiListesi != null)
                                             {
-                                                <option value="@item.Logref">@item.Tamadi</option>
+                                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                                @foreach (var item in KisiListesi)
+                                                {
+                                                    <option value="@item.Logref">@item.Tamadi</option>
+                                                }
                                             }
-                                        }
-                                    </InputSelect>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>İlgili Kişi 5</td>
-                                <td>
-                                    <InputSelect @bind-Value="recordDto.Kisiref5" class="form-control">
-                                        @if (KisiListesi != null)
-                                        {
-                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                            @foreach (var item in KisiListesi)
+                                        </InputSelect>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>İlgili Kişi 5</td>
+                                    <td>
+                                        <InputSelect @bind-Value="recordDto.Kisiref5" class="form-control">
+                                            @if (KisiListesi != null)
                                             {
-                                                <option value="@item.Logref">@item.Tamadi</option>
+                                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                                @foreach (var item in KisiListesi)
+                                                {
+                                                    <option value="@item.Logref">@item.Tamadi</option>
+                                                }
                                             }
-                                        }
-                                    </InputSelect>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </MudSimpleTable>
-                </div>
-                <div class="col-md-4">
-                    <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
-                        <tbody>
-                            <tr>
-                                <td>Ürün Grubu 1</td>
-                                <td>
-                                    <InputSelect @bind-Value="recordDto.Grup1" class="form-control">
-                                        @if (UrunGrubuListesi != null)
-                                        {
-                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                            @foreach (var item in UrunGrubuListesi)
+                                        </InputSelect>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </MudSimpleTable>
+                    </div>
+                    <div class="col-md-4">
+                        <MudSimpleTable Dense="true" Hover="false" Bordered="false" Striped="false" Style="overflow-x: auto;">
+                            <tbody>
+                                <tr>
+                                    <td>Ürün Grubu 1</td>
+                                    <td>
+                                        <InputSelect @bind-Value="recordDto.Grup1" class="form-control">
+                                            @if (UrunGrubuListesi != null)
                                             {
-                                                <option value="@item.Adi">@item.Adi</option>
+                                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                                @foreach (var item in UrunGrubuListesi)
+                                                {
+                                                    <option value="@item.Adi">@item.Adi</option>
+                                                }
                                             }
-                                        }
-                                    </InputSelect>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Ürün Grubu 2</td>
-                                <td>
-                                    <InputSelect @bind-Value="recordDto.Grup2" class="form-control">
-                                        @if (UrunGrubuListesi != null)
-                                        {
-                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                            @foreach (var item in UrunGrubuListesi)
+                                        </InputSelect>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Ürün Grubu 2</td>
+                                    <td>
+                                        <InputSelect @bind-Value="recordDto.Grup2" class="form-control">
+                                            @if (UrunGrubuListesi != null)
                                             {
-                                                <option value="@item.Adi">@item.Adi</option>
+                                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                                @foreach (var item in UrunGrubuListesi)
+                                                {
+                                                    <option value="@item.Adi">@item.Adi</option>
+                                                }
                                             }
-                                        }
-                                    </InputSelect>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Ürün Grubu 3</td>
-                                <td>
-                                    <InputSelect @bind-Value="recordDto.Grup3" class="form-control">
-                                        @if (UrunGrubuListesi != null)
-                                        {
-                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                            @foreach (var item in UrunGrubuListesi)
+                                        </InputSelect>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Ürün Grubu 3</td>
+                                    <td>
+                                        <InputSelect @bind-Value="recordDto.Grup3" class="form-control">
+                                            @if (UrunGrubuListesi != null)
                                             {
-                                                <option value="@item.Adi">@item.Adi</option>
+                                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                                @foreach (var item in UrunGrubuListesi)
+                                                {
+                                                    <option value="@item.Adi">@item.Adi</option>
+                                                }
                                             }
-                                        }
-                                    </InputSelect>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Ürün Grubu 4</td>
-                                <td>
-                                    <InputSelect @bind-Value="recordDto.Grup4" class="form-control">
-                                        @if (UrunGrubuListesi != null)
-                                        {
-                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                            @foreach (var item in UrunGrubuListesi)
+                                        </InputSelect>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Ürün Grubu 4</td>
+                                    <td>
+                                        <InputSelect @bind-Value="recordDto.Grup4" class="form-control">
+                                            @if (UrunGrubuListesi != null)
                                             {
-                                                <option value="@item.Adi">@item.Adi</option>
+                                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                                @foreach (var item in UrunGrubuListesi)
+                                                {
+                                                    <option value="@item.Adi">@item.Adi</option>
+                                                }
                                             }
-                                        }
-                                    </InputSelect>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Ürün Grubu 5</td>
-                                <td>
-                                    <InputSelect @bind-Value="recordDto.Grup5" class="form-control">
-                                        @if (UrunGrubuListesi != null)
-                                        {
-                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                            @foreach (var item in UrunGrubuListesi)
+                                        </InputSelect>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Ürün Grubu 5</td>
+                                    <td>
+                                        <InputSelect @bind-Value="recordDto.Grup5" class="form-control">
+                                            @if (UrunGrubuListesi != null)
                                             {
-                                                <option value="@item.Adi">@item.Adi</option>
+                                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                                @foreach (var item in UrunGrubuListesi)
+                                                {
+                                                    <option value="@item.Adi">@item.Adi</option>
+                                                }
                                             }
-                                        }
-                                    </InputSelect>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </MudSimpleTable>
+                                        </InputSelect>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </MudSimpleTable>
+                    </div>
                 </div>
             </div>
-            <br />
-
-            @*<div class="form-group">
-                    <div class="row">
-                        <div class="col-md-2">
-                            <label>Malzeme Kodu</label>
-                            <InputText @bind-Value="recordDto.Malzemekodu" class="form-control" placeholder="Stok Kodu" disabled />
-                        </div>
-                        <div class="col-md-4">
-                            <label>Malzeme Tanımı</label>
-                            <InputText @bind-Value="recordDto.Malzemeadi" class="form-control" placeholder="Stok Adı" disabled />
-                        </div>
-                        <div class="col-md-2">
-                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
-                                       OnClick="MalzemeListesiAc"
-                                       Color="Color.Info" Size="Size.Medium">Bul</MudButton>
-                        </div>
-                    </div>
-                </div>*@
-
+    
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-8">
@@ -275,6 +258,7 @@
                 <MudText>Kaydet</MudText>
             }
         </MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="YeniTakvimEkle">Takvim Oluştur</MudButton>
         <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
     </div>
 
@@ -610,10 +594,9 @@
                 KonuListesi = result;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            Snackbar.Add(ex.Message, severity: Severity.Error);
         }
     }
 
@@ -627,10 +610,9 @@
                 UrunGrubuListesi = result;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            Snackbar.Add(ex.Message, severity: Severity.Error);
         }
     }
 
@@ -692,7 +674,7 @@
                 throw new Exception("Firma Dönem Seçili değil");
 
             var request = new FaaliyetRequestDto();
-            request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);;
+            request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu); ;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
             request.Faaliyet = recordDto;
 
@@ -705,6 +687,27 @@
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    public async Task YeniTakvimEkle()
+    {
+        
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+        
+        var cariForm = modal.Show<Pages.Takvim.Takvim_Ekle_Guncelle>("Yeni Takvim Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+            }
+
         }
     }
 
