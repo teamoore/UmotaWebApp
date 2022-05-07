@@ -255,6 +255,7 @@
                 cariModel.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
                 cariModel.Insdate = DateTime.Now;
                 cariModel.Active = 0;
+                cariModel.Logoref = 0;
                 await NoUret();
             }
             else

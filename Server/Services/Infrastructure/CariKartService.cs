@@ -35,9 +35,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                var results = await dbContext.CariKarts.Where(x => (x.Active == 0) && (x.Kodu.StartsWith("120") || x.Kodu.StartsWith("320")))
+                var results = await dbContext.CariKarts.Where(x => x.Active == 0)
                                         .Take(100)
-                                        .OrderByDescending(x => x.Logref)
+                                        .OrderBy(x => x.Logref)
                                         .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider).ToListAsync();
 
                 return results;
@@ -84,7 +84,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
                 var word = request.CariKart.Adi.ToLower();
-                var results = await dbContext.CariKarts.Where(x => (x.Active == 0) && (x.Kodu.StartsWith("120") || x.Kodu.StartsWith("320")) && 
+                var results = await dbContext.CariKarts.Where(x => (x.Active == 0) && 
                         (x.Adi.ToLower().Contains(word)
                         || x.Adi2.ToLower().Contains(word)
                         || x.Adres1.ToLower().Contains(word)
@@ -93,7 +93,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                         || x.Web.Contains(word)
                         || x.Kodu.Contains(word)))
                     .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider)
-                    .OrderByDescending(x => x.Logref)
+                    .OrderBy(x => x.Logref)
                     .ToListAsync();
 
                 return results;
