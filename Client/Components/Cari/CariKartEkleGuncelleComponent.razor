@@ -28,11 +28,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <label>Ünvanı</label>
-                                    <InputText @bind-Value="cariModel.Adi" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Adi" class="form-control"  maxlength="50"/>
                                 </div>
                                 <div class="col-md-6">
                                     <label>Tabela Ünvanı</label>
-                                    <InputText @bind-Value="cariModel.Adi2" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Adi2" class="form-control"  maxlength="50"/>
                                 </div>
                             </div>
                         </div>
@@ -49,11 +49,11 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label>Vergi/TCK No</label>
-                                    <InputText @bind-Value="cariModel.Vdno" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Vdno" class="form-control"  maxlength="15"/>
                                 </div>
                                 <div class="col-md-3">
                                     <label>Vergi Dairesi</label>
-                                    <InputText @bind-Value="cariModel.Vdadi" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Vdadi" class="form-control"  maxlength="30"/>
                                 </div>
                                 <div class="col-md-3">
                                     <label>Sektör</label>
@@ -80,11 +80,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <label>Adres (1.Satır)</label>
-                                    <InputText @bind-Value="cariModel.Adres1" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Adres1" class="form-control" maxlength="50" />
                                 </div>
                                 <div class="col-md-6">
                                     <label>Adres (2.Satır)</label>
-                                    <InputText @bind-Value="cariModel.Adres1" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Adres2" class="form-control" maxlength="50" />
                                 </div>
                             </div>
                         </div>
@@ -93,15 +93,28 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <label>Ülke</label>
-                                    <InputText @bind-Value="cariModel.Ulke" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Ulke" class="form-control"  maxlength="20"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label>Şehir</label>
-                                    <InputText @bind-Value="cariModel.Il" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Il" class="form-control"  maxlength="20"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label>İlçe</label>
-                                    <InputText @bind-Value="cariModel.Ilce" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Ilce" class="form-control"  maxlength="50"/>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Semt</label>
+                                    <InputText @bind-Value="cariModel.Semt" class="form-control"  maxlength="50"/>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Posta Kodu</label>
+                                    <InputText @bind-Value="cariModel.Postakodu" class="form-control"  maxlength="10"/>
                                 </div>
                             </div>
                         </div>
@@ -110,15 +123,15 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <label>Telefon 1</label>
-                                    <InputText @bind-Value="cariModel.Tel1" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Tel1" class="form-control"  maxlength="17"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label>Telefon 2</label>
-                                    <InputText @bind-Value="cariModel.Tel2" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Tel2" class="form-control"  maxlength="17"/>
                                 </div>
                                 <div class="col-md-4">
                                     <label>Fax</label>
-                                    <InputText @bind-Value="cariModel.Faks" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Faks" class="form-control"  maxlength="17"/>
                                 </div>
                             </div>
                         </div>
@@ -127,11 +140,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <label>E-Posta</label>
-                                    <InputText @bind-Value="cariModel.Mail" class="form-control" type="email" />
+                                    <InputText @bind-Value="cariModel.Mail" class="form-control" type="email"  maxlength="50"/>
                                 </div>
                                 <div class="col-md-6">
                                     <label>Web Sitesi</label>
-                                    <InputText @bind-Value="cariModel.Web" class="form-control" />
+                                    <InputText @bind-Value="cariModel.Web" class="form-control"  maxlength="40"/>
                                 </div>
                             </div>
 
