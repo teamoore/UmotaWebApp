@@ -110,7 +110,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        header.HeaderText = "Sipariş Durum Raporu";
+        header.HeaderText = "Bekleyen Siparişler";
         await KullaniciYetkileriGetir();
 
         await Rapor();
@@ -150,7 +150,7 @@
                     var response = await httpClient.PostGetServiceResponseAsync<List<SiparisRaporuDto>, SiparisRaporuRequestDto>(UrlHelper.SiparisRaporu, request);
                     if (response == null || response.Count == 0)
                     {
-                        Snackbar.Add("Aradığınız kritere göre kayıt bulunamadı.", severity: Severity.Warning);
+                        Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
                         loadingCompleted = true;
                         return;
                     }

@@ -82,8 +82,12 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 db.Open();
                 var p = new DynamicParameters();
+                
+                string selectstr = "";
+                if (request.TopRowCount > 0)
+                    selectstr = "top " + request.TopRowCount;
 
-                var sql = "select *, islem_sayisi IslemSayisi" +
+                var sql = "select "+selectstr+" *, islem_sayisi IslemSayisi" +
                     " from " + Configuration.GetUmotaObjectName("v020_faaliyet", firmaId: request.FirmaId.ToString()) + " a with(nolock) where 1=1";
 
                 var tumFaaliyetleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(request.kullanicikodu, KullaniciYetkiKodlari.TumFaaliyetleriGorebilir);
@@ -160,35 +164,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return result.ToList();
 
             }
-
-            //var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
-            //var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
-            //optionsBuilder.UseSqlServer(connectionstring);
-
-            //using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
-            //{
-            //    var word = request.Aranacak.ToLower();
-            //    var tumFaaliyetleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(request.kullanicikodu, KullaniciYetkiKodlari.TumFaaliyetleriGorebilir);
-
-            //    return await dbContext.V020Faaliyets.Where(x => 
-            //    (x.Yapilanlar.ToLower().Contains(word)
-            //    || x.Grup1.ToLower().Contains(word)
-            //    || x.Grup2.ToLower().Contains(word)
-            //    || x.Grup3.ToLower().Contains(word)
-            //    || x.Grup4.ToLower().Contains(word)
-            //    || x.Grup5.ToLower().Contains(word)
-            //    || x.Malzemeadi.ToLower().Contains(word)
-            //    || x.Malzemekodu.ToLower().Contains(word)
-            //    || x.Giren.ToLower().Contains(word)
-            //    || x.Cariadi.ToLower().Contains(word)
-            //    || x.Carikodu.ToLower().Contains(word)
-            //    || x.Konu.ToLower().Contains(word)
-            //    || x.Kisiadi.ToLower().Contains(word))
-            //    && (tumFaaliyetleriGormeYetkisi == 1 || x.Insuser == request.kullanicikodu)
-            //    ).OrderByDescending(x => x.Tarih
-            //    ).ProjectTo<FaaliyetDto>(Mapper.ConfigurationProvider).ToListAsync();
-            //}
-
         }
         public async Task<FaaliyetDto> SaveFaaliyet(FaaliyetRequestDto request)
         {

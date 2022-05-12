@@ -14,11 +14,8 @@
     <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
 }
 
-<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<CariDurumRaporuDto,bool>(FilterFunc1)">
+<MudTable Items="@mainDataList" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true">
     <HeaderContent>
-        <MudTh>Cari Grup</MudTh>
-        <MudTh>Özel Kod3</MudTh>
-        <MudTh>Özel Kod3 Açıklama</MudTh>
         <MudTh>Cari Kodu</MudTh>
         <MudTh>Cari Adı</MudTh>
         <MudTh>Bakiye</MudTh>
@@ -28,11 +25,10 @@
         <MudTh>Son Fatura Tarihi</MudTh>
         <MudTh>Kaç gün geçmiş</MudTh>
         <MudTh>Batak</MudTh>
+        <MudTh>Özel Kod3</MudTh>
+        <MudTh>Özel Kod3 Açıklama</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Cari Grup">@context.carigrup</MudTd>
-        <MudTd DataLabel="Özel Kod3">@context.specode3</MudTd>
-        <MudTd DataLabel="Özel Kod3 Açıklama">@context.specode3adi</MudTd>
         <MudTd DataLabel="Cari Kodu">@context.carikodu</MudTd>
         <MudTd DataLabel="Cari Adı">@context.cariadi</MudTd>
         <MudTd DataLabel="Bakiye" Style="text-align:right">@context.bakiyeFormatted</MudTd>
@@ -42,6 +38,8 @@
         <MudTd DataLabel="Son Fatura Tarihi">@context.sonfattarFormatted</MudTd>
         <MudTd DataLabel="Kaç gün geçmiş">@context.kacgungecmis</MudTd>
         <MudTd DataLabel="Batak">@context.specode4</MudTd>
+        <MudTd DataLabel="Özel Kod3">@context.specode3</MudTd>
+        <MudTd DataLabel="Özel Kod3 Açıklama">@context.specode3adi</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
@@ -69,32 +67,11 @@
 
     public HeaderBarSearch header = new HeaderBarSearch();
 
-    public List<CariDurumRaporuDto> items = new List<CariDurumRaporuDto>();
+    public List<CariDurumRaporuDto> mainDataList = new List<CariDurumRaporuDto>();
 
-    private string _searchString;
-    private bool _sortNameByLength;
     private bool loadingCompleted = true;
     private bool sayfayiGormeYetkisi = true;
     private bool isAdmin = true;
-
-    private bool FilterFunc1(CariDurumRaporuDto element) => FilterFunc(element, _searchString);
-
-    private bool FilterFunc(CariDurumRaporuDto element, string searchString)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.cariadi != null && element.cariadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.carikodu != null && element.carikodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.specode3 != null && element.specode3.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.specode3adi != null && element.specode3adi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.specode4 != null && element.specode4.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -139,15 +116,10 @@
                     if (!string.IsNullOrWhiteSpace(request.CariAdi))
                         request.CariAdi = '%' + request.CariAdi + '%';
 
-                    var response = await httpClient.PostGetServiceResponseAsync<List<CariDurumRaporuDto>, CariDurumRaporuRequestDto>(UrlHelper.CariDurumRaporu, request);
-                    if (response == null || response.Count == 0)
-                    {
-                        Snackbar.Add("Aradığınız kritere göre kayıt bulunamadı.", severity: Severity.Warning);
-                        loadingCompleted = true;
-                        return;
-                    }
+                    mainDataList = await httpClient.PostGetServiceResponseAsync<List<CariDurumRaporuDto>, CariDurumRaporuRequestDto>(UrlHelper.CariDurumRaporu, request);
                     loadingCompleted = true;
-                    items = response;
+                    if (mainDataList == null || mainDataList.Count == 0)
+                        Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
                 }
             }
         }

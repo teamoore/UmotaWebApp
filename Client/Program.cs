@@ -30,6 +30,8 @@ namespace UmotaWebApp.Client
             builder.Services.AddBlazoredLocalStorage();
             builder.Services.AddScoped<ModalManager>();
             builder.Services.AddScoped<TakvimHelper>();
+            builder.Services.AddScoped<YetkiHelper>();
+            builder.Services.AddScoped<FaaliyetHelper>();
             builder.Services.AddScoped<Radzen.DialogService>();
             builder.Services.AddScoped<Helper>();
             builder.Services.AddAuthorizationCore();

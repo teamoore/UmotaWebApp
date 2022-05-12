@@ -39,6 +39,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 p.Add("@RaporTarihi", request.RaporTarihi);
                 p.Add("@SearchText", request.SearchText);
                 p.Add("@CariAdi", request.CariAdi);
+                p.Add("@BatakGelmesin", request.BatakGelsin ? false : true);
+                p.Add("@AvukatGelmesin", request.AvukatGelsin ? false : true);
+                p.Add("@AvansGelmesin", request.AvansGelsin ? false : true);
 
                 var res = await db.QueryAsync<CariDurumRaporuDto>("UmotaRaporSP_CariDurum", p, commandType: CommandType.StoredProcedure);
                 return res.ToList();

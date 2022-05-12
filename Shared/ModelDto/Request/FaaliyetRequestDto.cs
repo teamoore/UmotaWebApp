@@ -19,5 +19,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public string Konu { get; set; }
         public string UrunGrubu { get; set; }
         public string Giren { get; set; }
+        public int TopRowCount { get; set; }
     }
 }
