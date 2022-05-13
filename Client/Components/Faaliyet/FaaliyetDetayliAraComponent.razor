@@ -75,8 +75,12 @@
 </EditForm>
 
 @code {
+    [Parameter]
+    public FaaliyetRequestDto mainRequest { get; set; }
+
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
 
     [Inject]
     ISnackbar Snackbar { get; set; }
@@ -101,6 +105,9 @@
     {
         await GetKonuListesi();
         await GetUrunGrubuListesi();
+
+        if (mainRequest != null)
+            faaliyetrequest = mainRequest;
     }
 
     private async Task Tamam()

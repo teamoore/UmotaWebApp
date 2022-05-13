@@ -28,5 +28,12 @@ namespace UmotaWebApp.Shared.ModelDto
                 return this.KullaniciYetkiKodu == "ADM" ? "Admin" : "Standart";
             }
         }
+        public bool isAdmin
+        {
+            get
+            {
+                return this.KullaniciYetkiKodu == "ADM" ? true : false;
+            }
+        }
     }
 }

@@ -8,7 +8,7 @@ using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Client.ServiceHelpers
 {
-    public class TakvimHelper : IDataHelper<TakvimDto>
+    public class TakvimHelper : IDataHelper<TakvimDto, TakvimRequestDto>
     {
         public HttpClient httpClient { get; set; }
         public ILocalStorageService LocalStorageService { get; set; }
@@ -43,6 +43,19 @@ namespace UmotaWebApp.Client.ServiceHelpers
             var takvimler = await httpClient.PostGetServiceResponseAsync<List<TakvimDto>, TakvimRequestDto>(UrlHelper.TakvimListesi, request);
 
             
+            return takvimler;
+        }
+
+        public async Task<List<TakvimDto>> LoadRecords(TakvimRequestDto request)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+            request.User = kullanicikodu;
+
+            var takvimler = await httpClient.PostGetServiceResponseAsync<List<TakvimDto>, TakvimRequestDto>(UrlHelper.TakvimListesi, request);
+
             return takvimler;
         }
 

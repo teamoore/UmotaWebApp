@@ -1,4 +1,4 @@
-﻿<EditForm Model="recordDto">
+﻿<EditForm Model="mainRecord">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
@@ -14,15 +14,15 @@
                 <div class="row">
                     <div class="col-md-3">
                         <label>Faaliyet Tarihi</label>
-                        <InputDate @bind-Value="recordDto.Tarih" class="form-control"></InputDate>
+                        <InputDate @bind-Value="mainRecord.Tarih" class="form-control"></InputDate>
                     </div>
                     <div class="col-md-2">
-                        <MudTimePicker Label="Faaliyet Saati" Editable="true" @bind-Time="recordDto.FaaliyetSaati" />
+                        <MudTimePicker Label="Faaliyet Saati" Editable="true" @bind-Time="mainRecord.FaaliyetSaati" />
                     </div>
 
                     <div class="col-md-2">
                         <label>Faaliyet Türü</label>
-                        <InputSelect @bind-Value="recordDto.Islemturu" class="form-control">
+                        <InputSelect @bind-Value="mainRecord.Islemturu" class="form-control">
                             <option value="1">Gerçekleşen Faaliyet</option>
                             <option value="0">Planlanan Faaliyet</option>
                         </InputSelect>
@@ -42,7 +42,7 @@
                     </div>
                     <div class="col-md-2">
                         <label>Faaliyet Sayısı</label>
-                        <InputNumber @bind-Value="recordDto.IslemSayisi" class="form-control" placeholder="Faaliyet Sayısı" disabled />
+                        <InputNumber @bind-Value="mainRecord.IslemSayisi" class="form-control" placeholder="Faaliyet Sayısı" disabled />
                     </div>
                 </div>
 
@@ -52,11 +52,11 @@
                 <div class="row">
                     <div class="col-md-2">
                         <label>Cari Kodu</label>
-                        <InputText @bind-Value="recordDto.Carikodu" class="form-control" placeholder="Cari Kodu" disabled />
+                        <InputText @bind-Value="mainRecord.Carikodu" class="form-control" placeholder="Cari Kodu" disabled />
                     </div>
                     <div class="col-md-4">
                         <label>Cari Adı</label>
-                        <InputText @bind-Value="recordDto.Cariadi" class="form-control" placeholder="Cari Adı" disabled />
+                        <InputText @bind-Value="mainRecord.Cariadi" class="form-control" placeholder="Cari Adı" disabled />
                     </div>
                     <div class="col-md-4">
                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Medium>Bul</MudButton>
@@ -74,7 +74,7 @@
                                 <tr>
                                     <td>İlgili Kişi 1</td>
                                     <td>
-                                        <InputSelect @bind-Value="recordDto.Kisiref" class="form-control">
+                                        <InputSelect @bind-Value="mainRecord.Kisiref" class="form-control">
                                             @if (KisiListesi != null)
                                             {
                                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -89,7 +89,7 @@
                                 <tr>
                                     <td>İlgili Kişi 2</td>
                                     <td>
-                                        <InputSelect @bind-Value="recordDto.Kisiref2" class="form-control">
+                                        <InputSelect @bind-Value="mainRecord.Kisiref2" class="form-control">
                                             @if (KisiListesi != null)
                                             {
                                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -104,7 +104,7 @@
                                 <tr>
                                     <td>İlgili Kişi 3</td>
                                     <td>
-                                        <InputSelect @bind-Value="recordDto.Kisiref3" class="form-control">
+                                        <InputSelect @bind-Value="mainRecord.Kisiref3" class="form-control">
                                             @if (KisiListesi != null)
                                             {
                                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -119,7 +119,7 @@
                                 <tr>
                                     <td>İlgili Kişi 4</td>
                                     <td>
-                                        <InputSelect @bind-Value="recordDto.Kisiref4" class="form-control">
+                                        <InputSelect @bind-Value="mainRecord.Kisiref4" class="form-control">
                                             @if (KisiListesi != null)
                                             {
                                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -134,7 +134,7 @@
                                 <tr>
                                     <td>İlgili Kişi 5</td>
                                     <td>
-                                        <InputSelect @bind-Value="recordDto.Kisiref5" class="form-control">
+                                        <InputSelect @bind-Value="mainRecord.Kisiref5" class="form-control">
                                             @if (KisiListesi != null)
                                             {
                                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -155,7 +155,7 @@
                                 <tr>
                                     <td>Ürün Grubu 1</td>
                                     <td>
-                                        <InputSelect @bind-Value="recordDto.Grup1" class="form-control">
+                                        <InputSelect @bind-Value="mainRecord.Grup1" class="form-control">
                                             @if (UrunGrubuListesi != null)
                                             {
                                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -170,7 +170,7 @@
                                 <tr>
                                     <td>Ürün Grubu 2</td>
                                     <td>
-                                        <InputSelect @bind-Value="recordDto.Grup2" class="form-control">
+                                        <InputSelect @bind-Value="mainRecord.Grup2" class="form-control">
                                             @if (UrunGrubuListesi != null)
                                             {
                                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -185,7 +185,7 @@
                                 <tr>
                                     <td>Ürün Grubu 3</td>
                                     <td>
-                                        <InputSelect @bind-Value="recordDto.Grup3" class="form-control">
+                                        <InputSelect @bind-Value="mainRecord.Grup3" class="form-control">
                                             @if (UrunGrubuListesi != null)
                                             {
                                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -200,7 +200,7 @@
                                 <tr>
                                     <td>Ürün Grubu 4</td>
                                     <td>
-                                        <InputSelect @bind-Value="recordDto.Grup4" class="form-control">
+                                        <InputSelect @bind-Value="mainRecord.Grup4" class="form-control">
                                             @if (UrunGrubuListesi != null)
                                             {
                                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -215,7 +215,7 @@
                                 <tr>
                                     <td>Ürün Grubu 5</td>
                                     <td>
-                                        <InputSelect @bind-Value="recordDto.Grup5" class="form-control">
+                                        <InputSelect @bind-Value="mainRecord.Grup5" class="form-control">
                                             @if (UrunGrubuListesi != null)
                                             {
                                                 <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -237,7 +237,7 @@
                 <div class="row">
                     <div class="col-md-8">
                         <label>Açıklama</label>
-                        <InputTextArea @bind-Value="recordDto.Yapilanlar" class="form-control" rows="5"></InputTextArea>
+                        <InputTextArea @bind-Value="mainRecord.Yapilanlar" class="form-control" rows="5"></InputTextArea>
                     </div>
                 </div>
             </div>
@@ -283,6 +283,12 @@
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    FaaliyetHelper mainDataHelper { get; set; }
+
     [Parameter]
     public int? logRef { get; set; }
 
@@ -292,8 +298,10 @@
     public bool IsUpdate { get; set; }
     private bool loadingCompleted = false;
     private bool _processing = false;
+    private string listPage = "faaliyet_listef";
+    private string tableName = "faaliyet";
 
-    FaaliyetDto recordDto = new FaaliyetDto();
+    FaaliyetDto mainRecord = new FaaliyetDto();
 
     public List<SisSabitlerDetayDto> UrunGrubuListesi { get; set; }
     public List<SisSabitlerDetayDto> KonuListesi { get; set; }
@@ -304,12 +312,12 @@
     {
         get
         {
-            return recordDto.Konu;
+            return mainRecord.Konu;
         }
         set
         {
             _konu = value;
-            recordDto.Konu = _konu;
+            mainRecord.Konu = _konu;
 
             CariFaaliyetSayisiGetir().GetAwaiter();
         }
@@ -319,14 +327,11 @@
     {
         IsUpdate = logRef.HasValue;
 
-        if (!IsUpdate)
-        {
-            recordDto.Tarih = DateTime.Now;
-            recordDto.FaaliyetSaati = recordDto.Tarih.Value.GetTime();
-            recordDto.Islemturu = 1;
-        }
+        if (IsUpdate)
+            await GetRecord();
+        else
+            await NewRecord();
 
-        await GetRecord();
         await GetKonuListesi();
         await GetUrunGrubuListesi();
         await GetKisiListesi();
@@ -335,27 +340,24 @@
 
     public async Task GetRecord()
     {
+        if (logRef.HasValue == false)
+            return;
+
         try
         {
-            if (logRef.HasValue == false)
-                return;
-
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
-
-            var result = await httpClient.GetServiceResponseAsync<FaaliyetDto>(UrlHelper.FaaliyetGetir + "?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no);
-            if (result != null)
-            {
-                recordDto = result;
-                recordDto.FaaliyetSaati = recordDto.Tarih.Value.GetTime();
-            }
+            this.mainRecord = await mainDataHelper.LoadRecord(this.logRef.Value);
         }
         catch (Exception ex)
         {
-            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+            Snackbar.Add(ex.Message, severity: Severity.Error);
         }
+    }
+
+    public async Task NewRecord()
+    {
+        mainRecord.Tarih = DateTime.Now;
+        mainRecord.FaaliyetSaati = mainRecord.Tarih.Value.GetTime();
+        mainRecord.Islemturu = 1;
     }
 
     public async Task ValidSubmit()
@@ -379,9 +381,9 @@
             if (result.Data != null)
             {
                 var cariSecim = (VCariKartDto)result.Data;
-                recordDto.Cariadi = cariSecim.Adi;
-                recordDto.Carikodu = cariSecim.Kodu;
-                recordDto.Cariref = cariSecim.Logref;
+                mainRecord.Cariadi = cariSecim.Adi;
+                mainRecord.Carikodu = cariSecim.Kodu;
+                mainRecord.Cariref = cariSecim.Logref;
                 await GetKisiListesi();
                 await CariFaaliyetSayisiGetir();
             }
@@ -404,19 +406,19 @@
             if (result.Data != null)
             {
                 var cariSecim = (CariKartDto)result.Data;
-                recordDto.Cariadi = cariSecim.Adi;
-                recordDto.Carikodu = cariSecim.Kodu;
-                recordDto.Cariref = cariSecim.Logref;
+                mainRecord.Cariadi = cariSecim.Adi;
+                mainRecord.Carikodu = cariSecim.Kodu;
+                mainRecord.Cariref = cariSecim.Logref;
                 KisiListesi = new List<KisilerDto>();
-                if (recordDto.Islemturu == 1)
-                    recordDto.IslemSayisi = 1;
+                if (mainRecord.Islemturu == 1)
+                    mainRecord.IslemSayisi = 1;
             }
         }
     }
 
     public async Task YeniKisiEkle()
     {
-        if (!recordDto.Cariref.HasValue)
+        if (!mainRecord.Cariref.HasValue)
             return;
 
         var opt = new ModalOptions();
@@ -424,7 +426,7 @@
 
         var parameters = new ModalParameters();
         parameters.Add("modalForm", 1);
-        parameters.Add("CariKartRef", recordDto.Cariref);
+        parameters.Add("CariKartRef", mainRecord.Cariref);
 
         var cariForm = modal.Show<CariKartKisiEkleGuncelleComponent>("Yeni Kişi Ekle", parameters: parameters, options: opt);
         var result = await cariForm.Result;
@@ -445,36 +447,26 @@
         try
         {
             SubmitValidation();
-
-            _processing = true;
-            recordDto.Upddate = DateTime.Now;
-            recordDto.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            recordDto.Status = 1;
-            recordDto.Tarih = recordDto.Tarih.Value.ChangeTime(recordDto.FaaliyetSaati);
-
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
-
-            var request = new FaaliyetRequestDto();
-            request.Faaliyet = recordDto;
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
-
-            var result = await httpClient.PostGetServiceResponseAsync<FaaliyetDto, FaaliyetRequestDto>(UrlHelper.FaaliyetGuncelle, request);
-
-            Snackbar.Add("Faaliyet güncellendi", severity: Severity.Success);
-
-            navigation.NavigateTo("/faaliyet_listef");
-
         }
-        catch (ClientException e)
+        catch (ClientException ex)
         {
-            foreach (var item in e.ErrorList)
+            foreach (var item in ex.ErrorList)
             {
                 Snackbar.Add(item, severity: Severity.Warning);
             }
             return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            await mainDataHelper.UpdateRecord(mainRecord);
+
+            navigation.NavigateTo("/" + listPage);
         }
         catch (Exception ex)
         {
@@ -488,12 +480,6 @@
 
     private async Task SaveRecord()
     {
-
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-        if (selectedFirmaDonem == null)
-            throw new Exception("Firma Dönem Seçili değil");
-
         try
         {
             SubmitValidation();
@@ -513,24 +499,11 @@
         try
         {
             _processing = true;
-            recordDto.Insdate = DateTime.Now;
-            recordDto.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            recordDto.Giren = recordDto.Insuser;
-            recordDto.Tarih = recordDto.Tarih.Value.ChangeTime(recordDto.FaaliyetSaati);
-            recordDto.Status = 0;
 
-            await LogRefUret();
+            mainRecord.Logref = await yetkiHelper.RefNoAl(tableName);
+            await mainDataHelper.SaveRecord(mainRecord);
 
-            var request = new FaaliyetRequestDto();
-            request.Faaliyet = recordDto;
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
-
-            var result = await httpClient.PostGetServiceResponseAsync<FaaliyetDto, FaaliyetRequestDto>(UrlHelper.FaaliyetKaydet, request);
-
-            Snackbar.Add("Faaliyet güncellendi", severity: Severity.Success);
-
-            navigation.NavigateTo("/faaliyet_listef");
-
+            navigation.NavigateTo("/" + listPage);
         }
         catch (Exception ex)
         {
@@ -547,32 +520,20 @@
         await OnVazgecClicked.InvokeAsync();
     }
 
-    public async Task LogRefUret()
-    {
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-        if (selectedFirmaDonem == null)
-            throw new Exception("Firma Dönem Seçili değil");
-
-        var result2 = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=faaliyet&firmaId=" + selectedFirmaDonem.firma_no.Value);
-        recordDto.Logref = result2;
-
-    }
-
     public void SubmitValidation()
     {
         var err = new List<string>();
 
-        if (!recordDto.Cariref.HasValue)
+        if (!mainRecord.Cariref.HasValue)
             err.Add("Cari Hesap boş geçilemez");
 
-        if (!recordDto.Kisiref.HasValue)
+        if (!mainRecord.Kisiref.HasValue)
             err.Add("Firma yetkilisi boş geçilemez");
 
-        if (!recordDto.Islemturu.HasValue)
+        if (!mainRecord.Islemturu.HasValue)
             err.Add("Faaliyet türü boş geçilemez");
 
-        if (string.IsNullOrWhiteSpace(recordDto.Konu))
+        if (string.IsNullOrWhiteSpace(mainRecord.Konu))
             err.Add("Faaliyet konusu boş geçilemez");
 
         if (err.Count > 0)
@@ -620,12 +581,12 @@
     {
         try
         {
-            if (recordDto.Cariref.HasValue == false)
+            if (mainRecord.Cariref.HasValue == false)
                 return;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
-            var result = await httpClient.GetServiceResponseAsync<List<KisilerDto>>(UrlHelper.CariKartKisiGetir + "?cariref=" + recordDto.Cariref + "&firmaId=" + selectedFirmaDonem.firma_no);
+            var result = await httpClient.GetServiceResponseAsync<List<KisilerDto>>(UrlHelper.CariKartKisiGetir + "?cariref=" + mainRecord.Cariref + "&firmaId=" + selectedFirmaDonem.firma_no);
             if (result != null)
             {
                 KisiListesi = result;
@@ -651,9 +612,9 @@
             if (result.Data != null)
             {
                 var mkart = (MalzemeKartDto)result.Data;
-                recordDto.Malzemeref = mkart.Logref;
-                recordDto.Malzemeadi = mkart.Adi;
-                recordDto.Malzemekodu = mkart.Kodu;
+                mainRecord.Malzemeref = mkart.Logref;
+                mainRecord.Malzemeadi = mkart.Adi;
+                mainRecord.Malzemekodu = mkart.Kodu;
             }
             else
             {
@@ -665,7 +626,7 @@
     {
         try
         {
-            if (!recordDto.Cariref.HasValue || recordDto.Konu == null || recordDto.Islemturu != 1)
+            if (!mainRecord.Cariref.HasValue || mainRecord.Konu == null || mainRecord.Islemturu != 1)
                 return;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
@@ -676,11 +637,11 @@
             var request = new FaaliyetRequestDto();
             request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu); ;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
-            request.Faaliyet = recordDto;
+            request.Faaliyet = mainRecord;
 
             var result = await httpClient.PostGetServiceResponseAsync<int, FaaliyetRequestDto>(UrlHelper.CariFaaliyetSayisi, request);
 
-            recordDto.IslemSayisi = result;
+            mainRecord.IslemSayisi = result;
 
             this.StateHasChanged();
         }
@@ -692,13 +653,13 @@
 
     public async Task YeniTakvimEkle()
     {
-        
+
         var opt = new ModalOptions();
         opt.ContentScrollable = true;
 
         var parameters = new ModalParameters();
         parameters.Add("modalForm", 1);
-        
+
         var cariForm = modal.Show<Pages.Takvim.Takvim_Ekle_Guncelle>("Yeni Takvim Ekle", parameters: parameters, options: opt);
         var result = await cariForm.Result;
 

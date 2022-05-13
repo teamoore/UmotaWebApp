@@ -1,13 +1,15 @@
 ﻿@page "/malzeme_listef"
 
-<Malzeme_Detayli_Ara header="detayAraBar" onSearchButtonClicked="Search"></Malzeme_Detayli_Ara>
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="true"
+                 onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick" ShowSearchSection="true"></HeaderSearchBar>
 
 @if (loadingCompleted == false)
 {
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@list" RowsPerPage="100" FixedHeader="true" Height="500px" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<MalzemeKartDto,bool>(FilterFunc1)">
+<MudTable Items="@mainDataList" RowsPerPage="100" FixedHeader="true" Height="500px" Dense="true" Hover="true" Bordered="true" Striped="true">
     <ToolBarContent>
         <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="Ekle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
     </ToolBarContent>
@@ -70,73 +72,19 @@
     [Inject]
     ISnackbar Snackbar { get; set; }
 
-    public MalzemeStokRequestDto detayAraBar = new MalzemeStokRequestDto();
+    [CascadingParameter] IModalService modal { get; set; }
 
-    public List<MalzemeKartDto> list = new List<MalzemeKartDto>();
-    private string _searchString;
-    private bool _sortNameByLength;
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public List<MalzemeKartDto> mainDataList = new List<MalzemeKartDto>();
     private bool loadingCompleted = false;
-
-    private bool FilterFunc1(MalzemeKartDto element) => FilterFunc(element, _searchString);
-
-    private bool FilterFunc(MalzemeKartDto element, string searchString)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.Adi != null && element.Adi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Kodu != null && element.Kodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Marka != null && element.Marka.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
-    }
 
     protected override async Task OnInitializedAsync()
     {
-        detayAraBar.HeaderText = "CRM Malzeme Listesi";
+        header.HeaderText = "CRM Malzeme Listesi";
 
         await LoadList();
         loadingCompleted = true;
-    }
-
-    public async Task Search()
-    {
-        try
-        {
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma dönem seçilmedi");
-
-            loadingCompleted = false;
-            this.StateHasChanged();
-            var request = new MalzemeKartRequestDto();
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
-            if (!string.IsNullOrWhiteSpace(detayAraBar.SearchText))
-                request.SearchText = detayAraBar.SearchText;
-            if (!string.IsNullOrWhiteSpace(detayAraBar.MalzemeMarka))
-                request.Marka = detayAraBar.MalzemeMarka;
-            if (!string.IsNullOrWhiteSpace(detayAraBar.MalzemeAdi))
-                request.MalzemeAdi = detayAraBar.MalzemeAdi;
-            if (!string.IsNullOrWhiteSpace(detayAraBar.MalzemeKodu))
-                request.MalzemeKodu = detayAraBar.MalzemeKodu;
-
-            var result = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
-            list = result;
-
-            if (list == null || list.Count == 0)
-            {
-                Snackbar.Add("Veri bulunamadı", severity: Severity.Warning);
-            }
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
-        }
-        finally
-        {
-            loadingCompleted = true;
-        }
     }
 
     private async Task LoadList()
@@ -148,12 +96,93 @@
                 throw new Exception("Firma dönem seçilmedi");
 
             loadingCompleted = false;
-            list = await httpClient.GetServiceResponseAsync<List<MalzemeKartDto>>(UrlHelper.MalzemeKartListesi + "?firmaId=" + selectedFirmaDonem.firma_no.Value);
+            mainDataList = await httpClient.GetServiceResponseAsync<List<MalzemeKartDto>>(UrlHelper.MalzemeKartListesi + "?firmaId=" + selectedFirmaDonem.firma_no.Value);
             loadingCompleted = true;
         }
         catch (Exception)
         {
             throw;
+        }
+    }
+
+    public async Task BtnAraClick()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma dönem seçilmedi");
+
+            loadingCompleted = false;
+            this.StateHasChanged();
+            var request = new MalzemeKartRequestDto();
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+            if (!string.IsNullOrWhiteSpace(header.SearchText))
+                request.SearchText = header.SearchText;
+
+            mainDataList = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+            if (mainDataList == null || mainDataList.Count == 0)
+                Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı", severity: Severity.Warning);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            loadingCompleted = true;
+        }
+    }
+
+    public async Task BtnDetayliAraClick()
+    {
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma dönem seçilmedi");
+
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            var filterForm = modal.Show<Pages.Malzeme.Stok_Liste_Filters>("Arama Seçenekleri", opt);
+            var result = await filterForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+
+                    var mrequest = (MalzemeStokRequestDto)result.Data;
+
+                    var request = new MalzemeKartRequestDto();
+                    request.FirmaId = selectedFirmaDonem.firma_no.Value;
+                    if (!string.IsNullOrWhiteSpace(header.SearchText))
+                        request.SearchText = header.SearchText;
+
+                    if (!string.IsNullOrWhiteSpace(mrequest.MalzemeMarka))
+                        request.Marka = mrequest.MalzemeMarka;
+                    if (!string.IsNullOrWhiteSpace(mrequest.MalzemeAdi))
+                        request.MalzemeAdi = mrequest.MalzemeAdi;
+                    if (!string.IsNullOrWhiteSpace(mrequest.MalzemeKodu))
+                        request.MalzemeKodu = mrequest.MalzemeKodu;
+
+                    mainDataList = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+                    if (mainDataList == null || mainDataList.Count == 0)
+                        Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı", severity: Severity.Warning);
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            loadingCompleted = true;
         }
     }
 

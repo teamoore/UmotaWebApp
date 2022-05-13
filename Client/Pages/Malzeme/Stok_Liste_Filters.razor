@@ -1,0 +1,81 @@
+﻿<EditForm Model="raporrequest">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mt-12">
+        <div class="form">
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-10">
+                        <label>Malzeme Adı</label>
+                        <InputText @bind-Value="raporrequest.MalzemeAdi" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Malzeme Kodu</label>
+                        <InputText @bind-Value="raporrequest.MalzemeKodu" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Marka</label>
+                        <InputText @bind-Value="raporrequest.MalzemeMarka" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Tamam" OnClick="Tamam" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+
+</EditForm>
+
+@code {
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    MalzemeStokRequestDto raporrequest = new MalzemeStokRequestDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    private async Task Tamam()
+    {
+        await ModalInstance.CloseAsync(ModalResult.Ok<MalzemeStokRequestDto>(raporrequest));
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+
+}

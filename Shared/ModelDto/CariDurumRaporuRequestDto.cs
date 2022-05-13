@@ -16,5 +16,8 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? RaporTarihi { get; set; }
         public string SearchText { get; set; }
         public string CariAdi { get; set; }
+        public bool BatakGelsin { get; set; }
+        public bool AvukatGelsin { get; set; }
+        public bool AvansGelsin { get; set; }
     }
 }

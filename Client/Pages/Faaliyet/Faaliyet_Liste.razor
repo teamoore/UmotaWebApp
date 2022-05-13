@@ -1,22 +1,25 @@
 ﻿@page "/faaliyet_listef"
 
-<HeaderSearchBar header="header" onAddNewButtonClicked="YeniKayitEkle"
-                 ShowButtons="false" ShowFilterButton="true"
-                 onDoneButtonClicked="FaaliyetAra" onFilterButtonClicked="FaaliyetDetayliAra"  ShowSearchSection="_ShowSearchSection"></HeaderSearchBar>
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="true" ShowSearchSection="true"
+                 onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick"></HeaderSearchBar>
 
 @if (loadingCompleted == false)
 {
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@listItems" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<FaaliyetDto,bool>(FilterFunc1)">
+@if (menuYetkiDto.View == false)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
+}
+
+<MudTable Items="@mainDataList" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
     <ToolBarContent>
-        @if (menuEklemeYetkisi)
+        @if (menuYetkiDto.Insert)
         {
             <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         }
-        <MudSpacer />
-        @*<MudTextField @bind-Value="_searchString" Placeholder="Faaliyet Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>*@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
@@ -35,7 +38,7 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            @if (menuDegistirmeYetkisi)
+            @if (menuYetkiDto.Update)
             {
                 <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Degistir(context.Logref))" Size="Size.Medium" />
             }
@@ -57,7 +60,7 @@
             </MudTooltip>
         </MudTd>
         <MudTd>
-            @if (menuSilmeYetkisi)
+            @if (menuYetkiDto.Delete)
             {
                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
             }
@@ -73,6 +76,7 @@
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
 
     [Inject]
     ModalManager ModalManager { get; set; }
@@ -89,83 +93,32 @@
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
-    public List<FaaliyetDto> listItems { get; set; }
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    FaaliyetHelper mainDataHelper { get; set; }
 
     public HeaderBarSearch header = new HeaderBarSearch();
+    public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
+    public List<FaaliyetDto> mainDataList { get; set; }
+    public FaaliyetRequestDto mainDataRequest = new FaaliyetRequestDto();
 
-    private string _searchString = "";
-    private bool _sortNameByLength;
-    private bool _ShowSearchSection = true;
-
+    private string formName = "faaliyet_listef";
+    private string insertPage = "faaliyet_listef_ekle";
+    private string updatePage = "faaliyet_listef_guncelle";
+    private string headerText = "Faaliyet Listesi";
     private bool loadingCompleted = false;
-
-    private bool isAdmin { get; set; }
-
-    private bool menuGormeYetkisi { get; set; }
-    private bool menuEklemeYetkisi { get; set; }
-    private bool menuDegistirmeYetkisi { get; set; }
-    private bool menuSilmeYetkisi { get; set; }
-
-    private bool FilterFunc1(FaaliyetDto element) => FilterFunc(element, _searchString);
-
-    private bool FilterFunc(FaaliyetDto element, string searchString)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.Konu != null && element.Konu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Cariadi != null && element.Cariadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Kisiadi != null && element.Kisiadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Kisiadi2 != null && element.Kisiadi2.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Kisiadi3 != null && element.Kisiadi3.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Kisiadi4 != null && element.Kisiadi4.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Kisiadi5 != null && element.Kisiadi5.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Grup1 != null && element.Grup1.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Grup2 != null && element.Grup2.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Grup3 != null && element.Grup3.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Grup4 != null && element.Grup4.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Grup5 != null && element.Grup5.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Insuser != null && element.Insuser.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Yapilanlar != null && element.Yapilanlar.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-
-
-
-        return false;
-    }
-
-    private void YetkiControl()
-    {
-        menuGormeYetkisi = isAdmin ? isAdmin : false;
-        menuEklemeYetkisi = isAdmin ? isAdmin : false;
-        menuDegistirmeYetkisi = isAdmin ? isAdmin : false;
-        menuSilmeYetkisi = isAdmin ? isAdmin : false;
-    }
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            header.HeaderText = "Faaliyet Listesi";
-            await CheckUser();
+            header.HeaderText = headerText;
 
-            YetkiControl();
+            menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
 
-            if (!isAdmin)
-                await GetUserMenuYetkisi();
-
+            await NewDataRequest();
             await LoadList();
         }
         catch (Exception ex)
@@ -174,82 +127,38 @@
         }
     }
 
-    private async Task LoadList()
+    private async Task NewDataRequest()
     {
-        loadingCompleted = false;
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-        var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-        listItems = await httpClient.GetServiceResponseAsync<List<FaaliyetDto>>(UrlHelper.FaaliyetListesi + "?firmaId=" + selectedFirmaDonem.firma_no + "&kullanicikodu=" + kullanicikodu);
-        loadingCompleted = true;
-        listItems = listItems.OrderByDescending(i => i.Insdate).ToList();
-    }
-
-    public void Degistir(int logref)
-    {
-        navigation.NavigateTo("/faaliyet_listef_guncelle/" + logref.ToString());
-    }
-
-    public void YeniKayitEkle()
-    {
-        navigation.NavigateTo("/faaliyet_listef_ekle");
-    }
-
-    private async Task FaaliyetAra()
-    {
-
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
         if (selectedFirmaDonem == null)
             throw new Exception("Firma Dönem Seçili değil");
 
-        loadingCompleted = false;
-        this.StateHasChanged();
+        mainDataRequest.FirmaId = selectedFirmaDonem.firma_no.Value;
+        mainDataRequest.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+        mainDataRequest.TopRowCount = 100;
+    }
 
-        var request = new FaaliyetRequestDto();
-        request.SearchText = header.SearchText;
-        request.FirmaId = selectedFirmaDonem.firma_no.Value;
-        request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-
-        var result = await httpClient.PostGetServiceResponseAsync<List<FaaliyetDto>, FaaliyetRequestDto>(UrlHelper.FaaliyetAra, request);
-        if (result == null || result.Count == 0)
+    private async Task LoadList()
+    {
+        if (menuYetkiDto.View == false)
         {
-            await ModalManager.ShowMessageAsync("Arama", "Aradığınız kritere uygun kayıt bulunamadı.\n Lütfen detaylı aramayı seçiniz");
             loadingCompleted = true;
-            return;
+            throw new Exception("Bu sayfayı görme yetkiniz yok");
         }
 
-        listItems = result;
+        mainDataList = await mainDataHelper.LoadRecords(mainDataRequest);
         loadingCompleted = true;
     }
 
-    private async Task GetUserMenuYetkisi()
+    public void YeniKayitEkle()
     {
+        navigation.NavigateTo("/" + insertPage);
+    }
 
-        var kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-
-        var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=faaliyet_listef&hak_tipi=sel");
-
-        menuGormeYetkisi = result == 1;
-
-        if (menuGormeYetkisi)
-        {
-            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=faaliyet_listef&hak_tipi=ins");
-            menuEklemeYetkisi = result == 1;
-
-            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=faaliyet_listef&hak_tipi=upd");
-            menuDegistirmeYetkisi = result == 1;
-
-            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=faaliyet_listef&hak_tipi=del");
-            menuSilmeYetkisi = result == 1;
-        }
-
-        if (!menuGormeYetkisi)
-        {
-            _ShowSearchSection = false;
-            throw new Exception("Bu sayfayı görüntüleme yetkiniz yoktur");
-        }
-
-
+    public void Degistir(int logref)
+    {
+        navigation.NavigateTo("/" + updatePage + "/" + logref.ToString());
     }
 
     public async Task Sil(int logref)
@@ -260,14 +169,14 @@
             if (!modalRes)
                 return;
 
+            if (menuYetkiDto.Delete == false)
+                throw new Exception("Silme yetkiniz bulunmamaktadır");
+
             loadingCompleted = false;
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-            var kullanici = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
-            var delete = await httpClient.GetFromJsonAsync<ServiceResponse<bool>>(Utils.UrlHelper.FaaliyetSil + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value + "&kullanici=" + kullanici);
+            var recordDto = await mainDataHelper.LoadRecord(logref);
 
-            if (delete.Success == false)
-                throw new Exception(delete.Message);
+            await mainDataHelper.DeleteRecord(recordDto);
 
             Snackbar.Add("Faaliyet silindi");
 
@@ -279,57 +188,42 @@
         }
     }
 
-    private async Task CheckUser()
+    private async Task BtnAraClick()
     {
-
-        var kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-
-        var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanici_kodu);
-
-        if (result != null)
-        {
-            isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
-        }
-
+        mainDataRequest.SearchText = header.SearchText;
+        mainDataRequest.TopRowCount = 0;
+        loadingCompleted = false;
+        this.StateHasChanged();
+        await LoadList();
+        if (mainDataList == null || mainDataList.Count == 0)
+            Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
     }
 
-    private async Task FaaliyetDetayliAra()
+    private async Task BtnDetayliAraClick()
     {
         try
         {
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
-
             var opt = new ModalOptions();
             opt.ContentScrollable = true;
 
-            var cariForm = modal.Show<Components.Faaliyet.FaaliyetDetayliAraComponent>("Detaylı Arama", opt);
-            var result = await cariForm.Result;
+            modalParameters = new ModalParameters();
+            modalParameters.Add("mainRequest", mainDataRequest);
+
+            var filterForm = modal.Show<Components.Faaliyet.FaaliyetDetayliAraComponent>("Detaylı Arama", modalParameters, opt);
+            var result = await filterForm.Result;
 
             if (!result.Cancelled)
             {
                 if (result.Data != null)
                 {
-                    var request = (FaaliyetRequestDto)result.Data;
-
+                    mainDataRequest = (FaaliyetRequestDto)result.Data;
+                    mainDataRequest.SearchText = header.SearchText;
+                    mainDataRequest.TopRowCount = 0;
                     loadingCompleted = false;
                     this.StateHasChanged();
-
-                    request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-                    request.FirmaId = selectedFirmaDonem.firma_no.Value;
-                    request.SearchText = header.SearchText;
-
-                    var response = await httpClient.PostGetServiceResponseAsync<List<FaaliyetDto>, FaaliyetRequestDto>(UrlHelper.FaaliyetAra, request);
-                    if (response == null || response.Count == 0)
-                    {
-                        Snackbar.Add("Aradığınız kriterlere göre kayıt bulunamadı.", severity: Severity.Warning);
-                        loadingCompleted = true;
-                        return;
-                    }
-                    loadingCompleted = true;
-                    listItems = response;
+                    await LoadList();
+                    if (mainDataList == null || mainDataList.Count == 0)
+                        Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
                 }
             }
         }
