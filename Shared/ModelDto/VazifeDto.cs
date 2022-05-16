@@ -20,5 +20,23 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? Insdate { get; set; }
         public string Upduser { get; set; }
         public DateTime? Upddate { get; set; }
+
+        private bool _yapildiMi = false;
+        public bool YapildiMi
+        {
+            get
+            {
+                if (Yapildi.HasValue && Yapildi.Value == 1)
+                    _yapildiMi = true;
+
+                return _yapildiMi;
+            }
+            set
+            {
+                _yapildiMi = value;
+
+                this.Yapildi = _yapildiMi ? byte.Parse("1") : byte.Parse("0");
+            }
+        }
     }
 }

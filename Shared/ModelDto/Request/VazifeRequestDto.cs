@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace UmotaWebApp.Shared.ModelDto.Request
 {
-    public class VazifeRequestDto
+    public class VazifeRequestDto : BaseRequestDto
     {
-        public string User { get; set; }
-        public short FirmaId { get; set; }
-
         public VazifeDto Vazife { get; set; }
     }
 }
