@@ -67,7 +67,8 @@ namespace UmotaWebApp.Client.ServiceHelpers
                 throw new Exception("Firma Dönem Seçili değil");
 
             takvim.Insdate = DateTime.Now;
-            takvim.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            if (string.IsNullOrEmpty(takvim.Insuser))
+                takvim.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
             takvim.Tarih = takvim.Tarih.Value.ChangeTime(takvim.Saat);
             takvim.Status = 0;

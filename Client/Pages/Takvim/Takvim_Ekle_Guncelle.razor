@@ -109,6 +109,9 @@
     [Parameter]
     public int? modalForm { get; set; }
 
+    [Parameter]
+    public TakvimDto GorevTakvimi { get; set; }
+
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
 
@@ -128,6 +131,8 @@
 
     private bool loadingCompleted = false;
     private bool _processing = false;
+    private bool _pageHasError = false;
+
     public HeaderBarSearch header = new HeaderBarSearch();
 
     public async Task ValidSubmit()
@@ -149,6 +154,15 @@
 
     private async Task SaveCompleted()
     {
+        if (_pageHasError)
+            return;
+
+        if (GorevTakvimi != null)
+        {
+            await ModalInstance.CloseAsync();
+            return;
+        }
+
         if (modalForm.HasValue)
             await ModalInstance.CloseAsync();
         else
@@ -242,6 +256,7 @@
 
     public void SubmitValidation()
     {
+        _pageHasError = false;
         var err = new List<string>();
 
         if (string.IsNullOrWhiteSpace(takvim.Baslik))
@@ -255,6 +270,8 @@
 
         if (err.Count > 0)
         {
+            _pageHasError = true;
+
             var ex = new ClientException("Kayıt Hatası");
             ex.ErrorList = err;
 
@@ -268,10 +285,20 @@
 
         var isUpdate = this.takvimLogRef.HasValue;
 
-        loadingCompleted = true;
+        loadingCompleted = false;
+
+        if (GorevTakvimi != null)
+        {
+            this.takvim.Tarih = GorevTakvimi.Tarih.HasValue ? GorevTakvimi.Tarih.Value : DateTime.Now;
+            this.takvim.Baslik = GorevTakvimi.Baslik;
+            this.takvim.Aciklama = GorevTakvimi.Aciklama;
+            this.takvim.Insuser = GorevTakvimi.Insuser;
+        }
 
         if (isUpdate)
             await LoadRecord();
+
+        loadingCompleted = true;
     }
 
     public async Task CariListesiAc()
@@ -290,6 +317,7 @@
                 takvim.Cari_Adi = cariSecim.Adi;
                 takvim.Cari_Kodu = cariSecim.Kodu;
                 takvim.CariRef = cariSecim.Logref;
+                takvim.Baslik = string.Format("Müşteri Görüşmesi : {0}", cariSecim.Adi);
             }
 
         }

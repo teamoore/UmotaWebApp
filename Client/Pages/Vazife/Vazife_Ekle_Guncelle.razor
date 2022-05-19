@@ -25,7 +25,7 @@
                     </div>
                 </div>
             </div>
- 
+
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-6">
@@ -34,6 +34,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-6">
@@ -54,6 +55,24 @@
             </div>
 
             <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Atanacak Kişi</label>
+                        <select class="form-control" @bind="record.AtananKisi">
+                            @if (kullanicilar != null)
+                            {
+                                <option value="-1">Seçiniz</option>
+                                @foreach (var item in kullanicilar)
+                                {
+                                    <option value="@item.KullaniciAdi">@item.KullaniciAdi (@item.MailAdres)</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
                     @if (_processing)
                     {
@@ -65,7 +84,8 @@
                         <MudText>Kaydet</MudText>
                     }
                 </MudButton>
-                <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+                <MudButton Disabled="@_processing" OnClick="TakvimEkraniAc" Variant="Variant.Filled" Color="Color.Secondary">Takvime Ekle</MudButton>
+                    <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
             </div>
         </div>
     </div>
@@ -87,6 +107,9 @@
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
 
     [Inject]
+    KullaniciHelper kullaniciHelper { get; set; }
+
+    [Inject]
     ModalManager ModalManager { get; set; }
 
     [Inject]
@@ -103,6 +126,7 @@
     private bool loadingCompleted = false;
     private bool _processing = false;
     public HeaderBarSearch header = new HeaderBarSearch();
+    public List<SisKullaniciDto> kullanicilar = new List<SisKullaniciDto>();
 
     public async Task ValidSubmit()
     {
@@ -236,11 +260,60 @@
 
         var isUpdate = this.vazifeLogRef.HasValue;
 
-        loadingCompleted = true;
+        loadingCompleted = false;
+
+        await LoadKullanicilar();
 
         if (isUpdate)
             await LoadRecord();
+
+        loadingCompleted = true;
     }
 
- 
+    private async Task LoadKullanicilar()
+    {
+        try
+        {
+            kullanicilar = await kullaniciHelper.TumListe();
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+    public async Task TakvimEkraniAc()
+    {
+        if (this.record.Logref <= 0)
+        {
+            Snackbar.Add("Vazifeyi kaydettikten sonra takvime ekleyebilirsiniz", severity: Severity.Info);
+            return;
+        }
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+        opt.HideCloseButton = false;
+
+        var prms = new ModalParameters();
+        prms.Add("GorevTakvimi", new TakvimDto()
+        {
+            Tarih = record.SonTarih,
+            Baslik = record.Baslik,
+            Aciklama = record.Aciklama,
+            Insuser = record.AtananKisi
+        });
+
+        var myForm = modal.Show<Pages.Takvim.Takvim_Ekle_Guncelle>("Takvim", prms ,opt);
+
+        var result = await myForm.Result;
+
+        if (!result.Cancelled)
+        {
+            {
+                var takvimSecim = (TakvimDto)result.Data;
+            }
+
+        }
+    }
+
+
 }

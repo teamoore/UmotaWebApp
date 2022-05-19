@@ -670,7 +670,6 @@ namespace UmotaWebApp.Server.Data.Models
                 entity.ToTable("vazife");
 
                 entity.Property(e => e.Logref)
-                    .ValueGeneratedNever()
                     .HasColumnName("logref");
 
                 entity.Property(e => e.AtananKisi).HasColumnName("atanan_kisi");

@@ -33,6 +33,7 @@ namespace UmotaWebApp.Client
             builder.Services.AddScoped<YetkiHelper>();
             builder.Services.AddScoped<FaaliyetHelper>();
             builder.Services.AddScoped<VazifeHelper>();
+            builder.Services.AddScoped<KullaniciHelper>();
             builder.Services.AddScoped<Radzen.DialogService>();
             builder.Services.AddScoped<Helper>();
             builder.Services.AddAuthorizationCore();
