@@ -1,0 +1,241 @@
+﻿@page "/vazife_listef"
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="false" ShowSearchSection="false"
+                 onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+@if (menuYetkiDto.View == false)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
+}
+
+<MudTable Items="@mainDataList" FixedHeader="true" Height="500px" SortLabel="Sort By" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
+    <ToolBarContent>
+        @if (menuYetkiDto.Insert)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        }
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>
+
+            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.Oncelik)">Öncelik</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+
+            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.YapildiMi)">Yapıldı mı?</MudTableSortLabel>
+        </MudTh>
+        <MudTh>Başlık</MudTh>
+        <MudTh>Açıklama</MudTh>
+        <MudTh>
+            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.SonTarih)">Son Tarih</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.Insdate)">Kayıt Tarihi</MudTableSortLabel>
+        </MudTh>
+        <MudTh>#</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            @if (menuYetkiDto.Update)
+            {
+                <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Degistir(context.Logref))" Size="Size.Medium" />
+            }
+        </MudTd>
+        <MudTd DataLabel="Öncelik">
+            @context.OncelikAciklama
+        </MudTd>
+        <MudTd DataLabel="Yapıldı mı?">
+            @context.YapildiAciklama
+        </MudTd>
+        <MudTd DataLabel="Başlık">@context.Baslik</MudTd>
+        <MudTd DataLabel="Açıklama">
+
+            <MudTooltip Text="@context.Aciklama" Arrow="true" Placement="Placement.Top">
+                @context.Aciklama.MinimizeString(50)
+            </MudTooltip>
+        </MudTd>
+        <MudTd DataLabel="Son Tarih">@context.SonTarih</MudTd>
+        <MudTd DataLabel="Kayıt Tarihi">@context.Insdate</MudTd>
+
+        <MudTd>
+            @if (menuYetkiDto.Delete)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
+            }
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
+
+@code {
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    VazifeHelper mainDataHelper { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+    public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
+    public List<VazifeDto> mainDataList { get; set; }
+    public VazifeRequestDto mainDataRequest = new VazifeRequestDto();
+
+    private string formName = "vazife_listef";
+    private string insertPage = "vazife_ekle_guncelle";
+    private string updatePage = "vazife_ekle_guncelle";
+    private string headerText = "Görev Listesi";
+    private bool loadingCompleted = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            header.HeaderText = headerText;
+
+            menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
+
+            await NewDataRequest();
+            await LoadList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    private async Task NewDataRequest()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        mainDataRequest.FirmaId = selectedFirmaDonem.firma_no.Value;
+        mainDataRequest.KullaniciKodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+        mainDataRequest.TopRowCount = 100;
+    }
+
+    private async Task LoadList()
+    {
+        if (menuYetkiDto.View == false)
+        {
+            loadingCompleted = true;
+            throw new Exception("Bu sayfayı görme yetkiniz yok");
+        }
+
+        mainDataList = await mainDataHelper.LoadRecords(mainDataRequest);
+        loadingCompleted = true;
+    }
+
+    public void YeniKayitEkle()
+    {
+        navigation.NavigateTo("/" + insertPage);
+    }
+
+    public void Degistir(int logref)
+    {
+        navigation.NavigateTo("/" + updatePage + "/" + logref.ToString());
+    }
+
+    public async Task Sil(int logref)
+    {
+        try
+        {
+            var modalRes = await ModalManager.ShowConfirmationAsync("Kayıt silinecek!", "Silmek istediğinizden emin misiniz?", "Evet", "Hayır");
+            if (!modalRes)
+                return;
+
+            if (menuYetkiDto.Delete == false)
+                throw new Exception("Silme yetkiniz bulunmamaktadır");
+
+            loadingCompleted = false;
+
+            var recordDto = await mainDataHelper.LoadRecord(logref);
+
+            await mainDataHelper.DeleteRecord(recordDto);
+
+            Snackbar.Add("Kayıt silindi");
+
+            await LoadList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    private async Task BtnAraClick()
+    {
+        mainDataRequest.SearchText = header.SearchText;
+        mainDataRequest.TopRowCount = 0;
+        loadingCompleted = false;
+        this.StateHasChanged();
+        await LoadList();
+        if (mainDataList == null || mainDataList.Count == 0)
+            Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+    }
+
+    private async Task BtnDetayliAraClick()
+    {
+        try
+        {
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            modalParameters = new ModalParameters();
+            modalParameters.Add("mainRequest", mainDataRequest);
+
+            var filterForm = modal.Show<Components.Faaliyet.FaaliyetDetayliAraComponent>("Detaylı Arama", modalParameters, opt);
+            var result = await filterForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    mainDataRequest = (VazifeRequestDto)result.Data;
+                    mainDataRequest.SearchText = header.SearchText;
+                    mainDataRequest.TopRowCount = 0;
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+                    await LoadList();
+                    if (mainDataList == null || mainDataList.Count == 0)
+                        Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+    }
+
+
+}

@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-
-#nullable disable
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace UmotaWebApp.Server.Data.Models
 {
-    public partial class Takvim
+    public partial class Vazife
     {
         public int Logref { get; set; }
-
-        public DateTime? Tarih { get; set; }
-        public int? VazifeRef { get; set; }
-        public int? KisiRef { get; set; }
+        public string AtananKisi { get; set; }
         public string Baslik { get; set; }
         public string Aciklama { get; set; }
-        public int? CariRef { get; set; }
-        public string Cari_Kodu { get; set; }
-        public string Cari_Adi { get; set; }
+        public DateTime? SonTarih { get; set; }
+        public byte? Oncelik { get; set; }
         public byte? Yapildi { get; set; }
         public byte? Status { get; set; }
         public string Insuser { get; set; }
