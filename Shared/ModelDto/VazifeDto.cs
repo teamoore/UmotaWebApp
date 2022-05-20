@@ -6,18 +6,14 @@ using System.Threading.Tasks;
 
 namespace UmotaWebApp.Shared.ModelDto
 {
-    public class TakvimDto
+    public class VazifeDto
     {
         public int Logref { get; set; }
-
-        public DateTime? Tarih { get; set; }
-
-        public TimeSpan? Saat { get; set; }
+        public string AtananKisi { get; set; }
         public string Baslik { get; set; }
         public string Aciklama { get; set; }
-        public int? CariRef { get; set; }
-        public string Cari_Kodu { get; set; }
-        public string Cari_Adi { get; set; }
+        public DateTime? SonTarih { get; set; }
+        public byte? Oncelik { get; set; }
         public byte? Yapildi { get; set; }
         public byte? Status { get; set; }
         public string Insuser { get; set; }
@@ -25,29 +21,47 @@ namespace UmotaWebApp.Shared.ModelDto
         public string Upduser { get; set; }
         public DateTime? Upddate { get; set; }
 
-        public DateTime? TarihEnd
-        {
-            get
-            {
-                return this.Tarih.HasValue ? this.Tarih.Value.AddHours(1) : null;
-            }
-        }
-
         private bool _yapildiMi = false;
         public bool YapildiMi
         {
-            get 
+            get
             {
                 if (Yapildi.HasValue && Yapildi.Value == 1)
                     _yapildiMi = true;
 
                 return _yapildiMi;
             }
-            set 
+            set
             {
                 _yapildiMi = value;
 
                 this.Yapildi = _yapildiMi ? byte.Parse("1") : byte.Parse("0");
+            }
+        }
+
+        private string _oncelik = "";
+
+        public string OncelikAciklama
+        {
+            get
+            {
+                switch (this.Oncelik)
+                {
+                    case 1:
+                        _oncelik = "Düşük";
+                        break;
+                    case 2:
+                        _oncelik = "Orta";
+                        break;
+                    case 3:
+                        _oncelik = "Yüksek";
+                        break;
+                    default:
+                        _oncelik = "Düşük";
+                        break;
+                }
+
+                return _oncelik;
             }
         }
 

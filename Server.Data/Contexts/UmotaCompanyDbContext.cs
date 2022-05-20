@@ -77,6 +77,7 @@ namespace UmotaWebApp.Server.Data.Models
         public virtual DbSet<V041FiltreMontaj> V041FiltreMontajs { get; set; }
         public virtual DbSet<V042FiltreMontaj> V042FiltreMontajs { get; set; }
         public virtual DbSet<V050MalzKalite> V050MalzKalites { get; set; }
+        public virtual DbSet<Vazife> Vazifes { get; set; }
 
         public virtual DbSet<Takvim> Takvims { get; set; }
 
@@ -662,6 +663,47 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasColumnName("yapilanlar");
             });
 
+            modelBuilder.Entity<Vazife>(entity =>
+            {
+                entity.HasKey(e => e.Logref);
+
+                entity.ToTable("vazife");
+
+                entity.Property(e => e.Logref)
+                    .HasColumnName("logref");
+
+                entity.Property(e => e.AtananKisi).HasColumnName("atanan_kisi");
+                entity.Property(e => e.Baslik).HasColumnName("baslik");
+                entity.Property(e => e.Aciklama).HasColumnName("aciklama");
+                entity.Property(e => e.Oncelik).HasColumnName("oncelik");
+                entity.Property(e => e.Yapildi).HasColumnName("yapildi");
+
+                entity.Property(e => e.Insdate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("insdate");
+
+                entity.Property(e => e.Insuser)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("insuser");
+
+
+                entity.Property(e => e.Status).HasColumnName("status");
+
+                entity.Property(e => e.SonTarih)
+                    .HasColumnType("datetime")
+                    .HasColumnName("son_tarih");
+
+                entity.Property(e => e.Upddate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("upddate");
+
+                entity.Property(e => e.Upduser)
+                    .HasMaxLength(15)
+                    .IsUnicode(false)
+                    .HasColumnName("upduser");
+            });
+
             modelBuilder.Entity<Takvim>(entity =>
             {
                 entity.HasKey(e => e.Logref);
@@ -672,6 +714,8 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasColumnName("logref");
 
                 entity.Property(e => e.CariRef).HasColumnName("cariref");
+                entity.Property(e => e.VazifeRef).HasColumnName("vaziferef");
+                entity.Property(e => e.KisiRef).HasColumnName("kisiref");
 
                 entity.Property(e => e.Baslik)
                     .HasMaxLength(140)
