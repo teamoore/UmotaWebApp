@@ -64,5 +64,26 @@ namespace UmotaWebApp.Shared.ModelDto
                 return _oncelik;
             }
         }
+
+        private string _yapildiAciklama = "";
+        public string YapildiAciklama
+        {
+            get
+            {
+                switch (this.Yapildi)
+                {
+                    case 1:
+                        _yapildiAciklama = "Yapıldı";
+                        break;
+                    case 0:
+                        _yapildiAciklama = "Yapılmadı";
+                        break;
+                    default:
+                        _yapildiAciklama = "Yapılmadı";
+                        break;
+                }
+                return _yapildiAciklama;
+            }
+        }
     }
 }

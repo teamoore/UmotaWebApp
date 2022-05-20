@@ -1,7 +1,6 @@
 ﻿@page "/vazife_listef"
-
 <HeaderSearchBar header="header"
-                 ShowButtons="false" ShowFilterButton="true" ShowSearchSection="true"
+                 ShowButtons="false" ShowFilterButton="false" ShowSearchSection="false"
                  onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick"></HeaderSearchBar>
 
 @if (loadingCompleted == false)
@@ -24,7 +23,12 @@
     <HeaderContent>
         <MudTh>#</MudTh>
         <MudTh>
+
             <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.Oncelik)">Öncelik</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+
+            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.YapildiMi)">Yapıldı mı?</MudTableSortLabel>
         </MudTh>
         <MudTh>Başlık</MudTh>
         <MudTh>Açıklama</MudTh>
@@ -43,7 +47,12 @@
                 <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Degistir(context.Logref))" Size="Size.Medium" />
             }
         </MudTd>
-        <MudTd DataLabel="Öncelik">@context.OncelikAciklama</MudTd>
+        <MudTd DataLabel="Öncelik">
+            @context.OncelikAciklama
+        </MudTd>
+        <MudTd DataLabel="Yapıldı mı?">
+            @context.YapildiAciklama
+        </MudTd>
         <MudTd DataLabel="Başlık">@context.Baslik</MudTd>
         <MudTd DataLabel="Açıklama">
 
@@ -160,7 +169,7 @@
     {
         try
         {
-            var modalRes = await ModalManager.ShowConfirmationAsync("Faaliyet silinecek!", "Silmek istediğinizden emin misiniz?", "Evet", "Hayır");
+            var modalRes = await ModalManager.ShowConfirmationAsync("Kayıt silinecek!", "Silmek istediğinizden emin misiniz?", "Evet", "Hayır");
             if (!modalRes)
                 return;
 
@@ -173,7 +182,7 @@
 
             await mainDataHelper.DeleteRecord(recordDto);
 
-            Snackbar.Add("Faaliyet silindi");
+            Snackbar.Add("Kayıt silindi");
 
             await LoadList();
         }

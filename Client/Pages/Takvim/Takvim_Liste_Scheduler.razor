@@ -21,7 +21,9 @@
 
     <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 500px;" TItem="TakvimDto" Data=@appointments StartProperty="Tarih" EndProperty="TarihEnd"
                      TextProperty="Baslik" SelectedIndex="1"
-                     AppointmentRender=@OnAppointmentRender>
+                     AppointmentRender=@OnAppointmentRender
+                     AppointmentSelect=@OnAppointmentSelect
+                     >
         <Template Context="appointments">
             <span style="color:black;font-size:10pt;">
                 <strong>@appointments.Baslik</strong>
@@ -102,6 +104,34 @@
         {
             args.Attributes["style"] = "background: red";
         }
+    }
+
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<TakvimDto> args)
+    {
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+        opt.HideCloseButton = false;
+
+        var prms = new ModalParameters();
+        prms.Add("takvimLogRef", args.Data.Logref);
+        prms.Add("modalForm", 1);
+
+        var myForm = modal.Show<Pages.Takvim.Takvim_Ekle_Guncelle>("Takvim", prms, opt);
+
+        var result = await myForm.Result;
+
+        if (!result.Cancelled)
+        {
+            {
+                var takvimSecim = (TakvimDto)result.Data;
+                await LoadTakvimBilgisi();
+                await scheduler.Reload();
+            }
+
+        }
+
+
     }
 
     private void YeniTakvim()
