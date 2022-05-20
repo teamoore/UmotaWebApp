@@ -32,6 +32,7 @@ namespace UmotaWebApp.Client
             builder.Services.AddScoped<TakvimHelper>();
             builder.Services.AddScoped<YetkiHelper>();
             builder.Services.AddScoped<FaaliyetHelper>();
+            builder.Services.AddScoped<TeklifHelper>();
             builder.Services.AddScoped<Radzen.DialogService>();
             builder.Services.AddScoped<Helper>();
             builder.Services.AddAuthorizationCore();

@@ -39,6 +39,7 @@ namespace UmotaWebApp.Client.Utils
         public const string CariKartKisiKaydet = "/api/kisiler/savekisi";
         public const string CariKartKisiGuncelle = "/api/kisiler/updatekisi";
         public const string RefNoAl = "/api/helper/RefNoAl";
+        public const string FisNoAl = "/api/helper/GenerateRef";
         public const string CariSektorList = "/api/helper/GetCariSektorList";
         public const string DovizListesi = "/api/doviz/GetDovizList";
         public const string DovizKuruGetir = "/api/doviz/GetDovizKur";

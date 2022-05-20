@@ -130,7 +130,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 db.Open();
                 var p = new DynamicParameters();
 
-                var sql = "select *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
+                string selectstr = "";
+                if (request.TopRowCount > 0)
+                    selectstr = "top " + request.TopRowCount;
+
+                var sql = "select " + selectstr + " *, lodeme_plani LodemePlani, ilgili_adi IlgiliAdi, teslim_sekli TeslimSekli, teslim_tarihi TeslimTarihi, sevk_edilecek_bayi_adi SevkEdilecekBayiAdi, sevk_ilgilisi SevkIlgilisi" +
                     " from " + Configuration.GetUmotaObjectName("v009_teklif", firmaId: request.FirmaId.ToString()) + " a with(nolock) where 1=1";
 
                 var tumTeklifleriGormeYetkisi = await SisKullaniciService.GetKullaniciYetkisiByKullaniciKodu(request.kullanicikodu, KullaniciYetkiKodlari.TumTeklifleriGorebilir);

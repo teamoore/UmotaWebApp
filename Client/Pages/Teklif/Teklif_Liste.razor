@@ -1,22 +1,20 @@
 ﻿@page "/stek_listef/{duruminfo?}"
 
-<HeaderSearchBar header="header" onAddNewButtonClicked="YeniTeklif"
+<HeaderSearchBar header="header"
                  ShowButtons="false" ShowFilterButton="true"
-                 onDoneButtonClicked="TeklifAra" onFilterButtonClicked="TeklifDetayliAra" ShowSearchSection="_ShowSearchSection"></HeaderSearchBar>
+                 onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick" ShowSearchSection="true"></HeaderSearchBar>
 
 @if (loadingCompleted == false)
 {
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@teklifler" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true" Filter="new Func<TeklifDto,bool>(FilterFunc1)">
+<MudTable Items="@mainDataList" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
     <ToolBarContent>
-        @if (menuEklemeYetkisi)
+        @if (menuYetkiDto.Insert)
         {
             <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTeklif" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         }       
-        <MudSpacer />
-        @*<MudTextField @bind-Value="_searchString" Placeholder="Teklif Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>*@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
@@ -39,12 +37,12 @@
     <RowTemplate>
         <MudTd>
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
-                @if (menuDegistirmeYetkisi)
+                @if (menuYetkiDto.Update)
                 {
                     <MudMenuItem OnClick="(() => TeklifDetay(context.Logref))">Değiştir</MudMenuItem>
                 }
                 <MudMenuItem OnClick="(() => TeklifDurumDegistir(context.Logref,null))">Durum Değiştir</MudMenuItem>
-                @if (isAdmin)
+                @if (menuYetkiDto.IsAdmin)
                 {
                     <MudMenuItem OnClick="(() => TeklifDurumDegistir(context.Logref,1))">Durum Değiştir(Admin)</MudMenuItem>
                 }
@@ -66,7 +64,7 @@
         <MudTd DataLabel="Açıklama">@context.Aciklama1</MudTd>
         <MudTd DataLabel="Kaydı Giren">@context.Insuser</MudTd>
         <MudTd>
-            @if (menuSilmeYetkisi)
+            @if (menuYetkiDto.Delete)
             {
                 <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
             }
@@ -84,6 +82,7 @@
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
 
     [Inject]
     ModalManager ModalManager { get; set; }
@@ -100,131 +99,146 @@
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
-    public List<TeklifDto> teklifler { get; set; }
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    TeklifHelper mainDataHelper { get; set; }
 
     public HeaderBarSearch header = new HeaderBarSearch();
+    public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
+    public List<TeklifDto> mainDataList { get; set; }
+    public TeklifRequestDto mainDataRequest = new TeklifRequestDto();
 
-    private string _searchString = "";
-    private bool _sortNameByLength;
-    private bool _ShowSearchSection = true;
-
-    private bool isAdmin { get; set; }
-
-    private bool menuGormeYetkisi { get; set; }
-    private bool menuEklemeYetkisi { get; set; }
-    private bool menuSilmeYetkisi { get; set; }
-
-    private bool menuDegistirmeYetkisi { get; set; }
+    private string formName = "stek_listef";
+    private string insertPage = "stek_listef_ekle";
+    private string updatePage = "stek_listef_detay";
+    private string headerText = "Teklif Listesi";
     private bool loadingCompleted { get; set; }
-
-    private bool FilterFunc1(TeklifDto element) => FilterFunc(element, _searchString);
-
-    private bool FilterFunc(TeklifDto element, string searchString)
-    {
-        if (string.IsNullOrWhiteSpace(searchString))
-            return true;
-        if (element.Proje != null && element.Proje.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.LcariAdi != null && element.LcariAdi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        if (element.Teklifno != null && element.LcariKodu != null && element.TeslimTarihiFormatted != null
-            && $"{element.Teklifno} {element.LcariKodu} {element.TeslimTarihiFormatted} {element.TeslimSekli}".Contains(searchString, StringComparison.OrdinalIgnoreCase))
-            return true;
-        return false;
-    }
-
-    private void YetkiControl()
-    {
-        menuGormeYetkisi = isAdmin ? isAdmin : false;
-        menuEklemeYetkisi = isAdmin ? isAdmin : false;
-        menuDegistirmeYetkisi = isAdmin ? isAdmin : false;
-        menuSilmeYetkisi = isAdmin ? isAdmin : false;
-    }
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            header.HeaderText = "Teklif Listesi";
-            await CheckUser();
+            header.HeaderText = headerText;
 
-            YetkiControl();
+            menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
 
-            if (!isAdmin)
-                await GetUserMenuYetkisi();
-
-            await LoadTeklifler();
-
+            await NewDataRequest();
+            await LoadList();
         }
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
-
     }
 
-    private async Task LoadTeklifler()
+    private async Task NewDataRequest()
     {
-        try
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        mainDataRequest.FirmaId = selectedFirmaDonem.firma_no.Value;
+        mainDataRequest.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+        mainDataRequest.TopRowCount = 100;
+        mainDataRequest.Duruminfo = duruminfo;
+    }
+
+    private async Task LoadList()
+    {
+        if (menuYetkiDto.View == false)
         {
-            loadingCompleted = false;
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            teklifler = await httpClient.GetServiceResponseAsync<List<TeklifDto>>(UrlHelper.TeklifListesi + "?firmaId=" + selectedFirmaDonem.firma_no + "&kullanicikodu=" + kullanicikodu + "&duruminfo=" + duruminfo);
             loadingCompleted = true;
-            teklifler = teklifler.OrderByDescending(i => i.Insdate).ToList();
+            throw new Exception("Bu sayfayı görme yetkiniz yok");
         }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
-        }
+
+        mainDataList = await mainDataHelper.LoadRecords(mainDataRequest);
+        loadingCompleted = true;
     }
 
     public void TeklifDetay(int logref)
     {
-        navigation.NavigateTo("/stek_listef_detay/" + logref.ToString());
+        navigation.NavigateTo("/" + updatePage + "/" + logref.ToString());
     }
 
     public void YeniTeklif()
     {
-        navigation.NavigateTo("/stek_listef_ekle");
+        navigation.NavigateTo("/" + insertPage);
     }
 
-    private async Task TeklifAra()
+    private async Task BtnAraClick()
+    {
+        mainDataRequest.SearchText = header.SearchText;
+        mainDataRequest.TopRowCount = 0;
+        loadingCompleted = false;
+        this.StateHasChanged();
+        await LoadList();
+        if (mainDataList == null || mainDataList.Count == 0)
+            Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+    }
+
+    private async Task BtnDetayliAraClick()
     {
         try
         {
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
 
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
+            modalParameters = new ModalParameters();
+            modalParameters.Add("mainRequest", mainDataRequest);
 
-            loadingCompleted = false;
-            this.StateHasChanged();
+            var filterForm = modal.Show<Components.Teklif.TeklifDetayliAraComponent>("Detaylı Arama", modalParameters, opt);
+            var result = await filterForm.Result;
 
-            var request = new TeklifRequestDto();
-            request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
-            request.SearchText = header.SearchText;
-
-            var result = await httpClient.PostGetServiceResponseAsync<List<TeklifDto>, TeklifRequestDto>(UrlHelper.TeklifAra, request);
-            if (result == null || result.Count == 0)
+            if (!result.Cancelled)
             {
-                Snackbar.Add("Aradığınız kritere göre teklif bulunamadı.", severity: Severity.Warning);
-                loadingCompleted = true;
-                header.SearchText = string.Empty;
-                return;
+                if (result.Data != null)
+                {
+                    mainDataRequest = (TeklifRequestDto)result.Data;
+                    mainDataRequest.SearchText = header.SearchText;
+                    mainDataRequest.TopRowCount = 0;
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+                    await LoadList();
+                    if (mainDataList == null || mainDataList.Count == 0)
+                        Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+                }
             }
-
-            loadingCompleted = true;
-
-            teklifler = result;
         }
         catch (Exception ex)
         {
             Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
         }
 
+    }
+
+    public async Task Sil(int logref)
+    {
+        try
+        {
+            var modalRes = await ModalManager.ShowConfirmationAsync("Teklif silinecek!", "Silmek istediğinizden emin misiniz?", "Evet", "Hayır");
+            if (!modalRes)
+                return;
+
+            if (menuYetkiDto.Delete == false)
+                throw new Exception("Silme yetkiniz bulunmamaktadır");
+
+            loadingCompleted = false;
+
+            var recordDto = await mainDataHelper.LoadRecord(logref);
+
+            await mainDataHelper.DeleteRecord(recordDto);
+
+            Snackbar.Add("Teklif silindi");
+
+            await LoadList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
     }
 
     public async Task TeklifDurumDegistir(int logref, int? admin)
@@ -249,80 +263,11 @@
                 if (durumSecim.Duruminfo.Equals(TeklifDurum.TeklifRevizyonda))
                     navigation.NavigateTo("/stek_listef_detay/" + durumSecim.Logref);
                 else
-                    await LoadTeklifler();
+                    await LoadList();
             } else
             {
-                await LoadTeklifler();
+                await LoadList();
             }
-        }
-    }
-
-    private async Task CheckUser()
-    {
-
-        var kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-
-        var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanici_kodu);
-
-        if (result != null)
-        {
-            isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
-        }
-
-    }
-
-    private async Task GetUserMenuYetkisi()
-    {
-
-        var kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-
-        var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=stek_listef&hak_tipi=sel");
-
-        menuGormeYetkisi = result == 1;
-
-        if (menuGormeYetkisi)
-        {
-            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=stek_listef&hak_tipi=ins");
-            menuEklemeYetkisi = result == 1;
-
-            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=stek_listef&hak_tipi=upd");
-            menuDegistirmeYetkisi = result == 1;
-
-            result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanici_kodu + "&menu_dfm=stek_listef&hak_tipi=del");
-            menuSilmeYetkisi = result == 1;
-        }
-
-        if (!menuGormeYetkisi)
-        {
-            _ShowSearchSection = false;
-            throw new Exception("Bu sayfayı görüntüleme yetkiniz yoktur");
-        }
-    }
-
-    public async Task Sil(int logref)
-    {
-        try
-        {
-            var modalRes = await ModalManager.ShowConfirmationAsync("Teklif silinecek!", "Silmek istediğinizden emin misiniz?", "Evet", "Hayır");
-            if (!modalRes)
-                return;
-
-            loadingCompleted = false;
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-            var kullanici = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-
-            var delete = await httpClient.GetFromJsonAsync<ServiceResponse<bool>>(Utils.UrlHelper.TeklifSil + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value + "&kullanici=" + kullanici);
-
-            if (delete.Success == false)
-                throw new Exception(delete.Message);
-
-            Snackbar.Add("Teklif silindi");
-
-            await LoadTeklifler();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
     }
 
@@ -393,50 +338,4 @@
         }
     }
 
-    private async Task TeklifDetayliAra()
-    {
-        try
-        {
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
-
-            var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
-
-            var cariForm = modal.Show<Components.Teklif.TeklifDetayliAraComponent>("Detaylı Arama", opt);
-            var result = await cariForm.Result;
-
-            if (!result.Cancelled)
-            {
-                if (result.Data != null)
-                {
-                    loadingCompleted = false;
-                    this.StateHasChanged();
-
-                    var request = (TeklifRequestDto)result.Data;
-
-                    request.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-                    request.FirmaId = selectedFirmaDonem.firma_no.Value;
-                    request.SearchText = header.SearchText;
-
-                    var response = await httpClient.PostGetServiceResponseAsync<List<TeklifDto>, TeklifRequestDto>(UrlHelper.TeklifAra, request);
-                    if (response == null || response.Count == 0)
-                    {
-                        Snackbar.Add("Aradığınız kritere göre teklif bulunamadı.", severity: Severity.Warning);
-                        loadingCompleted = true;
-                        return;
-                    }
-                    loadingCompleted = true;
-                    teklifler = response;
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
-        }
-    }
 }
