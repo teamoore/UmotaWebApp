@@ -301,11 +301,20 @@
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    TeklifHelper mainDataHelper { get; set; }
+
     [Parameter]
     public int? logRef { get; set; }
 
     private bool loadingCompleted = false;
     private bool _processing = false;
+    private string listPage = "stek_listef_detay";
+    private string tableName = "teklif";
+
 
     private int _dovizTuru = -1;
     public int DovizTuruBilgisi
@@ -348,57 +357,43 @@
 
     public List<KisilerDto> KisiListesi { get; set; }
 
-    protected override async Task OnParametersSetAsync()
-    {
-        IsUpdate = logRef.HasValue;
-        if (!IsUpdate)
-            await TeklifNoUret();
-    }
-
     protected override async Task OnInitializedAsync()
     {
         IsUpdate = logRef.HasValue;
 
         if (!IsUpdate)
-        {
-            teklif.Tarih = DateTime.Now;
-            teklif.TeslimSekli = "MÜŞTERİ TESLİM";
-            this.teklif.Notlar = Utils.Consts.TeklifSozlesmesi;
-        }
+            await NewRecord();
+        else
+            await GetTeklif();
 
         await TeslimListesiCek();
         await PersonelListesiCek();
         await OdemePlaniCek();
-
-        await GetTeklif();
         await DovizListesiGetir();
         await GetKisiListesi();
         loadingCompleted = true;
+    }
 
-
+    public async Task NewRecord()
+    {
+        teklif.Teklifno = await yetkiHelper.FisNoAl("teklif","teklifno");
+        teklif.Tarih = DateTime.Now;
+        teklif.TeslimSekli = "MÜŞTERİ TESLİM";
+        this.teklif.Notlar = Utils.Consts.TeklifSozlesmesi;
     }
 
     public async Task GetTeklif()
     {
+        if (logRef.HasValue == false)
+            return;
+
         try
         {
-            if (logRef.HasValue == false)
-                return;
-
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
-
-            var result = await httpClient.GetServiceResponseAsync<TeklifDto>(UrlHelper.TeklifGetir + "?logref=" + logRef + "&firmaId=" + selectedFirmaDonem.firma_no);
-            if (result != null)
-            {
-                teklif = result;
-            }
+            this.teklif = await mainDataHelper.LoadRecord(this.logRef.Value);
         }
         catch (Exception ex)
         {
-            await ModalManager.ShowMessageAsync("Hata", ex.Message);
+            Snackbar.Add(ex.Message, severity: Severity.Error);
         }
     }
 
@@ -487,35 +482,25 @@
         try
         {
             TeklifValidation();
-
-            _processing = true;
-            teklif.Upddate = DateTime.Now;
-            teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            teklif.Status = 1;
-
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
-
-            var request = new TeklifRequestDto();
-            request.Teklif = teklif;
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
-
-            var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifRequestDto>(UrlHelper.TeklifGuncelle, request);
-
-            Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
-
-            navigation.NavigateTo("/stek_listef_detay/" + result.Logref);
-
         }
-        catch (ClientException e)
+        catch (ClientException ex)
         {
-            foreach (var item in e.ErrorList)
+            foreach (var item in ex.ErrorList)
             {
                 Snackbar.Add(item, severity: Severity.Warning);
             }
             return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+            await mainDataHelper.UpdateRecord(teklif);
+            Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
+            navigation.NavigateTo("/" + listPage + "/" + teklif.Logref);
         }
         catch (Exception ex)
         {
@@ -529,27 +514,9 @@
 
     private async Task SaveTeklif()
     {
-
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-        if (selectedFirmaDonem == null)
-            throw new Exception("Firma Dönem Seçili değil");
-
         try
         {
             TeklifValidation();
-
-            _processing = true;
-            teklif.Dovizref = 20;
-            var requestDovizKuru = new DovizKuruRequestDto();
-            requestDovizKuru.KurTarihi = teklif.Tarih.Value;
-            requestDovizKuru.KurTuru = 4;
-            requestDovizKuru.DovizTuru = teklif.Dovizref.Value;
-            requestDovizKuru.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
-
-            var dovizKuruResult = await httpClient.PostGetServiceResponseAsync<double, DovizKuruRequestDto>(UrlHelper.DovizKuruGetir, requestDovizKuru);
-
-            teklif.Dovizkuru = dovizKuruResult;
         }
         catch (ClientException ex)
         {
@@ -562,38 +529,24 @@
         catch (Exception)
         {
         }
-        finally
-        {
-            _processing = false;
-        }
 
         try
         {
-
             _processing = true;
-            teklif.Insdate = DateTime.Now;
-            teklif.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            teklif.Logref = await yetkiHelper.RefNoAl("teklif");
+            teklif.Teklifno = await yetkiHelper.FisNoAl("teklif","teklifno");
+            teklif.Dovizref = 20;
+            teklif.Dovizkuru = await yetkiHelper.DovizKuruAl(teklif.Dovizref.Value, teklif.Tarih.Value);
             teklif.Tarih = teklif.Tarih.HasValue ? teklif.Tarih : DateTime.Now;
             teklif.Saat = teklif.Saat.HasValue ? teklif.Saat : DateTime.Now;
-            teklif.Status = 0;
             teklif.Trcode = 1;
             teklif.Duruminfo = "Teklif Hazırlanıyor";
             teklif.Revizyon = 0;
             teklif.Revzno = "";
 
-            await TeklifNoUret();
-            await LogRefUret();
-
-            var request = new TeklifRequestDto();
-            request.Teklif = teklif;
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
-
-            var result = await httpClient.PostGetServiceResponseAsync<TeklifDto, TeklifRequestDto>(UrlHelper.TeklifKaydet, request);
-
-            Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
-
-            navigation.NavigateTo("/stek_listef_detay/" + result.Logref);
-
+            await mainDataHelper.SaveRecord(teklif);
+            Snackbar.Add("Teklif eklendi", severity: Severity.Success);
+            navigation.NavigateTo("/" + listPage + "/" + teklif.Logref);
         }
         catch (Exception ex)
         {
@@ -608,34 +561,6 @@
     public async Task Vazgec()
     {
         await OnVazgecClicked.InvokeAsync();
-    }
-
-    public async Task TeklifNoUret()
-    {
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-        if (selectedFirmaDonem == null)
-            throw new Exception("Firma dönem seçilmedi");
-
-        var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=teklif&keyField=teklifno&firmaId=" + selectedFirmaDonem.firma_no.Value);
-        if (string.IsNullOrEmpty(result) == false)
-        {
-            teklif.Teklifno = result;
-        }
-
-
-
-    }
-
-    public async Task LogRefUret()
-    {
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-        if (selectedFirmaDonem == null)
-            throw new Exception("Firma Dönem Seçili değil");
-
-        var result2 = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=teklif&firmaId=" + selectedFirmaDonem.firma_no.Value);
-        teklif.Logref = result2;
-
     }
 
     public async Task TeslimListesiCek()
@@ -696,16 +621,7 @@
     {
         try
         {
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
-
-            var result = await httpClient.GetServiceResponseAsync<IEnumerable<DovizDto>>(UrlHelper.DovizListesi + "?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
-            if (result != null)
-            {
-                DovizListesi = result;
-            }
+            DovizListesi = await yetkiHelper.DovizListesiGetir();
         }
         catch (Exception ex)
         {
@@ -722,27 +638,9 @@
                 throw new Exception("Döviz tipi seçmelisiniz");
             }
             _DovizKuruState = "Çekiliyor...";
-            teklif.Dovizkuruid = null;
-
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
-
-            var request = new DovizKuruRequestDto();
-            request.KurTarihi = teklif.Tarih.Value;
-            request.KurTuru = 4;
-            request.DovizTuru = teklif.Dovizrefid.Value;
-            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
-
-            var result = await httpClient.PostGetServiceResponseAsync<double, DovizKuruRequestDto>(UrlHelper.DovizKuruGetir, request);
-
-            teklif.Dovizkuruid = result;
+            teklif.Dovizkuruid = await yetkiHelper.DovizKuruAl(teklif.Dovizrefid.Value, teklif.Tarih.Value);
             _DovizKuruState = "Güncel";
-
             this.StateHasChanged();
-
-
         }
         catch (Exception ex)
         {
@@ -807,6 +705,9 @@
 
     public async Task SevkAdresiSec()
     {
+        if (!teklif.Cariref.HasValue)
+            return;
+
         var opt = new ModalOptions();
         opt.ContentScrollable = true;
 

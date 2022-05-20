@@ -65,5 +65,43 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return result;
         }
 
+        public async Task<string> FisNoAl(string tablename, string fieldname)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<string>(UrlHelper.FisNoAl + "?table=" + tablename + "&keyField=" + fieldname + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+
+            return result;
+        }
+        public async Task<double> DovizKuruAl(int dovizturu, DateTime tarih)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var requestDovizKuru = new DovizKuruRequestDto();
+            requestDovizKuru.KurTarihi = tarih;
+            requestDovizKuru.KurTuru = 4;
+            requestDovizKuru.DovizTuru = dovizturu;
+            requestDovizKuru.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+
+            var dovizKuruResult = await httpClient.PostGetServiceResponseAsync<double, DovizKuruRequestDto>(UrlHelper.DovizKuruGetir, requestDovizKuru);
+
+            return dovizKuruResult;
+        }
+        public async Task<IEnumerable<DovizDto>> DovizListesiGetir()
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<IEnumerable<DovizDto>>(UrlHelper.DovizListesi + "?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
+            return result;
+        }
     }
 }

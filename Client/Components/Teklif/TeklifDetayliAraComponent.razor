@@ -20,7 +20,7 @@
                     <div class="col-md-8">
                         <label>Teklif Durumu</label>
                         <InputSelect @bind-Value="teklifrequest.Duruminfo" class="form-control">
-                            <option value=-1>@Utils.Mesajlar.Seciniz</option>
+                            <option value="">@Utils.Mesajlar.Seciniz</option>
                             <option value=@TeklifDurum.TeklifHazirlaniyor>@TeklifDurum.TeklifHazirlaniyor</option>
                             <option value=@TeklifDurum.MusteriOnayiBekliyor>@TeklifDurum.MusteriOnayiBekliyor</option>
                             <option value=@TeklifDurum.FinansalUygunlukBekleniyor>@TeklifDurum.FinansalUygunlukBekleniyor</option>
@@ -92,6 +92,9 @@
 </EditForm>
 
 @code {
+    [Parameter]
+    public TeklifRequestDto mainRequest { get; set; }
+
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
 
@@ -118,6 +121,9 @@
     {
         await DovizListesiGetir();
         await PersonelListesiGetir();
+
+        if (mainRequest != null)
+            teklifrequest = mainRequest;
     }
 
     private async Task Tamam()

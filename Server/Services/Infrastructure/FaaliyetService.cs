@@ -66,7 +66,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     sql += " )";
                 }
 
-                sql += " order by insdate desc";
+                sql += " order by tarih desc";
                 var result = await db.QueryAsync<FaaliyetDto>(sql, commandType: CommandType.Text);
 
                 db.Close();
@@ -156,7 +156,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     p.Add("@grup", value: "%" + request.UrunGrubu + "%", dbType: DbType.String);
                 }
 
-                sql += " order by insdate desc";
+                sql += " order by tarih desc";
                 var result = await db.QueryAsync<FaaliyetDto>(sql, p, commandType: CommandType.Text);
 
                 db.Close();
