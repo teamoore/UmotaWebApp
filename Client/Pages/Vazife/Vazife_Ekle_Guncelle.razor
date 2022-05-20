@@ -47,16 +47,7 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-4">
-                        <MudSwitch @bind-Checked="record.YapildiMi" Label="Yapıldı" Color="Color.Success" />
-
-                    </div>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label>Atanacak Kişi</label>
                         <select class="form-control" @bind="record.AtananKisi">
                             @if (kullanicilar != null)
@@ -68,6 +59,25 @@
                                 }
                             }
                         </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label>Önceliklendirme</label>
+                        <select class="form-control" @bind="record.Oncelik">
+                            <option value="-1">Seçiniz</option>
+                            <option value="1">Düşük</option>
+                            <option value="2">Orta</option>
+                            <option value="3">Yüksek</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-4">
+                        <MudSwitch @bind-Checked="record.YapildiMi" Label="Yapıldı" Color="Color.Success" />
+
                     </div>
                 </div>
             </div>
@@ -85,7 +95,7 @@
                     }
                 </MudButton>
                 <MudButton Disabled="@_processing" OnClick="TakvimEkraniAc" Variant="Variant.Filled" Color="Color.Secondary">Takvime Ekle</MudButton>
-                    <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+                <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
             </div>
         </div>
     </div>
@@ -245,6 +255,9 @@
         if (string.IsNullOrWhiteSpace(record.Baslik))
             err.Add("Başlık boş geçilemez");
 
+        if (record.Oncelik == -1)
+            err.Add("Öncelik seçiniz");
+
         if (err.Count > 0)
         {
             var ex = new ClientException("Kayıt Hatası");
@@ -264,6 +277,7 @@
 
         await LoadKullanicilar();
 
+        this.record.Oncelik = 1; // düşük öncelik
         if (isUpdate)
             await LoadRecord();
 

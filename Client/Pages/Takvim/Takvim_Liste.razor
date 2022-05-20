@@ -21,7 +21,12 @@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
-        <MudTh>Tarih</MudTh>
+        <MudTh>
+            <MudTableSortLabel  SortBy="new Func<TakvimDto, object>(x=>x.YapildiAciklama)">Yapıldı mı?</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<TakvimDto, object>(x=>x.Tarih)">Tarih</MudTableSortLabel>
+        </MudTh>
         <MudTh>Cari Adı</MudTh>
         <MudTh>Başlık</MudTh>
         <MudTh>Açıklama</MudTh>
@@ -37,6 +42,7 @@
 
             </MudMenu>
         </MudTd>
+        <MudTd>@context.YapildiAciklama</MudTd>
         <MudTd>@context.Tarih</MudTd>
         <MudTd>@context.Cari_Adi</MudTd>
         <MudTd>@context.Baslik</MudTd>

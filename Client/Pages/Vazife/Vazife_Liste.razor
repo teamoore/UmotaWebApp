@@ -14,7 +14,7 @@
     <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
 }
 
-<MudTable Items="@mainDataList" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
+<MudTable Items="@mainDataList" FixedHeader="true" Height="500px" SortLabel="Sort By" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
     <ToolBarContent>
         @if (menuYetkiDto.Insert)
         {
@@ -23,10 +23,17 @@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
+        <MudTh>
+            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.Oncelik)">Öncelik</MudTableSortLabel>
+        </MudTh>
         <MudTh>Başlık</MudTh>
         <MudTh>Açıklama</MudTh>
-        <MudTh>Son Tarih</MudTh>
-        <MudTh>Kayıt Tarihi</MudTh>
+        <MudTh>
+            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.SonTarih)">Son Tarih</MudTableSortLabel>
+        </MudTh>
+        <MudTh>
+            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.Insdate)">Kayıt Tarihi</MudTableSortLabel>
+        </MudTh>
         <MudTh>#</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -36,6 +43,7 @@
                 <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Degistir(context.Logref))" Size="Size.Medium" />
             }
         </MudTd>
+        <MudTd DataLabel="Öncelik">@context.OncelikAciklama</MudTd>
         <MudTd DataLabel="Başlık">@context.Baslik</MudTd>
         <MudTd DataLabel="Açıklama">
 
@@ -45,7 +53,7 @@
         </MudTd>
         <MudTd DataLabel="Son Tarih">@context.SonTarih</MudTd>
         <MudTd DataLabel="Kayıt Tarihi">@context.Insdate</MudTd>
-        
+
         <MudTd>
             @if (menuYetkiDto.Delete)
             {

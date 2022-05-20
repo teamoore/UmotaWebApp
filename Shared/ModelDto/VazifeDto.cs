@@ -38,5 +38,31 @@ namespace UmotaWebApp.Shared.ModelDto
                 this.Yapildi = _yapildiMi ? byte.Parse("1") : byte.Parse("0");
             }
         }
+
+        private string _oncelik = "";
+
+        public string OncelikAciklama
+        {
+            get
+            {
+                switch (this.Oncelik)
+                {
+                    case 1:
+                        _oncelik = "Düşük";
+                        break;
+                    case 2:
+                        _oncelik = "Orta";
+                        break;
+                    case 3:
+                        _oncelik = "Yüksek";
+                        break;
+                    default:
+                        _oncelik = "Düşük";
+                        break;
+                }
+
+                return _oncelik;
+            }
+        }
     }
 }
