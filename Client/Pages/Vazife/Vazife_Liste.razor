@@ -1,4 +1,6 @@
 ﻿@page "/vazife_listef"
+@inject IJSRuntime jsRuntime
+
 <HeaderSearchBar header="header"
                  ShowButtons="false" ShowFilterButton="false" ShowSearchSection="false"
                  onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick"></HeaderSearchBar>
@@ -19,6 +21,8 @@
         {
             <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         }
+        &nbsp;
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
@@ -99,6 +103,9 @@
 
     [Inject]
     YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    DownloadHelper downloadHelper { get; set; }
 
     [Inject]
     VazifeHelper mainDataHelper { get; set; }
@@ -237,5 +244,17 @@
         }
     }
 
+    public async Task DownloadCsv()
+    {
+        var content = @"Öncelik;Yapıldı mı;Başlık;Açıklama;Son Tarih;Kayıt Tarihi
+        ";
+
+        foreach (var item in mainDataList)
+        {
+            content += item.OncelikAciklama + ";" + item.YapildiAciklama + ";" + item.Baslik + ";" + item.Aciklama + ";"
+                + item.SonTarih + ";" + item.Insdate + Environment.NewLine;
+        }
+        await downloadHelper.DownloadCsv(content);
+    }
 
 }

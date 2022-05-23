@@ -15,6 +15,10 @@
 }
 
 <MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<CariHesapEkstresiDto,bool>(FilterFunc1)">
+    <ToolBarContent>
+        
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+    </ToolBarContent>
     <HeaderContent>
         <MudTh>Tarih</MudTh>
         <MudTh>İşlem</MudTh>
@@ -59,6 +63,9 @@
 
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    DownloadHelper downloadHelper { get; set; }
 
     [Inject]
     ISnackbar Snackbar { get; set; }
@@ -176,5 +183,20 @@
         {
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
+    }
+
+    public async Task DownloadCsv()
+    {
+        var content = @"Tarih;İşlem;Belge No;Açıklama;Borç Tutar TL;Alacak Tutar TL;Bakiye TL;İşlem Dövizi;Döviz Tutarı;Döviz Kuru
+        ";
+
+        foreach (var item in items)
+        {
+            content += item.tarihFormatted + ";" + item.fisturadi + ";" + item.belgeno + ";" + item.aciklama + ";"
+                + item.borctutFormatted + ";" + item.alacaktutFormatted + ";" + item.bakiyeFormatted + ";" +
+                item.dovizkodu + ";" + item.doviztutarFormatted + ";" + item.dovizkuru +
+                Environment.NewLine;
+        }
+        await downloadHelper.DownloadCsv(content);
     }
 }
