@@ -14,7 +14,9 @@
         @if (menuYetkiDto.Insert)
         {
             <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTeklif" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
-        }       
+        }
+        &nbsp;
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
@@ -101,6 +103,9 @@
 
     [Inject]
     YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    DownloadHelper downloadHelper { get; set; }
 
     [Inject]
     TeklifHelper mainDataHelper { get; set; }
@@ -336,6 +341,22 @@
         {
             loadingCompleted = true;
         }
+    }
+
+    public async Task DownloadCsv()
+    {
+        var content = @"Durum;Teklif No;Revize No;Tarih;Cari Kodu;Cari Adı;Tutar TL;Tutar;Döviz;Proje Adı;Satış Temsilcisi;Teslim Tarihi;Kaydı Giren
+        ";
+
+        foreach (var item in mainDataList)
+        {
+            content += item.Duruminfo + ";" + item.Teklifno + ";" + item.Revzno + ";" + item.TarihFormatted + ";"
+                + item.Carikodu + ";" + item.Cariadi + ";" + Helper.FormattedDouble(item.Tutarmatrahtl) + ";" +
+                Helper.FormattedDouble(item.Tutarmatrah) + ";" + item.Dovizdokuid +  ";" + item.Proje + ";" +
+                item.Temsilciadi + ";" + item.TeslimTarihiFormatted + ";" + item.Insuser + 
+                Environment.NewLine;
+        }
+        await downloadHelper.DownloadCsv(content);
     }
 
 }

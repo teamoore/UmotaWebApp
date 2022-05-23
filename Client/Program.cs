@@ -21,6 +21,8 @@ namespace UmotaWebApp.Client
     {
         public static async Task Main(string[] args)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
@@ -37,6 +39,7 @@ namespace UmotaWebApp.Client
             builder.Services.AddScoped<KullaniciHelper>();
             builder.Services.AddScoped<Radzen.DialogService>();
             builder.Services.AddScoped<Helper>();
+            builder.Services.AddScoped<DownloadHelper>();
             builder.Services.AddAuthorizationCore();
 
             builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
