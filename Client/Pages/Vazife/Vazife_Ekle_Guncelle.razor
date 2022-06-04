@@ -40,14 +40,49 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-3">
-                        <label>Cari Adı</label>
-                        <InputText @bind-Value="record.CariAdi" class="form-control" placeholder="Cari Adı" disabled />
+                    <div class="col-md-6">
+                        <label>Cari Bilgileri</label>
+                        <div class="row">
+                            <div class="col">
+                                <InputText @bind-Value="record.CariKodu" class="form-control" placeholder="Cari Kodu" disabled />
+                            </div>
+                            <div class="col">
+                                <InputText @bind-Value="record.CariAdi" class="form-control" placeholder="Cari Adı" disabled />
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Small>Bul</MudButton>
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Color="Color.Info" Size=Size.Small>Yeni Cari</MudButton>
+                                
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-3">
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Medium>Bul</MudButton>
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Color="Color.Info" Size=Size.Medium>Yeni Cari</MudButton>
-                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="YeniKisiEkle" Color="Color.Info" Size=Size.Medium>Yeni Kişi</MudButton>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>İlgili Kişi</label>
+                        <div class="row">
+                            <div class="col">
+
+                                <InputSelect @bind-Value="record.KisiRef" class="form-control">
+                                    @if (KisiListesi != null)
+                                    {
+                                        <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                        @foreach (var item in KisiListesi)
+                                        {
+                                            <option value="@item.Logref">@item.Tamadi</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="YeniKisiEkle" Color="Color.Info" Size=Size.Small>Yeni Kişi</MudButton>
+
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -91,9 +126,10 @@
                         <label>Önceliklendirme</label>
                         <select class="form-control" @bind="record.Oncelik">
                             <option value="-1">Seçiniz</option>
-                            <option value="1">Düşük</option>
-                            <option value="2">Orta</option>
-                            <option value="3">Yüksek</option>
+                            <option value="1">Rutin</option>
+                            <option value="2">Önemli</option>
+                            <option value="3">Acil</option>
+                            <option value="3">Acil ve Önemli</option>
                         </select>
                     </div>
                 </div>
@@ -309,7 +345,11 @@
 
         this.record.Oncelik = 1; // düşük öncelik
         if (isUpdate)
+        {
             await LoadRecord();
+            await GetKisiListesi();
+        }
+
 
         loadingCompleted = true;
     }
@@ -346,7 +386,7 @@
             Insuser = record.AtananKisi
         });
 
-        var myForm = modal.Show<Pages.Takvim.Takvim_Ekle_Guncelle>("Takvim", prms ,opt);
+        var myForm = modal.Show<Pages.Takvim.Takvim_Ekle_Guncelle>("Takvim", prms, opt);
 
         var result = await myForm.Result;
 
@@ -373,6 +413,7 @@
             {
                 var cariSecim = (VCariKartDto)result.Data;
                 record.CariAdi = cariSecim.Adi;
+                record.CariKodu = cariSecim.Kodu;
                 record.CariRef = cariSecim.Logref;
                 await GetKisiListesi();
             }
