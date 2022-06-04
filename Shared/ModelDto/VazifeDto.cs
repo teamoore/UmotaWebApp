@@ -85,5 +85,15 @@ namespace UmotaWebApp.Shared.ModelDto
                 return _yapildiAciklama;
             }
         }
+
+        public string VazifeTipi { get; set; }
+
+        public int? CariRef { get; set; }
+
+        public string CariAdi { get; set; }
+        public int? KisiRef { get; set; }
+
+        public DateTime? BaslangicTarihi { get; set; }
+        public DateTime? BitirmeTarihi { get; set; }
     }
 }

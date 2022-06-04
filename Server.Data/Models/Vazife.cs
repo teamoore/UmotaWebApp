@@ -9,6 +9,10 @@ namespace UmotaWebApp.Server.Data.Models
     public partial class Vazife
     {
         public int Logref { get; set; }
+        public string VazifeTipi { get; set; }
+        public int? CariRef { get; set; }
+        public string CariAdi { get; set; }
+        public int? KisiRef { get; set; }
         public string AtananKisi { get; set; }
         public string Baslik { get; set; }
         public string Aciklama { get; set; }
@@ -20,5 +24,7 @@ namespace UmotaWebApp.Server.Data.Models
         public DateTime? Insdate { get; set; }
         public string Upduser { get; set; }
         public DateTime? Upddate { get; set; }
+        public DateTime? BaslangicTarihi { get; set; }
+        public DateTime? BitirmeTarihi { get; set; }
     }
 }

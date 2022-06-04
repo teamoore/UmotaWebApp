@@ -19,9 +19,35 @@
 
                 <div class="row">
 
-                    <div class="col-md-3">
-                        <label>Bitirme Tarih</label>
+                    <div class="col-md-2">
+                        <label>En son bitirilecek tarih?</label>
                         <InputDate @bind-Value="record.SonTarih" class="form-control"></InputDate>
+                    </div>
+
+
+                    <div class="col-md-2">
+                        <label>Başlama Tarihi</label>
+                        <InputDate @bind-Value="record.BaslangicTarihi" class="form-control"></InputDate>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label>Bitirme Tarihi</label>
+                        <InputDate @bind-Value="record.BitirmeTarihi" class="form-control"></InputDate>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Cari Adı</label>
+                        <InputText @bind-Value="record.CariAdi" class="form-control" placeholder="Cari Adı" disabled />
+                    </div>
+                    <div class="col-md-3">
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Medium>Bul</MudButton>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Color="Color.Info" Size=Size.Medium>Yeni Cari</MudButton>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="YeniKisiEkle" Color="Color.Info" Size=Size.Medium>Yeni Kişi</MudButton>
                     </div>
                 </div>
             </div>
@@ -131,12 +157,16 @@
     [Inject]
     VazifeHelper dataHelper { get; set; }
 
+    [Inject]
+    KisiHelper kisiHelper { get; set; }
+
     public VazifeDto record = new VazifeDto();
 
     private bool loadingCompleted = false;
     private bool _processing = false;
     public HeaderBarSearch header = new HeaderBarSearch();
     public List<SisKullaniciDto> kullanicilar = new List<SisKullaniciDto>();
+    public List<KisilerDto> KisiListesi { get; set; }
 
     public async Task ValidSubmit()
     {
@@ -329,5 +359,92 @@
         }
     }
 
+    public async Task CariListesiAc()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
 
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (VCariKartDto)result.Data;
+                record.CariAdi = cariSecim.Adi;
+                record.CariRef = cariSecim.Logref;
+                await GetKisiListesi();
+            }
+        }
+    }
+
+    public async Task YeniCariEkle()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+
+        var cariForm = modal.Show<CariKartEkleGuncelleComponent>("Yeni Cari Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (CariKartDto)result.Data;
+                record.CariAdi = cariSecim.Adi;
+                record.CariRef = cariSecim.Logref;
+                KisiListesi = new List<KisilerDto>();
+            }
+        }
+    }
+
+    public async Task YeniKisiEkle()
+    {
+        if (!record.CariRef.HasValue)
+            return;
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+        parameters.Add("CariKartRef", record.CariRef);
+
+        var cariForm = modal.Show<CariKartKisiEkleGuncelleComponent>("Yeni Kişi Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (KisilerDto)result.Data;
+                KisiListesi.Add(Secim);
+            }
+
+        }
+    }
+
+    public async Task GetKisiListesi()
+    {
+        try
+        {
+            if (record.CariRef.HasValue == false)
+                return;
+
+            var result = await kisiHelper.LoadRecords(record.CariRef.Value);
+
+            if (result != null)
+            {
+                KisiListesi = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
 }
