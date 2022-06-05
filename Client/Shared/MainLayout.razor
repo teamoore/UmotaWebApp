@@ -10,11 +10,19 @@
         <MudText Typo="Typo.h5" Class="ml-3">UNO Endüstriyel</MudText>
         <MudSpacer />
         <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="ShowDonemFirmalar">@_selectedFirma</MudButton>
+
+        <MudIconButton OnClick="GoToVazifeler">
+            <MudBadge Content="_vazifeSayisi" Color="Color.Error" Overlap="true" Class="mx-6 my-4">
+                <MudIcon Icon="@Icons.Material.Filled.Task" Color="Color.Warning" />
+            </MudBadge>
+        </MudIconButton>
+            
         <MudText Typo="Typo.h5" Class="ml-3">&nbsp;</MudText>
         <MudMenu FullWidth="true">
             <ActivatorContent>
                 <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary" Variant="Variant.Filled">@_avatarName</MudChip>
             </ActivatorContent>
+
             <ChildContent>
                 <MudMenuItem OnClick="KullaniciProfil">Profil</MudMenuItem>
                 <MudMenuItem OnClick="NavigateToExit">Çıkış</MudMenuItem>
@@ -51,10 +59,15 @@
     [Inject]
     HttpClient httpClient { get; set; }
 
+    [Inject]
+    VazifeHelper vazifeHelper { get; set; }
+
     bool _drawerOpen = true;
 
     string _avatarName = "";
     string _selectedFirma = "";
+
+    int _vazifeSayisi = 0;
 
     void DrawerToggle()
     {
@@ -76,6 +89,11 @@
             var selectedFirmaDonem = await localStorage.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
             _selectedFirma = selectedFirmaDonem.aciklama;
+
+            _vazifeSayisi = await vazifeHelper.CountRecords(new VazifeRequestDto()
+            {
+                User = loginStr
+            });
         }
         else
         {
@@ -114,14 +132,19 @@
         }
     }
 
+
     public void KullaniciProfil()
     {
         NavigationManager.NavigateTo("/kullanici_profil");
     }
 
-
     public void ShowDonemFirmalar()
     {
         NavigationManager.NavigateTo("/donemfirmasec");
+    }
+
+    private void GoToVazifeler()
+    {
+        NavigationManager.NavigateTo("/vazife_listef");
     }
 }

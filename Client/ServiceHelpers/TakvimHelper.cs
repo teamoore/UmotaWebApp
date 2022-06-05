@@ -70,7 +70,10 @@ namespace UmotaWebApp.Client.ServiceHelpers
             if (string.IsNullOrEmpty(takvim.Insuser))
                 takvim.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
-            takvim.Tarih = takvim.Tarih.Value.ChangeTime(takvim.Saat);
+            if (!takvim.Saat.HasValue)
+                takvim.Saat = TimeSpan.FromMinutes(60 * 9); //saat 09:00 default
+
+            takvim.Tarih = takvim.Saat.HasValue ? takvim.Tarih.Value.ChangeTime(takvim.Saat) : takvim.Tarih.Value;
             takvim.Status = 0;
 
             var request = new TakvimRequestDto();

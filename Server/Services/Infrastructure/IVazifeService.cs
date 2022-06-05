@@ -16,5 +16,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<VazifeDto> GetVazife(short firmaId, int logref);
 
         public Task<VazifeDto> UpdateVazife(VazifeRequestDto request);
+
+        public Task<int> GetVazifeCount(VazifeRequestDto request);
     }
 }

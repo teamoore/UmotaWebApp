@@ -180,7 +180,6 @@
                         <MudText>Kaydet</MudText>
                     }
                 </MudButton>
-                <MudButton Disabled="@_processing" OnClick="TakvimEkraniAc" Variant="Variant.Filled" Color="Color.Secondary">Takvime Ekle</MudButton>
                 <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
             </div>
         </div>
@@ -222,6 +221,9 @@
 
     [Inject]
     KisiHelper kisiHelper { get; set; }
+
+    [Inject]
+    TakvimHelper takvimHelper { get; set; }
 
     public VazifeDto record = new VazifeDto();
 
@@ -298,7 +300,19 @@
 
             await dataHelper.SaveRecord(record);
 
+            var takvim = new TakvimDto();
+            takvim.Baslik = record.Baslik;
+            takvim.Aciklama = record.Aciklama;
+            takvim.CariRef = record.CariRef;
+            takvim.Cari_Adi = record.CariAdi;
+            takvim.Cari_Kodu = record.CariKodu;
+            takvim.Tarih = record.SonTarih.HasValue ? record.SonTarih : DateTime.Now;
+
+            await takvimHelper.SaveRecord(takvim);
+
             Snackbar.Add("Kayıt eklendi.", severity: Severity.Success);
+
+            this.StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -420,40 +434,6 @@
         }
         catch (Exception)
         {
-        }
-    }
-
-    public async Task TakvimEkraniAc()
-    {
-        if (this.record.Logref <= 0)
-        {
-            Snackbar.Add("Vazifeyi kaydettikten sonra takvime ekleyebilirsiniz", severity: Severity.Info);
-            return;
-        }
-
-        var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-        opt.HideCloseButton = false;
-
-        var prms = new ModalParameters();
-        prms.Add("GorevTakvimi", new TakvimDto()
-        {
-            Tarih = record.SonTarih,
-            Baslik = record.Baslik,
-            Aciklama = record.Aciklama,
-            Insuser = record.AtananKisi
-        });
-
-        var myForm = modal.Show<Pages.Takvim.Takvim_Ekle_Guncelle>("Takvim", prms, opt);
-
-        var result = await myForm.Result;
-
-        if (!result.Cancelled)
-        {
-            {
-                var takvimSecim = (TakvimDto)result.Data;
-            }
-
         }
     }
 

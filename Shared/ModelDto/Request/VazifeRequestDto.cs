@@ -8,6 +8,7 @@ namespace UmotaWebApp.Shared.ModelDto.Request
 {
     public class VazifeRequestDto : BaseRequestDto
     {
+        public bool AdminView { get; set; }
         public VazifeDto Vazife { get; set; }
     }
 }

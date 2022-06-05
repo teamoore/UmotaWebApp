@@ -47,7 +47,13 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                var results = await dbContext.Vazifes.Where(x => x.Insuser == request.User && x.Status == 0)
+                List<VazifeDto> results = null;
+
+                if (request.AdminView == false)
+                    results = await dbContext.Vazifes.Where(x => x.Insuser == request.User && x.Status == 0)
+                                    .ProjectTo<VazifeDto>(Mapper.ConfigurationProvider).ToListAsync();
+                else
+                    results = await dbContext.Vazifes.Where(x => x.Status == 0)
                                 .ProjectTo<VazifeDto>(Mapper.ConfigurationProvider).ToListAsync();
                 return results;
             }
@@ -86,6 +92,19 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 await dbContext.SaveChangesAsync();
 
                 return Mapper.Map<VazifeDto>(row);
+            }
+        }
+
+        public Task<int> GetVazifeCount(VazifeRequestDto request)
+        {
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var results = dbContext.Vazifes.Where(x => x.Insuser == request.User && x.Status == 0 && x.Yapildi == 0).Count();
+                return Task.FromResult(results);
             }
         }
     }
