@@ -15,32 +15,56 @@
 
     <div class="mt-5">
         <div class="form">
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Görev Tipi</label>
+                        <select class="form-control" @bind="record.VazifeTipi">
+                            <option value="-1">Seçiniz</option>
+                            <option value="Randevu">Randevu</option>
+                            <option value="Görev">Görev</option>
+                            <option value="Arama">Arama</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
 
                 <div class="row">
 
-                    <div class="col-md-2">
+                    <div class="col-md-3">
                         <label>En son bitirilecek tarih?</label>
                         <InputDate @bind-Value="record.SonTarih" class="form-control"></InputDate>
                     </div>
 
 
-                    <div class="col-md-2">
-                        <label>Başlama Tarihi</label>
-                        <InputDate @bind-Value="record.BaslangicTarihi" class="form-control"></InputDate>
-                    </div>
 
-                    <div class="col-md-2">
-                        <label>Bitirme Tarihi</label>
-                        <InputDate @bind-Value="record.BitirmeTarihi" class="form-control"></InputDate>
-                    </div>
 
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col">
+                                <label>Başlama Tarihi</label>
+                                <InputDate @bind-Value="record.BaslangicTarihi" class="form-control"></InputDate>
+                            </div>
+
+                            <div class="col">
+                                <label>Bitirme Tarihi</label>
+                                <InputDate @bind-Value="record.BitirmeTarihi" class="form-control"></InputDate>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
                         <label>Cari Bilgileri</label>
                         <div class="row">
                             <div class="col">
@@ -52,7 +76,7 @@
                             <div class="col">
                                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Small>Bul</MudButton>
                                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Color="Color.Info" Size=Size.Small>Yeni Cari</MudButton>
-                                
+
                             </div>
                         </div>
                     </div>
@@ -61,7 +85,7 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-8">
                         <label>İlgili Kişi</label>
                         <div class="row">
                             <div class="col">
@@ -82,14 +106,14 @@
 
                             </div>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-8">
                         <label>Başlık</label>
                         <InputText @bind-Value="record.Baslik" class="form-control"></InputText>
                     </div>
@@ -98,7 +122,7 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-8">
                         <label>Açıklama</label>
                         <InputTextArea rows="5" @bind-Value="record.Aciklama" class="form-control"></InputTextArea>
                     </div>
@@ -108,7 +132,7 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label>Atanacak Kişi</label>
                         <select class="form-control" @bind="record.AtananKisi">
                             @if (kullanicilar != null)
@@ -122,14 +146,14 @@
                         </select>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label>Önceliklendirme</label>
                         <select class="form-control" @bind="record.Oncelik">
                             <option value="-1">Seçiniz</option>
                             <option value="1">Rutin</option>
                             <option value="2">Önemli</option>
                             <option value="3">Acil</option>
-                            <option value="3">Acil ve Önemli</option>
+                            <option value="4">Acil ve Önemli</option>
                         </select>
                     </div>
                 </div>
@@ -173,6 +197,9 @@
     public int? vazifeLogRef { get; set; }
 
     [Parameter]
+    public int? vazifeTipi { get; set; }
+
+    [Parameter]
     public int? modalForm { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
@@ -203,6 +230,9 @@
     public HeaderBarSearch header = new HeaderBarSearch();
     public List<SisKullaniciDto> kullanicilar = new List<SisKullaniciDto>();
     public List<KisilerDto> KisiListesi { get; set; }
+    public Dictionary<int, string> vazifeTipleri = new Dictionary<int, string>();
+
+    private bool _pageHasError = false;
 
     public async Task ValidSubmit()
     {
@@ -223,6 +253,9 @@
 
     private async Task SaveCompleted()
     {
+        if (_pageHasError)
+            return;
+
         if (modalForm.HasValue)
             await ModalInstance.CloseAsync();
         else
@@ -316,6 +349,8 @@
 
     public void SubmitValidation()
     {
+        _pageHasError = false;
+
         var err = new List<string>();
 
         if (string.IsNullOrWhiteSpace(record.Baslik))
@@ -324,13 +359,26 @@
         if (record.Oncelik == -1)
             err.Add("Öncelik seçiniz");
 
+        if (string.IsNullOrEmpty(record.VazifeTipi) || record.VazifeTipi.Equals("-1"))
+            err.Add("Görevi tipiniz seçiniz");
+
         if (err.Count > 0)
         {
+            _pageHasError = true;
+
             var ex = new ClientException("Kayıt Hatası");
             ex.ErrorList = err;
 
             throw ex;
         }
+    }
+
+    public void InitVazifeTipleri()
+    {
+        vazifeTipleri.Add(1, "Randevu");
+        vazifeTipleri.Add(2, "Görev");
+        vazifeTipleri.Add(3, "Arama");
+
     }
 
     protected override async Task OnInitializedAsync()
@@ -340,6 +388,16 @@
         var isUpdate = this.vazifeLogRef.HasValue;
 
         loadingCompleted = false;
+
+        InitVazifeTipleri();
+        string pvt = "";
+
+        if (this.vazifeTipi.HasValue)
+        {
+            vazifeTipleri.TryGetValue(this.vazifeTipi.Value, out pvt);
+            record.VazifeTipi = pvt;
+        }
+
 
         await LoadKullanicilar();
 

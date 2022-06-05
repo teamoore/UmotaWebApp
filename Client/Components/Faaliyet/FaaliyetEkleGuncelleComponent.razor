@@ -245,21 +245,41 @@
         </div>
     </div>
 
-
     <div class="form-group">
-        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
-            @if (_processing)
-            {
-                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                <MudText Class="ms-2">Kaydediliyor...</MudText>
-            }
-            else
-            {
-                <MudText>Kaydet</MudText>
-            }
-        </MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="YeniTakvimEkle">Takvim Oluştur</MudButton>
-        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+        <div class="row">
+            <div class="col-md-5">
+                <div class="row">
+                    <div class="col">
+                        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+                            @if (_processing)
+                            {
+                                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                                <MudText Class="ms-2">Kaydediliyor...</MudText>
+                            }
+                            else
+                            {
+                                <MudText>Kaydet</MudText>
+                            }
+                        </MudButton>
+                        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+                    </div>
+
+                    <div class="col">
+                        <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+                            <MudButton StartIcon="@Icons.Material.Filled.AccessAlarm" IconColor="Color.Warning"
+                                       OnClick="(() => YeniVazifeEkle(1))" Title="Randevu Oluşturun">Randevu</MudButton>
+                            <MudButton StartIcon="@Icons.Material.Filled.Task" IconColor="Color.Warning" Title="Görev Oluşturun" OnClick="(() => YeniVazifeEkle(2))">
+                                Görev
+                            </MudButton>
+                            <MudButton StartIcon="@Icons.Material.Filled.PhoneAndroid" IconColor="Color.Warning" Title="Arama Oluştur" OnClick="(() => YeniVazifeEkle(3))">Arama</MudButton>
+                        </MudButtonGroup>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        
     </div>
 
 </EditForm>
@@ -651,7 +671,7 @@
         }
     }
 
-    public async Task YeniTakvimEkle()
+    public async Task YeniVazifeEkle(int vazifeTipi)
     {
 
         var opt = new ModalOptions();
@@ -659,8 +679,9 @@
 
         var parameters = new ModalParameters();
         parameters.Add("modalForm", 1);
+        parameters.Add("vazifeTipi", vazifeTipi);
 
-        var cariForm = modal.Show<Pages.Takvim.Takvim_Ekle_Guncelle>("Yeni Takvim Ekle", parameters: parameters, options: opt);
+        var cariForm = modal.Show<Pages.Vazife.Vazife_Ekle_Guncelle>("Yeni Görev", parameters: parameters, options: opt);
         var result = await cariForm.Result;
 
         if (!result.Cancelled)
