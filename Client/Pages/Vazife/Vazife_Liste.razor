@@ -19,7 +19,13 @@
     <ToolBarContent>
         @if (menuYetkiDto.Insert)
         {
-            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
+        }
+        &nbsp;
+        @if (menuYetkiDto.IsAdmin)
+        {
+
+            <MudIconButton Icon="@Icons.Material.Filled.AdminPanelSettings" OnClick="AdminLoadList" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yönetici Olarak Listele" />
         }
         &nbsp;
         <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
@@ -42,6 +48,7 @@
         <MudTh>
             <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.Insdate)">Kayıt Tarihi</MudTableSortLabel>
         </MudTh>
+        <MudTh>Kaydı Ekleyen</MudTh>
         <MudTh>#</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -66,7 +73,7 @@
         </MudTd>
         <MudTd DataLabel="Son Tarih">@context.SonTarih</MudTd>
         <MudTd DataLabel="Kayıt Tarihi">@context.Insdate</MudTd>
-
+        <MudTd DataLabel="Kaydı Ekleyen">@context.Insuser</MudTd>
         <MudTd>
             @if (menuYetkiDto.Delete)
             {
@@ -148,6 +155,13 @@
         mainDataRequest.FirmaId = selectedFirmaDonem.firma_no.Value;
         mainDataRequest.KullaniciKodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
         mainDataRequest.TopRowCount = 100;
+    }
+
+    private async Task AdminLoadList()
+    {
+        loadingCompleted = false;
+        mainDataRequest.AdminView = true;
+        await LoadList();
     }
 
     private async Task LoadList()

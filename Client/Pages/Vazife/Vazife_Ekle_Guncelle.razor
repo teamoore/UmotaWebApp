@@ -15,20 +15,105 @@
 
     <div class="mt-5">
         <div class="form">
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Görev Tipi</label>
+                        <select class="form-control" @bind="record.VazifeTipi">
+                            <option value="-1">Seçiniz</option>
+                            <option value="Randevu">Randevu</option>
+                            <option value="Görev">Görev</option>
+                            <option value="Arama">Arama</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
             <div class="form-group">
 
                 <div class="row">
 
                     <div class="col-md-3">
-                        <label>Bitirme Tarih</label>
+                        <label>En son bitirilecek tarih?</label>
                         <InputDate @bind-Value="record.SonTarih" class="form-control"></InputDate>
+                    </div>
+
+
+
+
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col">
+                                <label>Başlama Tarihi</label>
+                                <InputDate @bind-Value="record.BaslangicTarihi" class="form-control"></InputDate>
+                            </div>
+
+                            <div class="col">
+                                <label>Bitirme Tarihi</label>
+                                <InputDate @bind-Value="record.BitirmeTarihi" class="form-control"></InputDate>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-8">
+                        <label>Cari Bilgileri</label>
+                        <div class="row">
+                            <div class="col">
+                                <InputText @bind-Value="record.CariKodu" class="form-control" placeholder="Cari Kodu" disabled />
+                            </div>
+                            <div class="col">
+                                <InputText @bind-Value="record.CariAdi" class="form-control" placeholder="Cari Adı" disabled />
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Color="Color.Info" Size=Size.Small>Bul</MudButton>
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Color="Color.Info" Size=Size.Small>Yeni Cari</MudButton>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>İlgili Kişi</label>
+                        <div class="row">
+                            <div class="col">
+
+                                <InputSelect @bind-Value="record.KisiRef" class="form-control">
+                                    @if (KisiListesi != null)
+                                    {
+                                        <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                        @foreach (var item in KisiListesi)
+                                        {
+                                            <option value="@item.Logref">@item.Tamadi</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="YeniKisiEkle" Color="Color.Info" Size=Size.Small>Yeni Kişi</MudButton>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
                         <label>Başlık</label>
                         <InputText @bind-Value="record.Baslik" class="form-control"></InputText>
                     </div>
@@ -37,7 +122,7 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-8">
                         <label>Açıklama</label>
                         <InputTextArea rows="5" @bind-Value="record.Aciklama" class="form-control"></InputTextArea>
                     </div>
@@ -47,7 +132,7 @@
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label>Atanacak Kişi</label>
                         <select class="form-control" @bind="record.AtananKisi">
                             @if (kullanicilar != null)
@@ -61,13 +146,14 @@
                         </select>
                     </div>
 
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label>Önceliklendirme</label>
                         <select class="form-control" @bind="record.Oncelik">
                             <option value="-1">Seçiniz</option>
-                            <option value="1">Düşük</option>
-                            <option value="2">Orta</option>
-                            <option value="3">Yüksek</option>
+                            <option value="1">Rutin</option>
+                            <option value="2">Önemli</option>
+                            <option value="3">Acil</option>
+                            <option value="4">Acil ve Önemli</option>
                         </select>
                     </div>
                 </div>
@@ -94,7 +180,6 @@
                         <MudText>Kaydet</MudText>
                     }
                 </MudButton>
-                <MudButton Disabled="@_processing" OnClick="TakvimEkraniAc" Variant="Variant.Filled" Color="Color.Secondary">Takvime Ekle</MudButton>
                 <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
             </div>
         </div>
@@ -109,6 +194,9 @@
 
     [Parameter]
     public int? vazifeLogRef { get; set; }
+
+    [Parameter]
+    public int? vazifeTipi { get; set; }
 
     [Parameter]
     public int? modalForm { get; set; }
@@ -131,12 +219,22 @@
     [Inject]
     VazifeHelper dataHelper { get; set; }
 
+    [Inject]
+    KisiHelper kisiHelper { get; set; }
+
+    [Inject]
+    TakvimHelper takvimHelper { get; set; }
+
     public VazifeDto record = new VazifeDto();
 
     private bool loadingCompleted = false;
     private bool _processing = false;
     public HeaderBarSearch header = new HeaderBarSearch();
     public List<SisKullaniciDto> kullanicilar = new List<SisKullaniciDto>();
+    public List<KisilerDto> KisiListesi { get; set; }
+    public Dictionary<int, string> vazifeTipleri = new Dictionary<int, string>();
+
+    private bool _pageHasError = false;
 
     public async Task ValidSubmit()
     {
@@ -157,6 +255,9 @@
 
     private async Task SaveCompleted()
     {
+        if (_pageHasError)
+            return;
+
         if (modalForm.HasValue)
             await ModalInstance.CloseAsync();
         else
@@ -199,7 +300,19 @@
 
             await dataHelper.SaveRecord(record);
 
+            var takvim = new TakvimDto();
+            takvim.Baslik = record.Baslik;
+            takvim.Aciklama = record.Aciklama;
+            takvim.CariRef = record.CariRef;
+            takvim.Cari_Adi = record.CariAdi;
+            takvim.Cari_Kodu = record.CariKodu;
+            takvim.Tarih = record.SonTarih.HasValue ? record.SonTarih : DateTime.Now;
+
+            await takvimHelper.SaveRecord(takvim);
+
             Snackbar.Add("Kayıt eklendi.", severity: Severity.Success);
+
+            this.StateHasChanged();
         }
         catch (Exception ex)
         {
@@ -250,6 +363,8 @@
 
     public void SubmitValidation()
     {
+        _pageHasError = false;
+
         var err = new List<string>();
 
         if (string.IsNullOrWhiteSpace(record.Baslik))
@@ -258,13 +373,26 @@
         if (record.Oncelik == -1)
             err.Add("Öncelik seçiniz");
 
+        if (string.IsNullOrEmpty(record.VazifeTipi) || record.VazifeTipi.Equals("-1"))
+            err.Add("Görevi tipiniz seçiniz");
+
         if (err.Count > 0)
         {
+            _pageHasError = true;
+
             var ex = new ClientException("Kayıt Hatası");
             ex.ErrorList = err;
 
             throw ex;
         }
+    }
+
+    public void InitVazifeTipleri()
+    {
+        vazifeTipleri.Add(1, "Randevu");
+        vazifeTipleri.Add(2, "Görev");
+        vazifeTipleri.Add(3, "Arama");
+
     }
 
     protected override async Task OnInitializedAsync()
@@ -275,11 +403,25 @@
 
         loadingCompleted = false;
 
+        InitVazifeTipleri();
+        string pvt = "";
+
+        if (this.vazifeTipi.HasValue)
+        {
+            vazifeTipleri.TryGetValue(this.vazifeTipi.Value, out pvt);
+            record.VazifeTipi = pvt;
+        }
+
+
         await LoadKullanicilar();
 
         this.record.Oncelik = 1; // düşük öncelik
         if (isUpdate)
+        {
             await LoadRecord();
+            await GetKisiListesi();
+        }
+
 
         loadingCompleted = true;
     }
@@ -295,39 +437,93 @@
         }
     }
 
-    public async Task TakvimEkraniAc()
+    public async Task CariListesiAc()
     {
-        if (this.record.Logref <= 0)
-        {
-            Snackbar.Add("Vazifeyi kaydettikten sonra takvime ekleyebilirsiniz", severity: Severity.Info);
-            return;
-        }
-
         var opt = new ModalOptions();
         opt.ContentScrollable = true;
-        opt.HideCloseButton = false;
 
-        var prms = new ModalParameters();
-        prms.Add("GorevTakvimi", new TakvimDto()
-        {
-            Tarih = record.SonTarih,
-            Baslik = record.Baslik,
-            Aciklama = record.Aciklama,
-            Insuser = record.AtananKisi
-        });
-
-        var myForm = modal.Show<Pages.Takvim.Takvim_Ekle_Guncelle>("Takvim", prms ,opt);
-
-        var result = await myForm.Result;
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+        var result = await cariForm.Result;
 
         if (!result.Cancelled)
         {
+            if (result.Data != null)
             {
-                var takvimSecim = (TakvimDto)result.Data;
+                var cariSecim = (VCariKartDto)result.Data;
+                record.CariAdi = cariSecim.Adi;
+                record.CariKodu = cariSecim.Kodu;
+                record.CariRef = cariSecim.Logref;
+                await GetKisiListesi();
+            }
+        }
+    }
+
+    public async Task YeniCariEkle()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+
+        var cariForm = modal.Show<CariKartEkleGuncelleComponent>("Yeni Cari Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (CariKartDto)result.Data;
+                record.CariAdi = cariSecim.Adi;
+                record.CariRef = cariSecim.Logref;
+                KisiListesi = new List<KisilerDto>();
+            }
+        }
+    }
+
+    public async Task YeniKisiEkle()
+    {
+        if (!record.CariRef.HasValue)
+            return;
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+        parameters.Add("CariKartRef", record.CariRef);
+
+        var cariForm = modal.Show<CariKartKisiEkleGuncelleComponent>("Yeni Kişi Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (KisilerDto)result.Data;
+                KisiListesi.Add(Secim);
             }
 
         }
     }
 
+    public async Task GetKisiListesi()
+    {
+        try
+        {
+            if (record.CariRef.HasValue == false)
+                return;
 
+            var result = await kisiHelper.LoadRecords(record.CariRef.Value);
+
+            if (result != null)
+            {
+                KisiListesi = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
 }

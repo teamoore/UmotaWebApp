@@ -48,16 +48,19 @@ namespace UmotaWebApp.Shared.ModelDto
                 switch (this.Oncelik)
                 {
                     case 1:
-                        _oncelik = "Düşük";
+                        _oncelik = "Rutin";
                         break;
                     case 2:
-                        _oncelik = "Orta";
+                        _oncelik = "Önemli";
                         break;
                     case 3:
-                        _oncelik = "Yüksek";
+                        _oncelik = "Acil";
+                        break;
+                    case 4:
+                        _oncelik = "Acil ve Önemli";
                         break;
                     default:
-                        _oncelik = "Düşük";
+                        _oncelik = "Rutin";
                         break;
                 }
 
@@ -85,5 +88,16 @@ namespace UmotaWebApp.Shared.ModelDto
                 return _yapildiAciklama;
             }
         }
+
+        public string VazifeTipi { get; set; }
+
+        public int? CariRef { get; set; }
+
+        public string CariAdi { get; set; }
+        public string CariKodu { get; set; }
+        public int? KisiRef { get; set; }
+
+        public DateTime? BaslangicTarihi { get; set; }
+        public DateTime? BitirmeTarihi { get; set; }
     }
 }

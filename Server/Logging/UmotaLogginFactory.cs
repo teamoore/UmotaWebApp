@@ -44,12 +44,19 @@ namespace UmotaWebApp.Server.Logging
                               .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                               .Build();
             var connStr = configuration.GetConnectionString("LoggerConnection");
-                       
-
+            
             using (SqlConnection db = new SqlConnection(connStr))
             {
-                db.Execute("insert into dbo.sis_logs (LogMessage) values ('" + logMsg + "')");
+                try
+                {
+                    db.Execute("insert into dbo.sis_logs (LogMessage) values ('" + logMsg + "')");
+                }
+                catch (Exception)
+                {
+                }
+                
             }
+
         }
     }
 }

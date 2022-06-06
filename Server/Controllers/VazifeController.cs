@@ -105,5 +105,27 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpPost("count")]
+        public Task<ServiceResponse<int>> VazifeGetirCount(VazifeRequestDto request)
+        {
+            try
+            {
+                var r = new ServiceResponse<int>()
+                {
+                    Value = dataService.GetVazifeCount(request).Result
+                };
+
+                return Task.FromResult(r);
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return Task.FromResult(e);
+            }
+        }
+
     }
 }

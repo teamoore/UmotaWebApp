@@ -104,10 +104,10 @@ namespace UmotaWebApp.Server.Services.Infrastructure
               .ProjectTo<SisKullaniciDto>(Mapper.ConfigurationProvider).FirstOrDefaultAsync();
 
             if (kullanici == null)
-                throw new ApiException("Kullanıcı kodu ve/veya şifre hatalı girildi.");
+                throw new Exception("Kullanıcı kodu ve/veya şifre hatalı girildi.");
 
             if (kullanici.KullaniciIptal)
-                throw new ApiException("Kullanıcının sisteme girişi engellenmiş. Sistem yöneticinize başvurunuz.");
+                throw new Exception("Kullanıcının sisteme girişi engellenmiş. Sistem yöneticinize başvurunuz.");
 
             var kullanici_donem_yetki = await MasterDbContext.SisFirmaDonemYetkis.Where(x => x.Kodu == kullanici.KullaniciKodu)
                 .ProjectTo<SisFirmaDonemYetkiDto>(Mapper.ConfigurationProvider).ToListAsync();

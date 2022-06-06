@@ -40,6 +40,7 @@ namespace UmotaWebApp.Client
             builder.Services.AddScoped<Radzen.DialogService>();
             builder.Services.AddScoped<Helper>();
             builder.Services.AddScoped<DownloadHelper>();
+            builder.Services.AddScoped<KisiHelper>();
             builder.Services.AddAuthorizationCore();
 
             builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();

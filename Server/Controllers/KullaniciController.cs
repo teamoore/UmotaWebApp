@@ -87,7 +87,7 @@ namespace UmotaWebApp.Server.Controllers
             catch (Exception ex)
             {
                 result.SetException(ex);
-                Logger.Log(LogLevel.Error, ex.Message);
+                Logger.Log(LogLevel.Error, ex.Message, new object[] { request });
             }
             
             return result;

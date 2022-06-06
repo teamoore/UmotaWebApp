@@ -85,6 +85,19 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return result;
         }
 
+        public async Task<int> CountRecords(VazifeRequestDto request)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+            request.User = kullanicikodu;
+
+            var records = await httpClient.PostGetServiceResponseAsync<int, VazifeRequestDto>(UrlHelper.VazifeSayisi, request);
+
+            return records;
+        }
+
         public async Task<VazifeDto> UpdateRecord(VazifeDto vazife)
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
