@@ -77,5 +77,7 @@ namespace UmotaWebApp.Client.Utils
         public const string VazifeListesi = "/api/Vazife/list";
         public const string VazifeKaydet = "/api/Vazife/save";
         public const string VazifeGuncelle = "/api/Vazife/update";
+        public const string TahsilatRaporu = "/api/Report/tahsilatraporu";
+        public const string BankaDurumRaporu = "/api/Report/bankadurumraporu";
     }
 }
