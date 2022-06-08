@@ -1,0 +1,209 @@
+﻿@page "/r_tahsilatf"
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="true"
+                 onFilterButtonClicked="Rapor" ShowSearchSection="false"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+@if (sayfayiGormeYetkisi == false)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
+}
+
+<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" >
+    <ToolBarContent>
+
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Temsilci</MudTh>
+        <MudTh>Bölge</MudTh>
+        <MudTh>Cari Kodu</MudTh>
+        <MudTh>Cari Ünvan</MudTh>
+        <MudTh>Tarih</MudTh>
+        <MudTh>Yıl</MudTh>
+        <MudTh>Ay</MudTh>
+        <MudTh>Gun</MudTh>
+        <MudTh>Belge No</MudTh>
+        <MudTh>Nakit</MudTh>
+        <MudTh>Nakit İade</MudTh>
+        <MudTh>Havale</MudTh>
+        <MudTh>Havale İade</MudTh>
+        <MudTh>Çek</MudTh>
+        <MudTh>Çek İade</MudTh>
+        <MudTh>Senet</MudTh>
+        <MudTh>Senet İade</MudTh>
+        <MudTh>Kredi Kartı</MudTh>
+        <MudTh>Kredi Kartı İade</MudTh>
+        <MudTh>Virman</MudTh>
+        <MudTh>Toplam</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Temsilci">@context.saticiadi</MudTd>
+        <MudTd DataLabel="Bölge">@context.cariozelkod2</MudTd>
+        <MudTd DataLabel="Cari Kodu">@context.carikodu</MudTd>
+        <MudTd DataLabel="Cari Ünvan">@context.cariadi</MudTd>
+        <MudTd DataLabel="Tarih">@context.tarihFormatted</MudTd>
+        <MudTd DataLabel="Yıl">@context.yil</MudTd>
+        <MudTd DataLabel="Ay">@context.ay</MudTd>
+        <MudTd DataLabel="Gun">@context.gun</MudTd>
+        <MudTd DataLabel="Belge No">@context.tranno</MudTd>
+        <MudTd DataLabel="Nakit" Style="text-align:right">@context.nakitFormatted</MudTd>
+        <MudTd DataLabel="Nakit İade" Style="text-align:right">@context.nakit_iFormatted</MudTd>
+        <MudTd DataLabel="Havale" Style="text-align:right">@context.havaleFormatted</MudTd>
+        <MudTd DataLabel="Havale İade" Style="text-align:right">@context.havale_iFormatted</MudTd>
+        <MudTd DataLabel="Çek" Style="text-align:right">@context.cekFormatted</MudTd>
+        <MudTd DataLabel="Çek İade" Style="text-align:right">@context.cek_iFormatted</MudTd>
+        <MudTd DataLabel="Senet" Style="text-align:right">@context.senetFormatted</MudTd>
+        <MudTd DataLabel="Senet İade" Style="text-align:right">@context.senet_iFormatted</MudTd>
+        <MudTd DataLabel="Kredi Kartı" Style="text-align:right">@context.kredikartFormatted</MudTd>
+        <MudTd DataLabel="Kredi Kartı İade" Style="text-align:right">@context.kredikart_iFormatted</MudTd>
+        <MudTd DataLabel="Virman" Style="text-align:right">@context.virmanFormatted</MudTd>
+        <MudTd DataLabel="Toplam" Style="text-align:right">@context.toplamFormatted</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
+@code
+{
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    DownloadHelper downloadHelper { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public List<TahsilatRaporuDto> items = new List<TahsilatRaporuDto>();
+
+    private bool loadingCompleted = true;
+    private bool sayfayiGormeYetkisi = true;
+    private bool isAdmin = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Tahsilat Raporu";
+        await KullaniciYetkileriGetir();
+
+        await Rapor();
+    }
+
+    public async Task Rapor()
+    {
+        if (!sayfayiGormeYetkisi)
+            return;
+
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+
+            var filterForm = modal.Show<Pages.Raporlar.TahsilatRaporuFilters>("Rapor Seçenekleri", opt);
+            var result = await filterForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+
+                    var request = (TahsilatRaporuRequestDto)result.Data;
+
+                    request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+                    request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+
+                    var response = await httpClient.PostGetServiceResponseAsync<List<TahsilatRaporuDto>, TahsilatRaporuRequestDto>(UrlHelper.TahsilatRaporu, request);
+                    if (response == null || response.Count == 0)
+                    {
+                        Snackbar.Add("Aradığınız kritere göre kayıt bulunamadı.", severity: Severity.Warning);
+                        loadingCompleted = true;
+                        return;
+                    }
+                    loadingCompleted = true;
+                    items = response;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task KullaniciYetkileriGetir()
+    {
+        try
+        {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanicikodu);
+
+            if (result != null)
+            {
+                isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
+                if (isAdmin)
+                {
+                    sayfayiGormeYetkisi = true;
+                }
+                else
+                {
+                    var yetki = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanicikodu + "&menu_dfm=r_tahsilatf&hak_tipi=sel");
+                    sayfayiGormeYetkisi = yetki == 1;
+                }
+            }
+            else
+            {
+                isAdmin = false;
+                sayfayiGormeYetkisi = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    public async Task DownloadCsv()
+    {
+        var content = @"Tarih;Yil;Ay;Gun;Temsilci;Bölge;Cari Kodu;Cari Ünvan;Nakit;Nakit İade;Havale;Havale İade;Çek;Çek İade;Senet;Senet İade;Kredi Kart;Kredi Kart İade;Virman;Toplam
+        ";
+
+        foreach (var item in items)
+        {
+            content += item.tarihFormatted + ";" + item.yil + ";" + item.ay + ";" + item.gun + ";" + item.saticiadi + ";" + item.cariozelkod2 + ";"
+                + item.carikodu+ ";" + item.cariadi + ";"
+                + item.nakitFormatted + ";" + item.nakit_iFormatted + ";" + item.havaleFormatted + ";" + item.havale_iFormatted + ";"
+                + item.cekFormatted + ";" + item.cek_iFormatted + ";" + item.senetFormatted + ";" + item.senet_iFormatted + ";"
+                + item.kredikartFormatted + ";" + item.kredikart_iFormatted + ";" + item.virmanFormatted + ";" + item.toplamFormatted
+                + Environment.NewLine;
+        }
+        await downloadHelper.DownloadCsv(content);
+    }
+}
