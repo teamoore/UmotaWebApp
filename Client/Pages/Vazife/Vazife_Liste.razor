@@ -15,7 +15,7 @@
     <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
 }
 
-<MudTable Items="@mainDataList" FixedHeader="true" Height="500px" SortLabel="Sort By" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
+<MudTable GroupBy="@_groupDefinition" Items="@mainDataList" FixedHeader="true" Height="500px" SortLabel="Sort By" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
     <ToolBarContent>
         @if (menuYetkiDto.Insert)
         {
@@ -51,6 +51,9 @@
         <MudTh>Kaydı Ekleyen</MudTh>
         <MudTh>#</MudTh>
     </HeaderContent>
+    <GroupHeaderTemplate>
+        <MudTh Class="mud-table-cell-custom-group" colspan="9">@($"{context.GroupName}: {context.Key}")</MudTh>
+    </GroupHeaderTemplate>
     <RowTemplate>
         <MudTd>
             @if (menuYetkiDto.Update)
@@ -127,6 +130,14 @@
     private string updatePage = "vazife_ekle_guncelle";
     private string headerText = "Görev Listesi";
     private bool loadingCompleted = false;
+
+    private TableGroupDefinition<VazifeDto> _groupDefinition = new()
+    {
+        GroupName = "Görev Tipi",
+        Indentation = false,
+        Expandable = false,
+        Selector = (e) => e.VazifeTipi
+    };
 
     protected override async Task OnInitializedAsync()
     {

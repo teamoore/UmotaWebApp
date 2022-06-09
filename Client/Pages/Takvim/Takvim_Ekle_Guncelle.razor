@@ -290,9 +290,13 @@
         if (GorevTakvimi != null)
         {
             this.takvim.Tarih = GorevTakvimi.Tarih.HasValue ? GorevTakvimi.Tarih.Value : DateTime.Now;
+            this.takvim.Saat = GorevTakvimi.Saat;
             this.takvim.Baslik = GorevTakvimi.Baslik;
             this.takvim.Aciklama = GorevTakvimi.Aciklama;
             this.takvim.Insuser = GorevTakvimi.Insuser;
+            this.takvim.CariRef = GorevTakvimi.CariRef;
+            this.takvim.Cari_Adi = GorevTakvimi.Cari_Adi;
+            this.takvim.Cari_Kodu = GorevTakvimi.Cari_Kodu;
         }
 
         if (isUpdate)

@@ -201,6 +201,9 @@
     [Parameter]
     public int? modalForm { get; set; }
 
+    [Parameter]
+    public VazifeDto gorevParam { get; set; }
+
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
 
@@ -410,6 +413,13 @@
         {
             vazifeTipleri.TryGetValue(this.vazifeTipi.Value, out pvt);
             record.VazifeTipi = pvt;
+        }
+
+        if (gorevParam != null)
+        {
+            this.record.CariAdi = gorevParam.CariAdi;
+            this.record.CariKodu = gorevParam.CariKodu;
+            this.record.CariRef = gorevParam.CariRef;
         }
 
 
