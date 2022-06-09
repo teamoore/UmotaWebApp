@@ -139,7 +139,7 @@
                                 <option value="-1">Seçiniz</option>
                                 @foreach (var item in kullanicilar)
                                 {
-                                    <option value="@item.KullaniciAdi" selected="@isLoginUser(item.KullaniciAdi)">@item.KullaniciAdi (@item.MailAdres)</option>
+                                    <option value="@item.KullaniciAdi" selected="@isLoginUser(item.KullaniciKodu)">@item.KullaniciAdi (@item.MailAdres)</option>
                                 }
                             }
                         </select>
