@@ -139,14 +139,14 @@
                                 <option value="-1">Seçiniz</option>
                                 @foreach (var item in kullanicilar)
                                 {
-                                    <option value="@item.KullaniciAdi">@item.KullaniciAdi (@item.MailAdres)</option>
+                                    <option value="@item.KullaniciAdi" selected="@isLoginUser(item.KullaniciAdi)">@item.KullaniciAdi (@item.MailAdres)</option>
                                 }
                             }
                         </select>
                     </div>
 
                     <div class="col-md-4">
-                        <label>Önceliklendirme</label>
+                        <label>Önem Derecesi</label>
                         <select class="form-control" @bind="record.Oncelik">
                             <option value="-1">Seçiniz</option>
                             <option value="1">Rutin</option>
@@ -205,6 +205,9 @@
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
 
     [Inject]
     KullaniciHelper kullaniciHelper { get; set; }
@@ -235,6 +238,7 @@
     public List<SisKullaniciDto> kullanicilar = new List<SisKullaniciDto>();
     public List<KisilerDto> KisiListesi { get; set; }
     public Dictionary<int, string> vazifeTipleri = new Dictionary<int, string>();
+    private string _currentUser = "";
 
     private bool _pageHasError = false;
 
@@ -378,6 +382,9 @@
         if (string.IsNullOrEmpty(record.VazifeTipi) || record.VazifeTipi.Equals("-1"))
             err.Add("Görevi tipiniz seçiniz");
 
+        if (string.IsNullOrEmpty(record.AtananKisi) || record.AtananKisi.Equals("-1"))
+            err.Add("Atanacak kişi boş geçilemez");
+
         if (err.Count > 0)
         {
             _pageHasError = true;
@@ -404,6 +411,8 @@
         var isUpdate = this.vazifeLogRef.HasValue;
 
         loadingCompleted = false;
+
+        _currentUser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
         InitVazifeTipleri();
         string pvt = "";
@@ -537,5 +546,10 @@
         {
             Snackbar.Add(ex.Message, severity: Severity.Error);
         }
+    }
+
+    private bool isLoginUser(string username)
+    {
+        return username.Equals(_currentUser);
     }
 }
