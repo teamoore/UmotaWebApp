@@ -78,10 +78,7 @@ namespace UmotaWebApp.Client.Utils
         public const string VazifeKaydet = "/api/Vazife/save";
         public const string VazifeGuncelle = "/api/Vazife/update";
         public const string VazifeSayisi = "/api/Vazife/count";
-        public const string VazifeSayisi = "/api/Vazife/count";
-=========
         public const string TahsilatRaporu = "/api/Report/tahsilatraporu";
         public const string BankaDurumRaporu = "/api/Report/bankadurumraporu";
->>>>>>>>> Temporary merge branch 2
     }
 }
