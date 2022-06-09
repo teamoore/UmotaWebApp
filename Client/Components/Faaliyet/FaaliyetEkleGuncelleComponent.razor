@@ -267,7 +267,7 @@
                     <div class="col">
                         <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
                             <MudButton StartIcon="@Icons.Material.Filled.AccessAlarm" IconColor="Color.Warning"
-                                       OnClick="(() => YeniVazifeEkle(1))" Title="Randevu Oluşturun">Randevu</MudButton>
+                                       OnClick="(() => YeniTakvimEkle())" Title="Randevu Oluşturun">Randevu</MudButton>
                             <MudButton StartIcon="@Icons.Material.Filled.Task" IconColor="Color.Warning" Title="Görev Oluşturun" OnClick="(() => YeniVazifeEkle(2))">
                                 Görev
                             </MudButton>
@@ -681,7 +681,43 @@
         parameters.Add("modalForm", 1);
         parameters.Add("vazifeTipi", vazifeTipi);
 
+        var vzf = new VazifeDto();
+        vzf.CariRef = this.mainRecord.Cariref;
+        vzf.CariKodu = this.mainRecord.Carikodu;
+        vzf.CariAdi = this.mainRecord.Cariadi;
+
+        parameters.Add("gorevParam", vzf);
+
         var cariForm = modal.Show<Pages.Vazife.Vazife_Ekle_Guncelle>("Yeni Görev", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+            }
+
+        }
+    }
+
+    public async Task YeniTakvimEkle()
+    {
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+
+        var gt = new TakvimDto();
+        gt.Cari_Kodu = this.mainRecord.Carikodu;
+        gt.CariRef = this.mainRecord.Cariref;
+        gt.Cari_Adi = this.mainRecord.Cariadi;
+        gt.Saat = this.mainRecord.FaaliyetSaati;
+
+        parameters.Add("GorevTakvimi", gt);
+
+        var cariForm = modal.Show<Pages.Takvim.Takvim_Ekle_Guncelle>("Yeni Takvim Ekle", parameters: parameters, options: opt);
         var result = await cariForm.Result;
 
         if (!result.Cancelled)
