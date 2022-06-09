@@ -66,5 +66,45 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("tahsilatraporu")]
+        public async Task<ServiceResponse<List<TahsilatRaporuDto>>> TahsilatRaporuGetir(TahsilatRaporuRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<List<TahsilatRaporuDto>>()
+                {
+                    Value = await TeklifReportService.TahsilatRaporu(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<TahsilatRaporuDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("bankadurumraporu")]
+        public async Task<ServiceResponse<List<BankaDurumRaporuDto>>> BankaDurumRaporuGetir(BankaDurumRaporuRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<List<BankaDurumRaporuDto>>()
+                {
+                    Value = await TeklifReportService.BankaDurumRaporu(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<BankaDurumRaporuDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

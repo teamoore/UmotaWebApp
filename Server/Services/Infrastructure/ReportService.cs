@@ -68,6 +68,32 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return res.ToList();
             }
         }
+        public async Task<List<TahsilatRaporuDto>> TahsilatRaporu(TahsilatRaporuRequestDto request)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                var p = new DynamicParameters();
+                p.Add("@LogoFirmaNo", request.LogoFirmaNo);
+                p.Add("@LogoDonemNo", request.LogoDonemNo);
+                p.Add("@CariKodu", request.CariKodu);
+                p.Add("@BaslangicTarih", request.BaslangicTarih);
+                p.Add("@BitisTarih", request.BitisTarih);
 
+                var res = await db.QueryAsync<TahsilatRaporuDto>("UmotaRaporSP_TahsilatRaporu", p, commandType: CommandType.StoredProcedure);
+                return res.ToList();
+            }
+        }
+        public async Task<List<BankaDurumRaporuDto>> BankaDurumRaporu(BankaDurumRaporuRequestDto request)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                var p = new DynamicParameters();
+                p.Add("@LogoFirmaNo", request.LogoFirmaNo);
+                p.Add("@LogoDonemNo", request.LogoDonemNo);
+
+                var res = await db.QueryAsync<BankaDurumRaporuDto>("UmotaRaporSP_BankaDurumRaporu", p, commandType: CommandType.StoredProcedure);
+                return res.ToList();
+            }
+        }
     }
 }

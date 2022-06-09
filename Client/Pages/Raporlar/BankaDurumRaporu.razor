@@ -1,0 +1,194 @@
+﻿@page "/r_bankalarf"
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="true"
+                 onFilterButtonClicked="Rapor" ShowSearchSection="false"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+@if (sayfayiGormeYetkisi == false)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
+}
+
+<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true">
+    <ToolBarContent>
+
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Banka Kodu</MudTh>
+        <MudTh>Banka Adı</MudTh>
+        <MudTh>Banka Şube</MudTh>
+        <MudTh>TL</MudTh>
+        <MudTh>USD</MudTh>
+        <MudTh>EUR</MudTh>
+        <MudTh>CHF</MudTh>
+        <MudTh>Tahsildeki Çekler</MudTh>
+        <MudTh>Teminat Çekleri</MudTh>
+        <MudTh>Teminatsız Krediler Nakit</MudTh>
+        <MudTh>Teminatsız Krediler Taksitli</MudTh>
+        <MudTh>Teminatsız Krediler Araç</MudTh>
+        <MudTh>Teminatsız Krediler İpotek</MudTh>
+        <MudTh>Teminatsız Krediler İskonto</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Banka Kodu">@context.bankakodu</MudTd>
+        <MudTd DataLabel="Banka Adı">@context.bankaadi</MudTd>
+        <MudTd DataLabel="Banka Şube">@context.bankasube</MudTd>
+        <MudTd DataLabel="TL" Style="text-align:right">@context.tlFormatted</MudTd>
+        <MudTd DataLabel="USD" Style="text-align:right">@context.usdFormatted</MudTd>
+        <MudTd DataLabel="EUF" Style="text-align:right">@context.eurFormatted</MudTd>
+        <MudTd DataLabel="CHF" Style="text-align:right">@context.chfFormatted</MudTd>
+        <MudTd DataLabel="Tahsildeki Çekler" Style="text-align:right">@context.tahsilcekleriFormatted</MudTd>
+        <MudTd DataLabel="Teminat Çekleri" Style="text-align:right">@context.teminatcekleriFormatted</MudTd>
+        <MudTd DataLabel="Teminatsız Krediler Nakit" Style="text-align:right">@context.temsnkr_nakitFormatted</MudTd>
+        <MudTd DataLabel="Teminatsız Krediler Taksitli" Style="text-align:right">@context.temsnkr_taksitFormatted</MudTd>
+        <MudTd DataLabel="Teminatsız Krediler Araç" Style="text-align:right">@context.temsnkr_aracFormatted</MudTd>
+        <MudTd DataLabel="Teminatsız Krediler İpotek" Style="text-align:right">@context.temsnkr_ipotekFormatted</MudTd>
+        <MudTd DataLabel="Teminatsız Krediler İskonto" Style="text-align:right">@context.temsnkr_iskontoFormatted</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
+@code
+{
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    DownloadHelper downloadHelper { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public List<BankaDurumRaporuDto> items = new List<BankaDurumRaporuDto>();
+
+    private bool loadingCompleted = true;
+    private bool sayfayiGormeYetkisi = true;
+    private bool isAdmin = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Banka Durum Raporu";
+        await KullaniciYetkileriGetir();
+
+        await Rapor();
+    }
+
+    public async Task Rapor()
+    {
+        if (!sayfayiGormeYetkisi)
+            return;
+
+        try
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+
+            var filterForm = modal.Show<Pages.Raporlar.BankaDurumRaporuFilters>("Rapor Seçenekleri", opt);
+            var result = await filterForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+
+                    var request = (BankaDurumRaporuRequestDto)result.Data;
+
+                    request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+                    request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+
+                    var response = await httpClient.PostGetServiceResponseAsync<List<BankaDurumRaporuDto>, BankaDurumRaporuRequestDto>(UrlHelper.BankaDurumRaporu, request);
+                    if (response == null || response.Count == 0)
+                    {
+                        Snackbar.Add("Aradığınız kritere göre kayıt bulunamadı.", severity: Severity.Warning);
+                        loadingCompleted = true;
+                        return;
+                    }
+                    loadingCompleted = true;
+                    items = response;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task KullaniciYetkileriGetir()
+    {
+        try
+        {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanicikodu);
+
+            if (result != null)
+            {
+                isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
+                if (isAdmin)
+                {
+                    sayfayiGormeYetkisi = true;
+                }
+                else
+                {
+                    var yetki = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanicikodu + "&menu_dfm=r_bankalarf&hak_tipi=sel");
+                    sayfayiGormeYetkisi = yetki == 1;
+                }
+            }
+            else
+            {
+                isAdmin = false;
+                sayfayiGormeYetkisi = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    public async Task DownloadCsv()
+    {
+        var content = @"Banka Kodu;Banka Adı;Banka Şube;TL;USD;EUR;CHF;Tahsildeki Çekler;Teminat Çekleri;Teminatsız Krediler Nakit;Teminatsız Krediler Taksitli;Teminatsız Krediler Araç;Teminatsız Krediler İpotek;Teminatsız Krediler İskonto
+        ";
+
+        foreach (var item in items)
+        {
+            content += item.bankakodu + ";" + item.bankaadi + ";" + item.bankasube + ";"
+                + item.tlFormatted + ";" + item.usdFormatted + ";" + item.eurFormatted + ";" + item.chfFormatted + ";"
+                + item.tahsilcekleriFormatted + ";" + item.teminatcekleriFormatted + ";" + item.temsnkr_nakitFormatted + ";" + item.temsnkr_taksitFormatted + ";"
+                + item.temsnkr_aracFormatted + ";" + item.temsnkr_ipotekFormatted + ";" + item.temsnkr_iskontoFormatted
+                + Environment.NewLine;
+        }
+        await downloadHelper.DownloadCsv(content);
+    }
+}
