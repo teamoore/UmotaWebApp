@@ -428,9 +428,9 @@
         if (isUpdate)
         {
             await LoadRecord();
-            await GetKisiListesi();
         }
 
+        await GetKisiListesi();
 
         loadingCompleted = true;
     }
@@ -510,6 +510,9 @@
             if (result.Data != null)
             {
                 var Secim = (KisilerDto)result.Data;
+                if (KisiListesi == null)
+                    KisiListesi = new List<KisilerDto>();
+
                 KisiListesi.Add(Secim);
             }
 
