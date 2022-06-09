@@ -16,7 +16,6 @@
     <div class="mt-5">
         <div class="form">
             <div class="form-group">
-
                 <div class="row">
 
                     <div class="col-md-3">
@@ -51,6 +50,34 @@
 
                 </div>
 
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>İlgili Kişi</label>
+                        <div class="row">
+                            <div class="col">
+
+                                <InputSelect @bind-Value="takvim.KisiRef" class="form-control">
+                                    @if (KisiListesi != null)
+                                    {
+                                        <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                        @foreach (var item in KisiListesi)
+                                        {
+                                            <option value="@item.Logref">@item.Tamadi</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.PersonAdd" OnClick="YeniKisiEkle" Color="Color.Info" Size=Size.Small>Yeni Kişi</MudButton>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <div class="row">
@@ -127,11 +154,15 @@
     [Inject]
     TakvimHelper TakvimHelper { get; set; }
 
+    [Inject]
+    KisiHelper kisiHelper { get; set; }
+
     public TakvimDto takvim = new TakvimDto();
 
     private bool loadingCompleted = false;
     private bool _processing = false;
     private bool _pageHasError = false;
+    public List<KisilerDto> KisiListesi { get; set; }
 
     public HeaderBarSearch header = new HeaderBarSearch();
 
@@ -297,10 +328,14 @@
             this.takvim.CariRef = GorevTakvimi.CariRef;
             this.takvim.Cari_Adi = GorevTakvimi.Cari_Adi;
             this.takvim.Cari_Kodu = GorevTakvimi.Cari_Kodu;
+            this.takvim.KisiRef = GorevTakvimi.KisiRef;
+
         }
 
         if (isUpdate)
             await LoadRecord();
+
+        await GetKisiListesi();
 
         loadingCompleted = true;
     }
@@ -347,6 +382,55 @@
                 takvim.Cari_Kodu = cariSecim.Kodu;
                 takvim.CariRef = cariSecim.Logref;
             }
+        }
+    }
+
+    public async Task YeniKisiEkle()
+    {
+        if (!takvim.CariRef.HasValue)
+            return;
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+        parameters.Add("CariKartRef", takvim.CariRef);
+
+        var cariForm = modal.Show<CariKartKisiEkleGuncelleComponent>("Yeni Kişi Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (KisilerDto)result.Data;
+                if (KisiListesi == null)
+                    KisiListesi = new List<KisilerDto>();
+
+                KisiListesi.Add(Secim);
+            }
+
+        }
+    }
+
+    public async Task GetKisiListesi()
+    {
+        try
+        {
+            if (takvim.CariRef.HasValue == false)
+                return;
+
+            var result = await kisiHelper.LoadRecords(takvim.CariRef.Value);
+
+            if (result != null)
+            {
+                KisiListesi = result;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
         }
     }
 }

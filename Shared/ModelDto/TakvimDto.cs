@@ -18,6 +18,7 @@ namespace UmotaWebApp.Shared.ModelDto
         public int? CariRef { get; set; }
         public string Cari_Kodu { get; set; }
         public string Cari_Adi { get; set; }
+        public int? KisiRef { get; set; }
         public byte? Yapildi { get; set; }
         public byte? Status { get; set; }
         public string Insuser { get; set; }
