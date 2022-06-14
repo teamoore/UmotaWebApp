@@ -90,13 +90,11 @@ namespace UmotaWebApp.Shared.ModelDto
         }
 
         public string VazifeTipi { get; set; }
-
         public int? CariRef { get; set; }
-
         public string CariAdi { get; set; }
         public string CariKodu { get; set; }
         public int? KisiRef { get; set; }
-
+        public string KisiAdi { get; set; }
         public DateTime? BaslangicTarihi { get; set; }
         public DateTime? BitirmeTarihi { get; set; }
     }

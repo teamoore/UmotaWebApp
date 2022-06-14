@@ -80,5 +80,11 @@ namespace UmotaWebApp.Client.Utils
         public const string VazifeSayisi = "/api/Vazife/count";
         public const string TahsilatRaporu = "/api/Report/tahsilatraporu";
         public const string BankaDurumRaporu = "/api/Report/bankadurumraporu";
+
+        public const string ServisAra = "/api/servis/search";
+        public const string ServisGetir = "/api/servis/get";
+        public const string ServisKaydet = "/api/servis/save";
+        public const string ServisGuncelle = "/api/servis/update";
+        public const string ServisSil = "/api/servis/delete";
     }
 }

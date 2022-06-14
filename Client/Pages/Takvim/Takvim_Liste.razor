@@ -1,7 +1,7 @@
 ﻿@page "/takvim_listef"
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="YeniTakvim"
-                 ShowButtons="true" ShowFilterButton="false"
+                 ShowButtons="false" ShowFilterButton="false"
                  ShowSearchSection="false"></HeaderSearchBar>
 
 @if (loadingCompleted == false)
@@ -11,13 +11,10 @@
 
 <MudTable Items="@takvimler" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
     <ToolBarContent>
-
         <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" Title="Yeni Ekle" OnClick="YeniTakvim" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
-      
-
-        <MudIconButton Icon="@Icons.Material.Filled.Schedule" Title="Takvim Görünümü"  OnClick="TakvimScheduler" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Medium" />
+        &nbsp;
+        <MudIconButton Icon="@Icons.Material.Filled.Schedule" Title="Takvim Görünümü" OnClick="TakvimScheduler" Variant="Variant.Filled" Color="Color.Secondary" Size="Size.Medium" />
         <MudSpacer />
-
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>

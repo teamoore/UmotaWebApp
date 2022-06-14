@@ -1,0 +1,133 @@
+﻿<div class="container">
+    <EditForm Model="cari" OnValidSubmit="LoadList">
+        <div class="form">
+
+            <div class="form-group">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <InputText @bind-Value="_searchString" class="form-control" />
+                    </div>
+                    <div class="col-md-8">
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
+                                   OnClick="LoadList" Color="Color.Primary" Size="Size.Medium">Bul</MudButton>
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Add"
+                                   OnClick="EkleSec" Color="Color.Tertiary" Size="Size.Medium">Ekle</MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   OnClick="Vazgec" Color="Color.Secondary" Size="Size.Medium">Vazgeç</MudButton>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </EditForm>
+
+    @if (!loadingCompleted)
+    {
+        <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+    }
+
+    <MudTable Items="@items" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<KisilerDto,bool>(FilterFunc1)">
+        @*<ToolBarContent>
+                <MudText Typo="Typo.h6">Malzeme Markaları</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Marka Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>*@
+        <HeaderContent>
+            <MudTh>#</MudTh>
+            <MudTh>Kişi Adı</MudTh>
+            <MudTh>Bölüm</MudTh>
+            <MudTh>Pozisyon</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <MudFab Color="Color.Primary" StartIcon="@Icons.Filled.Add" Size="Size.Small" OnClick="(() => Sec(context))" />
+            </MudTd>
+            <MudTd DataLabel="Kişi Adı">@context.Tamadi</MudTd>
+            <MudTd DataLabel="Bölüm">@context.Bolum</MudTd>
+            <MudTd DataLabel="Pozsiyon">@context.Pozisyon</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+        </PagerContent>
+    </MudTable>
+</div>
+
+@code
+{
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Parameter]
+    public int? CariKartRef { get; set; }
+
+    public List<KisilerDto> items { get; set; }
+
+    public VCariKartsRequestDto cari = new VCariKartsRequestDto();
+
+    private string _searchString;
+    private bool _sortNameByLength;
+    private bool loadingCompleted = false;
+
+    private bool FilterFunc1(KisilerDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(KisilerDto element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Tamadi != null && element.Tamadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadList();
+    }
+
+    private async Task LoadList()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        loadingCompleted = false;
+        items = await httpClient.GetServiceResponseAsync<List<KisilerDto>>(UrlHelper.CariKartKisiGetir + "?cariref=" + CariKartRef + "&firmaId=" + selectedFirmaDonem.firma_no);
+        loadingCompleted = true;
+    }
+
+    public async Task Sec(KisilerDto secim)
+    {
+        await ModalInstance.CloseAsync(ModalResult.Ok<KisilerDto>(secim));
+    }
+
+    private async Task EkleSec()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+        parameters.Add("CariKartRef", CariKartRef);
+
+        var Form = modal.Show<CariKartKisiEkleGuncelleComponent>("Yeni Kişi Ekle", parameters: parameters, options: opt);
+        var result = await Form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (KisilerDto)result.Data;
+                await ModalInstance.CloseAsync(ModalResult.Ok<KisilerDto>(Secim));
+            }
+        }
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+}

@@ -2,7 +2,7 @@
 @inject IJSRuntime jsRuntime
 
 <HeaderSearchBar header="header"
-                 ShowButtons="false" ShowFilterButton="false" ShowSearchSection="false"
+                 ShowButtons="false" ShowFilterButton="true" ShowSearchSection="true"
                  onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick"></HeaderSearchBar>
 
 @if (loadingCompleted == false)
@@ -10,78 +10,62 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-@if (menuYetkiDto.View == false)
+@*@if (menuYetkiDto.View == false)
 {
     <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
-}
+}*@
 
 <MudTable GroupBy="@_groupDefinition" Items="@mainDataList" FixedHeader="true" Height="500px" SortLabel="Sort By" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
     <ToolBarContent>
-        @if (menuYetkiDto.Insert)
-        {
-            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
-        }
-        &nbsp;
-        @if (menuYetkiDto.IsAdmin)
-        {
-
-            <MudIconButton Icon="@Icons.Material.Filled.AdminPanelSettings" OnClick="AdminLoadList" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yönetici Olarak Listele" />
-        }
+        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
         &nbsp;
         <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
+        <MudTh>Atanan</MudTh>
         <MudTh>
-
-            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.Oncelik)">Öncelik</MudTableSortLabel>
+            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.Oncelik)">Önem Derecesi</MudTableSortLabel>
         </MudTh>
         <MudTh>
-
             <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.YapildiMi)">Yapıldı mı?</MudTableSortLabel>
         </MudTh>
         <MudTh>Başlık</MudTh>
+        <MudTh>Cari Adı</MudTh>
+        <MudTh>Kişi Adı</MudTh>
         <MudTh>Açıklama</MudTh>
         <MudTh>
             <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.SonTarih)">Son Tarih</MudTableSortLabel>
         </MudTh>
         <MudTh>
-            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.Insdate)">Kayıt Tarihi</MudTableSortLabel>
+            <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.Insdate)">Giriş Tarihi</MudTableSortLabel>
         </MudTh>
-        <MudTh>Kaydı Ekleyen</MudTh>
+        <MudTh>Kaydı Giren</MudTh>
         <MudTh>#</MudTh>
     </HeaderContent>
     <GroupHeaderTemplate>
-        <MudTh Class="mud-table-cell-custom-group" colspan="9">@($"{context.GroupName}: {context.Key}")</MudTh>
+        <MudTh Class="mud-table-cell-custom-group" colspan="12">@($"{context.GroupName}: {context.Key}")</MudTh>
     </GroupHeaderTemplate>
     <RowTemplate>
         <MudTd>
-            @if (menuYetkiDto.Update)
-            {
-                <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Degistir(context.Logref))" Size="Size.Medium" />
-            }
+            <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Degistir(context.Logref))" Size="Size.Medium" />
         </MudTd>
-        <MudTd DataLabel="Öncelik">
-            @context.OncelikAciklama
-        </MudTd>
-        <MudTd DataLabel="Yapıldı mı?">
-            @context.YapildiAciklama
-        </MudTd>
+        <MudTd DataLabel="Atanan">@context.AtananKisi</MudTd>
+        <MudTd DataLabel="Önem Derecesi">@context.OncelikAciklama</MudTd>
+        <MudTd DataLabel="Yapıldı mı?">@context.YapildiAciklama</MudTd>
         <MudTd DataLabel="Başlık">@context.Baslik</MudTd>
+        <MudTd DataLabel="Cari Adı">@context.CariAdi</MudTd>
+        <MudTd DataLabel="Kisi Adı">@context.KisiAdi</MudTd>
         <MudTd DataLabel="Açıklama">
-
             <MudTooltip Text="@context.Aciklama" Arrow="true" Placement="Placement.Top">
                 @context.Aciklama.MinimizeString(50)
             </MudTooltip>
         </MudTd>
-        <MudTd DataLabel="Son Tarih">@context.SonTarih</MudTd>
-        <MudTd DataLabel="Kayıt Tarihi">@context.Insdate</MudTd>
-        <MudTd DataLabel="Kaydı Ekleyen">@context.Insuser</MudTd>
+        <MudTd DataLabel="Görev Tarihi">@context.SonTarih</MudTd>
+        <MudTd DataLabel="Giriş Tarihi">@context.Insdate</MudTd>
+        <MudTd DataLabel="Kaydı Giren">@context.Insuser</MudTd>
         <MudTd>
-            @if (menuYetkiDto.Delete)
-            {
-                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
-            }
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
         </MudTd>
     </RowTemplate>
     <PagerContent>
@@ -130,6 +114,7 @@
     private string updatePage = "vazife_ekle_guncelle";
     private string headerText = "Görev Listesi";
     private bool loadingCompleted = false;
+    private string _currentUser = "";
 
     private TableGroupDefinition<VazifeDto> _groupDefinition = new()
     {
@@ -146,6 +131,7 @@
             header.HeaderText = headerText;
 
             menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
+            _currentUser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
             await NewDataRequest();
             await LoadList();
@@ -166,22 +152,18 @@
         mainDataRequest.FirmaId = selectedFirmaDonem.firma_no.Value;
         mainDataRequest.KullaniciKodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
         mainDataRequest.TopRowCount = 100;
-    }
-
-    private async Task AdminLoadList()
-    {
-        loadingCompleted = false;
-        mainDataRequest.AdminView = true;
-        await LoadList();
+        mainDataRequest.AdminView = menuYetkiDto.IsAdmin;
+        mainDataRequest.Yapildi = 0;
+        mainDataRequest.AtananUser = _currentUser;
     }
 
     private async Task LoadList()
     {
-        if (menuYetkiDto.View == false)
-        {
-            loadingCompleted = true;
-            throw new Exception("Bu sayfayı görme yetkiniz yok");
-        }
+        //if (menuYetkiDto.View == false)
+        //{
+        //    loadingCompleted = true;
+        //    throw new Exception("Bu sayfayı görme yetkiniz yok");
+        //}
 
         mainDataList = await mainDataHelper.LoadRecords(mainDataRequest);
         loadingCompleted = true;
@@ -205,8 +187,8 @@
             if (!modalRes)
                 return;
 
-            if (menuYetkiDto.Delete == false)
-                throw new Exception("Silme yetkiniz bulunmamaktadır");
+            //if (menuYetkiDto.Delete == false)
+            //    throw new Exception("Silme yetkiniz bulunmamaktadır");
 
             loadingCompleted = false;
 
@@ -245,7 +227,7 @@
             modalParameters = new ModalParameters();
             modalParameters.Add("mainRequest", mainDataRequest);
 
-            var filterForm = modal.Show<Components.Faaliyet.FaaliyetDetayliAraComponent>("Detaylı Arama", modalParameters, opt);
+            var filterForm = modal.Show<Pages.Vazife.Vazife_Liste_Filters>("Detaylı Arama", modalParameters, opt);
             var result = await filterForm.Result;
 
             if (!result.Cancelled)

@@ -1,0 +1,270 @@
+﻿@page "/servis_liste"
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="true"
+                 onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick" ShowSearchSection="true"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+<MudTable Items="@mainDataList" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
+    <ToolBarContent>
+        @if (menuYetkiDto.Insert)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="Yeni" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        }
+        &nbsp;
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>İşlem</MudTh>
+        <MudTh>Tarih</MudTh>
+        <MudTh>Yıl</MudTh>
+        <MudTh>Bildirim Tarihi</MudTh>
+        <MudTh>Fiş No</MudTh>
+        <MudTh>Evrak No</MudTh>
+        <MudTh>Müşteri Adı</MudTh>
+        <MudTh>Bayi Adı</MudTh>
+        <MudTh>Servis Adı</MudTh>
+        <MudTh>Yetkili</MudTh>
+        <MudTh>Durum</MudTh>
+        <MudTh>Kaydı Giren</MudTh>
+        <MudTh>#</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
+                @if (menuYetkiDto.Update)
+                {
+                    <MudMenuItem OnClick="(() => Detay(context.Logref))">Değiştir</MudMenuItem>
+                }
+                <MudMenuItem OnClick="(() => TeklifDurumDetay(context.Logref))">Eski Servis Bilgileri</MudMenuItem>
+            </MudMenu>
+        </MudTd>
+        <MudTd DataLabel="İşlem">@context.Istipi</MudTd>
+        <MudTd DataLabel="Tarih">@context.Tarih</MudTd>
+        <MudTd DataLabel="Yıl">@context.Yil</MudTd>
+        <MudTd DataLabel="Bildirim Tarihi">@context.BildirimTarihi</MudTd>
+        <MudTd DataLabel="Fiş No">@context.Fisno</MudTd>
+        <MudTd DataLabel="Evrak No">@context.Evrakno</MudTd>
+        <MudTd DataLabel="Müşteri Adı">@context.Cariadi</MudTd>
+        <MudTd DataLabel="Bayi Adı">@context.Bayiadi</MudTd>
+        <MudTd DataLabel="Servis Adı">@context.Servisadi</MudTd>
+        <MudTd DataLabel="Yetkili">@context.IlgiliKisi</MudTd>
+        <MudTd DataLabel="Durum">@context.Durum</MudTd>
+        <MudTd DataLabel="Kaydı Giren">@context.Insuser</MudTd>
+        <MudTd>
+            @if (menuYetkiDto.Delete)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
+            }
+        </MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
+
+@code {
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    DownloadHelper downloadHelper { get; set; }
+
+    [Inject]
+    ServisHelper mainDataHelper { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+    public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
+    public List<ServisDto> mainDataList { get; set; }
+    public ServisRequestDto mainDataRequest = new ServisRequestDto();
+
+    private string formName = "servis_listef";
+    private string insertPage = "servis_form";
+    private string updatePage = "servis_form";
+    private string headerText = "Servis Listesi";
+    private bool loadingCompleted { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            header.HeaderText = headerText;
+
+            menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
+
+            await NewDataRequest();
+            await LoadList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    private async Task NewDataRequest()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        mainDataRequest.FirmaId = selectedFirmaDonem.firma_no.Value;
+        mainDataRequest.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+        mainDataRequest.TopRowCount = 100;
+    }
+
+    private async Task LoadList()
+    {
+        if (menuYetkiDto.View == false)
+        {
+            loadingCompleted = true;
+            throw new Exception("Bu sayfayı görme yetkiniz yok");
+        }
+
+        mainDataList = await mainDataHelper.LoadRecords(mainDataRequest);
+        loadingCompleted = true;
+    }
+
+    public void Detay(int logref)
+    {
+        navigation.NavigateTo("/" + updatePage + "/" + logref.ToString());
+    }
+
+    public void Yeni()
+    {
+        navigation.NavigateTo("/" + insertPage);
+    }
+
+    private async Task BtnAraClick()
+    {
+        mainDataRequest.SearchText = header.SearchText;
+        mainDataRequest.TopRowCount = 0;
+        loadingCompleted = false;
+        this.StateHasChanged();
+        await LoadList();
+        if (mainDataList == null || mainDataList.Count == 0)
+            Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+    }
+
+    private async Task BtnDetayliAraClick()
+    {
+        try
+        {
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            modalParameters = new ModalParameters();
+            modalParameters.Add("mainRequest", mainDataRequest);
+
+            var filterForm = modal.Show<Pages.Servis.ServisListeFilters>("Detaylı Arama", modalParameters, opt);
+            var result = await filterForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    mainDataRequest = (ServisRequestDto)result.Data;
+                    mainDataRequest.SearchText = header.SearchText;
+                    mainDataRequest.TopRowCount = 0;
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+                    await LoadList();
+                    if (mainDataList == null || mainDataList.Count == 0)
+                        Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+
+    }
+
+    public async Task Sil(int logref)
+    {
+        try
+        {
+            var modalRes = await ModalManager.ShowConfirmationAsync("Kayıt silinecek!", "Silmek istediğinizden emin misiniz?", "Evet", "Hayır");
+            if (!modalRes)
+                return;
+
+            if (menuYetkiDto.Delete == false)
+                throw new Exception("Silme yetkiniz bulunmamaktadır");
+
+            loadingCompleted = false;
+
+            var recordDto = await mainDataHelper.LoadRecord(logref);
+
+            await mainDataHelper.DeleteRecord(recordDto);
+
+            Snackbar.Add("Kayıt silindi");
+
+            await LoadList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+
+    public async Task TeklifDurumDetay(int logref)
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("teklifref", logref);
+
+        var teklifDurumForm = modal.Show<TeklifDurumDetayComponent>("Teklif Durum Geçmişi", parameters: parameters, options: opt);
+        var result = await teklifDurumForm.Result;
+
+        if (!result.Cancelled)
+        {
+        }
+    }
+
+
+    public async Task DownloadCsv()
+    {
+        var content = @"Durum;Teklif No;Revize No;Tarih;Cari Kodu;Cari Adı;Tutar TL;Tutar;Döviz;Proje Adı;Satış Temsilcisi;Teslim Tarihi;Kaydı Giren
+    ";
+
+        //foreach (var item in mainDataList)
+        //{
+        //    content += item.Duruminfo + ";" + item.Teklifno + ";" + item.Revzno + ";" + item.TarihFormatted + ";"
+        //        + item.Carikodu + ";" + item.Cariadi + ";" + Helper.FormattedDouble(item.Tutarmatrahtl) + ";" +
+        //        Helper.FormattedDouble(item.Tutarmatrah) + ";" + item.Dovizdokuid + ";" + item.Proje + ";" +
+        //        item.Temsilciadi + ";" + item.TeslimTarihiFormatted + ";" + item.Insuser +
+        //        Environment.NewLine;
+        //}
+        await downloadHelper.DownloadCsv(content);
+    }
+
+}
