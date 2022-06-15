@@ -129,7 +129,92 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             return result;
         }
+        public async Task<List<ServisMalzemeDto>> LoadMalzemeler(int servisref)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
 
+            var result = await httpClient.GetServiceResponseAsync<List<ServisMalzemeDto>>(UrlHelper.ServisMalzemelerGetir + "?servisref=" + servisref + "&firmaId=" + selectedFirmaDonem.firma_no);
 
+            return result;
+        }
+
+        public async Task<ServisMalzemeDto> LoadMalzemeRecord(int logref)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<ServisMalzemeDto>(UrlHelper.ServisMalzemeGetir + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no);
+
+            return result;
+        }
+
+        public async Task<ServisMalzemeDto> SaveMalzemeRecord(ServisMalzemeDto recordDto)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            recordDto.Insdate = DateTime.Now;
+            recordDto.Insuser = kullanicikodu;
+            recordDto.Status = 0;
+
+            var request = new ServisMalzemeRequestDto();
+            request.ServisMalzeme = recordDto;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<ServisMalzemeDto, ServisMalzemeRequestDto>(UrlHelper.ServisMalzemeKaydet, request);
+
+            return result;
+        }
+
+        public async Task<ServisMalzemeDto> UpdateMalzemeRecord(ServisMalzemeDto recordDto)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            recordDto.Upddate = DateTime.Now;
+            recordDto.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            recordDto.Status = 1;
+
+            var request = new ServisMalzemeRequestDto();
+            request.ServisMalzeme = recordDto;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<ServisMalzemeDto, ServisMalzemeRequestDto>(UrlHelper.ServisMalzemeGuncelle, request);
+
+            return result;
+        }
+
+        public async Task<ServisMalzemeDto> DeleteMalzemeRecord(ServisMalzemeDto recordDto)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            recordDto.Upddate = DateTime.Now;
+            recordDto.Upduser = kullanicikodu;
+            recordDto.Status = 2;
+
+            var request = new ServisMalzemeRequestDto();
+            request.ServisMalzeme = recordDto;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<ServisMalzemeDto, ServisMalzemeRequestDto>(UrlHelper.ServisMalzemeGuncelle, request);
+
+            return result;
+        }
     }
 }

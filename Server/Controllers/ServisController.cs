@@ -127,6 +127,84 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpGet("getmalzemeler")]
+        public async Task<ServiceResponse<List<ServisMalzemeDto>>> GetServisMalzemeler(int servisref, string firmaId)
+        {
+            try
+            {
+                return new ServiceResponse<List<ServisMalzemeDto>>()
+                {
+                    Value = await ServisService.GetServisMalzemeler(servisref, firmaId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
 
+                var e = new ServiceResponse<List<ServisMalzemeDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("getmalzeme")]
+        public async Task<ServiceResponse<ServisMalzemeDto>> GetServisMalzeme(int logref, string firmaId)
+        {
+            try
+            {
+                return new ServiceResponse<ServisMalzemeDto>()
+                {
+                    Value = await ServisService.GetServisMalzeme(logref, firmaId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<ServisMalzemeDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("savemalzeme")]
+        public async Task<ServiceResponse<ServisMalzemeDto>> SaveServisMalzeme(ServisMalzemeRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<ServisMalzemeDto>()
+                {
+                    Value = await ServisService.SaveServisMalzeme(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<ServisMalzemeDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("updatemalzeme")]
+        public async Task<ServiceResponse<ServisMalzemeDto>> UpdateServisMalzeme(ServisMalzemeRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<ServisMalzemeDto>()
+                {
+                    Value = await ServisService.UpdateServisMalzeme(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<ServisMalzemeDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

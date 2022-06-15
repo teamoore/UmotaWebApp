@@ -15,8 +15,8 @@
         {
             <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="Yeni" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         }
-        &nbsp;
-        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        @*&nbsp;
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />*@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
@@ -41,7 +41,7 @@
                 {
                     <MudMenuItem OnClick="(() => Detay(context.Logref))">Değiştir</MudMenuItem>
                 }
-                <MudMenuItem OnClick="(() => TeklifDurumDetay(context.Logref))">Eski Servis Bilgileri</MudMenuItem>
+                @*<MudMenuItem OnClick="(() => TeklifDurumDetay(context.Logref))">Eski Servis Bilgileri</MudMenuItem>*@
             </MudMenu>
         </MudTd>
         <MudTd DataLabel="İşlem">@context.Istipi</MudTd>

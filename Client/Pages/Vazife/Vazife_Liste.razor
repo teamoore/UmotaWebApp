@@ -150,11 +150,10 @@
             throw new Exception("Firma Dönem Seçili değil");
 
         mainDataRequest.FirmaId = selectedFirmaDonem.firma_no.Value;
-        mainDataRequest.KullaniciKodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+        mainDataRequest.KullaniciKodu = _currentUser;
         mainDataRequest.TopRowCount = 100;
         mainDataRequest.AdminView = menuYetkiDto.IsAdmin;
         mainDataRequest.Yapildi = 0;
-        mainDataRequest.AtananUser = _currentUser;
     }
 
     private async Task LoadList()

@@ -14,5 +14,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<ServisDto> SaveServis(ServisRequestDto request);
         public Task<ServisDto> UpdateServis(ServisRequestDto request);
         public Task<bool> DeleteServis(int logref, string firmaId, string kullanici);
+        public Task<List<ServisMalzemeDto>> GetServisMalzemeler(int servisref, string firmaId);
+        public Task<ServisMalzemeDto> GetServisMalzeme(int logref, string firmaId);
+        public Task<ServisMalzemeDto> SaveServisMalzeme(ServisMalzemeRequestDto request);
+        public Task<ServisMalzemeDto> UpdateServisMalzeme(ServisMalzemeRequestDto request);
     }
 }

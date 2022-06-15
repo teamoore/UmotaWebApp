@@ -45,9 +45,9 @@
                     <div class="col-md-6">
                         <label>Atanan</label>
                         <select class="form-control" @bind="vaziferequest.AtananUser">
+                            <option value="">Seçiniz</option>
                             @if (kullanicilar != null && vaziferequest.AdminView)
                             {
-                                <option value="">Seçiniz</option>
                                 @foreach (var item in kullanicilar)
                                 {
                                     <option value="@item.KullaniciKodu">@item.KullaniciKodu (@item.KullaniciAdi)</option>

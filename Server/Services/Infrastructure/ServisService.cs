@@ -182,13 +182,16 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 if (servisRow == null)
                     throw new ApiException("Servis kaydı bulunamadı");
 
+                // Güncellenen kaydı loga at
+                var servisLog = new ServisLog();
+                Mapper.Map(servisRow, servisLog);
+                await dbContext.ServisLogs.AddAsync(servisLog);
+
                 Mapper.Map(request.Servis, servisRow);
                 await dbContext.SaveChangesAsync();
 
                 return Mapper.Map<ServisDto>(servisRow);
             }
-
-
         }
         public async Task<bool> DeleteServis(int logref, string firmaId, string kullanici)
         {
@@ -214,9 +217,76 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
                 return true;
             }
-
-
         }
 
+        public async Task<List<ServisMalzemeDto>> GetServisMalzemeler(int servisref, string firma_id)
+        {
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firma_id.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var results = await dbContext.V012ServisMalzemelers.Where(x => x.Servisref == servisref)
+                    .ProjectTo<ServisMalzemeDto>(Mapper.ConfigurationProvider)
+                    .ToListAsync();
+
+                return results;
+            }
+        }
+        public async Task<ServisMalzemeDto> GetServisMalzeme(int logref, string firma_id)
+        {
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: firma_id.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var results = await dbContext.V012ServisMalzemelers.Where(x => x.Logref == logref)
+                    .ProjectTo<ServisMalzemeDto>(Mapper.ConfigurationProvider)
+                    .SingleOrDefaultAsync();
+
+                return results;
+            }
+        }
+
+        public async Task<ServisMalzemeDto> SaveServisMalzeme(ServisMalzemeRequestDto request)
+        {
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var servis = Mapper.Map<ServisMalzemeler>(request.ServisMalzeme);
+                await dbContext.ServisMalzemelers.AddAsync(servis);
+
+                await dbContext.SaveChangesAsync();
+                return Mapper.Map<ServisMalzemeDto>(servis);
+            }
+        }
+        public async Task<ServisMalzemeDto> UpdateServisMalzeme(ServisMalzemeRequestDto request)
+        {
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+            {
+                var servisRow = await dbContext.ServisMalzemelers.Where(x => x.Logref == request.ServisMalzeme.Logref).SingleOrDefaultAsync();
+                if (servisRow == null)
+                    throw new ApiException("Servis malzeme kaydı bulunamadı");
+
+                // Güncellenen kaydı loga at
+                var servisLog = new ServisMalzemelerLog();
+                Mapper.Map(servisRow, servisLog);
+                await dbContext.ServisMalzemelerLogs.AddAsync(servisLog);
+
+                Mapper.Map(request.ServisMalzeme, servisRow);
+                await dbContext.SaveChangesAsync();
+
+                return Mapper.Map<ServisMalzemeDto>(servisRow);
+            }
+        }
     }
 }

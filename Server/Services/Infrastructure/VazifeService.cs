@@ -86,6 +86,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     sql += " and a.insuser = '" + request.InsUser + "'";
                 }
 
+                if (string.IsNullOrWhiteSpace(request.AtananUser) && string.IsNullOrWhiteSpace(request.InsUser))
+                {
+                    sql += " and (a.atanan_kisi = '" + request.KullaniciKodu + "' or a.insuser = '" + request.KullaniciKodu + "')";
+                }
+
                 if (!string.IsNullOrWhiteSpace(request.SearchText))
                 {
                     sql += " and(";
