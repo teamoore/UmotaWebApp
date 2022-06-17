@@ -53,15 +53,17 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         private string CreateHtml(TeklifDto teklif, List<TeklifDetayDto> teklifDetays, SharedEnums.TeklifPdfType teklifPdfType)
         {
             var css = Environment.CurrentDirectory +  @"\Media\css\bootstrap.min.css";
+            var path = Environment.CurrentDirectory + "\\Media\\logo\\logo.jpeg";
+            var path_opac = Environment.CurrentDirectory + "\\Media\\logo\\logo_opac3.png";
 
             var str = "<html><head>" +
                 "<link href='"+ css +"' rel='stylesheet' type='text/css' media='screen'/>"
 
                 + "</head>" +
-                "<body style='font-family:Roboto,Arial;'>" +
+                "<body style='font-family:Roboto,Arial;' background='" + path_opac +"'>" +
                 @"<table style='width:100%;background-color:#4700D8;text-align:center;color:white;font-weight:bold;font-family:Roboto,Arial;'><tr><td style='height:30px;'>TEKLİF</td></tr></table><div class='container'>";
 
-            var path = Environment.CurrentDirectory + "\\Media\\logo\\logo.jpeg";
+            
 
             str += @" <table class='table table-striped'>
   <tr>
