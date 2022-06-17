@@ -1,0 +1,437 @@
+﻿@page "/servis_malzeme_form/{logref:int}"
+@page "/servis_malzeme_form"
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="false"
+                 ShowSearchSection="false"></HeaderSearchBar>
+
+
+<EditForm Model="record">
+
+    @if (loadingCompleted == false)
+    {
+        <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+    }
+
+    <div class="mt-5">
+        <div class="form">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Tür</label>
+                        <select class="form-control" @bind="record.Tur">
+                            <option value="">Seçiniz</option>
+                            <option value="MALZEME">MALZEME</option>
+                            <option value="YOL">YOL</option>
+                            <option value="KONAKLAMA">KONAKLAMA</option>
+                            <option value="YEMEK">YEMEK</option>
+                            <option value="HARCIRAH">HARCIRAH</option>
+                            <option value="DİĞER">DİĞER</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Malzeme Kodu</label>
+                        <div class="row">
+                            <div class="col-8">
+                                <InputText @bind-Value="record.Malzkodu" class="form-control" disabled />
+                            </div>
+                            <div class="col-4">
+                                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="MalzemeSec" Color="Color.Info" Size=Size.Small>Seç</MudButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>Malzeme Adı</label>
+                        <InputText @bind-Value="record.Malzadi" class="form-control" disabled />
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Seri No</label>
+                        <InputText @bind-Value="record.Serino" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label>Miktar</label>
+                        <InputNumber @bind-Value="pageMiktar" class="form-control"/>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Birim</label>
+                        <select class="form-control" @bind="record.Birim">
+                            <option value="">Seçiniz</option>
+                            <option value="ADET">ADET</option>
+                            <option value="KM">KM</option>
+                            <option value="GÜN">GÜN</option>
+                            <option value="SAAT">SAAT</option>
+                            <option value="KG">KG</option>
+                            <option value="GR">GR</option>
+                            <option value="MT">MT</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label>Birim Fiyat</label>
+                        <InputNumber @bind-Value="pageFiyat" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label>Tutar</label>
+                        <InputNumber @bind-Value="record.Tutar" class="form-control" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>Açıklama</label>
+                        <InputTextArea rows="5" @bind-Value="record.Aciklama" class="form-control"></InputTextArea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Durum</label>
+                        <select class="form-control" @bind="record.Durum">
+                            <option value="">Seçiniz</option>
+                            <option value="TAMAMLANDI">TAMAMLANDI</option>
+                            <option value="DEĞİŞTİRİLDİ">DEĞİŞTİRİLDİ</option>
+                            <option value="ONARILDI">ONARILDI</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <MudSwitch @bind-Checked="record.Garanti" Label="Garanti" Color="Color.Success" />
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+                    @if (_processing)
+                    {
+                        <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                        <MudText Class="ms-2">Kaydediliyor...</MudText>
+                    }
+                    else
+                    {
+                        <MudText>Kaydet</MudText>
+                    }
+                </MudButton>
+                <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+            </div>
+        </div>
+    </div>
+
+
+
+</EditForm>
+
+
+@code {
+
+    [Parameter]
+    public int? logref { get; set; }
+
+    [Parameter]
+    public int? servisref { get; set; }
+
+    [Parameter]
+    public int? modalForm { get; set; }
+
+    [Parameter]
+    public ServisDto servis { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ServisHelper dataHelper { get; set; }
+
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    public ServisMalzemeDto record = new ServisMalzemeDto();
+    private bool loadingCompleted = false;
+    private bool _processing = false;
+    public HeaderBarSearch header = new HeaderBarSearch();
+    private string _currentUser = "";
+
+    private bool _pageHasError = false;
+
+    private double? _pageMiktar = 1;
+    public double? pageMiktar
+    {
+        get
+        {
+            _pageMiktar = record.Miktar;
+            return _pageMiktar;
+        }
+        set
+        {
+            _pageMiktar = value;
+            record.Miktar = value;
+
+            CalculateTutar();
+        }
+    }
+
+    private double? _pageFiyat = 0;
+    public double? pageFiyat
+    {
+        get
+        {
+            _pageFiyat = record.Fiyat;
+            return _pageFiyat;
+        }
+        set
+        {
+            _pageFiyat = value;
+            record.Fiyat = value;
+
+            CalculateTutar();
+        }
+    }
+
+    public async Task ValidSubmit()
+    {
+        var isUpdate = this.logref.HasValue;
+
+        if (!isUpdate)
+            await SaveRecord();
+        else
+            await UpdateRecord();
+
+        await SaveCompleted();
+    }
+
+    private async Task Vazgec()
+    {
+        if (modalForm.HasValue)
+            await ModalInstance.CloseAsync();
+        else
+            navigation.NavigateTo("/servis_listef");
+    }
+
+    private async Task SaveCompleted()
+    {
+        if (_pageHasError)
+            return;
+
+        if (modalForm.HasValue)
+            await ModalInstance.CloseAsync(ModalResult.Ok<ServisMalzemeDto>(record));
+        else
+            navigation.NavigateTo("/servis_listef");
+    }
+
+    public async Task LoadRecord()
+    {
+        try
+        {
+            this.record = await dataHelper.LoadMalzemeRecord(this.logref.Value);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task NewRecord()
+    {
+        record.Servisref = servisref.Value;
+        //record.Tur = "MALZEME";
+        pageMiktar = 1;
+        record.Fiyat = 0;
+        record.Tutar = 0;
+    }
+
+    private async Task SaveRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            if (record.Logref == 0)
+                this.record.Logref = await yetkiHelper.RefNoAl("servis_malzemeler");
+
+            await dataHelper.SaveMalzemeRecord(record);
+
+            Snackbar.Add("Kayıt eklendi.", severity: Severity.Success);
+
+            this.StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    private async Task UpdateRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            await dataHelper.UpdateMalzemeRecord(record);
+
+            Snackbar.Add("Kayıt güncellendi", severity: Severity.Success);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    public void SubmitValidation()
+    {
+        _pageHasError = false;
+
+        var err = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(record.Tur))
+            err.Add("Tür bilgisi boş geçilemez");
+
+        if (string.IsNullOrWhiteSpace(record.Birim))
+            err.Add("Birim bilgisi boş geçilemez");
+
+        if (record.Miktar <= 0)
+            err.Add("Miktar sıfırdan büyük olmalı");
+
+        if (record.Tur == "MALZEME" && string.IsNullOrWhiteSpace(record.Malzkodu))
+            err.Add("Malzeme bilgisi boş geçilemez");
+
+        if (record.Tur == "MALZEME" && string.IsNullOrWhiteSpace(record.Serino))
+            err.Add("Seri No boş geçilemez");
+
+        if (err.Count > 0)
+        {
+            _pageHasError = true;
+
+            var ex = new ClientException("Kayıt Hatası");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Servis Malzeme Bilgileri";
+
+        var isUpdate = this.logref.HasValue;
+
+        loadingCompleted = false;
+
+        _currentUser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+        if (isUpdate)
+            await LoadRecord();
+        else
+            await NewRecord();
+
+        loadingCompleted = true;
+    }
+
+    public async Task MalzemeSec()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var form = modal.Show<Pages.Malzeme.Malzeme_Sec>("Malzeme Seç", options: opt);
+        var result = await form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var malzeme = (VMalzemeKartDto)result.Data;
+                record.Stokref = malzeme.Logref;
+                record.LstokKodu = malzeme.Kodu;
+                record.LstokAdi = malzeme.Adi;
+                record.Malzkodu = malzeme.Kodu;
+                record.Malzadi = malzeme.Adi;
+            }
+        }
+    }
+
+    private void CalculateTutar()
+    {
+        try
+        {
+            if (record.Miktar.HasValue && record.Fiyat.HasValue)
+                record.Tutar = Math.Round(record.Miktar.Value * record.Fiyat.Value, 2);
+            else
+                record.Tutar = 0;
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+}

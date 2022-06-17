@@ -1,0 +1,159 @@
+﻿<EditForm Model="vaziferequest">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mt-12">
+        <div class="form">
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Başlangıç Tarih</label>
+                        <InputDate @bind-Value="vaziferequest.BaslangicTarih" class="form-control"></InputDate>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Bitiş Tarih</label>
+                        <InputDate @bind-Value="vaziferequest.BitisTarih" class="form-control"></InputDate>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Müşteri Adı</label>
+                        <InputText @bind-Value="vaziferequest.Cariadi" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label>Kişi Adı</label>
+                        <InputText @bind-Value="vaziferequest.Kisiadi" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Giren</label>
+                        <select class="form-control" @bind="vaziferequest.InsUser">
+                            @if (kullanicilar != null)
+                            {
+                                <option value="">Seçiniz</option>
+                                @foreach (var item in kullanicilar)
+                                {
+                                    <option value="@item.KullaniciKodu">@item.KullaniciKodu (@item.KullaniciAdi)</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Atanan</label>
+                        <select class="form-control" @bind="vaziferequest.AtananUser">
+                            <option value="">Seçiniz</option>
+                            @if (kullanicilar != null && vaziferequest.AdminView)
+                            {
+                                @foreach (var item in kullanicilar)
+                                {
+                                    <option value="@item.KullaniciKodu">@item.KullaniciKodu (@item.KullaniciAdi)</option>
+                                }
+                            }
+                            else
+                            {
+                                <option value="@_currentUser">Ben</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Önem Derecesi</label>
+                        <select class="form-control" @bind="vaziferequest.Oncelik">
+                            <option value="0">Tümü</option>
+                            <option value="1">Rutin</option>
+                            <option value="2">Önemli</option>
+                            <option value="3">Acil</option>
+                            <option value="4">Acil ve Önemli</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Yapıldı</label>
+                        <select class="form-control" @bind="vaziferequest.Yapildi">
+                            <option value="0">Yapılmadı</option>
+                            <option value="1">Yapıldı</option>
+                            <option value="2">Tümü</option>
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <SaveButtonComponent Caption="Tamam" OnClick="Tamam" />
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+
+</EditForm>
+
+@code {
+    [Parameter]
+    public VazifeRequestDto mainRequest { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    KullaniciHelper kullaniciHelper { get; set; }
+
+    VazifeRequestDto vaziferequest = new VazifeRequestDto();
+    public List<SisKullaniciDto> kullanicilar = new List<SisKullaniciDto>();
+    private string _currentUser = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (mainRequest != null)
+            vaziferequest = mainRequest;
+
+        await LoadKullanicilar();
+
+        _currentUser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+    }
+
+    private async Task Tamam()
+    {
+        await ModalInstance.CloseAsync(ModalResult.Ok<VazifeRequestDto>(vaziferequest));
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+
+    private async Task LoadKullanicilar()
+    {
+        try
+        {
+            kullanicilar = await kullaniciHelper.TumListe();
+        }
+        catch (Exception)
+        {
+        }
+    }
+
+}

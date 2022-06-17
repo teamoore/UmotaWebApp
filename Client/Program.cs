@@ -41,6 +41,7 @@ namespace UmotaWebApp.Client
             builder.Services.AddScoped<Helper>();
             builder.Services.AddScoped<DownloadHelper>();
             builder.Services.AddScoped<KisiHelper>();
+            builder.Services.AddScoped<ServisHelper>();
             builder.Services.AddAuthorizationCore();
 
             builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();

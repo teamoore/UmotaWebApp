@@ -29,17 +29,11 @@
                 </div>
             </div>
             <div class="form-group">
-
                 <div class="row">
-
                     <div class="col-md-3">
-                        <label>En son bitirilecek tarih?</label>
+                        <label>Son Tarih</label>
                         <InputDate @bind-Value="record.SonTarih" class="form-control"></InputDate>
                     </div>
-
-
-
-
                 </div>
             </div>
 
@@ -139,7 +133,7 @@
                                 <option value="-1">Seçiniz</option>
                                 @foreach (var item in kullanicilar)
                                 {
-                                    <option value="@item.KullaniciAdi" selected="@isLoginUser(item.KullaniciKodu)">@item.KullaniciAdi (@item.MailAdres)</option>
+                                    <option value="@item.KullaniciKodu">@item.KullaniciKodu (@item.KullaniciAdi)</option>
                                 }
                             }
                         </select>
@@ -205,7 +199,7 @@
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
-    
+
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
@@ -306,15 +300,15 @@
 
             await dataHelper.SaveRecord(record);
 
-            var takvim = new TakvimDto();
-            takvim.Baslik = record.Baslik;
-            takvim.Aciklama = record.Aciklama;
-            takvim.CariRef = record.CariRef;
-            takvim.Cari_Adi = record.CariAdi;
-            takvim.Cari_Kodu = record.CariKodu;
-            takvim.Tarih = record.SonTarih.HasValue ? record.SonTarih : DateTime.Now;
+            //var takvim = new TakvimDto();
+            //takvim.Baslik = record.Baslik;
+            //takvim.Aciklama = record.Aciklama;
+            //takvim.CariRef = record.CariRef;
+            //takvim.Cari_Adi = record.CariAdi;
+            //takvim.Cari_Kodu = record.CariKodu;
+            //takvim.Tarih = record.SonTarih.HasValue ? record.SonTarih : DateTime.Now;
 
-            await takvimHelper.SaveRecord(takvim);
+            //await takvimHelper.SaveRecord(takvim);
 
             Snackbar.Add("Kayıt eklendi.", severity: Severity.Success);
 
@@ -430,10 +424,10 @@
             this.record.CariRef = gorevParam.CariRef;
         }
 
-
         await LoadKullanicilar();
 
         this.record.Oncelik = 1; // düşük öncelik
+        this.record.AtananKisi = _currentUser;
         if (isUpdate)
         {
             await LoadRecord();

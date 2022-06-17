@@ -107,6 +107,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             vazife.Upddate = DateTime.Now;
             vazife.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            vazife.Status = 1;
 
             var request = new VazifeRequestDto();
             request.Vazife = vazife;

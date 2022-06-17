@@ -1,0 +1,759 @@
+﻿@page "/servis_form/{LogRef:int}"
+@page "/servis_form"
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="false"
+                 ShowSearchSection="false"></HeaderSearchBar>
+
+<div class="form">
+
+    <EditForm Model="record">
+
+        @if (loadingCompleted == false)
+        {
+            <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+        }
+
+        <MudGrid class="mt-1">
+            <MudItem xs="12" sm="6">
+                <MudCard>
+                    <MudCardContent>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>İş Tipi</label>
+                                    <select class="form-control" @bind="record.Istipi">
+                                        <option value="">Seçiniz</option>
+                                        <option value="MONTAJ">MONTAJ</option>
+                                        <option value="SERVİS">SERVİS</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Talep Tarihi</label>
+                                    <InputDate @bind-Value="record.Tarih" class="form-control"></InputDate>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Bildirim Tarihi</label>
+                                    <InputDate @bind-Value="record.BildirimTarihi" class="form-control"></InputDate>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Evrak No</label>
+                                    <InputText @bind-Value="record.Evrakno" class="form-control"></InputText>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Fiş No</label>
+                                    <InputText @bind-Value="record.Fisno" class="form-control"></InputText>
+                                </div>
+                                <div class="col-md-4">
+                                    <MudSwitch @bind-Checked="record.Garanti" Label="Garanti" Color="Color.Success" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Durumu</label>
+                                    <select class="form-control" @bind="record.Durum">
+                                        <option value="">Seçiniz</option>
+                                        <option value="Yönlendirildi">Yönlendirildi</option>
+                                        <option value="İş Programına Alındı">İş Programına Alındı</option>
+                                        <option value="Tamamlandı">Tamamlandı</option>
+                                        <option value="Sorunlu Tamamlandı">Sorunlu Tamamlandı</option>
+                                        <option value="Bayi Bilgilendirildi">Bayi Bilgilendirildi</option>
+                                        <option value="İptal">İptal</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Başlama Tarihi</label>
+                                    <InputDate @bind-Value="record.Bastarih" class="form-control"></InputDate>
+                                </div>
+                                <div class="col-md-4">
+                                    <label>Bitiş Tarihi</label>
+                                    <InputDate @bind-Value="record.Bittarih" class="form-control"></InputDate>
+                                </div>
+                            </div>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudCard>
+                    <MudCardContent>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label>Müşteri Kodu</label>
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <InputText @bind-Value="record.Carikodu" class="form-control" disabled />
+                                        </div>
+                                        <div class="col-4">
+                                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="MusteriSec" Color="Color.Info" Size=Size.Small>Seç</MudButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>Müşteri Adı</label>
+                                    <InputText @bind-Value="record.Cariadi" class="form-control" disabled />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>İlgili Kişi</label>
+                                    <InputText @bind-Value="record.IlgiliKisi" class="form-control"></InputText>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>İletişim Bilgisi</label>
+                                    <InputText @bind-Value="record.IlgiliTel" class="form-control"></InputText>
+                                </div>
+                            </div>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudCard>
+                    <MudCardContent>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label>Bayi Kodu</label>
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <InputText @bind-Value="record.Bayikodu" class="form-control" disabled />
+                                        </div>
+                                        <div class="col-4">
+                                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="BayiSec" Color="Color.Info" Size=Size.Small>Seç</MudButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>Bayi Adı</label>
+                                    <InputText @bind-Value="record.Bayiadi" class="form-control" disabled />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>İlgili Kişi</label>
+                                    <InputText @bind-Value="record.BayiIlgiliKisi" class="form-control"></InputText>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>İletişim Bilgisi</label>
+                                    <InputText @bind-Value="record.BayiIlgiliTel" class="form-control"></InputText>
+                                </div>
+                            </div>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudCard>
+                    <MudCardContent>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label>Servis Kodu</label>
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <InputText @bind-Value="record.Serviskodu" class="form-control" disabled />
+                                        </div>
+                                        <div class="col-4">
+                                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="ServisSec" Color="Color.Info" Size=Size.Small>Seç</MudButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <label>Servis Adı</label>
+                                    <InputText @bind-Value="record.Servisadi" class="form-control" disabled />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>İlgili Kişi</label>
+                                    <InputText @bind-Value="record.ServisIlgiliKisi" class="form-control"></InputText>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>İletişim Bilgisi</label>
+                                    <InputText @bind-Value="record.ServisIlgiliTel" class="form-control"></InputText>
+                                </div>
+                            </div>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+
+            <MudItem xs="12" sm="6">
+                <MudCard>
+                    <MudCardContent>
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label>Talep Eden </label>
+                                    <select class="form-control" @bind="record.KimYonlendirdi">
+                                        <option value="">Seçiniz</option>
+                                        <option value="MÜŞTERİ">MÜŞTERİ</option>
+                                        <option value="BAYİ">BAYİ</option>
+                                        <option value="SATIŞ TEMSİLCİSİ">SATIŞ TEMSİLCİSİ</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Kimden geldi</label>
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <InputText @bind-Value="record.Yonlendirenkisi" class="form-control" disabled />
+                                        </div>
+                                        <div class="col-4">
+                                            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="KisiSec" Color="Color.Info" Size=Size.Small>Seç</MudButton>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+
+        <div class="mt-3">
+            <div class="form">
+                <MudTabs Elevation="3" Rounded="true" Centered="false" Class="my-6">
+                    <MudTabPanel Icon="@Icons.Material.Filled.DocumentScanner" Text="İstekler" BadgeColor="Color.Error">
+                        <br />
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <InputTextArea @bind-Value="record.IsTanimi" class="form-control" rows="5"></InputTextArea>
+                                </div>
+                            </div>
+                        </div>
+                    </MudTabPanel>
+
+                    <MudTabPanel Icon="@Icons.Material.Filled.Description" Text="Yapılanlar" BadgeColor="Color.Success">
+                        <br />
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <InputTextArea @bind-Value="record.Yapilanlar" class="form-control" rows="5"></InputTextArea>
+                                </div>
+                            </div>
+                        </div>
+                    </MudTabPanel>
+
+                    <MudTabPanel Icon="@Icons.Material.Filled.Description" Text="Özel Notlar" BadgeColor="Color.Success">
+                        <br />
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <InputTextArea @bind-Value="record.Not1" class="form-control" rows="5"></InputTextArea>
+                                </div>
+                            </div>
+                        </div>
+                    </MudTabPanel>
+
+                </MudTabs>
+
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+<MudTable Items="@MalzemeList" FixedHeader="true" Height="280px" RowsPerPage="1000" Dense="true" Hover="true" Bordered="true" Striped="true">
+    <ToolBarContent>
+        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="MalzemeEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        <MudSpacer />
+        <MudText Typo="Typo.h6">Ürünler</MudText>
+        <MudSpacer />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>Türü</MudTh>
+        <MudTh>Stok Kodu</MudTh>
+        <MudTh>Stok Adı</MudTh>
+        <MudTh>Seri No</MudTh>
+        <MudTh>Miktar</MudTh>
+        <MudTh>Birim</MudTh>
+        <MudTh>Fiyat</MudTh>
+        <MudTh>Tutar</MudTh>
+        <MudTh>Açıklama</MudTh>
+        <MudTh>Durum</MudTh>
+        <MudTh>#</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" @onclick="(() => MalzemeGuncelle(context.Logref))" />
+        </MudTd>
+        <MudTd DataLabel="Türü">@context.Tur</MudTd>
+        <MudTd DataLabel="Stok Kodu">@context.Malzkodu</MudTd>
+        <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
+        <MudTd DataLabel="Seri No">@context.Serino</MudTd>
+        <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
+        <MudTd DataLabel="Birim">@context.Birim</MudTd>
+        <MudTd DataLabel="Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.Fiyat.Value))</MudTd>
+        <MudTd DataLabel="Tutar" Style="text-align:right">@(Helper.FormattedDouble(context.Tutar))</MudTd>
+        <MudTd DataLabel="Açıklama">@context.Aciklama</MudTd>
+        <MudTd DataLabel="Durum">@context.Durum</MudTd>
+        <MudTd>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => MalzemeSil(context.Logref))" />
+        </MudTd>
+    </RowTemplate>
+
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+
+</MudTable>
+
+<div class="form-group mt-3">
+    <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+        @if (_processing)
+        {
+            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+            <MudText Class="ms-2">Kaydediliyor...</MudText>
+        }
+        else
+        {
+            <MudText>Kaydet</MudText>
+        }
+    </MudButton>
+    <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+</div>
+
+
+@code {
+    [Parameter]
+    public int? LogRef { get; set; }
+
+    [Parameter]
+    public int? modalForm { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ServisHelper dataHelper { get; set; }
+
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    public ServisDto record = new ServisDto();
+    public List<ServisMalzemeDto> MalzemeList { get; set; }
+
+    private bool loadingCompleted = false;
+    private bool _processing = false;
+    public HeaderBarSearch header = new HeaderBarSearch();
+    private string _currentUser = "";
+    private bool _pageHasError = false;
+
+    public async Task ValidSubmit()
+    {
+        var isUpdate = this.LogRef.HasValue;
+
+        if (!isUpdate)
+            await SaveRecord();
+        else
+            await UpdateRecord();
+
+        await SaveCompleted();
+    }
+
+    private async Task Vazgec()
+    {
+        await SaveCompleted();
+    }
+
+    private async Task SaveCompleted()
+    {
+        if (_pageHasError)
+            return;
+
+        if (modalForm.HasValue)
+            await ModalInstance.CloseAsync();
+        else
+            navigation.NavigateTo("/servis_liste");
+    }
+
+    public async Task LoadRecord()
+    {
+        try
+        {
+            this.record = await dataHelper.LoadRecord(this.LogRef.Value);
+            this.MalzemeList = await dataHelper.LoadMalzemeler(this.LogRef.Value);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task LoadMalzemeList()
+    {
+        try
+        {
+            this.MalzemeList = await dataHelper.LoadMalzemeler(this.LogRef.Value);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task NewRecord()
+    {
+        this.record.Tarih = DateTime.Now;
+        this.record.BildirimTarihi = DateTime.Now;
+        this.record.Durum = "Yönlendirildi";
+        this.record.Evrakno = await yetkiHelper.FisNoAl("servis", "evrakno");
+        this.record.Fisno = await yetkiHelper.FisNoAl("servis", "fisno");
+        this.MalzemeList = new List<ServisMalzemeDto>();
+    }
+
+    private async Task SaveRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            if (record.Logref == 0)
+                this.record.Logref = await yetkiHelper.RefNoAl("servis");
+
+            this.record.Evrakno = await yetkiHelper.FisNoAl("servis", "evrakno");
+            this.record.Fisno = await yetkiHelper.FisNoAl("servis", "fisno");
+            this.record.Yil = ((short)this.record.Tarih.Year);
+
+            await dataHelper.SaveRecord(record);
+
+            Snackbar.Add("Kayıt eklendi.", severity: Severity.Success);
+
+            this.StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    private async Task UpdateRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            this.record.Yil = ((short)this.record.Tarih.Year);
+            await dataHelper.UpdateRecord(record);
+
+            Snackbar.Add("Kayıt güncellendi", severity: Severity.Success);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    public void SubmitValidation()
+    {
+        _pageHasError = false;
+
+        var err = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(record.Evrakno))
+            err.Add("Evrak No boş geçilemez");
+
+        if (record.Cariref == 0 || record.Cariref == null)
+            err.Add("Müşteri bilgisi boş geçilemez");
+
+        if (record.Bayiref == 0 || record.Bayiref == null)
+            err.Add("Bayi bilgisi boş geçilemez");
+
+        if (record.Tservisref == 0 || record.Tservisref == null)
+            err.Add("Servis bilgisi boş geçilemez");
+
+        if (string.IsNullOrEmpty(record.Istipi))
+            err.Add("İş tipi boş geçilemez");
+
+        if (string.IsNullOrEmpty(record.IlgiliKisi) || string.IsNullOrEmpty(record.ServisIlgiliKisi) || string.IsNullOrEmpty(record.BayiIlgiliKisi))
+            err.Add("İlgili kişi bilgileri geçilemez");
+
+        if (err.Count > 0)
+        {
+            _pageHasError = true;
+
+            var ex = new ClientException("Kayıt Hatası");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Servis Bilgileri";
+
+        var isUpdate = this.LogRef.HasValue;
+
+        loadingCompleted = false;
+
+        _currentUser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+        if (isUpdate)
+            await LoadRecord();
+        else
+            await NewRecord();
+
+        loadingCompleted = true;
+    }
+
+    public async Task MusteriSec()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (VCariKartDto)result.Data;
+                record.Cariadi = cariSecim.Adi;
+                record.Carikodu = cariSecim.Kodu;
+                record.Cariref = cariSecim.Logref;
+                record.LcariAdi = cariSecim.Adi;
+                record.LcariKodu = cariSecim.Kodu;
+            }
+        }
+    }
+
+    public async Task BayiSec()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (VCariKartDto)result.Data;
+                record.Bayiadi = cariSecim.Adi;
+                record.Bayikodu = cariSecim.Kodu;
+                record.Bayiref = cariSecim.Logref;
+                record.LbayiAdi = cariSecim.Adi;
+                record.LbayiKodu = cariSecim.Kodu;
+            }
+        }
+    }
+
+    public async Task ServisSec()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (VCariKartDto)result.Data;
+                record.Servisadi = cariSecim.Adi;
+                record.Serviskodu = cariSecim.Kodu;
+                record.Tservisref = cariSecim.Logref;
+                record.LtservisAdi = cariSecim.Adi;
+                record.LtservisKodu = cariSecim.Kodu;
+                record.Il = cariSecim.Il;
+            }
+        }
+    }
+
+    public async Task KisiSec()
+    {
+        if (!record.Cariref.HasValue && !record.Bayiref.HasValue && !record.Tservisref.HasValue)
+            return;
+
+        var CariKartRef = 0;
+
+        if (record.KimYonlendirdi == "MÜŞTERİ")
+            CariKartRef = record.Cariref.Value;
+        else
+        if (record.KimYonlendirdi == "BAYİ")
+            CariKartRef = record.Bayiref.Value;
+        else
+        if (record.KimYonlendirdi == "SATIŞ TEMSİLCİSİ")
+            CariKartRef = 581;
+        else
+            return;
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("CariKartRef", CariKartRef);
+
+        var Form = modal.Show<Components.Cari.CariKartKisiSecComponent>("Kişi Seç", parameters: parameters, options: opt);
+        var result = await Form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (KisilerDto)result.Data;
+                record.Yonlendirenkisi = Secim.Tamadi;
+            }
+        }
+    }
+
+    public async Task MalzemeEkle()
+    {
+        if (record.Logref == 0)
+            record.Logref = record.Logref = await yetkiHelper.RefNoAl("servis");
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+        parameters.Add("servisref", record.Logref);
+
+        var cariForm = modal.Show<ServisMalzemeForm>("Malzeme Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (ServisMalzemeDto)result.Data;
+                MalzemeList.Add(Secim);
+            }
+        }
+    }
+
+    public async Task MalzemeGuncelle(int logref)
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+        parameters.Add("servisref", record.Logref);
+        parameters.Add("logref", logref);
+
+        var cariForm = modal.Show<ServisMalzemeForm>("Malzeme Güncelle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (ServisMalzemeDto)result.Data;
+                await LoadMalzemeList();
+            }
+        }
+
+    }
+
+    public async Task MalzemeSil(int logref)
+    {
+        try
+        {
+            var modalRes = await ModalManager.ShowConfirmationAsync("Malzeme silinecek!", "Silmek istediğinizden emin misiniz?", "Evet", "Hayır");
+            if (!modalRes)
+                return;
+
+            var recordDto = await dataHelper.LoadMalzemeRecord(logref);
+
+            await dataHelper.DeleteMalzemeRecord(recordDto);
+
+            Snackbar.Add("Malzeme silindi");
+
+            await LoadMalzemeList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+}
