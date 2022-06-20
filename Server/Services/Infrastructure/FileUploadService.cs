@@ -20,10 +20,12 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     public class FileUploadService : IFileUpload
     {
         public IConfiguration Configuration { get; }
-
-        public FileUploadService(IConfiguration configuration)
+        public IRefGenerator RefGeneratorService { get; }
+        public FileUploadService(IConfiguration configuration, IRefGenerator refGeneratorService)
         {
             Configuration = configuration;
+            RefGeneratorService = refGeneratorService;
+            RefGeneratorService = refGeneratorService;
         }
 
         public async Task<FileUploadDto> Upload(IBrowserFile file, CancellationToken cancellationToken)
@@ -74,6 +76,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 db.Open();
                 var p = new DynamicParameters();
+
+                request.File.LogRef = await RefGeneratorService.RefNoAl("imagedata", request.FirmaId.ToString());
 
                 var sqlstmt = "insert into [dbo].[imagedata] (logref,tablename,tablelogref,ifilename,aciklama,insuser,insdate) " +
                     "values (@LogRef,@TableName,@TableLogRef,@FileName,@Aciklama,@InsUser,getdate())";
