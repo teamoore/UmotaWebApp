@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -26,15 +27,15 @@ namespace UmotaWebApp.Server.Controllers
             this.fileUpload = fileUpload;
         }
 
-        [HttpPost("kaydet")]
+        [HttpPost("upload")]
         [DisableRequestSizeLimit]
-        public async Task<ServiceResponse<FileUploadDto>> DosyaYukle(FileUploadRequestDto request)
+        public async Task<ServiceResponse<FileUploadDto>> DosyaYukle(IBrowserFile file)
         {
             try
             {
                 return new ServiceResponse<FileUploadDto>()
                 {
-                    Value = await fileUpload.Upload(request,CancellationToken.None)
+                    Value = await fileUpload.Upload(file,CancellationToken.None)
                 };
             }
             catch (ApiException ex)
@@ -46,5 +47,48 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("upload2")]
+        [DisableRequestSizeLimit]
+        public async Task<ServiceResponse<FileUploadDto>> DosyaYukle2(FileDataDto file)
+        {
+            try
+            {
+                return new ServiceResponse<FileUploadDto>()
+                {
+                    Value = await fileUpload.Upload(file)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<FileUploadDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("save")]
+        public async Task<ServiceResponse<bool>> DosyaKaydet(FileUploadRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<bool>()
+                {
+                    Value = await fileUpload.Save(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<bool>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+
     }
 }

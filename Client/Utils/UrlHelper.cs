@@ -90,5 +90,8 @@ namespace UmotaWebApp.Client.Utils
         public const string ServisMalzemeKaydet = "/api/servis/savemalzeme";
         public const string ServisMalzemeGuncelle = "/api/servis/updatemalzeme";
         public const string ServisMalzemeSil = "/api/servis/deletemalzeme";
+        public const string FileUpload = "/api/FileUpload/upload";
+        public const string FileUpload2 = "/api/FileUpload/upload2";
+        public const string FileSave = "/api/FileUpload/save";
     }
 }

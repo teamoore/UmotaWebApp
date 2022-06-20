@@ -282,7 +282,53 @@
             </div>
         </div>
     </EditForm>
+
 </div>
+
+
+
+<MudItem xs="12" sm="6">
+    <MudCard>
+        <MudCardContent>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Dosya Yükle</label>
+                        <div class="row">
+                            <div class="col-8">
+                                <InputFile id="fileInput" OnChange="UploadFiles" hidden />
+
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Filled.CloudUpload"
+                                           for="fileInput">
+                                    Dosya yükle
+                                </MudButton>
+                            </div>
+                            <div class="col-4">
+                                @if (files != null)
+                                {
+                                    <MudText Typo="@Typo.h6">@files.Count() adet dosya seçildi</MudText>
+                                    <MudList>
+                                        @foreach (var file in files)
+                                        {
+                                            <MudListItem Icon="@Icons.Filled.AttachFile" @key="@file">
+                                                @file.Name <code>@file.Size bytes</code>
+                                            </MudListItem>
+                                        }
+                                    </MudList>
+                                }
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </MudCardContent>
+    </MudCard>
+</MudItem>
+
 
 <MudTable Items="@MalzemeList" FixedHeader="true" Height="280px" RowsPerPage="1000" Dense="true" Hover="true" Bordered="true" Striped="true">
     <ToolBarContent>
@@ -374,6 +420,9 @@
     [Inject]
     YetkiHelper yetkiHelper { get; set; }
 
+    [Inject]
+    UploadHelper uploadHelper { get; set; }
+
     public ServisDto record = new ServisDto();
     public List<ServisMalzemeDto> MalzemeList { get; set; }
 
@@ -382,6 +431,8 @@
     public HeaderBarSearch header = new HeaderBarSearch();
     private string _currentUser = "";
     private bool _pageHasError = false;
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+
 
     public async Task ValidSubmit()
     {
@@ -754,6 +805,47 @@
         catch (Exception ex)
         {
             Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+
+    private async Task UploadFiles(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles(1))
+        {
+            files = new List<IBrowserFile>();
+            files.Add(file);
+        }
+
+        foreach (var file in files)
+        {
+            var buffers = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffers);
+
+            var myfile = new FileDataDto();
+            myfile.Data = buffers;
+            myfile.FileName = file.Name;
+            myfile.FileType = file.ContentType;
+
+            var uploadedFile = await uploadHelper.Upload(myfile);
+
+            files = null;
+            
+            await uploadHelper.Save(new FileUploadRequestDto()
+            {
+                File = new FileUploadDto()
+                {
+                    FileName = uploadedFile.FileName,
+                    Image = uploadedFile.Image,
+                    ImageFilePath = uploadedFile.ImageFilePath,
+                    ImageType = uploadedFile.ImageType,
+                    LogRef = 1,
+                    TableLogRef = record.Logref,
+                    TableName = "servis"
+                }
+            });
+
+            Snackbar.Add("Dosya yüklendi : " + uploadedFile.FileName, severity: Severity.Success);
         }
     }
 }
