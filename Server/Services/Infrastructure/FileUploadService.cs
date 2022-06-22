@@ -91,9 +91,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                  Insuser = request.File.Insuser
             };
 
-            //geçici
-            request.ImageData.iData = null;
-
+            
             var connectionstring = Configuration.GetUmotaImageDbConnectionString(firmaId: request.FirmaId.ToString());
             var optionsBuilder = new DbContextOptionsBuilder<UmotaImageDbContext>();
             optionsBuilder.UseSqlServer(connectionstring);
