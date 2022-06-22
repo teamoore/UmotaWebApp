@@ -22,6 +22,8 @@ using System;
 using UmotaWebApp.Shared.Config;
 using UmotaWebApp.Server.Services.Email;
 using UmotaWebApp.Server.Services;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Http;
 
 namespace UmotaWebApp.Server
 {
@@ -76,6 +78,7 @@ namespace UmotaWebApp.Server
             services.AddScoped<IVazifeService, VazifeService>();
             services.AddScoped<ICariRaporService, CariRaporService>();
             services.AddScoped<IServisService, ServisService>();
+            services.AddScoped<IFileUpload, FileUploadService>();
 
             var architectureFolder = (IntPtr.Size == 8) ? "64 bit" : "32 bit";
             var wkHtmlToPdfPath = Path.Combine(Environment.CurrentDirectory, $"wkhtmltox\\v0.12.4\\{architectureFolder}\\libwkhtmltox");
@@ -133,6 +136,13 @@ namespace UmotaWebApp.Server
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot/dosyalar")),
+                RequestPath = new PathString("/Dosyalar")
+            });
 
             app.UseRouting();
 

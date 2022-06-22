@@ -282,7 +282,53 @@
             </div>
         </div>
     </EditForm>
+
 </div>
+
+
+
+<MudItem xs="12" sm="6">
+    <MudCard>
+        <MudCardContent>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-8">
+                        <label>Dosyalar</label>
+                        <div class="row">
+                            <div class="col-8">
+                                <InputFile id="fileInput" OnChange="UploadFiles" hidden />
+
+                                <MudButton HtmlTag="label"
+                                           Variant="Variant.Filled"
+                                           Color="Color.Primary"
+                                           StartIcon="@Icons.Filled.CloudUpload"
+                                           for="fileInput">
+                                    Dosya yükle
+                                </MudButton>
+                            </div>
+                            <div class="col-4">
+                                @if (dosyalar != null)
+                                {
+                                    <MudText Typo="@Typo.h6">@dosyalar.Count() adet dosya eklendi</MudText>
+                                    <MudList>
+                                        @foreach (var dosya in dosyalar)
+                                        {
+                                            <MudListItem Icon="@Icons.Filled.AttachFile" @key="@dosya">
+                                                <a href="/dosyalar/@dosya.FileName" download>@dosya.FileName </a> 
+                                            </MudListItem>
+                                        }
+                                    </MudList>
+                                }
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </MudCardContent>
+    </MudCard>
+</MudItem>
+
 
 <MudTable Items="@MalzemeList" FixedHeader="true" Height="280px" RowsPerPage="1000" Dense="true" Hover="true" Bordered="true" Striped="true">
     <ToolBarContent>
@@ -374,8 +420,13 @@
     [Inject]
     YetkiHelper yetkiHelper { get; set; }
 
+    [Inject]
+    UploadHelper uploadHelper { get; set; }
+
     public ServisDto record = new ServisDto();
     public List<ServisMalzemeDto> MalzemeList { get; set; }
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    public List<ImageDataDto> dosyalar = new List<ImageDataDto>();
 
     private bool loadingCompleted = false;
     private bool _processing = false;
@@ -417,6 +468,7 @@
         {
             this.record = await dataHelper.LoadRecord(this.LogRef.Value);
             this.MalzemeList = await dataHelper.LoadMalzemeler(this.LogRef.Value);
+            await DosyalariGetir();
         }
         catch (Exception ex)
         {
@@ -755,5 +807,62 @@
         {
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
+    }
+
+    private async Task UploadFiles(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            foreach (var file in e.GetMultipleFiles(1))
+            {
+                files = new List<IBrowserFile>();
+                files.Add(file);
+            }
+
+            foreach (var file in files)
+            {
+                var buffers = new byte[file.Size];
+                await file.OpenReadStream().ReadAsync(buffers);
+
+                var myfile = new FileDataDto();
+                myfile.Data = buffers;
+                myfile.FileName = file.Name;
+                myfile.FileType = file.ContentType;
+
+                var uploadedFile = await uploadHelper.Upload(myfile);
+
+                files = null;
+
+                await uploadHelper.Save(new FileUploadRequestDto()
+                {
+                    File = new FileUploadDto()
+                    {
+                        FileName = uploadedFile.FileName,
+                        Image = uploadedFile.Image,
+                        ImageFilePath = uploadedFile.ImageFilePath,
+                        ImageType = uploadedFile.ImageType,
+                        TableLogRef = record.Logref,
+                        TableName = "servis"
+                    }
+                });
+
+                await DosyalariGetir();
+
+                Snackbar.Add("Dosya yüklendi : " + uploadedFile.FileName, severity: Severity.Success);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task DosyalariGetir()
+    {
+        var request = new FileUploadRequestDto();
+        request.TableLogref = record.Logref;
+        request.TableName = "servis";
+
+        dosyalar = await uploadHelper.GetList(request);
     }
 }
