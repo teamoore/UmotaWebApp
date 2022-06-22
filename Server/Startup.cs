@@ -22,6 +22,8 @@ using System;
 using UmotaWebApp.Shared.Config;
 using UmotaWebApp.Server.Services.Email;
 using UmotaWebApp.Server.Services;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Http;
 
 namespace UmotaWebApp.Server
 {
@@ -134,6 +136,13 @@ namespace UmotaWebApp.Server
             app.UseHttpsRedirection();
             app.UseBlazorFrameworkFiles();
             app.UseStaticFiles();
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(
+            Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot/dosyalar")),
+                RequestPath = new PathString("/Dosyalar")
+            });
 
             app.UseRouting();
 

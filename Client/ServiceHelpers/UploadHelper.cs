@@ -34,7 +34,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return result;
         }
 
-        public async Task<bool> Save(FileUploadRequestDto request)
+        public async Task<ImageDataDto> Save(FileUploadRequestDto request)
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
             if (selectedFirmaDonem == null)
@@ -45,7 +45,25 @@ namespace UmotaWebApp.Client.ServiceHelpers
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
             request.File.Insuser = kullanicikodu;
 
-            var result = await httpClient.PostGetServiceResponseAsync<bool, FileUploadRequestDto>(UrlHelper.FileSave, request);
+            var refno = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=imagedata"  + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+            request.File.LogRef = refno;
+            
+            var result = await httpClient.PostGetServiceResponseAsync<ImageDataDto, FileUploadRequestDto>(UrlHelper.FileSave, request);
+
+            return result;
+        }
+
+        public async Task<List<ImageDataDto>> GetList(FileUploadRequestDto request)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<List<ImageDataDto>, FileUploadRequestDto>(UrlHelper.FileGetList, request);
 
             return result;
         }

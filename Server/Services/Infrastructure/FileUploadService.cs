@@ -1,8 +1,11 @@
-﻿using Dapper;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Dapper;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -11,6 +14,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using UmotaWebApp.Server.Data.Contexts;
+using UmotaWebApp.Server.Data.Models;
 using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ModelDto.Request;
@@ -19,13 +24,15 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 {
     public class FileUploadService : IFileUpload
     {
+        public IMapper Mapper { get; }
         public IConfiguration Configuration { get; }
         public IRefGenerator RefGeneratorService { get; }
-        public FileUploadService(IConfiguration configuration, IRefGenerator refGeneratorService)
+        public FileUploadService(IConfiguration configuration, IRefGenerator refGeneratorService, IMapper mapper)
         {
             Configuration = configuration;
             RefGeneratorService = refGeneratorService;
             RefGeneratorService = refGeneratorService;
+            Mapper = mapper;
         }
 
         public async Task<FileUploadDto> Upload(IBrowserFile file, CancellationToken cancellationToken)
@@ -62,7 +69,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             fs.Close();
             await fs.DisposeAsync();
 
-            result.FileName = file.FileName;
+            result.FileName = dosyaAdi;
             result.Image = file.Data;
             result.ImageFilePath = path;
             result.ImageType = file.FileType;
@@ -70,32 +77,49 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             return result;
         }
 
-        public async Task<bool> Save(FileUploadRequestDto request)
+        public async Task<ImageDataDto> Save(FileUploadRequestDto request)
         {
-            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaImageDbConnectionString(request.FirmaId.ToString())))
+            request.ImageData = new ImageDataDto()
             {
-                db.Open();
-                var p = new DynamicParameters();
+                 FileName = request.File.FileName,
+                 iData = request.File.Image,
+                 iType = request.File.ImageType,
+                 Logref = request.File.LogRef,
+                 TableLogref = request.File.TableLogRef,
+                 TableName = request.File.TableName,
+                 Insdate = DateTime.Now,
+                 Insuser = request.File.Insuser
+            };
 
-                request.File.LogRef = await RefGeneratorService.RefNoAl("imagedata", request.FirmaId.ToString());
+            //geçici
+            request.ImageData.iData = null;
 
-                var sqlstmt = "insert into [dbo].[imagedata] (logref,tablename,tablelogref,ifilename,aciklama,insuser,insdate) " +
-                    "values (@LogRef,@TableName,@TableLogRef,@FileName,@Aciklama,@InsUser,getdate())";
+            var connectionstring = Configuration.GetUmotaImageDbConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaImageDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
 
-                p.Add("@LogRef", request.File.LogRef, dbType: DbType.Int64);
-                p.Add("@TableName", request.File.TableName, dbType: DbType.String);
-                p.Add("@TableLogRef", request.File.TableLogRef, dbType: DbType.Int64);
-                p.Add("@FileName", request.File.FileName, dbType: DbType.String);
-                p.Add("@Aciklama", request.File.Aciklama, dbType: DbType.String);
-                p.Add("@InsUser", request.File.Insuser, dbType: DbType.String);
-                p.Add("@Image", request.File.Image, dbType: DbType.Binary);
+            using (UmotaImageDbContext dbContext = new (optionsBuilder.Options))
+            {
+                var imgdata = Mapper.Map<ImageData>(request.ImageData);
+                await dbContext.ImageDatas.AddAsync(imgdata);
 
-                var result = await db.ExecuteAsync(sqlstmt, p, commandType: CommandType.Text);
-
-                return true;
+                await dbContext.SaveChangesAsync();
+                return Mapper.Map<ImageDataDto>(imgdata);
             }
 
-            
+        }
+
+        public async Task<List<ImageDataDto>> GetList(FileUploadRequestDto request)
+        {
+            var connectionstring = Configuration.GetUmotaImageDbConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaImageDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaImageDbContext dbContext = new(optionsBuilder.Options))
+            {
+                return await dbContext.ImageDatas.Where(x => x.TableName == request.TableName && x.TableLogref == request.TableLogref)
+                    .ProjectTo<ImageDataDto>(Mapper.ConfigurationProvider).ToListAsync();
+            }
         }
     }
 }

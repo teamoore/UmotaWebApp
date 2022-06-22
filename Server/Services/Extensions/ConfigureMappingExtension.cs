@@ -61,6 +61,7 @@ namespace UmotaWebApp.Server.Services.Extensions
             CreateMap<V012ServisMalzemeler, ServisMalzemeDto>().ReverseMap();
             CreateMap<Servi, ServisLog>().ReverseMap();
             CreateMap<ServisMalzemeler, ServisMalzemelerLog>().ReverseMap();
+            CreateMap<ImageData, ImageDataDto>().ReverseMap();
         }
     }
 

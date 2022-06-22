@@ -70,11 +70,11 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("save")]
-        public async Task<ServiceResponse<bool>> DosyaKaydet(FileUploadRequestDto request)
+        public async Task<ServiceResponse<ImageDataDto>> DosyaKaydet(FileUploadRequestDto request)
         {
             try
             {
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<ImageDataDto>()
                 {
                     Value = await fileUpload.Save(request)
                 };
@@ -83,7 +83,28 @@ namespace UmotaWebApp.Server.Controllers
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
-                var e = new ServiceResponse<bool>();
+                var e = new ServiceResponse<ImageDataDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+
+        [HttpPost("list")]
+        public async Task<ServiceResponse<List<ImageDataDto>>> DosyalariGetir(FileUploadRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<List<ImageDataDto>>()
+                {
+                    Value = await fileUpload.GetList(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<ImageDataDto>>();
                 e.SetException(ex);
                 return e;
             }
