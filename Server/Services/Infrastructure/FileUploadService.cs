@@ -48,6 +48,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 await file.OpenReadStream(maxAllowedSize: maxSize).CopyToAsync(stream);
                 var ms = new MemoryStream();
                 stream.CopyTo(ms);
+                
+                await ms.DisposeAsync();
 
                 result.FileName = dosyaAdi;
                 result.Image = ms.ToArray();
