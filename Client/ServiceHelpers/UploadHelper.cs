@@ -68,5 +68,19 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return result;
         }
 
+        public async Task<bool> DeleteFile(FileUploadRequestDto request)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+            
+            var result = await httpClient.PostGetServiceResponseAsync<bool, FileUploadRequestDto>(UrlHelper.FileDelete, request);
+
+            return result;
+        }
     }
 }

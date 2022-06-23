@@ -94,5 +94,6 @@ namespace UmotaWebApp.Client.Utils
         public const string FileUpload2 = "/api/FileUpload/upload2";
         public const string FileSave = "/api/FileUpload/save";
         public const string FileGetList = "/api/FileUpload/list";
+        public const string FileDelete = "/api/FileUpload/delete";
     }
 }

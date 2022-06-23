@@ -44,7 +44,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             
             using (var stream = new FileStream(path, FileMode.Create))
             {
-                await file.OpenReadStream().CopyToAsync(stream);
+                var maxSize = 1024 * 1024 * 8; //8 Mb 
+                await file.OpenReadStream(maxAllowedSize: maxSize).CopyToAsync(stream);
                 var ms = new MemoryStream();
                 stream.CopyTo(ms);
 
@@ -117,6 +118,26 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 return await dbContext.ImageDatas.Where(x => x.TableName == request.TableName && x.TableLogref == request.TableLogref)
                     .ProjectTo<ImageDataDto>(Mapper.ConfigurationProvider).ToListAsync();
+            }
+        }
+
+        public async Task<bool> DeleteFile(FileUploadRequestDto request)
+        {
+            var connectionstring = Configuration.GetUmotaImageDbConnectionString(firmaId: request.FirmaId.ToString());
+            var optionsBuilder = new DbContextOptionsBuilder<UmotaImageDbContext>();
+            optionsBuilder.UseSqlServer(connectionstring);
+
+            using (UmotaImageDbContext dbContext = new(optionsBuilder.Options))
+            {
+                var img = await dbContext.ImageDatas.Where(x => x.Logref == request.File.LogRef).SingleOrDefaultAsync();
+
+                if (img == null)
+                    throw new Exception("Dosya bulunamadı");
+
+                dbContext.ImageDatas.Remove(img);
+                await dbContext.SaveChangesAsync();
+
+                return true;
             }
         }
     }

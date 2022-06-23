@@ -285,51 +285,6 @@
 
 </div>
 
-
-
-<MudItem xs="12" sm="6">
-    <MudCard>
-        <MudCardContent>
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-8">
-                        <label>Dosyalar</label>
-                        <div class="row">
-                            <div class="col-8">
-                                <InputFile id="fileInput" OnChange="UploadFiles" hidden />
-
-                                <MudButton HtmlTag="label"
-                                           Variant="Variant.Filled"
-                                           Color="Color.Primary"
-                                           StartIcon="@Icons.Filled.CloudUpload"
-                                           for="fileInput">
-                                    Dosya yükle
-                                </MudButton>
-                            </div>
-                            <div class="col-4">
-                                @if (dosyalar != null)
-                                {
-                                    <MudText Typo="@Typo.h6">@dosyalar.Count() adet dosya eklendi</MudText>
-                                    <MudList>
-                                        @foreach (var dosya in dosyalar)
-                                        {
-                                            <MudListItem Icon="@Icons.Filled.AttachFile" @key="@dosya">
-                                                <a href="/dosyalar/@dosya.FileName" download>@dosya.FileName </a> 
-                                            </MudListItem>
-                                        }
-                                    </MudList>
-                                }
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>
-            </div>
-        </MudCardContent>
-    </MudCard>
-</MudItem>
-
-
 <MudTable Items="@MalzemeList" FixedHeader="true" Height="280px" RowsPerPage="1000" Dense="true" Hover="true" Bordered="true" Striped="true">
     <ToolBarContent>
         <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="MalzemeEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
@@ -376,493 +331,570 @@
 
 </MudTable>
 
-<div class="form-group mt-3">
-    <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
-        @if (_processing)
-        {
-            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-            <MudText Class="ms-2">Kaydediliyor...</MudText>
-        }
-        else
-        {
-            <MudText>Kaydet</MudText>
-        }
-    </MudButton>
-    <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+<hr />
+<div class="mt-lg-5">
+    <div class="form">
+        <div class="form-group">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <InputFile id="fileInput" OnChange="UploadFiles" hidden />
+
+                    <MudButton HtmlTag="label"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Filled.CloudUpload"
+                               for="fileInput">
+                        Dosya yükle
+                    </MudButton>
+
+                    @if (dosyalar != null)
+                    {
+
+                        <MudText Typo="@Typo.h6">@dosyalar.Count() adet dosya eklendi</MudText>
+                        <MudList>
+                            @foreach (var dosya in dosyalar)
+                            {
+                                <div class="row">
+                                    <div class="col">
+                                        <MudListItem Icon="@Icons.Filled.AttachFile" @key="@dosya">
+                                            <a href="/dosyalar/@dosya.FileName" download>@dosya.FileName </a>
+                                        </MudListItem>
+                                    </div>
+                                    <div class="col">
+                                        <MudIconButton Icon="@Icons.Material.Filled.Delete" aria-label="delete" Color="Color.Secondary" OnClick="(() => DeleteFile(dosya.Logref))"></MudIconButton>
+                                    </div>
+                                </div>
+
+                            }
+                        </MudList>
+                    }
+                </div>
+
+            </div>
+
+        </div>
+    </div>
 </div>
 
 
-@code {
-    [Parameter]
-    public int? LogRef { get; set; }
 
-    [Parameter]
-    public int? modalForm { get; set; }
 
-    [CascadingParameter] IModalService modal { get; set; }
-    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
 
-    [Inject]
-    ILocalStorageService LocalStorageService { get; set; }
-
-    [Inject]
-    ModalManager ModalManager { get; set; }
-
-    [Inject]
-    NavigationManager navigation { get; set; }
-
-    [Inject]
-    ISnackbar Snackbar { get; set; }
-
-    [Inject]
-    ServisHelper dataHelper { get; set; }
-
-    [Inject]
-    YetkiHelper yetkiHelper { get; set; }
-
-    [Inject]
-    UploadHelper uploadHelper { get; set; }
-
-    public ServisDto record = new ServisDto();
-    public List<ServisMalzemeDto> MalzemeList { get; set; }
-    IList<IBrowserFile> files = new List<IBrowserFile>();
-    public List<ImageDataDto> dosyalar = new List<ImageDataDto>();
-
-    private bool loadingCompleted = false;
-    private bool _processing = false;
-    public HeaderBarSearch header = new HeaderBarSearch();
-    private string _currentUser = "";
-    private bool _pageHasError = false;
-
-    public async Task ValidSubmit()
-    {
-        var isUpdate = this.LogRef.HasValue;
-
-        if (!isUpdate)
-            await SaveRecord();
-        else
-            await UpdateRecord();
-
-        await SaveCompleted();
-    }
-
-    private async Task Vazgec()
-    {
-        await SaveCompleted();
-    }
-
-    private async Task SaveCompleted()
-    {
-        if (_pageHasError)
-            return;
-
-        if (modalForm.HasValue)
-            await ModalInstance.CloseAsync();
-        else
-            navigation.NavigateTo("/servis_liste");
-    }
-
-    public async Task LoadRecord()
-    {
-        try
-        {
-            this.record = await dataHelper.LoadRecord(this.LogRef.Value);
-            this.MalzemeList = await dataHelper.LoadMalzemeler(this.LogRef.Value);
-            await DosyalariGetir();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
-        }
-    }
-
-    public async Task LoadMalzemeList()
-    {
-        try
-        {
-            this.MalzemeList = await dataHelper.LoadMalzemeler(this.LogRef.Value);
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
-        }
-    }
-
-    public async Task NewRecord()
-    {
-        this.record.Tarih = DateTime.Now;
-        this.record.BildirimTarihi = DateTime.Now;
-        this.record.Durum = "Yönlendirildi";
-        this.record.Evrakno = await yetkiHelper.FisNoAl("servis", "evrakno");
-        this.record.Fisno = await yetkiHelper.FisNoAl("servis", "fisno");
-        this.MalzemeList = new List<ServisMalzemeDto>();
-    }
-
-    private async Task SaveRecord()
-    {
-        try
-        {
-            SubmitValidation();
-        }
-        catch (ClientException ex)
-        {
-            foreach (var item in ex.ErrorList)
+    <div class="form-group mt-3">
+        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
             {
-                Snackbar.Add(item, severity: Severity.Warning);
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Kaydediliyor...</MudText>
             }
-            return;
-        }
-        catch (Exception)
-        {
-        }
-
-        try
-        {
-            _processing = true;
-
-            if (record.Logref == 0)
-                this.record.Logref = await yetkiHelper.RefNoAl("servis");
-
-            this.record.Evrakno = await yetkiHelper.FisNoAl("servis", "evrakno");
-            this.record.Fisno = await yetkiHelper.FisNoAl("servis", "fisno");
-            this.record.Yil = ((short)this.record.Tarih.Year);
-
-            await dataHelper.SaveRecord(record);
-
-            Snackbar.Add("Kayıt eklendi.", severity: Severity.Success);
-
-            this.StateHasChanged();
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
-        }
-        finally
-        {
-            _processing = false;
-        }
-    }
-
-    private async Task UpdateRecord()
-    {
-        try
-        {
-            SubmitValidation();
-        }
-        catch (ClientException ex)
-        {
-            foreach (var item in ex.ErrorList)
+            else
             {
-                Snackbar.Add(item, severity: Severity.Warning);
+                <MudText>Kaydet</MudText>
             }
-            return;
-        }
-        catch (Exception)
+        </MudButton>
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+
+
+    @code {
+        [Parameter]
+        public int? LogRef { get; set; }
+
+        [Parameter]
+        public int? modalForm { get; set; }
+
+        [CascadingParameter] IModalService modal { get; set; }
+        [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+        [Inject]
+        ILocalStorageService LocalStorageService { get; set; }
+
+        [Inject]
+        ModalManager ModalManager { get; set; }
+
+        [Inject]
+        NavigationManager navigation { get; set; }
+
+        [Inject]
+        ISnackbar Snackbar { get; set; }
+
+        [Inject]
+        ServisHelper dataHelper { get; set; }
+
+        [Inject]
+        YetkiHelper yetkiHelper { get; set; }
+
+        [Inject]
+        UploadHelper uploadHelper { get; set; }
+
+        public ServisDto record = new ServisDto();
+        public List<ServisMalzemeDto> MalzemeList { get; set; }
+        IList<IBrowserFile> files = new List<IBrowserFile>();
+        public List<ImageDataDto> dosyalar = new List<ImageDataDto>();
+
+        private bool loadingCompleted = false;
+        private bool _processing = false;
+        public HeaderBarSearch header = new HeaderBarSearch();
+        private string _currentUser = "";
+        private bool _pageHasError = false;
+
+        public async Task ValidSubmit()
         {
-        }
+            var isUpdate = this.LogRef.HasValue;
 
-        try
-        {
-            _processing = true;
+            if (!isUpdate)
+                await SaveRecord();
+            else
+                await UpdateRecord();
 
-            this.record.Yil = ((short)this.record.Tarih.Year);
-            await dataHelper.UpdateRecord(record);
-
-            Snackbar.Add("Kayıt güncellendi", severity: Severity.Success);
-
-        }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
-        }
-        finally
-        {
-            _processing = false;
-        }
-    }
-
-    public void SubmitValidation()
-    {
-        _pageHasError = false;
-
-        var err = new List<string>();
-
-        if (string.IsNullOrWhiteSpace(record.Evrakno))
-            err.Add("Evrak No boş geçilemez");
-
-        if (record.Cariref == 0 || record.Cariref == null)
-            err.Add("Müşteri bilgisi boş geçilemez");
-
-        if (record.Bayiref == 0 || record.Bayiref == null)
-            err.Add("Bayi bilgisi boş geçilemez");
-
-        if (record.Tservisref == 0 || record.Tservisref == null)
-            err.Add("Servis bilgisi boş geçilemez");
-
-        if (string.IsNullOrEmpty(record.Istipi))
-            err.Add("İş tipi boş geçilemez");
-
-        if (string.IsNullOrEmpty(record.IlgiliKisi) || string.IsNullOrEmpty(record.ServisIlgiliKisi) || string.IsNullOrEmpty(record.BayiIlgiliKisi))
-            err.Add("İlgili kişi bilgileri geçilemez");
-
-        if (err.Count > 0)
-        {
-            _pageHasError = true;
-
-            var ex = new ClientException("Kayıt Hatası");
-            ex.ErrorList = err;
-
-            throw ex;
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        header.HeaderText = "Servis Bilgileri";
-
-        var isUpdate = this.LogRef.HasValue;
-
-        loadingCompleted = false;
-
-        _currentUser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-
-        if (isUpdate)
-            await LoadRecord();
-        else
-            await NewRecord();
-
-        loadingCompleted = true;
-    }
-
-    public async Task MusteriSec()
-    {
-        var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
-        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
-        var result = await cariForm.Result;
-
-        if (!result.Cancelled)
-        {
-            if (result.Data != null)
-            {
-                var cariSecim = (VCariKartDto)result.Data;
-                record.Cariadi = cariSecim.Adi;
-                record.Carikodu = cariSecim.Kodu;
-                record.Cariref = cariSecim.Logref;
-                record.LcariAdi = cariSecim.Adi;
-                record.LcariKodu = cariSecim.Kodu;
-            }
-        }
-    }
-
-    public async Task BayiSec()
-    {
-        var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
-        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
-        var result = await cariForm.Result;
-
-        if (!result.Cancelled)
-        {
-            if (result.Data != null)
-            {
-                var cariSecim = (VCariKartDto)result.Data;
-                record.Bayiadi = cariSecim.Adi;
-                record.Bayikodu = cariSecim.Kodu;
-                record.Bayiref = cariSecim.Logref;
-                record.LbayiAdi = cariSecim.Adi;
-                record.LbayiKodu = cariSecim.Kodu;
-            }
-        }
-    }
-
-    public async Task ServisSec()
-    {
-        var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
-        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
-        var result = await cariForm.Result;
-
-        if (!result.Cancelled)
-        {
-            if (result.Data != null)
-            {
-                var cariSecim = (VCariKartDto)result.Data;
-                record.Servisadi = cariSecim.Adi;
-                record.Serviskodu = cariSecim.Kodu;
-                record.Tservisref = cariSecim.Logref;
-                record.LtservisAdi = cariSecim.Adi;
-                record.LtservisKodu = cariSecim.Kodu;
-                record.Il = cariSecim.Il;
-            }
-        }
-    }
-
-    public async Task KisiSec()
-    {
-        if (!record.Cariref.HasValue && !record.Bayiref.HasValue && !record.Tservisref.HasValue)
-            return;
-
-        var CariKartRef = 0;
-
-        if (record.KimYonlendirdi == "MÜŞTERİ")
-            CariKartRef = record.Cariref.Value;
-        else
-        if (record.KimYonlendirdi == "BAYİ")
-            CariKartRef = record.Bayiref.Value;
-        else
-        if (record.KimYonlendirdi == "SATIŞ TEMSİLCİSİ")
-            CariKartRef = 581;
-        else
-            return;
-
-        var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
-        var parameters = new ModalParameters();
-        parameters.Add("CariKartRef", CariKartRef);
-
-        var Form = modal.Show<Components.Cari.CariKartKisiSecComponent>("Kişi Seç", parameters: parameters, options: opt);
-        var result = await Form.Result;
-
-        if (!result.Cancelled)
-        {
-            if (result.Data != null)
-            {
-                var Secim = (KisilerDto)result.Data;
-                record.Yonlendirenkisi = Secim.Tamadi;
-            }
-        }
-    }
-
-    public async Task MalzemeEkle()
-    {
-        if (record.Logref == 0)
-            record.Logref = record.Logref = await yetkiHelper.RefNoAl("servis");
-
-        var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
-        var parameters = new ModalParameters();
-        parameters.Add("modalForm", 1);
-        parameters.Add("servisref", record.Logref);
-
-        var cariForm = modal.Show<ServisMalzemeForm>("Malzeme Ekle", parameters: parameters, options: opt);
-        var result = await cariForm.Result;
-
-        if (!result.Cancelled)
-        {
-            if (result.Data != null)
-            {
-                var Secim = (ServisMalzemeDto)result.Data;
-                MalzemeList.Add(Secim);
-            }
-        }
-    }
-
-    public async Task MalzemeGuncelle(int logref)
-    {
-        var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
-        var parameters = new ModalParameters();
-        parameters.Add("modalForm", 1);
-        parameters.Add("servisref", record.Logref);
-        parameters.Add("logref", logref);
-
-        var cariForm = modal.Show<ServisMalzemeForm>("Malzeme Güncelle", parameters: parameters, options: opt);
-        var result = await cariForm.Result;
-
-        if (!result.Cancelled)
-        {
-            if (result.Data != null)
-            {
-                var Secim = (ServisMalzemeDto)result.Data;
-                await LoadMalzemeList();
-            }
+            await SaveCompleted();
         }
 
-    }
-
-    public async Task MalzemeSil(int logref)
-    {
-        try
+        private async Task Vazgec()
         {
-            var modalRes = await ModalManager.ShowConfirmationAsync("Malzeme silinecek!", "Silmek istediğinizden emin misiniz?", "Evet", "Hayır");
-            if (!modalRes)
+            await SaveCompleted();
+        }
+
+        private async Task SaveCompleted()
+        {
+            if (_pageHasError)
                 return;
 
-            var recordDto = await dataHelper.LoadMalzemeRecord(logref);
-
-            await dataHelper.DeleteMalzemeRecord(recordDto);
-
-            Snackbar.Add("Malzeme silindi");
-
-            await LoadMalzemeList();
+            if (modalForm.HasValue)
+                await ModalInstance.CloseAsync();
+            else
+                navigation.NavigateTo("/servis_liste");
         }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Warning);
-        }
-    }
 
-    private async Task UploadFiles(InputFileChangeEventArgs e)
-    {
-        try
+        public async Task LoadRecord()
         {
-            foreach (var file in e.GetMultipleFiles(1))
+            try
             {
-                files = new List<IBrowserFile>();
-                files.Add(file);
+                this.record = await dataHelper.LoadRecord(this.LogRef.Value);
+                this.MalzemeList = await dataHelper.LoadMalzemeler(this.LogRef.Value);
+                await DosyalariGetir();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Error);
+            }
+        }
+
+        public async Task LoadMalzemeList()
+        {
+            try
+            {
+                this.MalzemeList = await dataHelper.LoadMalzemeler(this.LogRef.Value);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Error);
+            }
+        }
+
+        public async Task NewRecord()
+        {
+            this.record.Tarih = DateTime.Now;
+            this.record.BildirimTarihi = DateTime.Now;
+            this.record.Durum = "Yönlendirildi";
+            this.record.Evrakno = await yetkiHelper.FisNoAl("servis", "evrakno");
+            this.record.Fisno = await yetkiHelper.FisNoAl("servis", "fisno");
+            this.MalzemeList = new List<ServisMalzemeDto>();
+        }
+
+        private async Task SaveRecord()
+        {
+            try
+            {
+                SubmitValidation();
+            }
+            catch (ClientException ex)
+            {
+                foreach (var item in ex.ErrorList)
+                {
+                    Snackbar.Add(item, severity: Severity.Warning);
+                }
+                return;
+            }
+            catch (Exception)
+            {
             }
 
-            foreach (var file in files)
+            try
             {
-                var buffers = new byte[file.Size];
-                await file.OpenReadStream().ReadAsync(buffers);
+                _processing = true;
 
-                var myfile = new FileDataDto();
-                myfile.Data = buffers;
-                myfile.FileName = file.Name;
-                myfile.FileType = file.ContentType;
+                if (record.Logref == 0)
+                    this.record.Logref = await yetkiHelper.RefNoAl("servis");
 
-                var uploadedFile = await uploadHelper.Upload(myfile);
+                this.record.Evrakno = await yetkiHelper.FisNoAl("servis", "evrakno");
+                this.record.Fisno = await yetkiHelper.FisNoAl("servis", "fisno");
+                this.record.Yil = ((short)this.record.Tarih.Year);
 
-                files = null;
+                await dataHelper.SaveRecord(record);
 
-                await uploadHelper.Save(new FileUploadRequestDto()
+                Snackbar.Add("Kayıt eklendi.", severity: Severity.Success);
+
+                this.StateHasChanged();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Error);
+            }
+            finally
+            {
+                _processing = false;
+            }
+        }
+
+        private async Task UpdateRecord()
+        {
+            try
+            {
+                SubmitValidation();
+            }
+            catch (ClientException ex)
+            {
+                foreach (var item in ex.ErrorList)
                 {
-                    File = new FileUploadDto()
+                    Snackbar.Add(item, severity: Severity.Warning);
+                }
+                return;
+            }
+            catch (Exception)
+            {
+            }
+
+            try
+            {
+                _processing = true;
+
+                this.record.Yil = ((short)this.record.Tarih.Year);
+                await dataHelper.UpdateRecord(record);
+
+                Snackbar.Add("Kayıt güncellendi", severity: Severity.Success);
+
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Error);
+            }
+            finally
+            {
+                _processing = false;
+            }
+        }
+
+        public void SubmitValidation()
+        {
+            _pageHasError = false;
+
+            var err = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(record.Evrakno))
+                err.Add("Evrak No boş geçilemez");
+
+            if (record.Cariref == 0 || record.Cariref == null)
+                err.Add("Müşteri bilgisi boş geçilemez");
+
+            if (record.Bayiref == 0 || record.Bayiref == null)
+                err.Add("Bayi bilgisi boş geçilemez");
+
+            if (record.Tservisref == 0 || record.Tservisref == null)
+                err.Add("Servis bilgisi boş geçilemez");
+
+            if (string.IsNullOrEmpty(record.Istipi))
+                err.Add("İş tipi boş geçilemez");
+
+            if (string.IsNullOrEmpty(record.IlgiliKisi) || string.IsNullOrEmpty(record.ServisIlgiliKisi) || string.IsNullOrEmpty(record.BayiIlgiliKisi))
+                err.Add("İlgili kişi bilgileri geçilemez");
+
+            if (err.Count > 0)
+            {
+                _pageHasError = true;
+
+                var ex = new ClientException("Kayıt Hatası");
+                ex.ErrorList = err;
+
+                throw ex;
+            }
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            header.HeaderText = "Servis Bilgileri";
+
+            var isUpdate = this.LogRef.HasValue;
+
+            loadingCompleted = false;
+
+            _currentUser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            if (isUpdate)
+                await LoadRecord();
+            else
+                await NewRecord();
+
+            loadingCompleted = true;
+        }
+
+        public async Task MusteriSec()
+        {
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+            var result = await cariForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    var cariSecim = (VCariKartDto)result.Data;
+                    record.Cariadi = cariSecim.Adi;
+                    record.Carikodu = cariSecim.Kodu;
+                    record.Cariref = cariSecim.Logref;
+                    record.LcariAdi = cariSecim.Adi;
+                    record.LcariKodu = cariSecim.Kodu;
+                }
+            }
+        }
+
+        public async Task BayiSec()
+        {
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+            var result = await cariForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    var cariSecim = (VCariKartDto)result.Data;
+                    record.Bayiadi = cariSecim.Adi;
+                    record.Bayikodu = cariSecim.Kodu;
+                    record.Bayiref = cariSecim.Logref;
+                    record.LbayiAdi = cariSecim.Adi;
+                    record.LbayiKodu = cariSecim.Kodu;
+                }
+            }
+        }
+
+        public async Task ServisSec()
+        {
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+            var result = await cariForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    var cariSecim = (VCariKartDto)result.Data;
+                    record.Servisadi = cariSecim.Adi;
+                    record.Serviskodu = cariSecim.Kodu;
+                    record.Tservisref = cariSecim.Logref;
+                    record.LtservisAdi = cariSecim.Adi;
+                    record.LtservisKodu = cariSecim.Kodu;
+                    record.Il = cariSecim.Il;
+                }
+            }
+        }
+
+        public async Task KisiSec()
+        {
+            if (!record.Cariref.HasValue && !record.Bayiref.HasValue && !record.Tservisref.HasValue)
+                return;
+
+            var CariKartRef = 0;
+
+            if (record.KimYonlendirdi == "MÜŞTERİ")
+                CariKartRef = record.Cariref.Value;
+            else
+            if (record.KimYonlendirdi == "BAYİ")
+                CariKartRef = record.Bayiref.Value;
+            else
+            if (record.KimYonlendirdi == "SATIŞ TEMSİLCİSİ")
+                CariKartRef = 581;
+            else
+                return;
+
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            var parameters = new ModalParameters();
+            parameters.Add("CariKartRef", CariKartRef);
+
+            var Form = modal.Show<Components.Cari.CariKartKisiSecComponent>("Kişi Seç", parameters: parameters, options: opt);
+            var result = await Form.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    var Secim = (KisilerDto)result.Data;
+                    record.Yonlendirenkisi = Secim.Tamadi;
+                }
+            }
+        }
+
+        public async Task MalzemeEkle()
+        {
+            if (record.Logref == 0)
+                record.Logref = record.Logref = await yetkiHelper.RefNoAl("servis");
+
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            var parameters = new ModalParameters();
+            parameters.Add("modalForm", 1);
+            parameters.Add("servisref", record.Logref);
+
+            var cariForm = modal.Show<ServisMalzemeForm>("Malzeme Ekle", parameters: parameters, options: opt);
+            var result = await cariForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    var Secim = (ServisMalzemeDto)result.Data;
+                    MalzemeList.Add(Secim);
+                }
+            }
+        }
+
+        public async Task MalzemeGuncelle(int logref)
+        {
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+
+            var parameters = new ModalParameters();
+            parameters.Add("modalForm", 1);
+            parameters.Add("servisref", record.Logref);
+            parameters.Add("logref", logref);
+
+            var cariForm = modal.Show<ServisMalzemeForm>("Malzeme Güncelle", parameters: parameters, options: opt);
+            var result = await cariForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    var Secim = (ServisMalzemeDto)result.Data;
+                    await LoadMalzemeList();
+                }
+            }
+
+        }
+
+        public async Task MalzemeSil(int logref)
+        {
+            try
+            {
+                var modalRes = await ModalManager.ShowConfirmationAsync("Malzeme silinecek!", "Silmek istediğinizden emin misiniz?", "Evet", "Hayır");
+                if (!modalRes)
+                    return;
+
+                var recordDto = await dataHelper.LoadMalzemeRecord(logref);
+
+                await dataHelper.DeleteMalzemeRecord(recordDto);
+
+                Snackbar.Add("Malzeme silindi");
+
+                await LoadMalzemeList();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Warning);
+            }
+        }
+
+        private async Task UploadFiles(InputFileChangeEventArgs e)
+        {
+            try
+            {
+                foreach (var file in e.GetMultipleFiles(1))
+                {
+                    files = new List<IBrowserFile>();
+                    files.Add(file);
+                }
+
+                foreach (var file in files)
+                {
+                    var buffers = new byte[file.Size];
+                    var maxSize = 1024 * 1024 * 8; //8 Mb 
+                    await file.OpenReadStream(maxAllowedSize: maxSize).ReadAsync(buffers);
+
+                    var myfile = new FileDataDto();
+                    myfile.Data = buffers;
+                    myfile.FileName = file.Name;
+                    myfile.FileType = file.ContentType;
+
+                    var uploadedFile = await uploadHelper.Upload(myfile);
+
+                    files = null;
+
+                    await uploadHelper.Save(new FileUploadRequestDto()
                     {
-                        FileName = uploadedFile.FileName,
-                        Image = uploadedFile.Image,
-                        ImageFilePath = uploadedFile.ImageFilePath,
-                        ImageType = uploadedFile.ImageType,
-                        TableLogRef = record.Logref,
-                        TableName = "servis"
-                    }
-                });
+                        File = new FileUploadDto()
+                        {
+                            FileName = uploadedFile.FileName,
+                            Image = uploadedFile.Image,
+                            ImageFilePath = uploadedFile.ImageFilePath,
+                            ImageType = uploadedFile.ImageType,
+                            TableLogRef = record.Logref,
+                            TableName = "servis"
+                        }
+                    });
+
+                    await DosyalariGetir();
+
+                    Snackbar.Add("Dosya yüklendi : " + uploadedFile.FileName, severity: Severity.Success);
+                }
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Error);
+            }
+        }
+
+        public async Task DosyalariGetir()
+        {
+            try
+            {
+                var request = new FileUploadRequestDto();
+                request.TableLogref = record.Logref;
+                request.TableName = "servis";
+
+                dosyalar = await uploadHelper.GetList(request);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Error);
+            }
+
+        }
+
+        public async Task DeleteFile(int logref)
+        {
+            try
+            {
+                var request = new FileUploadRequestDto();
+                request.File = new FileUploadDto() { LogRef = logref };
+                await uploadHelper.DeleteFile(request);
+
+                Snackbar.Add("Dosya silindi", severity: Severity.Success);
 
                 await DosyalariGetir();
-
-                Snackbar.Add("Dosya yüklendi : " + uploadedFile.FileName, severity: Severity.Success);
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Error);
             }
         }
-        catch (Exception ex)
-        {
-            Snackbar.Add(ex.Message, severity: Severity.Error);
-        }
     }
-
-    public async Task DosyalariGetir()
-    {
-        var request = new FileUploadRequestDto();
-        request.TableLogref = record.Logref;
-        request.TableName = "servis";
-
-        dosyalar = await uploadHelper.GetList(request);
-    }
-}

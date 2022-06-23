@@ -110,6 +110,24 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpPost("delete")]
+        public async Task<ServiceResponse<bool>> DosyaSil(FileUploadRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<bool>()
+                {
+                    Value = await fileUpload.DeleteFile(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
 
+                var e = new ServiceResponse<bool>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }
