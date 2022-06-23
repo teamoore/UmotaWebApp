@@ -15,5 +15,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<FileUploadDto> Upload(FileDataDto file);
         public Task<ImageDataDto> Save(FileUploadRequestDto request);
         public Task<List<ImageDataDto>> GetList(FileUploadRequestDto request);
+        public Task<bool> DeleteFile(FileUploadRequestDto request);
     }
 }

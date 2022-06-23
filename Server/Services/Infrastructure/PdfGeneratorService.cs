@@ -275,5 +275,56 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         }
 
 
+        #region Servis
+
+        private string CreateServisBilgilendirmeHtml(ServisDto servis)
+        {
+            var css = Environment.CurrentDirectory + @"\Media\css\bootstrap.min.css";
+            var path = Environment.CurrentDirectory + "\\Media\\logo\\logo.jpeg";
+            var path_opac = Environment.CurrentDirectory + "\\Media\\logo\\logo_opac3.png";
+
+            var str = "<html><head>" +
+                "<link href='" + css + "' rel='stylesheet' type='text/css' media='screen'/>"
+
+                + "</head>" +
+                "<body style='font-family:Roboto,Arial;'>" +
+                @"<table style='width:100%;background-color:#4700D8;text-align:center;color:white;font-weight:bold;font-family:Roboto,Arial;'><tr><td style='height:30px;'>SERVİS BİLGİLENDİRME FORMU</td></tr></table><div class='container'>";
+
+            str += @"<table class='table table-striped'><tr><td></td><td></td></tr></table>";
+
+            return str;
+        }
+
+        public MemoryStream CreateServisBilgilendirmePdf(ServisDto servis)
+        {
+            var doc = new HtmlToPdfDocument()
+            {
+                GlobalSettings = {
+                        ColorMode = ColorMode.Color,
+                        Orientation = Orientation.Portrait,
+                        PaperSize = PaperKind.A4,
+                        Margins = new MarginSettings { Top = 18, Bottom = 18 },
+                        },
+                Objects = {
+                        new ObjectSettings() {
+                            PagesCount = true,
+                            HtmlContent = CreateServisBilgilendirmeHtml(servis),
+                            WebSettings = {
+                                DefaultEncoding = "utf-8"
+                            },
+
+                            HeaderSettings = { FontSize = 11, Right = "Page [page] of [toPage]", Line = true, Spacing = 2.812 },
+                            FooterSettings = { FontSize = 9, Spacing = 2.8, FontName = "Roboto", Center = "Uno Endüstriyel - www.unoendustriyel.com" }
+                        }
+                         }
+            };
+
+            byte[] pdf = converter.Convert(doc);
+
+            return new MemoryStream(pdf);
+        }
+
+        #endregion
+
     }
 }
