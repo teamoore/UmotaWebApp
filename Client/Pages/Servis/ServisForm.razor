@@ -381,52 +381,65 @@
 
 
 
-    <div class="form-group mt-3">
-        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
-            @if (_processing)
-            {
-                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-                <MudText Class="ms-2">Kaydediliyor...</MudText>
-            }
-            else
-            {
-                <MudText>Kaydet</MudText>
-            }
-        </MudButton>
-        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
-    </div>
+<div class="form-group mt-3">
+    <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+        @if (_processing)
+        {
+            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+            <MudText Class="ms-2">Kaydediliyor...</MudText>
+        }
+        else
+        {
+            <MudText>Kaydet</MudText>
+        }
+    </MudButton>
+
+    <MudButton Disabled="@_processing" OnClick="BilgilendirmeGonder" Variant="Variant.Filled" Color="Color.Secondary">
+        @if (_processing)
+        {
+            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+            <MudText Class="ms-2">Gönderiliyor...</MudText>
+        }
+        else
+        {
+            <MudText>Bilgilendirme Gönder</MudText>
+        }
+    </MudButton>
+
+    <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+</div>
 
 
     @code {
-        [Parameter]
-        public int? LogRef { get; set; }
+            [Parameter]
+            public int? LogRef { get; set; }
 
-        [Parameter]
-        public int? modalForm { get; set; }
+            [Parameter]
+            public int? modalForm { get; set; }
 
-        [CascadingParameter] IModalService modal { get; set; }
-        [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+            [CascadingParameter] IModalService modal { get; set; }
+            [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
 
-        [Inject]
-        ILocalStorageService LocalStorageService { get; set; }
+            [Inject]
+            ILocalStorageService LocalStorageService { get; set; }
 
-        [Inject]
-        ModalManager ModalManager { get; set; }
+            [Inject]
+            ModalManager ModalManager { get; set; }
 
-        [Inject]
-        NavigationManager navigation { get; set; }
+            [Inject]
+            NavigationManager navigation { get; set; }
 
-        [Inject]
-        ISnackbar Snackbar { get; set; }
+            [Inject]
+            ISnackbar Snackbar { get; set; }
 
-        [Inject]
-        ServisHelper dataHelper { get; set; }
+            [Inject]
+            ServisHelper dataHelper { get; set; }
 
-        [Inject]
-        YetkiHelper yetkiHelper { get; set; }
+            [Inject]
+            YetkiHelper yetkiHelper { get; set; }
 
-        [Inject]
-        UploadHelper uploadHelper { get; set; }
+            [Inject]
+            UploadHelper uploadHelper { get; set; }
 
         public ServisDto record = new ServisDto();
         public List<ServisMalzemeDto> MalzemeList { get; set; }
@@ -891,6 +904,26 @@
                 Snackbar.Add("Dosya silindi", severity: Severity.Success);
 
                 await DosyalariGetir();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add(ex.Message, severity: Severity.Error);
+            }
+        }
+
+        public async Task BilgilendirmeGonder()
+        {
+            try
+            {
+                var result = await dataHelper.SendMailServisBilgilendirme(this.record);
+
+                if (result.isSuccess)
+                {
+                    Snackbar.Add("Servis Bilgilendirme, carinin e-posta adresine gönderildi.", severity: Severity.Success);
+                    return;
+                }
+
+                Snackbar.Add(result.)
             }
             catch (Exception ex)
             {

@@ -216,5 +216,28 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             return result;
         }
+
+        /// <summary>
+        /// Müşterinin email adresine servisle ilgili bilgilendirme atar
+        /// </summary>
+        /// <param name="servisDto"></param>
+        /// <returns></returns>
+        public async Task<PdfGenerateResponseDto> SendMailServisBilgilendirme(ServisDto servisDto)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var request = new PdfServisGeneratorRequestDto();
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+            request.Kullanici = kullanicikodu;
+
+            var result = await httpClient.PostGetServiceResponseAsync<PdfGenerateResponseDto, PdfServisGeneratorRequestDto>(UrlHelper.PdfServisBilgilendirme, request);
+
+            return result;
+        }
     }
 }

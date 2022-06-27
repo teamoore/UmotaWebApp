@@ -9,6 +9,7 @@ namespace UmotaWebApp.Shared.ModelDto
     public class PdfGenerateResponseDto
     {
         public bool isSuccess { get; set; }
+        public string Message { get; set; }
         public string PdfPath { get; set; }
         public byte[] PdfFile { get; set; }
     }
