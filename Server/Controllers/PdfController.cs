@@ -182,7 +182,7 @@ namespace UmotaWebApp.Server.Controllers
                 var file = "";
                 byte[] pdfData = null;
 
-                using (MemoryStream pdfStream = pdf.CreateServisBilgilendirmePdf(request.Servis))
+                using (MemoryStream pdfStream = pdf.CreateServisBilgilendirmePdf(request.Servis,request.Malzemeler))
                 {
                     var g = Guid.NewGuid();
 

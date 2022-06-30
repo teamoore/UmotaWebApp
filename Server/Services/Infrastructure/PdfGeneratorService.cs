@@ -277,7 +277,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         #region Servis
 
-        private string CreateServisBilgilendirmeHtml(ServisDto servis)
+        private string CreateServisBilgilendirmeHtml(ServisDto servis, List<ServisMalzemeDto> malzemeler)
         {
             var css = Environment.CurrentDirectory + @"\Media\css\bootstrap.min.css";
             var path = Environment.CurrentDirectory + "\\Media\\logo\\logo.jpeg";
@@ -290,12 +290,88 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 "<body style='font-family:Roboto,Arial;'>" +
                 @"<table style='width:100%;background-color:#4700D8;text-align:center;color:white;font-weight:bold;font-family:Roboto,Arial;'><tr><td style='height:30px;'>SERVİS BİLGİLENDİRME FORMU</td></tr></table><div class='container'>";
 
-            str += @"<table class='table table-striped'><tr><td></td><td></td></tr></table>";
+            str += @" 
+<table class='table table-striped'><tr><td></td>
+	<td style='text-align:center;'><img style='height:150px;' src='" + path + @"'></td>
+<td style='width:200px;'></br></br>
+<b>TARİH</b> : "+ DateTime.Now.ToShortDateString() +@"
+</br><b>Fiş No:</b>"+ servis.Fisno +@"
+</td>
+  </tr>
+  </table>
+<hr/>";
+
+            str += "<p><b>SAYIN:</b></p>";
+            str += "<p>"+ servis.Servisadi +"</br>"+ servis.ServisIlgiliKisi +"</p>";
+
+            str += @"<p><b>Merhaba</b></p><p>Aşağıda detayları belirtilmiş olan talep siz değerli çözüm ortağımıza yönlendirilmiş olup, en geç 24
+saat içerisinde müdahale edilmesini ve verilen servise müteakip konu ile ilgili tarafımızın bilgilendirilmesini rica ediyoruz. 
+İlgili servis formunun eksiksiz ve zamanında gönderilmesi konusunda hassasiyetiniz için teşekkür ederiz.</p>";
+
+            str += @"<p><b>MÜŞTERİ:</b></br>" + servis.Cariadi + "</br>" + servis.IlgiliKisi + "</br>" + servis.IslemAdresi;
+            str += "</br>" + servis.IslemIlce + "</br>" + servis.IslemSehir;
+            str += "</p>";
+
+            str += "<p><b>CİHAZ:</b></br>";
+            if (malzemeler != null && malzemeler.Count > 0 )
+            {
+                foreach (var item in malzemeler)
+                {
+                    str += item.LstokAdi + "</br>";
+                }
+            }
+            str += "</p>";
 
             return str;
         }
 
-        public MemoryStream CreateServisBilgilendirmePdf(ServisDto servis)
+        private string CreateMusteriBilgilendirmeHtml(ServisDto servis, List<ServisMalzemeDto> malzemeler)
+        {
+            var css = Environment.CurrentDirectory + @"\Media\css\bootstrap.min.css";
+            var path = Environment.CurrentDirectory + "\\Media\\logo\\logo.jpeg";
+            var path_opac = Environment.CurrentDirectory + "\\Media\\logo\\logo_opac3.png";
+
+            var str = "<html><head>" +
+                "<link href='" + css + "' rel='stylesheet' type='text/css' media='screen'/>"
+
+                + "</head>" +
+                "<body style='font-family:Roboto,Arial;'>" +
+                @"<table style='width:100%;background-color:#4700D8;text-align:center;color:white;font-weight:bold;font-family:Roboto,Arial;'><tr><td style='height:30px;'>SERVİS BİLGİLENDİRME FORMU</td></tr></table><div class='container'>";
+
+            str += @" 
+<table class='table table-striped'><tr><td></td>
+	<td style='text-align:center;'><img style='height:150px;' src='" + path + @"'></td>
+<td style='width:200px;'></br></br>
+<b>TARİH</b> : " + DateTime.Now.ToShortDateString() + @"
+</td>
+  </tr>
+  </table>
+<hr/>";
+
+            str += "<p><b>SAYIN:</b></p>";
+            str += "<p>" + servis.Cariadi + "</br>" + servis.IlgiliKisi + "</p>";
+
+            str += @"<p><b>Merhaba</b></p><p>Talebiniz doğrultusunda aşağıda detayları bulunan cihazınız ile ilgili servis kaydı oluşturulmuştur.
+Talebiniz servis ekibinin yarınki planlamasına dahil edilmiş olup , günlük iş programında uygun zamanın
+oluşması halinde bugün içersinde müdahele edilecektir. Müdahale edecek servisin iletişim bilgileri aşağıdaki gibidir. 
+Herhangi bir problemle karşılaşmanız durumunda servis@unoendustriyel.com adresinden bizimle irtibata geçebilirsiniz.</p>";
+
+            str += @"<p><b>SERVİS:</b></br>" + servis.Servisadi + "</br>" + servis.ServisIlgiliKisi + "</br>" + servis.ServisIlgiliTel;
+            
+            str += "<p><b>CİHAZ:</b></br>";
+            if (malzemeler != null && malzemeler.Count > 0)
+            {
+                foreach (var item in malzemeler)
+                {
+                    str += item.LstokAdi + "</br>";
+                }
+            }
+            str += "</p>";
+
+            return str;
+        }
+
+        public MemoryStream CreateServisBilgilendirmePdf(ServisDto servis, List<ServisMalzemeDto> malzemeler)
         {
             var doc = new HtmlToPdfDocument()
             {
@@ -308,7 +384,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 Objects = {
                         new ObjectSettings() {
                             PagesCount = true,
-                            HtmlContent = CreateServisBilgilendirmeHtml(servis),
+                            HtmlContent = CreateServisBilgilendirmeHtml(servis,malzemeler),
                             WebSettings = {
                                 DefaultEncoding = "utf-8"
                             },

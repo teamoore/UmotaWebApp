@@ -915,7 +915,7 @@
         {
             try
             {
-                var result = await dataHelper.SendMailServisBilgilendirme(this.record);
+                var result = await dataHelper.SendMailServisBilgilendirme(this.record, MalzemeList);
 
                 if (result.isSuccess)
                 {
@@ -923,7 +923,7 @@
                     return;
                 }
 
-                Snackbar.Add(result.)
+                Snackbar.Add(result.Message, severity: Severity.Warning);
             }
             catch (Exception ex)
             {

@@ -12,6 +12,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     {
         public MemoryStream CreateTeklifDetayPdf(TeklifDto teklif, List<TeklifDetayDto> teklifDetays, SharedEnums.TeklifPdfType teklifPdfType);
 
-        public MemoryStream CreateServisBilgilendirmePdf(ServisDto servis);
+        public MemoryStream CreateServisBilgilendirmePdf(ServisDto servis, List<ServisMalzemeDto> malzemeler);
     }
 }

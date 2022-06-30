@@ -11,5 +11,6 @@ namespace UmotaWebApp.Shared.ModelDto.Request
         public string Kullanici { get; set; }
         public short FirmaId { get; set; }
         public ServisDto Servis { get; set; }
+        public List<ServisMalzemeDto> Malzemeler { get; set; }
     }
 }
