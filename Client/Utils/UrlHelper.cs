@@ -96,5 +96,6 @@ namespace UmotaWebApp.Client.Utils
         public const string FileGetList = "/api/FileUpload/list";
         public const string FileDelete = "/api/FileUpload/delete";
         public const string PdfServisBilgilendirme = "api/Pdf/CreateServisBilgilendirmePdfDocumentSendMail";
+        public const string PdfMusteriBilgilendirme = "api/Pdf/CreateMusteriBilgilendirmePdfDocumentSendMail";
     }
 }

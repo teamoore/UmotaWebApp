@@ -234,5 +234,75 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("CreateMusteriBilgilendirmePdfDocumentSendMail")]
+        public async Task<ServiceResponse<PdfGenerateResponseDto>> CreateMusteriPdfDocumentSendMail(PdfServisGeneratorRequestDto request)
+        {
+            try
+            {
+                if (request.Servis == null)
+                    throw new Exception("Servis kaydı bulunamadı");
+
+                /*Email kontrolü yap*/
+
+                if (string.IsNullOrEmpty(request.Servis.Cariadi))
+                    throw new Exception("Cari adı mevcut değil");
+
+                var filename = "";
+                var file = "";
+                byte[] pdfData = null;
+
+                using (MemoryStream pdfStream = pdf.CreateMusteriBilgilendirmePdf(request.Servis, request.Malzemeler))
+                {
+                    var g = Guid.NewGuid();
+
+                    file = "MusteriBilgi-" + g.ToString() + ".pdf";
+
+                    filename = @$"{Environment.CurrentDirectory}/Media/Files/" + file;
+
+                    FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
+
+                    pdfData = pdfStream.ToArray();
+
+                    await fs.WriteAsync(pdfData, 0, pdfData.Length);
+                    fs.Close();
+                    fs.Dispose();
+
+                    var subject = string.Format("Müşteri Bilgilendirme {0}", request.Servis.Cariadi);
+
+                    //var message = new Message(new string[] { request.teklif.Mail }, subject, subject, pdfData);
+                    //var kullaniciDto = await sisKullaniciService.GetSisKullanici(request.Kullanici);
+
+                    //if (kullaniciDto == null)
+                    //    throw new Exception("Gönderen Kullanıcı bulunamadı");
+                    //if (kullaniciDto.MailAdres.IsValidEmail() == false)
+                    //    throw new Exception("Gönderici mail adresi geçersizdir, lütfen email adresinizi güncelleyiniz");
+                    //if (string.IsNullOrEmpty(kullaniciDto.MailSifre))
+                    //    throw new Exception("Gönderici mail şifresi boş olamaz, lütfen email şifrenizi güncelleyiniz");
+
+                    //message.From = kullaniciDto.MailAdres;
+                    //message.SmtpPassword = kullaniciDto.MailSifre;
+
+                    //_emailSender.SendEmail(message);
+                }
+
+                return new ServiceResponse<PdfGenerateResponseDto>()
+                {
+                    Value = new PdfGenerateResponseDto()
+                    {
+                        isSuccess = true,
+                        PdfPath = file,
+                        PdfFile = pdfData
+                    }
+                };
+
+            }
+            catch (Exception ex)
+            {
+                var e = new ServiceResponse<PdfGenerateResponseDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

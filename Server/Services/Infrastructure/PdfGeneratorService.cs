@@ -400,6 +400,35 @@ Herhangi bir problemle karşılaşmanız durumunda servis@unoendustriyel.com adr
             return new MemoryStream(pdf);
         }
 
+        public MemoryStream CreateMusteriBilgilendirmePdf(ServisDto servis, List<ServisMalzemeDto> malzemeler)
+        {
+            var doc = new HtmlToPdfDocument()
+            {
+                GlobalSettings = {
+                        ColorMode = ColorMode.Color,
+                        Orientation = Orientation.Portrait,
+                        PaperSize = PaperKind.A4,
+                        Margins = new MarginSettings { Top = 18, Bottom = 18 },
+                        },
+                Objects = {
+                        new ObjectSettings() {
+                            PagesCount = true,
+                            HtmlContent = CreateMusteriBilgilendirmeHtml(servis,malzemeler),
+                            WebSettings = {
+                                DefaultEncoding = "utf-8"
+                            },
+
+                            HeaderSettings = { FontSize = 11, Right = "Page [page] of [toPage]", Line = true, Spacing = 2.812 },
+                            FooterSettings = { FontSize = 9, Spacing = 2.8, FontName = "Roboto", Center = "Uno Endüstriyel - www.unoendustriyel.com" }
+                        }
+                         }
+            };
+
+            byte[] pdf = converter.Convert(doc);
+
+            return new MemoryStream(pdf);
+        }
+
         #endregion
 
     }

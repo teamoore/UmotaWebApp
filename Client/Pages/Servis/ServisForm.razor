@@ -411,35 +411,35 @@
 
 
     @code {
-            [Parameter]
-            public int? LogRef { get; set; }
+        [Parameter]
+        public int? LogRef { get; set; }
 
-            [Parameter]
-            public int? modalForm { get; set; }
+        [Parameter]
+        public int? modalForm { get; set; }
 
-            [CascadingParameter] IModalService modal { get; set; }
-            [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+        [CascadingParameter] IModalService modal { get; set; }
+        [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
 
-            [Inject]
-            ILocalStorageService LocalStorageService { get; set; }
+        [Inject]
+        ILocalStorageService LocalStorageService { get; set; }
 
-            [Inject]
-            ModalManager ModalManager { get; set; }
+        [Inject]
+        ModalManager ModalManager { get; set; }
 
-            [Inject]
-            NavigationManager navigation { get; set; }
+        [Inject]
+        NavigationManager navigation { get; set; }
 
-            [Inject]
-            ISnackbar Snackbar { get; set; }
+        [Inject]
+        ISnackbar Snackbar { get; set; }
 
-            [Inject]
-            ServisHelper dataHelper { get; set; }
+        [Inject]
+        ServisHelper dataHelper { get; set; }
 
-            [Inject]
-            YetkiHelper yetkiHelper { get; set; }
+        [Inject]
+        YetkiHelper yetkiHelper { get; set; }
 
-            [Inject]
-            UploadHelper uploadHelper { get; set; }
+        [Inject]
+        UploadHelper uploadHelper { get; set; }
 
         public ServisDto record = new ServisDto();
         public List<ServisMalzemeDto> MalzemeList { get; set; }
@@ -918,12 +918,13 @@
                 var result = await dataHelper.SendMailServisBilgilendirme(this.record, MalzemeList);
 
                 if (result.isSuccess)
-                {
-                    Snackbar.Add("Servis Bilgilendirme, carinin e-posta adresine gönderildi.", severity: Severity.Success);
-                    return;
-                }
+                    Snackbar.Add("Servis Bilgilendirme gönderildi.", severity: Severity.Success);
+                
+                var result2 = await dataHelper.SendMailMusteriBilgilendirme(this.record, MalzemeList);
 
-                Snackbar.Add(result.Message, severity: Severity.Warning);
+                if (result2.isSuccess)
+                    Snackbar.Add("Müşteri Bilgilendirme gönderildi.", severity: Severity.Success);
+                
             }
             catch (Exception ex)
             {
