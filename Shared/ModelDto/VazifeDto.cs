@@ -111,5 +111,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? BaslangicTarihi { get; set; }
         public DateTime? BitirmeTarihi { get; set; }
         public byte? Arsiv { get; set; }
+        public string TureGoreGrup { get; set; }
     }
 }

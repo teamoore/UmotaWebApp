@@ -125,7 +125,7 @@
         GroupName = "Görev Tipi",
         Indentation = false,
         Expandable = false,
-        Selector = (e) => e.VazifeTipi
+        Selector = (e) => e.TureGoreGrup
     };
 
     protected override async Task OnInitializedAsync()
@@ -157,6 +157,7 @@
         mainDataRequest.KullaniciKodu = _currentUser;
         mainDataRequest.TopRowCount = 100;
         mainDataRequest.AdminView = menuYetkiDto.IsAdmin;
+        mainDataRequest.LoginOlanKullanici = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
     }
 
     private async Task LoadList()
@@ -267,6 +268,7 @@
                     mainDataRequest = (VazifeRequestDto)result.Data;
                     mainDataRequest.SearchText = header.SearchText;
                     mainDataRequest.TopRowCount = 0;
+                    mainDataRequest.LoginOlanKullanici = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
 
                     //tümünü getirmek için
                     if (mainDataRequest.Yapildi.HasValue && mainDataRequest.Yapildi.Value == 2)

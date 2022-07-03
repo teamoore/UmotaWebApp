@@ -20,5 +20,6 @@ namespace UmotaWebApp.Shared.ModelDto.Request
         public byte? Yapildi { get; set; }
 
         public byte? Arsiv { get; set; }
+        public string LoginOlanKullanici { get; set; }
     }
 }

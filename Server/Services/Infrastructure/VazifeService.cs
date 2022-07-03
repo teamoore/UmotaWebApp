@@ -49,12 +49,22 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 db.Open();
                 var p = new DynamicParameters();
+                p.Add("@loginUser", value: request.LoginOlanKullanici, dbType: DbType.String);
 
                 string selectstr = "";
                 if (request.TopRowCount > 0)
                     selectstr = "top " + request.TopRowCount;
 
-                var sql = "select " + selectstr + " a.*, a.vazife_tipi VazifeTipi, a.atanan_kisi AtananKisi, a.cari_adi Cariadi, a.son_tarih SonTarih, a.baslangic_tarihi BaslangicTarihi, a.bitirme_tarihi BitirmeTarihi, b.tamadi KisiAdi, a.yapildi, a.oncelik, a.arsiv " +
+                var sql = "select " + selectstr + " a.*, a.vazife_tipi VazifeTipi, a.atanan_kisi AtananKisi, a.cari_adi Cariadi, a.son_tarih SonTarih, a.baslangic_tarihi BaslangicTarihi, a.bitirme_tarihi BitirmeTarihi, b.tamadi KisiAdi, a.yapildi, a.oncelik, a.arsiv ," +
+                    @"coalesce(case 
+	            when a.atanan_kisi = @loginUser and a.vazife_tipi = 'Görev' then 'Görevler (Ben)'
+
+                when a.atanan_kisi <> @loginUser and a.insuser = @loginUser and a.vazife_tipi = 'Görev'  then 'Görevler (Atadıklarım)'
+
+                when a.atanan_kisi = @loginUser and a.vazife_tipi = 'Arama' then 'Aramalar (Ben)'
+
+                when a.atanan_kisi <> @loginUser and a.insuser = @loginUser and a.vazife_tipi = 'Arama'  then 'Aramalar (Atadıklarım)' end,'Tanımsız') as TureGoreGrup " + 
+
                     " from " + Configuration.GetUmotaObjectName("vazife", firmaId: request.FirmaId.ToString()) + " a with(nolock) " +
                     " left outer join  " + Configuration.GetUmotaObjectName("kisiler", firmaId: request.FirmaId.ToString()) + " b with(nolock) on a.kisiref = b.logref " +
                     " where a.status < 2";
