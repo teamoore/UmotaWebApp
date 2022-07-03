@@ -45,33 +45,26 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<List<VazifeDto>> GetVazifes(VazifeRequestDto request)
         {
-            //var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
-            //var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
-            //optionsBuilder.UseSqlServer(connectionstring);
-
-            //using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
-            //{
-            //    List<VazifeDto> results = null;
-
-            //    if (request.AdminView == false)
-            //        results = await dbContext.Vazifes.Where(x => (x.Insuser == request.User || x.AtananKisi == request.User) && x.Status < 2)
-            //                        .ProjectTo<VazifeDto>(Mapper.ConfigurationProvider).ToListAsync();
-            //    else
-            //        results = await dbContext.Vazifes.Where(x => x.Status < 2)
-            //                    .ProjectTo<VazifeDto>(Mapper.ConfigurationProvider).ToListAsync();
-            //    return results;
-            //}
-
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(request.FirmaId.ToString())))
             {
                 db.Open();
                 var p = new DynamicParameters();
+                p.Add("@loginUser", value: request.LoginOlanKullanici, dbType: DbType.String);
 
                 string selectstr = "";
                 if (request.TopRowCount > 0)
                     selectstr = "top " + request.TopRowCount;
 
-                var sql = "select " + selectstr + " a.*, a.vazife_tipi VazifeTipi, a.atanan_kisi AtananKisi, a.cari_adi Cariadi, a.son_tarih SonTarih, a.baslangic_tarihi BaslangicTarihi, a.bitirme_tarihi BitirmeTarihi, b.tamadi KisiAdi" +
+                var sql = "select " + selectstr + " a.*, a.vazife_tipi VazifeTipi, a.atanan_kisi AtananKisi, a.cari_adi Cariadi, a.son_tarih SonTarih, a.baslangic_tarihi BaslangicTarihi, a.bitirme_tarihi BitirmeTarihi, b.tamadi KisiAdi, a.yapildi, a.oncelik, a.arsiv ," +
+                    @"coalesce(case 
+	            when a.atanan_kisi = @loginUser and a.vazife_tipi = 'Görev' then 'Görevler (Ben)'
+
+                when a.atanan_kisi <> @loginUser and a.insuser = @loginUser and a.vazife_tipi = 'Görev'  then 'Görevler (Atadıklarım)'
+
+                when a.atanan_kisi = @loginUser and a.vazife_tipi = 'Arama' then 'Aramalar (Ben)'
+
+                when a.atanan_kisi <> @loginUser and a.insuser = @loginUser and a.vazife_tipi = 'Arama'  then 'Aramalar (Atadıklarım)' end,'Tanımsız') as TureGoreGrup " + 
+
                     " from " + Configuration.GetUmotaObjectName("vazife", firmaId: request.FirmaId.ToString()) + " a with(nolock) " +
                     " left outer join  " + Configuration.GetUmotaObjectName("kisiler", firmaId: request.FirmaId.ToString()) + " b with(nolock) on a.kisiref = b.logref " +
                     " where a.status < 2";
@@ -132,14 +125,23 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     sql += " and a.oncelik = " + request.Oncelik;
                 }
 
-                if (request.Yapildi == 0)
+                if (request.Yapildi.HasValue && request.Yapildi == 0)
                 {
                     sql += " and a.yapildi = 0";
                 }
-                if (request.Yapildi == 1)
+                if (request.Yapildi.HasValue && request.Yapildi == 1)
                 {
                     sql += " and a.yapildi = 1";
                 }
+
+                if (request.Arsiv.HasValue && request.Arsiv == 1)
+                    sql += " and a.arsiv = 1";
+
+                if (request.Arsiv.HasValue && request.Arsiv == 0)
+                    sql += " and (a.arsiv is null or a.arsiv = 0) ";
+                
+                if (request.Arsiv.HasValue == false)
+                    sql += " and (a.arsiv is null or a.arsiv = 0) ";
 
                 sql += " order by vazife_tipi desc, son_tarih asc";
                 var result = await db.QueryAsync<VazifeDto>(sql, p, commandType: CommandType.Text);
