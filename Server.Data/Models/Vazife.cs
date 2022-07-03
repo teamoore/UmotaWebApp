@@ -26,5 +26,7 @@ namespace UmotaWebApp.Server.Data.Models
         public DateTime? Upddate { get; set; }
         public DateTime? BaslangicTarihi { get; set; }
         public DateTime? BitirmeTarihi { get; set; }
+
+        public byte? Arsiv { get; set; }
     }
 }

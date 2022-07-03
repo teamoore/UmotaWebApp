@@ -18,5 +18,7 @@ namespace UmotaWebApp.Shared.ModelDto.Request
         public string Kisiadi { get; set; }
         public byte? Oncelik { get; set; }
         public byte? Yapildi { get; set; }
+
+        public byte? Arsiv { get; set; }
     }
 }

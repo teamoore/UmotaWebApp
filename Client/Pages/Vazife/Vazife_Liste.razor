@@ -11,11 +11,11 @@
 }
 
 @*@if (menuYetkiDto.View == false)
-{
-    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
-}*@
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
+    }*@
 
-<MudTable GroupBy="@_groupDefinition" Items="@mainDataList" FixedHeader="true" Height="500px" SortLabel="Sort By" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
+<MudTable GroupBy="@_groupDefinition" Items="@mainDataList" FixedHeader="true" Height="500px" SortLabel="Sort By" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" RowStyleFunc="RowStyleCondition">
     <ToolBarContent>
         <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
         &nbsp;
@@ -42,6 +42,7 @@
         </MudTh>
         <MudTh>Kaydı Giren</MudTh>
         <MudTh>#</MudTh>
+        <MudTh>#</MudTh>
     </HeaderContent>
     <GroupHeaderTemplate>
         <MudTh Class="mud-table-cell-custom-group" colspan="12">@($"{context.GroupName}: {context.Key}")</MudTh>
@@ -65,7 +66,10 @@
         <MudTd DataLabel="Giriş Tarihi">@context.Insdate</MudTd>
         <MudTd DataLabel="Kaydı Giren">@context.Insuser</MudTd>
         <MudTd>
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Size="Size.Small" />
+            <MudIconButton Icon="@Icons.Material.Filled.Archive" Variant="Variant.Outlined" Color="Color.Warning" OnClick="(() => Arsivle(context.Logref))" Title="Arşive Kaldır" Size="Size.Small" />
+            </MudTd>
+        <MudTd>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Title="Sil" Size="Size.Small" />
         </MudTd>
     </RowTemplate>
     <PagerContent>
@@ -153,7 +157,6 @@
         mainDataRequest.KullaniciKodu = _currentUser;
         mainDataRequest.TopRowCount = 100;
         mainDataRequest.AdminView = menuYetkiDto.IsAdmin;
-        mainDataRequest.Yapildi = 0;
     }
 
     private async Task LoadList()
@@ -205,6 +208,34 @@
         }
     }
 
+    public async Task Arsivle(int logref)
+    {
+        try
+        {
+            var modalRes = await ModalManager.ShowConfirmationAsync("Kayıt arşive kaldırılacak!", "Emin misiniz?", "Evet", "Hayır");
+            if (!modalRes)
+                return;
+
+            //if (menuYetkiDto.Delete == false)
+            //    throw new Exception("Silme yetkiniz bulunmamaktadır");
+
+            loadingCompleted = false;
+
+            var recordDto = await mainDataHelper.LoadRecord(logref);
+            recordDto.Arsiv = 1;
+
+            await mainDataHelper.UpdateRecord(recordDto);
+
+            Snackbar.Add("Kayıt arşive kaldırıldı");
+
+            await LoadList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
     private async Task BtnAraClick()
     {
         mainDataRequest.SearchText = header.SearchText;
@@ -236,6 +267,11 @@
                     mainDataRequest = (VazifeRequestDto)result.Data;
                     mainDataRequest.SearchText = header.SearchText;
                     mainDataRequest.TopRowCount = 0;
+
+                    //tümünü getirmek için
+                    if (mainDataRequest.Yapildi.HasValue && mainDataRequest.Yapildi.Value == 2)
+                        mainDataRequest.Yapildi = null;
+
                     loadingCompleted = false;
                     this.StateHasChanged();
                     await LoadList();
@@ -253,7 +289,7 @@
     public async Task DownloadCsv()
     {
         var content = @"Öncelik;Yapıldı mı;Başlık;Açıklama;Son Tarih;Kayıt Tarihi
-        ";
+    ";
 
         foreach (var item in mainDataList)
         {
@@ -261,6 +297,29 @@
                 + item.SonTarih + ";" + item.Insdate + Environment.NewLine;
         }
         await downloadHelper.DownloadCsv(content);
+    }
+
+    private string RowStyleCondition(VazifeDto vazife, int index)
+    {
+        var style = "background-color:white";
+        switch (vazife.Yapildi)
+        {
+            case 1:
+                style = "background-color:#defae8;text-decoration: line-through;";
+                break;
+            default:
+                style = "background-color:white";
+                break;
+        }
+
+        if (vazife.ArsivMi)
+        {
+            style = "background-color:#f7eddc;";
+
+            style += vazife.YapildiMi ? "text-decoration: line-through;" : "";
+        }
+
+        return style;
     }
 
 }
