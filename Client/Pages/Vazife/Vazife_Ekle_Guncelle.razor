@@ -337,10 +337,13 @@
         {
             _processing = true;
 
+            record.Status = 1;
+            record.Upddate = DateTime.Now;
+            record.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
             await dataHelper.UpdateRecord(record);
 
             Snackbar.Add("Kayıt güncellendi", severity: Severity.Success);
-
         }
         catch (Exception ex)
         {

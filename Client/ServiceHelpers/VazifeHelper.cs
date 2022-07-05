@@ -24,6 +24,9 @@ namespace UmotaWebApp.Client.ServiceHelpers
         public async Task<VazifeDto> DeleteRecord(VazifeDto request)
         {
             request.Status = 2;
+            request.Upddate = DateTime.Now;
+            request.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
             var result = await UpdateRecord(request);
             return result;
         }
@@ -104,10 +107,6 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
-
-            vazife.Upddate = DateTime.Now;
-            vazife.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            vazife.Status = 1;
 
             var request = new VazifeRequestDto();
             request.Vazife = vazife;
