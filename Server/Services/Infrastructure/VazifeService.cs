@@ -196,7 +196,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                var results = dbContext.Vazifes.Where(x => (x.AtananKisi == request.User) && x.Status < 2 && x.Yapildi == 0 && x.Arsiv == 0).Count();
+                var results = dbContext.Vazifes.Where(x => (x.AtananKisi == request.User) && x.Status < 2 && x.Yapildi == 0 && (x.Arsiv == 0 || x.Arsiv == null)).Count();
                 return Task.FromResult(results);
             }
         }
