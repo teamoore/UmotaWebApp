@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace UmotaWebApp.Server.Data.Models
 {
@@ -26,5 +23,10 @@ namespace UmotaWebApp.Server.Data.Models
         public DateTime? Upddate { get; set; }
         public DateTime? BaslangicTarihi { get; set; }
         public DateTime? BitirmeTarihi { get; set; }
+
+        public byte? Arsiv { get; set; }
+        
+        [NotMapped]
+        public string TureGoreGrup { get; set; }
     }
 }

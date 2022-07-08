@@ -222,6 +222,12 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     p.Add("@duruminfo", value: request.Duruminfo, dbType: DbType.String);
                 }
 
+                if (!string.IsNullOrWhiteSpace(request.insuser))
+                {
+                    sql += " and a.insuser like @insuser ";
+                    p.Add("@insuser", value: request.insuser, dbType: DbType.String);
+                }
+
                 sql += " order by insdate desc";
                 var result = await db.QueryAsync<TeklifDto>(sql, p, commandType: CommandType.Text);
 

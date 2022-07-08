@@ -362,7 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Server/wkhtmltox/v0.12.4/64 bit/libwkhtmltox.dll
-/Server/Media/Files/Teklif-d4fd5811-0f9c-4641-a13c-dd650bf01c7e.pdf
-/Server/Media/Files/Teklif-ac809d65-e0a5-4097-9fdc-af066edaa05a.pdf
-/Server/Media/Files/Teklif-a6fe13e2-a4d0-47c7-8681-2d646e53ca40.pdf
-/Server/Media/Files/Teklif-2c4cae1a-67a4-487f-adb2-8b8963f8f3f4.pdf
+*.xlsx
+*.docx
+*.pdf

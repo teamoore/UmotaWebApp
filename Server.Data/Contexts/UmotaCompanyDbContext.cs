@@ -684,6 +684,7 @@ namespace UmotaWebApp.Server.Data.Models
                 entity.Property(e => e.VazifeTipi).HasColumnName("vazife_tipi");
                 entity.Property(e => e.BaslangicTarihi).HasColumnName("baslangic_tarihi");
                 entity.Property(e => e.BitirmeTarihi).HasColumnName("bitirme_tarihi");
+                entity.Property(e => e.Arsiv).HasColumnName("arsiv");
 
                 entity.Property(e => e.Insdate)
                     .HasColumnType("datetime")

@@ -149,6 +149,8 @@
         mainDataRequest.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
         mainDataRequest.TopRowCount = 100;
         mainDataRequest.Duruminfo = duruminfo;
+        if (!string.IsNullOrWhiteSpace(duruminfo))
+            mainDataRequest.insuser = mainDataRequest.kullanicikodu;
     }
 
     private async Task LoadList()
@@ -353,7 +355,7 @@
             content += item.Duruminfo + ";" + item.Teklifno + ";" + item.Revzno + ";" + item.TarihFormatted + ";"
                 + item.Carikodu + ";" + item.Cariadi + ";" + Helper.FormattedDouble(item.Tutarmatrahtl) + ";" +
                 Helper.FormattedDouble(item.Tutarmatrah) + ";" + item.Dovizdokuid +  ";" + item.Proje + ";" +
-                item.Temsilciadi + ";" + item.TeslimTarihiFormatted + ";" + item.Insuser + 
+                item.Temsilciadi + ";" + item.TeslimTarihiFormatted + ";" + item.Insuser +
                 Environment.NewLine;
         }
         await downloadHelper.DownloadCsv(content);

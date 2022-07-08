@@ -20,6 +20,7 @@ namespace UmotaWebApp.Shared.ModelDto
         public string Cariadi { get; set; }
         public int? Revizyon { get; set; }
         public string Duruminfo { get; set; }
+        public string insuser { get; set; }
         public int TopRowCount { get; set; }
     }
 }

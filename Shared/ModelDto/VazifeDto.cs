@@ -20,7 +20,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? Insdate { get; set; }
         public string Upduser { get; set; }
         public DateTime? Upddate { get; set; }
-
         private bool _yapildiMi = false;
         public bool YapildiMi
         {
@@ -39,8 +38,24 @@ namespace UmotaWebApp.Shared.ModelDto
             }
         }
 
-        private string _oncelik = "";
+        private bool _arsivMi = false;
+        public bool ArsivMi
+        {
+            get 
+            {
+                if (this.Arsiv.HasValue && this.Arsiv.Value == 1)
+                    _arsivMi = true;
 
+                return _arsivMi;
+            }
+            set 
+            {
+                _arsivMi = value;
+
+                this.Arsiv = _arsivMi ? byte.Parse("1") : byte.Parse("0");
+            }
+        }
+        private string _oncelik = "";
         public string OncelikAciklama
         {
             get
@@ -67,7 +82,6 @@ namespace UmotaWebApp.Shared.ModelDto
                 return _oncelik;
             }
         }
-
         private string _yapildiAciklama = "";
         public string YapildiAciklama
         {
@@ -88,7 +102,6 @@ namespace UmotaWebApp.Shared.ModelDto
                 return _yapildiAciklama;
             }
         }
-
         public string VazifeTipi { get; set; }
         public int? CariRef { get; set; }
         public string CariAdi { get; set; }
@@ -97,5 +110,7 @@ namespace UmotaWebApp.Shared.ModelDto
         public string KisiAdi { get; set; }
         public DateTime? BaslangicTarihi { get; set; }
         public DateTime? BitirmeTarihi { get; set; }
+        public byte? Arsiv { get; set; }
+        public string TureGoreGrup { get; set; }
     }
 }
