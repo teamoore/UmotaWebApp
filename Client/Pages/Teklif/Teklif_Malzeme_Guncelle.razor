@@ -1,4 +1,4 @@
-﻿@page "/stek_listef_detay/{logref:int}"
+﻿@page "/stek_listef_detay/{logref:int}/{viewmode:int?}"
 @using System.IO;
 @inject IJSRuntime jsRuntime
 
@@ -105,7 +105,10 @@
         <hr />
         <div class="row">
             <div class="col-md-12">
-                <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" OnClick="Duzenle" Color="Color.Primary">Teklif Düzenle</MudButton>
+                @if (!@inceleModu)
+                {
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" OnClick="Duzenle" Color="Color.Primary">Teklif Düzenle</MudButton>
+                }
                 <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Print" OnClick="SayfayiYazdir" Color="Color.Primary">Sayfayı Yazdır</MudButton>
 
                 <MudButtonGroup Color="Color.Primary">
@@ -124,7 +127,7 @@
                 }
 
                 <MudButtonGroup Color="Color.Secondary">
-                    <MudButton >Durum</MudButton>
+                    <MudButton>Durum</MudButton>
                     <MudMenu Icon="@Icons.Material.Filled.Update">
                         <MudMenuItem OnClick="() => TeklifDurumDegistir(logref,null)">Durum Değiştir</MudMenuItem>
                         @if (isAdmin)
@@ -132,7 +135,7 @@
                             <MudMenuItem OnClick="() => TeklifDurumDegistir(logref, 1)">Durum Değiştir (Admin)</MudMenuItem>
                         }
                         <MudMenuItem OnClick="() => TeklifDurumDetay(logref)">Durum Geçmişi</MudMenuItem>
-                        </MudMenu>
+                    </MudMenu>
                 </MudButtonGroup>
             </div>
         </div>
@@ -145,15 +148,20 @@
 
 <MudTable Items="@teklifDetayList" FixedHeader="true" Height="280px" RowsPerPage="1000" Dense="true" Hover="true" Loading="@(loadingCompleted == false)" Bordered="true" Striped="true" Filter="new Func<TeklifDetayDto,bool>(FilterFunc1)">
     <ToolBarContent>
-        <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="TeklifDetayEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        @if (!@inceleModu)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="TeklifDetayEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+        }
         <MudSpacer />
         <MudText Typo="Typo.h6">Teklif Satırları</MudText>
         <MudSpacer />
         <MudTextField @bind-Value="_searchString" Placeholder="Satırlarda Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-    </ToolBarContent>
+        </ToolBarContent>
     <HeaderContent>
-
-        <MudTh>#</MudTh>
+        @if (!@inceleModu)
+        {
+            <MudTh>#</MudTh>
+        }
         <MudTh>Poz No</MudTh>
         <MudTh>Stok Kodu</MudTh>
         <MudTh>Stok Adı</MudTh>
@@ -173,14 +181,18 @@
         <MudTh>İsk-2 %</MudTh>
         <MudTh>İsk-3 %</MudTh>
         <MudTh>Genel %</MudTh>
-        <MudTh>#</MudTh>
-
-
+        @if (!@inceleModu)
+        {
+            <MudTh>#</MudTh>
+        }
     </HeaderContent>
     <RowTemplate>
-        <MudTd>
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" @onclick="(() => TeklifDetayGuncelle(context.Logref))" />
-        </MudTd>
+        @if (!@inceleModu)
+        {
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Edit" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" @onclick="(() => TeklifDetayGuncelle(context.Logref))" />
+            </MudTd>
+        }
         <MudTd DataLabel="Poz No">@context.Sipnosira</MudTd>
         <MudTd DataLabel="Stok Kodu">@context.Malzkodu</MudTd>
         <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
@@ -200,9 +212,12 @@
         <MudTd DataLabel="İsk-2 %">@(Helper.FormattedDouble(context.Iskyuz2))</MudTd>
         <MudTd DataLabel="İsk-3 %">@(Helper.FormattedDouble(context.Iskyuz3))</MudTd>
         <MudTd DataLabel="Genel %">@(Helper.FormattedDouble(context.Iskyuz4))</MudTd>
-        <MudTd>
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
-        </MudTd>
+        @if (!@inceleModu)
+        {
+            <MudTd>
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" @onclick="(() => DeleteTeklifDetay(context.Logref))" />
+            </MudTd>
+        }
     </RowTemplate>
 
     <PagerContent>
@@ -217,6 +232,8 @@
 @code {
     [Parameter]
     public int logref { get; set; }
+    [Parameter]
+    public int? viewmode { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
@@ -243,6 +260,7 @@
     public List<TeklifDetayDto> teklifDetayList { get; set; }
 
     private bool isAdmin = false;
+    private bool inceleModu = false;
     private bool maliyetGorYonetici = false;
     private bool maliyetGorSatisci = false;
 
@@ -278,6 +296,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        if (viewmode != null && viewmode == 1)
+            inceleModu = true;
         await LoadTeklifData();
         await LoadTeklifDetayData();
         await KullaniciYetkileriGetir();
@@ -545,7 +565,7 @@
                     await LoadTeklifData();
                     await LoadTeklifDetayData();
                     this.loadingCompleted = true;
-                }                
+                }
                 else
                     await LoadTeklifData();
             }

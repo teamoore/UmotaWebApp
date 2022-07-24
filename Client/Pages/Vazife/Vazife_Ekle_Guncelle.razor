@@ -140,16 +140,20 @@
                         <MudSwitch @bind-Checked="record.YapildiMi" Label="Yapıldı" Color="Color.Success" />
 
                     </div>
+                    <div class="col-md-4">
+                        <MudSwitch @bind-Checked="record.ArsivMi" Label="Arşive Kaldır" Color="Color.Warning" />
+                    </div>
                 </div>
             </div>
 
             <div class="form-group">
                 <div class="row">
-                    <div class="col-md-4">
-                        <MudSwitch @bind-Checked="record.ArsivMi" Label="Arşive Kaldır" Color="Color.Warning" />
-
+                    <div class="col-md-8">
+                        <label>Yapılanlar</label>
+                        <InputTextArea rows="5" @bind-Value="record.Yapilanlar" class="form-control"></InputTextArea>
                     </div>
                 </div>
+
             </div>
 
             <div class="form-group">
@@ -372,6 +376,9 @@
 
         if (string.IsNullOrEmpty(record.AtananKisi) || record.AtananKisi.Equals("-1"))
             err.Add("Atanacak kişi boş geçilemez");
+
+        if (string.IsNullOrEmpty(record.Yapilanlar) && record.YapildiMi)
+            err.Add("Yapılanlar boş geçilemez");
 
         if (err.Count > 0)
         {

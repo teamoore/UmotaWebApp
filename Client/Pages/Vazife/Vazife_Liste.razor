@@ -34,6 +34,7 @@
         <MudTh>Cari Adı</MudTh>
         <MudTh>Kişi Adı</MudTh>
         <MudTh>Açıklama</MudTh>
+        <MudTh>Yapılanlar</MudTh>
         <MudTh>
             <MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<VazifeDto, object>(x=>x.SonTarih)">Son Tarih</MudTableSortLabel>
         </MudTh>
@@ -62,12 +63,17 @@
                 @context.Aciklama.MinimizeString(50)
             </MudTooltip>
         </MudTd>
+        <MudTd DataLabel="Yapılanlar">
+            <MudTooltip Text="@context.Yapilanlar" Arrow="true" Placement="Placement.Top">
+                @context.Yapilanlar.MinimizeString(50)
+            </MudTooltip>
+        </MudTd>
         <MudTd DataLabel="Görev Tarihi">@context.SonTarih</MudTd>
         <MudTd DataLabel="Giriş Tarihi">@context.Insdate</MudTd>
         <MudTd DataLabel="Kaydı Giren">@context.Insuser</MudTd>
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Archive" Variant="Variant.Outlined" Color="Color.Warning" OnClick="(() => Arsivle(context.Logref))" Title="Arşive Kaldır" Size="Size.Small" />
-            </MudTd>
+        </MudTd>
         <MudTd>
             <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Outlined" Color="Color.Error" OnClick="(() => Sil(context.Logref))" Title="Sil" Size="Size.Small" />
         </MudTd>

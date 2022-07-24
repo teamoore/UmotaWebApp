@@ -25,7 +25,8 @@ namespace UmotaWebApp.Server.Data.Models
         public DateTime? BitirmeTarihi { get; set; }
 
         public byte? Arsiv { get; set; }
-        
+        public string Yapilanlar { get; set; }
+
         [NotMapped]
         public string TureGoreGrup { get; set; }
     }
