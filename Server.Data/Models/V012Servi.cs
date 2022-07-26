@@ -65,5 +65,8 @@ namespace UmotaWebApp.Server.Data.Models
         public string Serviskodu { get; set; }
         public string Servisadi { get; set; }
         public string Il { get; set; }
+        public string MusteriMailAdresi { get; set; }
+        public string ServisMailAdresi { get; set; }
+        public string BayiMailAdresi { get; set; }
     }
 }

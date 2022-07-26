@@ -394,18 +394,6 @@
         }
     </MudButton>
 
-    <MudButton Disabled="@_processing" OnClick="BilgilendirmeGonder" Variant="Variant.Filled" Color="Color.Secondary">
-        @if (_processing)
-        {
-            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-            <MudText Class="ms-2">Gönderiliyor...</MudText>
-        }
-        else
-        {
-            <MudText>Bilgilendirme Gönder</MudText>
-        }
-    </MudButton>
-
     <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
 </div>
 
@@ -911,24 +899,4 @@
             }
         }
 
-        public async Task BilgilendirmeGonder()
-        {
-            try
-            {
-                var result = await dataHelper.SendMailServisBilgilendirme(this.record, MalzemeList);
-
-                if (result.isSuccess)
-                    Snackbar.Add("Servis Bilgilendirme gönderildi.", severity: Severity.Success);
-                
-                var result2 = await dataHelper.SendMailMusteriBilgilendirme(this.record, MalzemeList);
-
-                if (result2.isSuccess)
-                    Snackbar.Add("Müşteri Bilgilendirme gönderildi.", severity: Severity.Success);
-                
-            }
-            catch (Exception ex)
-            {
-                Snackbar.Add(ex.Message, severity: Severity.Error);
-            }
-        }
     }

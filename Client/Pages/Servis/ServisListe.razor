@@ -41,6 +41,8 @@
                 {
                     <MudMenuItem OnClick="(() => Detay(context.Logref))">Değiştir</MudMenuItem>
                 }
+                <MudMenuItem OnClick="(() => ServiseBilgilendirmeGonder(context.Logref))">Servis Bilgilendirme Gönder</MudMenuItem>
+                <MudMenuItem OnClick="(() => MusteriyeBilgilendirmeGonder(context.Logref))">Müşteriye Bilgilendirme Gönder</MudMenuItem>
                 @*<MudMenuItem OnClick="(() => TeklifDurumDetay(context.Logref))">Eski Servis Bilgileri</MudMenuItem>*@
             </MudMenu>
         </MudTd>
@@ -97,6 +99,7 @@
 
     [Inject]
     ServisHelper mainDataHelper { get; set; }
+
 
     public HeaderBarSearch header = new HeaderBarSearch();
     public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
@@ -265,6 +268,44 @@
         //        Environment.NewLine;
         //}
         await downloadHelper.DownloadCsv(content);
+    }
+
+    public async Task ServiseBilgilendirmeGonder(int logref)
+    {
+        try
+        {
+            List<ServisMalzemeDto> MalzemeList = await mainDataHelper.LoadMalzemeler(logref);
+            ServisDto record = await mainDataHelper.LoadRecord(logref);
+
+            var result = await mainDataHelper.SendMailServisBilgilendirme(record, MalzemeList);
+
+            if (result.isSuccess)
+                Snackbar.Add("Servis Bilgilendirme gönderildi.", severity: Severity.Success);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task MusteriyeBilgilendirmeGonder(int logref)
+    {
+        try
+        {
+            List<ServisMalzemeDto> MalzemeList = await mainDataHelper.LoadMalzemeler(logref);
+            ServisDto record = await mainDataHelper.LoadRecord(logref);
+
+            var result2 = await mainDataHelper.SendMailMusteriBilgilendirme(record, MalzemeList);
+
+            if (result2.isSuccess)
+                Snackbar.Add("Müşteri Bilgilendirme gönderildi.", severity: Severity.Success);
+
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
     }
 
 }

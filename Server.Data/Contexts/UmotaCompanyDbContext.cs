@@ -5436,6 +5436,15 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasMaxLength(21)
                     .IsUnicode(false)
                     .HasColumnName("yonlendirenkisi");
+
+                entity.Property(e => e.MusteriMailAdresi)
+                .HasColumnName("MusteriMailAdresi");
+
+                entity.Property(e => e.ServisMailAdresi)
+              .HasColumnName("ServisMailAdresi");
+
+                entity.Property(e => e.BayiMailAdresi)
+              .HasColumnName("BayiMailAdresi");
             });
 
             modelBuilder.Entity<V012ServisMalzemeler>(entity =>
