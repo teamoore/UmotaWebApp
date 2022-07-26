@@ -43,6 +43,7 @@
                 {
                     <MudMenuItem OnClick="(() => TeklifDetay(context.Logref))">Değiştir</MudMenuItem>
                 }
+                <MudMenuItem OnClick="(() => TeklifDetayIncele(context.Logref))">İncele</MudMenuItem>
                 <MudMenuItem OnClick="(() => TeklifDurumDegistir(context.Logref,null))">Durum Değiştir</MudMenuItem>
                 @if (menuYetkiDto.IsAdmin)
                 {
@@ -168,6 +169,11 @@
     public void TeklifDetay(int logref)
     {
         navigation.NavigateTo("/" + updatePage + "/" + logref.ToString());
+    }
+
+    public void TeklifDetayIncele(int logref)
+    {
+        navigation.NavigateTo("/" + updatePage + "/" + logref.ToString()+ "/1");
     }
 
     public void YeniTeklif()

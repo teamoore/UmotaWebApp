@@ -149,9 +149,12 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
+            if ((teklif.NewDuruminfo == TeklifDurum.UnoTeklifiIptalEtti) || (teklif.NewDuruminfo == TeklifDurum.MusteriTeklifiIptalEtti) && (string.IsNullOrWhiteSpace(teklif.TeklifDurumAciklama)))
+                throw new Exception("Açıklama boş geçilemez");
+
             _processing = true;
             this.StateHasChanged();
-  
+
             teklif.Upddate = DateTime.Now;
             teklif.Upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             teklif.Status = 1;
