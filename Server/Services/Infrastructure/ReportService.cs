@@ -63,6 +63,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 p.Add("@OnayDurum", request.OnayDurumu);
                 p.Add("@SiparisTuru", request.SiparisTuru);
                 p.Add("@SadeceBekleyenler", request.SadeceBekleyenler);
+                p.Add("@BaslangicTeslimTarih", request.BaslangicTeslimTarih);
+                p.Add("@BitisTeslimTarih", request.BitisTeslimTarih);
 
                 var res = await db.QueryAsync<SiparisRaporuDto>("UmotaRaporSP_SiparisDurum", p, commandType: CommandType.StoredProcedure);
                 return res.ToList();

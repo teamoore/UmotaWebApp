@@ -14,7 +14,7 @@
     <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
 }
 
-<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" >
+<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true">
     <ToolBarContent>
 
         <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
@@ -40,6 +40,8 @@
         <MudTh>Kredi Kartı</MudTh>
         <MudTh>Kredi Kartı İade</MudTh>
         <MudTh>Virman</MudTh>
+        <MudTh>Tahsilat Toplam</MudTh>
+        <MudTh>İade Toplam</MudTh>
         <MudTh>Toplam</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -63,12 +65,42 @@
         <MudTd DataLabel="Kredi Kartı" Style="text-align:right">@context.kredikartFormatted</MudTd>
         <MudTd DataLabel="Kredi Kartı İade" Style="text-align:right">@context.kredikart_iFormatted</MudTd>
         <MudTd DataLabel="Virman" Style="text-align:right">@context.virmanFormatted</MudTd>
+        <MudTd DataLabel="Tahsilat Toplam" Style="text-align:right">@context.toplam_tahsilatFormatted</MudTd>
+        <MudTd DataLabel="İade Toplam" Style="text-align:right">@context.toplam_iadeFormatted</MudTd>
         <MudTd DataLabel="Toplam" Style="text-align:right">@context.toplamFormatted</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
     </PagerContent>
 </MudTable>
+
+<div class="row mt-2">
+    <div class="col-md-4">
+
+        <MudSimpleTable Dense="true" Hover="false" Loading="@(loadingCompleted == false)" Bordered="false" Striped="false" Style="overflow-x: auto;">
+            <tbody>
+                <tr>
+                    <td>Toplam Tahsilat</td>
+                    <td style="text-align:right">@(Helper.FormattedDouble(this.items.Sum(x => x.toplam_tahsilat)))</td>
+                </tr>
+
+                <tr>
+                    <td>Toplam İade</td>
+                    <td style="text-align:right">@(Helper.FormattedDouble(this.items.Sum(x => x.toplam_iade)))</td>
+                </tr>
+
+                <tr>
+                    <td>Toplam</td>
+                    <td style="text-align:right">@(Helper.FormattedDouble(this.items.Sum(x => x.toplam)))</td>
+                </tr>
+
+            </tbody>
+        </MudSimpleTable>
+
+    </div>
+
+</div>
+
 
 @code
 {
@@ -193,12 +225,12 @@
     public async Task DownloadCsv()
     {
         var content = @"Tarih;Yil;Ay;Gun;Temsilci;Bölge;Cari Kodu;Cari Ünvan;Nakit;Nakit İade;Havale;Havale İade;Çek;Çek İade;Senet;Senet İade;Kredi Kart;Kredi Kart İade;Virman;Toplam
-        ";
+    ";
 
         foreach (var item in items)
         {
             content += item.tarihFormatted + ";" + item.yil + ";" + item.ay + ";" + item.gun + ";" + item.saticiadi + ";" + item.cariozelkod2 + ";"
-                + item.carikodu+ ";" + item.cariadi + ";"
+                + item.carikodu + ";" + item.cariadi + ";"
                 + item.nakitFormatted + ";" + item.nakit_iFormatted + ";" + item.havaleFormatted + ";" + item.havale_iFormatted + ";"
                 + item.cekFormatted + ";" + item.cek_iFormatted + ";" + item.senetFormatted + ";" + item.senet_iFormatted + ";"
                 + item.kredikartFormatted + ";" + item.kredikart_iFormatted + ";" + item.virmanFormatted + ";" + item.toplamFormatted

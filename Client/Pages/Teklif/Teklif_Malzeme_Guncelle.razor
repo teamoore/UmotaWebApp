@@ -165,6 +165,7 @@
         <MudTh>Poz No</MudTh>
         <MudTh>Stok Kodu</MudTh>
         <MudTh>Stok Adı</MudTh>
+        <MudTh>Marka</MudTh>
         <MudTh>Miktar</MudTh>
         <MudTh>Birim</MudTh>
         <MudTh>Net Fiyat</MudTh>
@@ -196,6 +197,7 @@
         <MudTd DataLabel="Poz No">@context.Sipnosira</MudTd>
         <MudTd DataLabel="Stok Kodu">@context.Malzkodu</MudTd>
         <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
+        <MudTd DataLabel="Marka">@context.Marka</MudTd>
         <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
         <MudTd DataLabel="Birim">@context.Birimkodu</MudTd>
         <MudTd DataLabel="Net Fiyat" Style="text-align:right">@(Helper.FormattedDouble(context.NetFiyatid.Value))</MudTd>
@@ -289,6 +291,8 @@
         if (element.LstokAdi != null && element.LstokAdi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         if (element.LstokKodu != null && element.LstokKodu.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Marka != null && element.Marka.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
         return false;

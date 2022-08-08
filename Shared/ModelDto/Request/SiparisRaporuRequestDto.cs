@@ -22,5 +22,7 @@ namespace UmotaWebApp.Shared.ModelDto.Request
         public int SadeceBekleyenler { get; set; }
         public DateTime? BaslangicTarih { get; set; }
         public DateTime? BitisTarih { get; set; }
+        public DateTime? BaslangicTeslimTarih { get; set; }
+        public DateTime? BitisTeslimTarih { get; set; }
     }
 }

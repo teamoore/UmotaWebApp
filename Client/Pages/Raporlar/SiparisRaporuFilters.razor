@@ -8,12 +8,25 @@
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-6">
-                        <label>Başlangıç Tarihi</label>
+                        <label>Başlangıç Sipariş Tarihi</label>
                         <InputDate @bind-Value="raporrequest.BaslangicTarih" class="form-control"></InputDate>
                     </div>
                     <div class="col-md-6">
-                        <label>Bitiş Tarihi</label>
+                        <label>Bitiş Sipariş Tarihi</label>
                         <InputDate @bind-Value="raporrequest.BitisTarih" class="form-control"></InputDate>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Başlangıç Teslim Tarihi</label>
+                        <InputDate @bind-Value="raporrequest.BaslangicTeslimTarih" class="form-control"></InputDate>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Bitiş Teslim Tarihi</label>
+                        <InputDate @bind-Value="raporrequest.BitisTeslimTarih" class="form-control"></InputDate>
                     </div>
                 </div>
             </div>

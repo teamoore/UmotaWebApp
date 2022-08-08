@@ -37,11 +37,43 @@ namespace UmotaWebApp.Shared.ModelDto
                 return this.nakit + this.havale + this.cek + this.senet + this.kredikart + this.virman - this.nakit_i - this.havale_i - this.cek_i - this.senet_i - this.kredikart_i;
             }
         }
+        public double? toplam_tahsilat
+        {
+            get
+            {
+                return this.nakit + this.havale + this.cek + this.senet + this.kredikart + this.virman;
+            }
+        }
+
+        public double? toplam_iade
+        {
+            get
+            {
+                return this.nakit_i + this.havale_i + this.cek_i + this.senet_i + this.kredikart_i;
+            }
+        }
+
         public string toplamFormatted
         {
             get
             {
                 return this.toplam.HasValue ? String.Format("{0:N2}", this.toplam.Value) : "";
+            }
+        }
+
+        public string toplam_tahsilatFormatted
+        {
+            get
+            {
+                return this.toplam_tahsilat.HasValue ? String.Format("{0:N2}", this.toplam_tahsilat.Value) : "";
+            }
+        }
+
+        public string toplam_iadeFormatted
+        {
+            get
+            {
+                return this.toplam_iade.HasValue ? String.Format("{0:N2}", this.toplam_iade.Value) : "";
             }
         }
 
