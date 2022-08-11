@@ -14,7 +14,7 @@
     <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
 }
 
-<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<SiparisRaporuDto,bool>(FilterFunc1)">
+<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="10000" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<SiparisRaporuDto,bool>(FilterFunc1)">
     <HeaderContent>
         <MudTh>Sipariş No</MudTh>
         <MudTh>Onay Durumu</MudTh>
@@ -26,6 +26,8 @@
         <MudTh>Malzeme Adı</MudTh>
         <MudTh>Sipariş Miktarı</MudTh>
         <MudTh>Bekleyen Miktar</MudTh>
+        <MudTh>Stok Miktarı</MudTh>
+        <MudTh>Rezerv Miktarı</MudTh>
         <MudTh>Bekleyen Tutar</MudTh>
         <MudTh>Sipariş Tarihi</MudTh>
         <MudTh>Teslimat Tarihi</MudTh>
@@ -33,8 +35,6 @@
         <MudTh>Geçen Gün</MudTh>
         <MudTh>Şehir</MudTh>
         <MudTh>İlçe</MudTh>
-        <MudTh>Stok Miktarı</MudTh>
-        <MudTh>Rezerv Miktarı</MudTh>
         <MudTh>Arıza Depo</MudTh>
         <MudTh>2.El Depo</MudTh>
     </HeaderContent>
@@ -49,6 +49,8 @@
         <MudTd DataLabel="Malzeme Adı">@context.malztanim</MudTd>
         <MudTd DataLabel="Sipariş Miktarı" Style="text-align:right">@context.miktar</MudTd>
         <MudTd DataLabel="Bekleyen Miktar" Style="text-align:right">@context.kalanmiktar</MudTd>
+        <MudTd DataLabel="Stok Miktarı" Style="text-align:right">@context.stokmik</MudTd>
+        <MudTd DataLabel="Rezerv Miktarı" Style="text-align:right">@context.rezerv</MudTd>
         <MudTd DataLabel="Bekleyen Tutar" Style="text-align:right">@context.bekleyentutarFormatted</MudTd>
         <MudTd DataLabel="Sipariş Tarihi">@context.siparistarihiFormatted</MudTd>
         <MudTd DataLabel="Teslimat Tarihi">@context.teslimattarihiFormatted</MudTd>
@@ -56,8 +58,6 @@
         <MudTd DataLabel="Geçen Gün">@context.gecensure</MudTd>
         <MudTd DataLabel="Şehir">@context.ili</MudTd>
         <MudTd DataLabel="İlçe">@context.ilcesi</MudTd>
-        <MudTd DataLabel="Stok Miktarı" Style="text-align:right">@context.stokmik</MudTd>
-        <MudTd DataLabel="Rezerv Miktarı" Style="text-align:right">@context.rezerv</MudTd>
         <MudTd DataLabel="Arıza Depo" Style="text-align:right">@context.stokmikariza</MudTd>
         <MudTd DataLabel="2.El Depo" Style="text-align:right">@context.stokmik2el</MudTd>
     </RowTemplate>
@@ -84,10 +84,13 @@
     ISnackbar Snackbar { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
 
     public HeaderBarSearch header = new HeaderBarSearch();
 
     public List<SiparisRaporuDto> items = new List<SiparisRaporuDto>();
+    public SiparisRaporuRequestDto mainDataRequest = new SiparisRaporuRequestDto();
+
 
     private string _searchString;
     private bool _sortNameByLength;
@@ -113,7 +116,22 @@
         header.HeaderText = "Bekleyen Siparişler";
         await KullaniciYetkileriGetir();
 
+        await NewDataRequest();
         await Rapor();
+    }
+
+    private async Task NewDataRequest()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        mainDataRequest.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+        mainDataRequest.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+        mainDataRequest.OnayDurumu = 0;
+        mainDataRequest.SiparisTuru = 1;
+        mainDataRequest.SadeceBekleyenler = 1;
     }
 
     public async Task Rapor()
@@ -123,16 +141,12 @@
 
         try
         {
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
-
             var opt = new ModalOptions();
             opt.ContentScrollable = true;
+            modalParameters = new ModalParameters();
+            modalParameters.Add("mainRequest", mainDataRequest);
 
-
-            var filterForm = modal.Show<Pages.Raporlar.SiparisRaporuFilters>("Rapor Seçenekleri", opt);
+            var filterForm = modal.Show<Pages.Raporlar.SiparisRaporuFilters>("Rapor Seçenekleri", modalParameters, opt);
             var result = await filterForm.Result;
 
             if (!result.Cancelled)
@@ -143,10 +157,6 @@
                     this.StateHasChanged();
 
                     var request = (SiparisRaporuRequestDto)result.Data;
-
-                    request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
-                    request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
-
                     var response = await httpClient.PostGetServiceResponseAsync<List<SiparisRaporuDto>, SiparisRaporuRequestDto>(UrlHelper.SiparisRaporu, request);
                     if (response == null || response.Count == 0)
                     {

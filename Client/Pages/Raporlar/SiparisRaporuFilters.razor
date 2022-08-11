@@ -121,6 +121,9 @@
 </EditForm>
 
 @code {
+    [Parameter]
+    public SiparisRaporuRequestDto mainRequest { get; set; }
+
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
 
@@ -143,9 +146,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        raporrequest.OnayDurumu = 0;
-        raporrequest.SiparisTuru = 1;
-        raporrequest.SadeceBekleyenler = 1;
+        if (mainRequest != null)
+            raporrequest = mainRequest;
     }
 
     private async Task Tamam()
