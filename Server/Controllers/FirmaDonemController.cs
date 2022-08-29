@@ -48,5 +48,27 @@ namespace UmotaWebApp.Server.Controllers
             }
 
         }
+
+        [HttpGet("GetOndegerFirmaDonem")]
+        [AllowAnonymous]
+        public async Task<ServiceResponse<SisFirmaDonemDto>> GetSisFirmaDonemOnDegerr(string kullanici_kodu)
+        {
+            try
+            {
+                return new ServiceResponse<SisFirmaDonemDto>()
+                {
+                    Value = await SisFirmaDonemService.GetSisFirmaDonemOnDeger()
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<SisFirmaDonemDto>();
+                e.SetException(ex);
+                return e;
+            }
+
+        }
     }
 }

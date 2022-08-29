@@ -89,6 +89,7 @@
 
     private SisKullaniciLoginRequestDto request = new SisKullaniciLoginRequestDto();
     private List<SisFirmaDonemDto> firmalar = null;
+    private SisFirmaDonemDto onDegerfirma = null;
     private int selectedFirmaDonem = -1;
 
     private SisKullaniciLoginResponseDto response { get; set; }
@@ -101,6 +102,7 @@
     {
         try
         {
+            onDegerfirma = await client.GetServiceResponseAsync<SisFirmaDonemDto>("/api/FirmaDonem/GetOndegerFirmaDonem");
             var result = await client.GetServiceResponseAsync<List<SisFirmaDonemDto>>("/api/FirmaDonem/List?kullanici_kodu=" + request.Kod);
 
             if (result != null && result.Count > 0)
@@ -108,7 +110,7 @@
                 firmalar = result;
                 selectedFirmaDonem = firmalar[0].logref;
 
-               await LocalStorage.SetItemAsync(Consts.DonemFirmalar,firmalar);
+                await LocalStorage.SetItemAsync(Consts.DonemFirmalar,firmalar);
             }
             else
             {
@@ -137,6 +139,7 @@
             var firma = firmalar.Where(x => x.logref == selectedFirmaDonem).SingleOrDefault();
 
             await LocalStorage.SetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem, firma);
+            await LocalStorage.SetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem, onDegerfirma);
 
             (AuthenticationStateProvider as AuthStateProvider).NotifyUserLogin(response.KullaniciDto.KullaniciKodu);
 

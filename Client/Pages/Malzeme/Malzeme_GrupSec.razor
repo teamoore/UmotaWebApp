@@ -50,13 +50,18 @@
     {
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
+        if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+        {
+            var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            if (ondegerFirmaDonem != null)
+                selectedFirmaDonem = ondegerFirmaDonem;
+        }
+
         items = await httpClient.GetServiceResponseAsync<List<SpeCodesDto>>("/api/malzemekart/GetGrupList?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
     }
 
     public async Task Sec(int logref, string kodu, string adi)
     {
-        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
         var res = new SpeCodesDto();
         res.LOGICALREF = logref;
         res.SPECODE = kodu;

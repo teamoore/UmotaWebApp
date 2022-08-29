@@ -41,7 +41,7 @@ namespace UmotaWebApp.Server.Controllers
                 var file = "";
                 byte[] pdfData = null;
 
-                using (MemoryStream pdfStream = pdf.CreateTeklifDetayPdf(request.teklif, request.teklifDetays, request.PdfType))
+                using (MemoryStream pdfStream = pdf.CreateTeklifDetayPdf(request.teklif, request.teklifDetays, request.PdfType, request.FirmaId))
                 {
                     var g = Guid.NewGuid();
                     
@@ -100,7 +100,7 @@ namespace UmotaWebApp.Server.Controllers
                 var file = "";
                 byte[] pdfData = null;
 
-                using (MemoryStream pdfStream = pdf.CreateTeklifDetayPdf(request.teklif, request.teklifDetays, request.PdfType))
+                using (MemoryStream pdfStream = pdf.CreateTeklifDetayPdf(request.teklif, request.teklifDetays, request.PdfType, request.FirmaId))
                 {
                     var g = Guid.NewGuid();
 

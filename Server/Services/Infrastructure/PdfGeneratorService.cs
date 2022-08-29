@@ -21,8 +21,12 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             this.converter = converter;
         }
 
-        public MemoryStream CreateTeklifDetayPdf(TeklifDto teklif, List<TeklifDetayDto> teklifDetays, SharedEnums.TeklifPdfType teklifPdfType)
+        public MemoryStream CreateTeklifDetayPdf(TeklifDto teklif, List<TeklifDetayDto> teklifDetays, SharedEnums.TeklifPdfType teklifPdfType, short FirmaId)
         {
+            string strfooter = "Uno Endüstriyel - www.unoendustriyel.com";
+            if (FirmaId == 101)
+                strfooter = "Makpa Endüstriyel Mutfak - www.makpa.com";
+
             var doc = new HtmlToPdfDocument()
             {
                 GlobalSettings = {
@@ -34,13 +38,13 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 Objects = {
                         new ObjectSettings() {
                             PagesCount = true,
-                            HtmlContent = CreateHtml(teklif,teklifDetays,teklifPdfType),
+                            HtmlContent = CreateHtml(teklif,teklifDetays,teklifPdfType, FirmaId),
                             WebSettings = { 
                                 DefaultEncoding = "utf-8"
                             },
                             
                             HeaderSettings = { FontSize = 11, Right = "Page [page] of [toPage]", Line = true, Spacing = 2.812 },
-                            FooterSettings = { FontSize = 9, Spacing = 2.8, FontName = "Roboto", Center = "Uno Endüstriyel - www.unoendustriyel.com" }
+                            FooterSettings = { FontSize = 9, Spacing = 2.8, FontName = "Roboto", Center = strfooter }
                         }
                          }
             };
@@ -50,11 +54,16 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             return new MemoryStream(pdf);
         }
 
-        private string CreateHtml(TeklifDto teklif, List<TeklifDetayDto> teklifDetays, SharedEnums.TeklifPdfType teklifPdfType)
+        private string CreateHtml(TeklifDto teklif, List<TeklifDetayDto> teklifDetays, SharedEnums.TeklifPdfType teklifPdfType, short FirmaId)
         {
             var css = Environment.CurrentDirectory +  @"\Media\css\bootstrap.min.css";
             var path = Environment.CurrentDirectory + "\\Media\\logo\\logo.jpeg";
             var path_opac = Environment.CurrentDirectory + "\\Media\\logo\\logo_opac3.png";
+            if (FirmaId == 101)
+            {
+                path = Environment.CurrentDirectory + "\\Media\\logo\\logo_makpa.jpeg";
+                path_opac = Environment.CurrentDirectory + "\\Media\\logo\\logo_makpa_opac.png";
+            }
 
             var str = "<html><head>" +
                 "<link href='"+ css +"' rel='stylesheet' type='text/css' media='screen'/>"

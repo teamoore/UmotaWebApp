@@ -83,6 +83,13 @@
         if (selectedFirmaDonem == null)
             throw new Exception("Firma Dönem Seçili değil");
 
+        if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+        {
+            var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            if (ondegerFirmaDonem != null)
+                selectedFirmaDonem = ondegerFirmaDonem;
+        }
+
         try
         {
             SubmitValidation();
@@ -157,6 +164,13 @@
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
         if (selectedFirmaDonem == null)
             throw new Exception("Firma dönem seçilmedi");
+
+        if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+        {
+            var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            if (ondegerFirmaDonem != null)
+                selectedFirmaDonem = ondegerFirmaDonem;
+        }
 
         var result = await httpClient.GetServiceResponseAsync<string>(UrlHelper.FisNoAlLogo +"?table=MARK&keyField=CODE&firmaId=" + selectedFirmaDonem.firma_no.Value + "&logofirmaId=" + selectedFirmaDonem.logo_firma.Value);
         if (string.IsNullOrEmpty(result) == false)

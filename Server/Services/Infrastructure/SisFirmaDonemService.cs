@@ -9,16 +9,24 @@ using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.ModelDto;
+using UmotaWebApp.Server.Data.Models;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using UmotaWebApp.Shared.CustomException;
+using Microsoft.EntityFrameworkCore;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
     public class SisFirmaDonemService : ISisFirmaDonemService
     {
         public IConfiguration Configuration { get; }
-
-        public SisFirmaDonemService(IConfiguration configuration)
+        public UmotaMasterDbContext MasterDbContext { get; }
+        public IMapper Mapper { get; }
+        public SisFirmaDonemService(IMapper mapper, UmotaMasterDbContext masterDbContext, IConfiguration configuration)
         {
+            Mapper = mapper;
             Configuration = configuration;
+            MasterDbContext = masterDbContext;
         }
 
         public async Task<List<SisFirmaDonemDto>> GetSisFirmaDonem(string kullanici)
@@ -37,10 +45,17 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 db.Close();
 
                 return result.OrderByDescending(x => x.ondeger).ThenByDescending(x => x.logref).ToList();
-
             }
+        }
+        public async Task<SisFirmaDonemDto> GetSisFirmaDonemOnDeger()
+        {
+            var firmadonem = await MasterDbContext.SisFirmaDonems.Where(x => x.Ondeger == 1)
+                .ProjectTo<SisFirmaDonemDto>(Mapper.ConfigurationProvider).FirstOrDefaultAsync();
 
+            if (firmadonem == null)
+                throw new ApiException("Öndeğer firma bulunamadı");
 
+            return firmadonem;
         }
     }
 }

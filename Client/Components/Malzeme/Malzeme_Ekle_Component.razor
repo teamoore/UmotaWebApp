@@ -232,6 +232,13 @@
     {
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
+        if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+        {
+            var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            if (ondegerFirmaDonem != null)
+                selectedFirmaDonem = ondegerFirmaDonem;
+        }
+
         specCodeItems = await httpClient.GetServiceResponseAsync<List<SpeCodesDto>>("/api/malzemekart/GetMarkaList?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
 
         specCodeItems = specCodeItems.OrderBy(x => x.DEFINITION_).ToList();
@@ -248,6 +255,13 @@
 
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
+
+            if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+            {
+                var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+                if (ondegerFirmaDonem != null)
+                    selectedFirmaDonem = ondegerFirmaDonem;
+            }
 
             malzeme = await httpClient.GetServiceResponseAsync<MalzemeKartDto>(UrlHelper.MalzemeKartGetir + "?logref=" + MalzemeKartRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
@@ -286,6 +300,13 @@
             _processing = true;
 
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+            {
+                var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+                if (ondegerFirmaDonem != null)
+                    selectedFirmaDonem = ondegerFirmaDonem;
+            }
 
             if (isUpdate)
             {
@@ -353,6 +374,13 @@
         if (selectedFirmaDonem == null)
             throw new Exception("Firma dönem seçilmedi");
 
+        if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+        {
+            var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            if (ondegerFirmaDonem != null)
+                selectedFirmaDonem = ondegerFirmaDonem;
+        }
+
         var result = await httpClient.GetServiceResponseAsync<string>("/api/helper/GenerateRef?table=malz_kart&keyField=kodu&firmaId=" + selectedFirmaDonem.firma_no.Value);
         if (string.IsNullOrEmpty(result) == false)
         {
@@ -392,6 +420,13 @@
 
         if (selectedFirmaDonem == null)
             throw new Exception("Firma Dönem Seçili değil");
+
+        if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+        {
+            var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            if (ondegerFirmaDonem != null)
+                selectedFirmaDonem = ondegerFirmaDonem;
+        }
 
         var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=malz_kart&firmaId=" + selectedFirmaDonem.firma_no.Value);
         malzeme.Logref = result * -1;

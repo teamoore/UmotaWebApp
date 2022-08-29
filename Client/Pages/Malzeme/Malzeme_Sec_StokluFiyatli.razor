@@ -124,6 +124,12 @@
             try
             {
                 var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+                if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+                {
+                    var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+                    if (ondegerFirmaDonem != null)
+                        selectedFirmaDonem = ondegerFirmaDonem;
+                }
 
                 var firma_no = selectedFirmaDonem.firma_no.Value;
 
@@ -154,6 +160,12 @@
                 _processing = true;
 
                 var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+                if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+                {
+                    var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+                    if (ondegerFirmaDonem != null)
+                        selectedFirmaDonem = ondegerFirmaDonem;
+                }
 
                 var request = new MalzemeStokRequestDto();
                 request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;

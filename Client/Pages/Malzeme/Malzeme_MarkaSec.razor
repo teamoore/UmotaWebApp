@@ -92,6 +92,14 @@
     private async Task LoadList()
     {
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+        {
+            var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            if (ondegerFirmaDonem != null)
+                selectedFirmaDonem = ondegerFirmaDonem;
+        }
+
         loadingCompleted = false;
         items = await httpClient.GetServiceResponseAsync<List<SpeCodesDto>>(UrlHelper.GetMarkaList +"?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
         loadingCompleted = true;

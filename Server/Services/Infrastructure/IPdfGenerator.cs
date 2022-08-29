@@ -7,7 +7,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 {
     public interface IPdfGenerator
     {
-        public MemoryStream CreateTeklifDetayPdf(TeklifDto teklif, List<TeklifDetayDto> teklifDetays, SharedEnums.TeklifPdfType teklifPdfType);
+        public MemoryStream CreateTeklifDetayPdf(TeklifDto teklif, List<TeklifDetayDto> teklifDetays, SharedEnums.TeklifPdfType teklifPdfType, short FirmaId);
 
         public MemoryStream CreateServisBilgilendirmePdf(ServisDto servis, List<ServisMalzemeDto> malzemeler);
 

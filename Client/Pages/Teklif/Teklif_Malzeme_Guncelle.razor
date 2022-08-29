@@ -462,6 +462,9 @@
     {
         try
         {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
             _pdfDisabled = true;
             _pdfButtonText = "Pdf Oluşturuluyor...";
 
@@ -470,6 +473,8 @@
             request.teklifDetays = this.teklifDetayList;
             selectedPdfType = (SharedEnums.TeklifPdfType)type;
             request.PdfType = (SharedEnums.TeklifPdfType)type;
+            request.Kullanici = kullanicikodu;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
             var result = await httpClient.PostAsJsonAsync<PdfGeneratorRequestDto>("/api/Pdf/CreateTeklifPdfDocument", request);
             var response = await result.Content.ReadFromJsonAsync<ServiceResponse<PdfGenerateResponseDto>>();
@@ -511,7 +516,6 @@
             var request = new PdfGeneratorRequestDto();
             request.teklif = this.teklif;
             request.teklifDetays = this.teklifDetayList;
-
             request.PdfType = selectedPdfType;
             request.Kullanici = kullanicikodu;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;

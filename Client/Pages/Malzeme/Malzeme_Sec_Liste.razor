@@ -107,6 +107,13 @@
 
                     var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
+                    if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+                    {
+                        var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+                        if (ondegerFirmaDonem != null)
+                            selectedFirmaDonem = ondegerFirmaDonem;
+                    }
+
                     var request = new MalzemeKartRequestDto();
                     request.MalzemeKart = malzemeKart;
                     request.FirmaId = selectedFirmaDonem.firma_no.Value;
@@ -139,6 +146,13 @@
                     _searchStarted = true;
 
                     var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+                    if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+                    {
+                        var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+                        if (ondegerFirmaDonem != null)
+                            selectedFirmaDonem = ondegerFirmaDonem;
+                    }
 
                     var request = new MalzemeKartRequestDto();
                     request.MalzemeKart = malzemeKart;

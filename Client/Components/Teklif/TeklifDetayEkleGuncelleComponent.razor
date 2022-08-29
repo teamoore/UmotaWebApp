@@ -303,6 +303,9 @@
     [Inject]
     ILocalStorageService LocalStorageService { get; set; }
 
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
     [Parameter]
     public int? logRef { get; set; }
 
@@ -617,7 +620,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
-            var result = await httpClient.GetServiceResponseAsync<List<DovizDto>>(UrlHelper.DovizListesi + "?logofirmno=" + selectedFirmaDonem.firma_no);
+            var result = await httpClient.GetServiceResponseAsync<List<DovizDto>>(UrlHelper.DovizListesi + "?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
             if (result != null)
             {
                 DovizListesi = result;
@@ -625,7 +628,6 @@
         }
         catch (Exception)
         {
-
             throw;
         }
     }
@@ -634,7 +636,6 @@
     {
         var opt = new ModalOptions();
         opt.ContentScrollable = true;
-
 
         var form = modal.Show<Pages.Malzeme.Malzeme_Sec_StokluFiyatli>("Malzeme Seç", options: opt);
         var result = await form.Result;
@@ -645,7 +646,6 @@
             {
                 await MalzemeDonusum(result.Data);
             }
-
         }
     }
 
@@ -666,7 +666,6 @@
             {
                 await MalzemeDonusum(result.Data);
             }
-
         }
     }
 
@@ -850,6 +849,13 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
+            if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+            {
+                var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+                if (ondegerFirmaDonem != null)
+                    selectedFirmaDonem = ondegerFirmaDonem;
+            }
+
             var request = new MalzemeFiyatRequestDto();
             request.Tarih = DateTime.Now;
             request.MalzemeRef = teklifDetay.LstokId.Value;
@@ -880,6 +886,13 @@
 
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
+
+            if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+            {
+                var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+                if (ondegerFirmaDonem != null)
+                    selectedFirmaDonem = ondegerFirmaDonem;
+            }
 
             var request = new MalzemeFiyatRequestDto();
             request.Tarih = DateTime.Now;
@@ -1126,27 +1139,11 @@
             {
                 throw new Exception("Döviz tipi seçmelisiniz");
             }
+
             _DovizKuruState = "Çekiliyor...";
-            teklifDetay.Dovizkuru = null;
-
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
-
-            var request = new DovizKuruRequestDto();
-            request.KurTarihi = teklif.Tarih.Value;
-            request.KurTuru = 4;
-            request.DovizTuru = teklifDetay.Dovizref.Value;
-            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
-
-            var result = await httpClient.PostGetServiceResponseAsync<double, DovizKuruRequestDto>(UrlHelper.DovizKuruGetir, request);
-
-            teklifDetay.Dovizkuru = result;
+            teklifDetay.Dovizkuru = await yetkiHelper.DovizKuruAl(teklifDetay.Dovizref.Value, teklif.Tarih.Value);
             _DovizKuruState = "Güncel";
-
             this.StateHasChanged();
-
         }
         catch (Exception ex)
         {
