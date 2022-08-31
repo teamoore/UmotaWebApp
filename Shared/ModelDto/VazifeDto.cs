@@ -13,6 +13,7 @@ namespace UmotaWebApp.Shared.ModelDto
         public string Baslik { get; set; }
         public string Aciklama { get; set; }
         public DateTime? SonTarih { get; set; }
+        public TimeSpan? SonTarihSaat { get; set; }
         public byte? Oncelik { get; set; }
         public byte? Yapildi { get; set; }
         public byte? Status { get; set; }

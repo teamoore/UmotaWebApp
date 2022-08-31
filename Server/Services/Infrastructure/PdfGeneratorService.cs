@@ -25,7 +25,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         {
             string strfooter = "Uno Endüstriyel - www.unoendustriyel.com";
             if (FirmaId == 101)
-                strfooter = "Makpa Endüstriyel Mutfak - www.makpa.com";
+                strfooter = "Makpa Endüstriyel Mutfak - www.ankaramakpa.com";
 
             var doc = new HtmlToPdfDocument()
             {

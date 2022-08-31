@@ -38,6 +38,8 @@ namespace UmotaWebApp.Client.ServiceHelpers
             var result = await httpClient.GetServiceResponseAsync<VazifeDto>(UrlHelper.VazifeGetir + "?firmaId=" + selectedFirmaDonem.firma_no.Value.ToString()
                 + "&logref=" + logref);
 
+            result.SonTarihSaat = result.SonTarih.Value.GetTime();
+            
             return result;
         }
 
@@ -78,6 +80,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
             vazife.Insdate = DateTime.Now;
             vazife.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             vazife.Status = 0;
+            vazife.SonTarih = vazife.SonTarih.Value.ChangeTime(vazife.SonTarihSaat);
 
             var request = new VazifeRequestDto();
             request.Vazife = vazife;
@@ -107,6 +110,8 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
+
+            vazife.SonTarih = vazife.SonTarih.Value.ChangeTime(vazife.SonTarihSaat);
 
             var request = new VazifeRequestDto();
             request.Vazife = vazife;

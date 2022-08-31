@@ -34,6 +34,9 @@
                         <label>Görev Tarihi</label>
                         <InputDate @bind-Value="record.SonTarih" class="form-control"></InputDate>
                     </div>
+                    <div class="col-md-2">
+                        <MudTimePicker Label="Saat" Editable="true" @bind-Time="record.SonTarihSaat" />
+                    </div>
                 </div>
             </div>
 
