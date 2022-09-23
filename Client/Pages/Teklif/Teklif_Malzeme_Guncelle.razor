@@ -152,6 +152,8 @@
         {
             <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="TeklifDetayEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         }
+        &nbsp;
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         <MudSpacer />
         <MudText Typo="Typo.h6">Teklif Satırları</MudText>
         <MudSpacer />
@@ -256,6 +258,9 @@
 
     [Inject]
     ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    DownloadHelper downloadHelper { get; set; }
 
     public TeklifDto teklif = new TeklifDto();
 
@@ -598,5 +603,42 @@
         if (!result.Cancelled)
         {
         }
+    }
+
+    public async Task DownloadCsv()
+    {
+        var content = @"Poz No;Stok Kodu;Stok Adı;Marka;Miktar;Birim;Net Fiyat;Tutar";
+
+        @if (@maliyetGorYonetici)
+        {
+            content += @";Maliyet 1 Toplam";
+        }
+        @if (@maliyetGorSatisci)
+        {
+            content += @";Maliyet 2 Toplam";
+        }
+
+        content += @";İsk-1 %;İsk-2 %;İsk-3 %;Genel %";
+        content += Environment.NewLine;
+
+        foreach (var item in teklifDetayList)
+        {
+            content += item.Sipnosira + ";'" + item.Malzkodu + ";" + item.Malzadi + ";" + item.Marka + ";" + item.Miktar + ";"
+                + item.Birimkodu + ";" + Helper.FormattedDouble(item.NetFiyatid) + ";" + Helper.FormattedDouble(item.Kdvmatrahid) + ";";
+
+            @if(@maliyetGorYonetici)
+            {
+                content += Helper.FormattedDouble(item.Maliyet1id * item.Miktar) + ";";
+            }
+
+            @if(maliyetGorSatisci)
+            {
+                content += Helper.FormattedDouble(item.Maliyet2id * item.Miktar) + ";";
+            }
+
+            content += Helper.FormattedDouble(item.Iskyuz1) + ";" + Helper.FormattedDouble(item.Iskyuz2) + ";" + Helper.FormattedDouble(item.Iskyuz3) + ";" + Helper.FormattedDouble(item.Iskyuz4) + ";";
+            content += Environment.NewLine;
+        }
+        await downloadHelper.DownloadCsv(content);
     }
 }

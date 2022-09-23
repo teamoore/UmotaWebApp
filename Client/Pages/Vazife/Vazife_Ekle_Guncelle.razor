@@ -368,6 +368,9 @@
 
         var err = new List<string>();
 
+        if (record.SonTarih == null)
+            err.Add("Tarih boş geçilemez");
+
         if (string.IsNullOrWhiteSpace(record.Baslik))
             err.Add("Başlık boş geçilemez");
 
@@ -375,7 +378,7 @@
             err.Add("Öncelik seçiniz");
 
         if (string.IsNullOrEmpty(record.VazifeTipi) || record.VazifeTipi.Equals("-1"))
-            err.Add("Görevi tipiniz seçiniz");
+            err.Add("Görevi tipini seçiniz");
 
         if (string.IsNullOrEmpty(record.AtananKisi) || record.AtananKisi.Equals("-1"))
             err.Add("Atanacak kişi boş geçilemez");

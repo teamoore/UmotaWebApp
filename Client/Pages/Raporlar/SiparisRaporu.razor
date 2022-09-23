@@ -15,6 +15,9 @@
 }
 
 <MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="10000" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<SiparisRaporuDto,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Excel indir" />
+    </ToolBarContent>
     <HeaderContent>
         <MudTh>Sipariş No</MudTh>
         <MudTh>Onay Durumu</MudTh>
@@ -82,6 +85,9 @@
 
     [Inject]
     ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    DownloadHelper downloadHelper { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] ModalParameters modalParameters { get; set; }
@@ -206,5 +212,23 @@
         {
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
+    }
+
+    public async Task DownloadCsv()
+    {
+        var content = @"Sipariş No;Onay Durumu;Cari Kodu;Cari Adı;Satış Temsilcisi;Proje;Malzeme Kodu;Malzeme Adı;Sipariş Miktarı;Bekleyen Miktar;Stok Miktarı;Rezerv Miktarı;Bekleyen Tutar;Sipariş Tarihi;Teslimat Tarihi;Teslimat Ayı;Geçen Gün;Şehir;İlçe;Arıza Depo;2.El Depo
+        ";
+
+        foreach (var item in items)
+        {
+            content += item.siparisno + ";" + item.onay + ";" + item.carikodu + ";" + item.caritanim + ";" +
+                item.satici + ";" + item.siparisbelgeno + ";" + item.malzkodu + ";" +
+                item.malztanim + ";" + item.miktar +  ";" + item.kalanmiktar + ";" +
+                item.stokmik + ";" + item.rezerv + ";" + item.bekleyentutarFormatted +  ";" + item.siparistarihiFormatted +  ";" + 
+                item.teslimattarihiFormatted + ";" + item.teslimatay + ";" + item.gecensure + ";" + item.ili + ";" + item.ilcesi +  ";" + 
+                item.stokmikariza + ";" + item.stokmik2el +
+                Environment.NewLine;
+        }
+        await downloadHelper.DownloadCsv(content);
     }
 }

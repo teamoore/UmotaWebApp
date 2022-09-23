@@ -10,6 +10,9 @@
 }
 
 <MudTable Items="@mainDataList" FixedHeader="true" Height="500px" RowsPerPage="100" Dense="true" Hover="true" Bordered="true" Striped="true">
+    <ToolBarContent>
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+    </ToolBarContent>
     <HeaderContent>
         <MudTh>Kodu</MudTh>
         <MudTh>Adı</MudTh>
@@ -78,6 +81,9 @@
 
     [Inject]
     ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    DownloadHelper downloadHelper { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
 
@@ -210,5 +216,43 @@
         {
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
+    }
+
+    public async Task DownloadCsv()
+    {
+        var content = @"Malzeme Kodu;Malzeme Adı;Marka;Birim;Fiili Miktar;Rezerv Miktar;Öneri Sip.Miktar;Satılabilir Miktar;Alım Sip.Miktar;Alım Sip.Termin;Satış Fiyatı;Satış Döviz";
+
+        @if (@maliyetGorYonetici)
+        {
+            content += @";Alış Fiyatı";
+        }
+        @if (@maliyetGorSatisci)
+        {
+            content += @";Alış Fiyatı";
+        }
+
+        content += @";Alış Döviz";
+        content += Environment.NewLine;
+
+        foreach (var item in mainDataList)
+        {
+            content += item.MalzemeKodu + ";" + item.MalzemeAdi + ";" + item.MalzemeMarka + ";" + item.BirimKodu + ";"
+                + item.StokMiktari + ";" + item.RezervMiktari + ";" + item.BekleyenOneriSatisSiparisMiktar + ";" + item.StokMiktari2 + ";"
+                + item.BekleyenAlimSiparisMiktar + ";" + item.BekleyenAlimSiparisTeslimTarihiFormatted + ";" + item.SatisFiyatiFormatted + ";" + item.SatisFiyatiDoviz + ";";
+
+            @if(@maliyetGorYonetici)
+            {
+                content += item.AlisFiyatiFormatted + ";";
+            }
+
+            @if(maliyetGorSatisci)
+            {
+                content += item.AlisFiyati2Formatted + ";";
+            }
+
+            content += item.AlisFiyatiDoviz + ";";
+            content += Environment.NewLine;
+        }
+        await downloadHelper.DownloadCsv(content);
     }
 }
