@@ -30,10 +30,25 @@
         <MudTh>Batak</MudTh>
         <MudTh>Özel Kod3</MudTh>
         <MudTh>Özel Kod3 Açıklama</MudTh>
+        <MudTh>Telefon 1</MudTh>
+        <MudTh>Telefon 2</MudTh>
+        <MudTh>E-posta</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Cari Kodu">@context.carikodu</MudTd>
-        <MudTd DataLabel="Cari Adı">@context.cariadi</MudTd>
+        <MudTd DataLabel="Cari Adı">
+            <MudTooltip Color="Color.Tertiary">
+                <ChildContent>
+                    @context.cariadi
+                </ChildContent>
+                <TooltipContent>
+                    <MudText Typo="Typo.h6">@context.cariadi</MudText>
+                    <MudText Typo="Typo.body2">@context.caritel1</MudText>
+                    <MudText Typo="Typo.body2">@context.caritel2</MudText>
+                    <MudText Typo="Typo.body2">@context.carimail</MudText>
+                </TooltipContent>
+            </MudTooltip>
+        </MudTd>
         <MudTd DataLabel="Bakiye" Style="text-align:right">@context.bakiyeFormatted</MudTd>
         <MudTd DataLabel="Ortlama Vade">@context.ortalamavadeFormatted</MudTd>
         <MudTd DataLabel="Ortlama Gün">@context.ortalamagun</MudTd>
@@ -43,6 +58,9 @@
         <MudTd DataLabel="Batak">@context.specode4</MudTd>
         <MudTd DataLabel="Özel Kod3">@context.specode3</MudTd>
         <MudTd DataLabel="Özel Kod3 Açıklama">@context.specode3adi</MudTd>
+        <MudTd DataLabel="Telefon 1">@context.caritel1</MudTd>
+        <MudTd DataLabel="Telefon 2">@context.caritel2</MudTd>
+        <MudTd DataLabel="E-posta">@context.carimail</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />

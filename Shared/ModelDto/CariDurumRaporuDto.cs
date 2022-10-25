@@ -49,5 +49,8 @@ namespace UmotaWebApp.Shared.ModelDto
                 return this.sonfattutar.HasValue ? String.Format("{0:N2}", this.sonfattutar.Value) : "";
             }
         }
+        public string caritel1 { get; set; }
+        public string caritel2 { get; set; }
+        public string carimail { get; set; }
     }
 }
