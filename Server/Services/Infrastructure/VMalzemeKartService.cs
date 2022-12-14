@@ -56,7 +56,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
                 return await dbContext.V002Malzemelers.Where(x => (x.Active == 0)
-                && (word == null || x.Adi.ToLower().Contains(word) || x.Kodu.ToLower().Contains(word))
+                && (word == null || x.Adi.ToLower().Contains(word) || x.Kodu.ToLower().Contains(word) || x.Adi3.ToLower().Contains(word))
                 && (marka == null || x.Descr.Contains(marka))
                     ).ProjectTo<VMalzemeKartDto>(Mapper.ConfigurationProvider).ToListAsync();
             }
