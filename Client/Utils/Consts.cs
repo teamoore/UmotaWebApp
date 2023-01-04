@@ -275,6 +275,7 @@ namespace UmotaWebApp.Client.Utils
         public const string DonemFirmalar = "donemFirmalar";
         public const string OndegerFirmaDonem = "odfirmaNo";
         public const string MakpaFirmaNo = "101";
+        public const string GASTROMOREFirmaNo = "200";
 
         public const string TeklifSozlesmesi = @"1.Fiyatlarımıza KDV dahil değildir. Teklifteki fiyatlarımız iskonto yapılmış net fiyatlardır. 
 2.Döviz kuru ödemenin gerçekleştiği veya faturanın kesildiği günden hesaplanacaktır.   

@@ -83,7 +83,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
-            if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+            if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
             {
                 var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
                 if (ondegerFirmaDonem != null)
