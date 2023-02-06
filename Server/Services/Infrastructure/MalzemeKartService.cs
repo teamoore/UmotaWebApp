@@ -192,6 +192,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 p.Add("@Active", 0);
                 p.Add("@UmotaFirmaNo", request.UmotaFirmaNo);
                 p.Add("@UmotaKartlariGetir", request.UmotaKartlariGetir);
+                p.Add("@YedekParca", request.YedekParcaGelsin);
 
                 var res = await db.QueryAsync<MalzemeStokDto>("GetMalzemeStokList", p, commandType: CommandType.StoredProcedure);
                 return res.ToList();

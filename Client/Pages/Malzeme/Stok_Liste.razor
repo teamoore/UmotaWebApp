@@ -35,6 +35,7 @@
             <MudTh>Alış Fiyatı 2</MudTh>
         }
         <MudTh>Alış Döviz</MudTh>
+        <MudTh>MAKPA Satılabilir Miktar</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Kodu">@context.MalzemeKodu</MudTd>
@@ -58,6 +59,7 @@
             <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyati2Formatted</MudTd>
         }
         <MudTd DataLabel="Alış Döviz">@context.AlisFiyatiDoviz</MudTd>
+        <MudTd DataLabel="MAKPA Satılabilir Miktar">@context.StokMiktariMakpa</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
@@ -122,6 +124,8 @@
             var request = new MalzemeStokRequestDto();
             request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
             request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+            request.YedekParcaGelsin = false;
+
             if (!string.IsNullOrWhiteSpace(header.SearchText))
                 request.SearchText = '%' + header.SearchText + '%';
 
@@ -171,6 +175,7 @@
 
                     request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
                     request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+
                     if (!string.IsNullOrWhiteSpace(header.SearchText))
                         request.SearchText = '%' + header.SearchText + '%';
 

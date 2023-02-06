@@ -19,5 +19,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public int TopRowCount { get; set; }
         public string HeaderText { get; set; }
         public int UmotaKartlariGetir { get; set; }
+        public bool YedekParcaGelsin { get; set; }
     }
 }

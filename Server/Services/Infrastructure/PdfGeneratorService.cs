@@ -26,6 +26,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             string strfooter = "Uno Endüstriyel - www.unoendustriyel.com";
             if (FirmaId == 101)
                 strfooter = "Makpa Endüstriyel Mutfak - www.ankaramakpa.com";
+            if (FirmaId == 200)
+                strfooter = "Gastromore - www.gastromore.com";
 
             var doc = new HtmlToPdfDocument()
             {
@@ -64,6 +66,11 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 path = Environment.CurrentDirectory + "\\Media\\logo\\logo_makpa.jpeg";
                 path_opac = Environment.CurrentDirectory + "\\Media\\logo\\logo_makpa_opac.png";
             }
+            //if (FirmaId == 200)
+            //{
+            //    path = Environment.CurrentDirectory + "\\Media\\logo\\logo_gastromore.jpeg";
+            //    path_opac = Environment.CurrentDirectory + "\\Media\\logo\\logo_gastromore_opac.png";
+            //}
 
             var str = "<html><head>" +
                 "<link href='"+ css +"' rel='stylesheet' type='text/css' media='screen'/>"

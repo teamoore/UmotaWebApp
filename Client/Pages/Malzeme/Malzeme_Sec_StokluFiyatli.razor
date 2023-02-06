@@ -56,6 +56,7 @@
                 <MudTh>Alış Fiyatı 2</MudTh>
             }
             <MudTh>Alış Döviz</MudTh>
+            <MudTh>MAKPA Satılabilir Miktar</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd>
@@ -82,6 +83,7 @@
                 <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyati2Formatted</MudTd>
             }
             <MudTd DataLabel="Alış Döviz">@context.AlisFiyatiDoviz</MudTd>
+            <MudTd DataLabel="MAKPA Satılabilir Miktar">@context.StokMiktariMakpa</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
@@ -92,87 +94,88 @@
 
     @code
 {
-        [CascadingParameter] IModalService modal { get; set; }
-        [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
-        [CascadingParameter] ModalParameters modalParameters { get; set; }
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
 
-        [Inject]
-        ILocalStorageService LocalStorageService { get; set; }
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
 
-        [Inject]
-        NavigationManager navigation { get; set; }
+    [Inject]
+    NavigationManager navigation { get; set; }
 
-        [Inject]
-        HttpClient httpClient { get; set; }
+    [Inject]
+    HttpClient httpClient { get; set; }
 
-        [Inject]
-        ISnackbar Snackbar { get; set; }
+    [Inject]
+    ISnackbar Snackbar { get; set; }
 
-        public List<MalzemeStokDto> malzemeKarts { get; set; }
-        public MalzemeStokRequestDto malzemeKart = new MalzemeStokRequestDto();
-        private bool _processing = false;
-        private bool maliyetGorYonetici = false;
-        private bool maliyetGorSatisci = false;
+    public List<MalzemeStokDto> malzemeKarts { get; set; }
+    public MalzemeStokRequestDto malzemeKart = new MalzemeStokRequestDto();
+    private bool _processing = false;
+    private bool maliyetGorYonetici = false;
+    private bool maliyetGorSatisci = false;
 
-        protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
+    {
+        await KullaniciYetkileriGetir();
+    }
+
+    public async Task MalzemeKartSec(int logref)
+    {
+        try
         {
-            await KullaniciYetkileriGetir();
-        }
-
-        public async Task MalzemeKartSec(int logref)
-        {
-            try
-            {
-                var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
             if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
-                {
-                    var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
-                    if (ondegerFirmaDonem != null)
-                        selectedFirmaDonem = ondegerFirmaDonem;
-                }
-
-                var firma_no = selectedFirmaDonem.firma_no.Value;
-
-                var mkart = await httpClient.GetServiceResponseAsync<VMalzemeKartDto>(UrlHelper.VMalzemeKartGetir + "?logref=" + logref + "&firmaId=" + firma_no);
-
-                if (mkart != null)
-                {
-                    modalParameters = new ModalParameters();
-                    modalParameters.Add("secim", mkart);
-                    await ModalInstance.CloseAsync(ModalResult.Ok<VMalzemeKartDto>(mkart));
-                }
-            }
-            catch (Exception ex)
             {
-                Snackbar.Add(ex.Message, severity: Severity.Error);
+                var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+                if (ondegerFirmaDonem != null)
+                    selectedFirmaDonem = ondegerFirmaDonem;
+            }
+
+            var firma_no = selectedFirmaDonem.firma_no.Value;
+
+            var mkart = await httpClient.GetServiceResponseAsync<VMalzemeKartDto>(UrlHelper.VMalzemeKartGetir + "?logref=" + logref + "&firmaId=" + firma_no);
+
+            if (mkart != null)
+            {
+                modalParameters = new ModalParameters();
+                modalParameters.Add("secim", mkart);
+                await ModalInstance.CloseAsync(ModalResult.Ok<VMalzemeKartDto>(mkart));
             }
         }
-
-        public async Task MalzemeBul()
+        catch (Exception ex)
         {
-            try
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task MalzemeBul()
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(malzemeKart.MalzemeAdi) && string.IsNullOrEmpty(malzemeKart.MalzemeMarka))
             {
-                if (string.IsNullOrEmpty(malzemeKart.MalzemeAdi) && string.IsNullOrEmpty(malzemeKart.MalzemeMarka))
-                {
-                    throw new Exception(Utils.Mesajlar.MetinGir);
-                }
+                throw new Exception(Utils.Mesajlar.MetinGir);
+            }
 
-                _processing = true;
+            _processing = true;
 
-                var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-                if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
-                {
-                    var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
-                    if (ondegerFirmaDonem != null)
-                        selectedFirmaDonem = ondegerFirmaDonem;
-                }
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
+            {
+                var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+                if (ondegerFirmaDonem != null)
+                    selectedFirmaDonem = ondegerFirmaDonem;
+            }
 
-                var request = new MalzemeStokRequestDto();
-                request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
-                request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
-                request.UmotaFirmaNo = selectedFirmaDonem.firma_no.Value;
-                request.UmotaKartlariGetir = 1;
-                if (!string.IsNullOrWhiteSpace(malzemeKart.MalzemeAdi))
+            var request = new MalzemeStokRequestDto();
+            request.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+            request.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+            request.UmotaFirmaNo = selectedFirmaDonem.firma_no.Value;
+            request.UmotaKartlariGetir = 1;
+            request.YedekParcaGelsin = false;
+            if (!string.IsNullOrWhiteSpace(malzemeKart.MalzemeAdi))
                     request.MalzemeAdi = '%' + malzemeKart.MalzemeAdi + '%';
                 if (!string.IsNullOrWhiteSpace(malzemeKart.MalzemeMarka))
                     request.MalzemeMarka = '%' + malzemeKart.MalzemeMarka + '%';
