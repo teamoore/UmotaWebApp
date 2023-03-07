@@ -13,5 +13,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<List<SiparisRaporuDto>> SiparisRaporu(SiparisRaporuRequestDto request);
         public Task<List<TahsilatRaporuDto>> TahsilatRaporu(TahsilatRaporuRequestDto request);
         public Task<List<BankaDurumRaporuDto>> BankaDurumRaporu(BankaDurumRaporuRequestDto request);
+        public Task<List<SatisFaturaAnalizRaporuDto>> SatisFaturaAnalizRaporu(SatisFaturaAnalizRaporuRequestDto request);
     }
 }

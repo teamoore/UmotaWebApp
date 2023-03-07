@@ -97,5 +97,26 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return res.ToList();
             }
         }
+        public async Task<List<SatisFaturaAnalizRaporuDto>> SatisFaturaAnalizRaporu(SatisFaturaAnalizRaporuRequestDto request)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                var p = new DynamicParameters();
+                p.Add("@LogoFirmaNo", request.LogoFirmaNo);
+                p.Add("@LogoDonemNo", request.LogoDonemNo);
+                p.Add("@FatNo", request.FatNo);
+                p.Add("@CariKodu", request.CariKodu);
+                p.Add("@CariAdi", request.CariAdi);
+                p.Add("@MalzemeKodu", request.MalzemeKodu);
+                p.Add("@MalzemeAdi", request.MalzemeAdi);
+                p.Add("@HizmetKodu", request.HizmetKodu);
+                p.Add("@HizmetAdi", request.HizmetAdi);
+                p.Add("@BaslangicTarih", request.BaslangicTarih);
+                p.Add("@BitisTarih", request.BitisTarih);
+
+                var res = await db.QueryAsync<SatisFaturaAnalizRaporuDto>("UmotaRaporSP_SatisFaturaAnaliz", p, commandType: CommandType.StoredProcedure);
+                return res.ToList();
+            }
+        }
     }
 }

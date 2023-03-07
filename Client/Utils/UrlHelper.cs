@@ -73,6 +73,7 @@ namespace UmotaWebApp.Client.Utils
         public const string TakvimGuncelle = "/api/Takvim/update";
         public const string TakvimGetir = "/api/Takvim/get";
         public const string SiparisRaporu = "/api/Report/siparisraporu";
+        public const string SatisFaturaAnalizRaporu = "/api/Report/satisfaturaanalizraporu";
         public const string VazifeGetir = "/api/Vazife/get";
         public const string VazifeListesi = "/api/Vazife/list";
         public const string VazifeKaydet = "/api/Vazife/save";

@@ -1,0 +1,261 @@
+﻿@page "/r_satfatanalizf"
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="true"
+                 onFilterButtonClicked="Rapor" ShowSearchSection="false"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+@if (sayfayiGormeYetkisi == false)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
+}
+
+<MudTable Items="@items" FixedHeader="true" Height="500px" RowsPerPage="10000" Dense="true" Hover="true" Bordered="true" Striped="true" Filter="new Func<SatisFaturaAnalizRaporuDto,bool>(FilterFunc1)">
+    <ToolBarContent>
+        <MudIconButton Icon="@Icons.Material.Filled.FileDownload" OnClick="DownloadCsv" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Excel indir" />
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Cari Özel Kod3</MudTh>
+        <MudTh>Cari Özel Kod3 Açıklama</MudTh>
+        <MudTh>Cari Kodu</MudTh>
+        <MudTh>Cari Adı</MudTh>
+        <MudTh>Marka</MudTh>
+        <MudTh>Malzeme Kodu</MudTh>
+        <MudTh>Malzeme Adı</MudTh>
+        <MudTh>Fatura No</MudTh>
+        <MudTh>Yıl</MudTh>
+        <MudTh>Ay</MudTh>
+        <MudTh>Fatura Tarihi</MudTh>
+        <MudTh>Miktar</MudTh>
+        <MudTh>EUR Kur</MudTh>
+        <MudTh>Fiyat (EUR)</MudTh>
+        <MudTh>Fiyat</MudTh>
+        <MudTh>KDV Matrahı</MudTh>
+        <MudTh>KDV Tutarı</MudTh>
+        <MudTh>Maliyet Tutarı</MudTh>
+        <MudTh>Kar Tutarı</MudTh>
+        <MudTh>Kar %</MudTh>
+        <MudTh>İndirim Tutarı</MudTh>
+        <MudTh>İndirim %</MudTh>
+        <MudTh>Sipariş No</MudTh>
+        <MudTh>Satış Elemanı</MudTh>
+        <MudTh>Satır Açıklaması</MudTh>
+        <MudTh>Cari Hesap Özel Kodu 2</MudTh>
+        <MudTh>Fatura Açıklama 1</MudTh>
+        <MudTh>Fatura Açıklama 2</MudTh>
+        <MudTh>Malzeme Grup Kodu</MudTh>
+        <MudTh>Malzeme Grup Adı</MudTh>
+        <MudTh>Malzeme Grup 1 Kodu</MudTh>
+        <MudTh>Malzeme Grup 1 Adı</MudTh>
+        <MudTh>Malzeme Grup 2 Kodu</MudTh>
+        <MudTh>Malzeme Grup 2 Adı</MudTh>
+        <MudTh>Fatura Türü</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Cari Özel Kod3">@context.cariozelkod3</MudTd>
+        <MudTd DataLabel="Cari Özel Kod3 Açıklama">@context.cariozelkod3aciklama</MudTd>
+        <MudTd DataLabel="Cari Kodu">@context.carikodu</MudTd>
+        <MudTd DataLabel="Cari Adı">@context.caritanim</MudTd>
+        <MudTd DataLabel="Marka">@context.marka</MudTd>
+        <MudTd DataLabel="Malzeme Kodu">@context.malzkodu</MudTd>
+        <MudTd DataLabel="Malzeme Adı">@context.malztanim</MudTd>
+        <MudTd DataLabel="Fatura No">@context.fatno</MudTd>
+        <MudTd DataLabel="Yıl">@context.fattaryil</MudTd>
+        <MudTd DataLabel="Ay">@context.fattaray</MudTd>
+        <MudTd DataLabel="Fatura Tarihi">@context.faturatarihiFormatted</MudTd>
+        <MudTd DataLabel="Miktar" Style="text-align:right">@context.miktar</MudTd>
+        <MudTd DataLabel="EUR Kur" Style="text-align:right">@context.eurkur</MudTd>
+        <MudTd DataLabel="Fiyat (EUR)" Style="text-align:right">@context.fiyateurFormatted</MudTd>
+        <MudTd DataLabel="Fiyat" Style="text-align:right">@context.fiyatFormatted</MudTd>
+        <MudTd DataLabel="KDV Matrahı" Style="text-align:right">@context.kdvmatFormatted</MudTd>
+        <MudTd DataLabel="KDV Tutarı" Style="text-align:right">@context.kdvtutFormatted</MudTd>
+        <MudTd DataLabel="Maliyet Tutarı" Style="text-align:right">@context.maliyettutFormatted</MudTd>
+        <MudTd DataLabel="Kar Tutarı" Style="text-align:right">@context.kartutFormatted</MudTd>
+        <MudTd DataLabel="Kar %" Style="text-align:right">@context.karoranFormatted</MudTd>
+        <MudTd DataLabel="İndirim Tutarı" Style="text-align:right">@context.indirimtutFormatted</MudTd>
+        <MudTd DataLabel="İndirim %" Style="text-align:right">@context.indirimoranFormatted</MudTd>
+        <MudTd DataLabel="Sipariş No">@context.siparisno</MudTd>
+        <MudTd DataLabel="Satış Elemanı">@context.satici</MudTd>
+        <MudTd DataLabel="Satır Açıklaması">@context.satiraciklama</MudTd>
+        <MudTd DataLabel="Cari Özel Kod2">@context.cariozelkod2</MudTd>
+        <MudTd DataLabel="Fatura Açıklama 1">@context.faturaaciklama1</MudTd>
+        <MudTd DataLabel="Fatura Açıklama 2">@context.faturaaciklama2</MudTd>
+        <MudTd DataLabel="Malzeme Grup Kodu">@context.malzemegrupkodu</MudTd>
+        <MudTd DataLabel="Malzeme Grup Adı">@context.malzemegrupadi</MudTd>
+        <MudTd DataLabel="Malzeme Grup 1 Kodu">@context.malzemeozelkod1</MudTd>
+        <MudTd DataLabel="Malzeme Grup 1 Adı">@context.malzemeozelkod1adi</MudTd>
+        <MudTd DataLabel="Malzeme Grup 2 Kodu">@context.malzemeozelkod2</MudTd>
+        <MudTd DataLabel="Malzeme Grup 2 Adı">@context.malzemeozelkod2adi</MudTd>
+        <MudTd DataLabel="Fatura Türü">@context.faturaturadi</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
+@code
+{
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    DownloadHelper downloadHelper { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public List<SatisFaturaAnalizRaporuDto> items = new List<SatisFaturaAnalizRaporuDto>();
+    public SatisFaturaAnalizRaporuRequestDto mainDataRequest = new SatisFaturaAnalizRaporuRequestDto();
+
+
+    private string _searchString;
+    private bool _sortNameByLength;
+    private bool loadingCompleted = true;
+    private bool sayfayiGormeYetkisi = true;
+    private bool isAdmin = true;
+
+    private bool FilterFunc1(SatisFaturaAnalizRaporuDto element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(SatisFaturaAnalizRaporuDto element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.siparisno != null && element.siparisno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.fatno != null && element.fatno.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Satış Faturaları Analizi";
+        await KullaniciYetkileriGetir();
+
+        await NewDataRequest();
+        await Rapor();
+    }
+
+    private async Task NewDataRequest()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        mainDataRequest.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
+        mainDataRequest.LogoDonemNo = selectedFirmaDonem.logo_donem.Value;
+    }
+
+    public async Task Rapor()
+    {
+        if (!sayfayiGormeYetkisi)
+            return;
+
+        try
+        {
+            var opt = new ModalOptions();
+            opt.ContentScrollable = true;
+            modalParameters = new ModalParameters();
+            modalParameters.Add("mainRequest", mainDataRequest);
+
+            var filterForm = modal.Show<Pages.Raporlar.SatisFaturaAnalizRaporuFilters>("Rapor Seçenekleri", modalParameters, opt);
+            var result = await filterForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+
+                    var request = (SatisFaturaAnalizRaporuRequestDto)result.Data;
+                    var response = await httpClient.PostGetServiceResponseAsync<List<SatisFaturaAnalizRaporuDto>, SatisFaturaAnalizRaporuRequestDto>(UrlHelper.SatisFaturaAnalizRaporu, request);
+                    if (response == null || response.Count == 0)
+                    {
+                        Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+                        loadingCompleted = true;
+                        return;
+                    }
+                    loadingCompleted = true;
+                    items = response;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+    }
+
+    public async Task KullaniciYetkileriGetir()
+    {
+        try
+        {
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            var result = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanicikodu);
+
+            if (result != null)
+            {
+                isAdmin = result.KullaniciYetkiKodu.Equals("ADM");
+                if (isAdmin)
+                {
+                    sayfayiGormeYetkisi = true;
+                }
+                else
+                {
+                    var yetki = await httpClient.GetServiceResponseAsync<int>(UrlHelper.KullaniciMenuYetkisi + "?kullanicikodu=" + kullanicikodu + "&menu_dfm=r_bekleyen_siparislerf&hak_tipi=sel");
+                    sayfayiGormeYetkisi = yetki == 1;
+                }
+            }
+            else
+            {
+                isAdmin = false;
+                sayfayiGormeYetkisi = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    public async Task DownloadCsv()
+    {
+        var content = @"Cari Özel Kod3;Cari Özel Kod3 Açıklama;Cari Kodu;Cari Adı;Marka;Malzeme Kodu;Malzeme Adı;Fatura No;Yıl;Ay;Fatura Tarihi;Miktar;EUR Kur;Fiyat (EUR);Fiyat;KDV Matrahı;KDV Tutarı;Maliyet Tutarı;Kar Tutarı;Kar%;İndirim Tutarı;İndirim %;Sipariş No;Satış Elemanı;Satır Açıklaması;Cari Özel Kod 2;Fatura Açıklama 1;Fatura Açıklama 2;Malzeme Grubu Kodu;Malzeme Grubu Adı;Malzeme Grubu 1 Kodu;Malzeme Grubu 1 Adı;Malzeme Grubu 2 Kodu;Malzeme Grubu 2 Adı;Fatura Türü
+        ";
+
+        foreach (var item in items)
+        {
+            content += item.cariozelkod3 + ";" + item.cariozelkod3aciklama + ";" + item.carikodu + ";" + item.caritanim + ";" +
+                item.marka + ";" + item.malzkodu + ";" + item.malztanim + ";" +
+                item.fatno + ";" + item.fattaryil + ";" + item.fattaray + ";" + item.faturatarihiFormatted + ";" +
+                item.miktar + ";" + item.eurkur + ";" + item.fiyateurFormatted + ";" + item.fiyatFormatted + ";" + item.kdvmatFormatted + ";" +
+                item.kdvtutFormatted + ";" + item.maliyettutFormatted + ";" + item.kartutFormatted + ";" + item.karoranFormatted + ";" + item.indirimtutFormatted + ";" +
+                item.indirimoranFormatted + ";" + item.siparisno + ";" + item.satici + ";" + item.satiraciklama + ";" + item.cariozelkod2 + ";" + item.faturaaciklama1 + ";" +
+                item.faturaaciklama2 + ";" + item.malzemegrupkodu + ";" + item.malzemegrupadi + ";" + item.malzemeozelkod1 + ";" + item.malzemeozelkod1adi + ";" +
+                item.malzemeozelkod2 + ";" + item.malzemeozelkod2adi + ";" + item.faturaturadi +
+                Environment.NewLine;
+        }
+        await downloadHelper.DownloadCsv(content);
+    }
+}

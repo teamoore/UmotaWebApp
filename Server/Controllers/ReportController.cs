@@ -106,5 +106,25 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("satisfaturaanalizraporu")]
+        public async Task<ServiceResponse<List<SatisFaturaAnalizRaporuDto>>> SatisFaturaAnalizRaporuGetir(SatisFaturaAnalizRaporuRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<List<SatisFaturaAnalizRaporuDto>>()
+                {
+                    Value = await TeklifReportService.SatisFaturaAnalizRaporu(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<SatisFaturaAnalizRaporuDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
     }
 }

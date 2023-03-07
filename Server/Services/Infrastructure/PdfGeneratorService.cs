@@ -60,17 +60,18 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         {
             var css = Environment.CurrentDirectory +  @"\Media\css\bootstrap.min.css";
             var path = Environment.CurrentDirectory + "\\Media\\logo\\logo.jpeg";
-            var path_opac = Environment.CurrentDirectory + "\\Media\\logo\\logo_opac3.png";
+            var path_opac = Environment.CurrentDirectory + "\\Media\\logo\\logo_opac.png";
+            var logo_img_style = "height:150px;";
+
             if (FirmaId == 101)
             {
                 path = Environment.CurrentDirectory + "\\Media\\logo\\logo_makpa.jpeg";
-                path_opac = Environment.CurrentDirectory + "\\Media\\logo\\logo_makpa_opac.png";
             }
-            //if (FirmaId == 200)
-            //{
-            //    path = Environment.CurrentDirectory + "\\Media\\logo\\logo_gastromore.jpeg";
-            //    path_opac = Environment.CurrentDirectory + "\\Media\\logo\\logo_gastromore_opac.png";
-            //}
+            if (FirmaId == 200)
+            {
+                path = Environment.CurrentDirectory + "\\Media\\logo\\logo_GM.jpg";
+                logo_img_style = "width:200px;float: left;margin: 1px 1px;";
+            }
 
             var str = "<html><head>" +
                 "<link href='"+ css +"' rel='stylesheet' type='text/css' media='screen'/>"
@@ -82,44 +83,52 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             
 
             str += @" <table class='table table-striped'>
-  <tr>
-	<td>
-        <p><b>Firma : " + teklif.Cariadi + @"</b><br>
-        <b>Sayın : "+ teklif.IlgiliAdi + @"</b><br><br>
-        <b>Teklif No  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: " + teklif.Teklifno + @"</b><br>
-        <b>Revize No    &nbsp;&nbsp;&nbsp;: " + teklif.Revzno + @"</b><br>
-        <b>Teklif Tarihi&nbsp;&nbsp;: " + teklif.TarihFormatted + @"</b><br>
-        <b>Teslim Tarihi: " + teklif.TeslimTarihiFormatted + @"</b><br>
-        <b>Proje Adı  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: " + teklif.Proje + @"</b><br>
-        <b>İlgili Adı &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: " + teklif.Temsilciadi + @"</b><br>
-        </p>
-		";
-        str += @" 
-
-	</td>
-	<td style='width:200px;'><img style='height:150px;' src='"+ path + @"'></td>
-  </tr>
-  </table>
-<hr/>";
+              <tr>
+	            <td style='width:110px;'>
+                    <p><b>Firma</b><br>
+                    <b>Sayın</b><br>
+                    <b>Teklif No</b><br>
+                    <b>Revize No</b><br>
+                    <b>Teklif Tarihi</b><br>
+                    <b>Teslim Tarihi</b><br>
+                    <b>Proje Adı</b><br>
+                    <b>İlgili Adı</b><br>
+                    </p>
+	            </td>
+	            <td style='width:500px;'>
+                    <p>" + teklif.Cariadi + @"<br>
+                    "+ teklif.IlgiliAdi + @"<br>
+                    " + teklif.Teklifno + @"<br>
+                    " + teklif.Revzno + @"<br>
+                    " + teklif.TarihFormatted + @"<br>
+                    " + teklif.TeslimTarihiFormatted + @"<br>
+                    " + teklif.Proje + @"<br>
+                    " + teklif.Temsilciadi + @"<br>
+                    </p>
+	            </td>
+	            <td style='width:200px;'><img style='" + logo_img_style + @"' src='" + path + @"'></td>
+              </tr>
+              </table>
+            ";
 
             if (teklifDetays != null && teklifDetays.Count != 0)
             {
                 str += "<table class='table table-striped'>";
                 str += @"
  
-    <tr>
-            <th scope='col'>POZ</th>
-            <th scope='col'>MALZEME LİSTESİ</th>
-            <th scope='col'>EBAT</th>
-            <th scope='col'>MARKA</th>
-            <th scope='col'>MENŞEİ</th>
-            <th scope='col'>ADET</th>
-            <th scope='col'>BİRİM FİYAT</th>
-            <th scope='col'>DÖVİZ</th>
-            <th scope='col'>TOPLAM FİYAT</th>
-    </tr>
+                    <tr>
+                            <th scope='col'>POZ</th>
+                            <th scope='col'>MALZEME LİSTESİ</th>
+                            <th scope='col'>EBAT</th>
+                            <th scope='col'>MARKA</th>
+                            <th scope='col'>MENŞEİ</th>
+                            <th scope='col'>ADET</th>
+                            <th scope='col'>BİRİM FİYAT</th>
+                            <th scope='col'>DÖVİZ</th>
+                            <th scope='col'>TOPLAM FİYAT</th>
+                    </tr>
  
-";
+                ";
                 double toptutar = 0;
                 double topisktutar = 0;
                 double topkdvtutar = 0;
