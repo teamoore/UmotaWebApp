@@ -70,7 +70,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             if (FirmaId == 200)
             {
                 path = Environment.CurrentDirectory + "\\Media\\logo\\logo_GM.jpg";
-                logo_img_style = "width:200px;float: left;margin: 1px 1px;";
+                logo_img_style = "width:200px;";
             }
 
             var str = "<html><head>" +
@@ -84,36 +84,51 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             str += @" <table class='table table-striped'>
               <tr>
-	            <td style='width:110px;'>
-                    <p><b>Firma</b><br>
-                    <b>Sayın</b><br>
-                    <b>Teklif No</b><br>
-                    <b>Revize No</b><br>
-                    <b>Teklif Tarihi</b><br>
-                    <b>Teslim Tarihi</b><br>
-                    <b>Proje Adı</b><br>
-                    <b>İlgili Adı</b><br>
-                    </p>
+	            <td style='width:600px;'>
+                    <table class='table table-sm table-borderless'>
+                        <tr>
+	                        <td style='width:110px;'><b>Firma</b></td>
+	                        <td style='width:490px;'>" + teklif.Cariadi + @"</td>
+                        </tr>
+                        <tr>
+	                        <td style='width:110px;'><b>Sayın</b></td>
+	                        <td style='width:490px;'>" + teklif.IlgiliAdi + @"
+            	            </td>
+                        </tr>
+                        <tr>
+	                        <td style='width:110px;'><b>Teklif No</b></td>
+	                        <td style='width:490px;'>" + teklif.Teklifno + @"</td>
+                        </tr>
+                        <tr>
+	                        <td style='width:110px;'><b>Revize No</b></td>
+	                        <td style='width:490px;'>" + teklif.Revzno + @"</td>
+                        </tr>
+                        <tr>
+	                        <td style='width:110px;'><b>Teklif Tarihi</b></td>
+	                        <td style='width:490px;'>" + teklif.TarihFormatted + @"</td>
+                        </tr>
+                        <tr>
+	                        <td style='width:110px;'><b>Teslim Tarihi</b></td>
+	                        <td style='width:490px;'>" + teklif.TeslimTarihiFormatted + @"</td>
+                        </tr>
+                        <tr>
+	                        <td style='width:110px;'><b>Proje Adı</b></td>
+	                        <td style='width:490px;'>" + teklif.Proje + @"</td>
+                        </tr>
+                        <tr>
+	                        <td style='width:110px;'><b>İlgili Adı</b></td>
+	                        <td style='width:490px;'>" + teklif.Temsilciadi + @"</td>
+                        </tr>
+                    </table>
 	            </td>
-	            <td style='width:500px;'>
-                    <p>" + teklif.Cariadi + @"<br>
-                    "+ teklif.IlgiliAdi + @"<br>
-                    " + teklif.Teklifno + @"<br>
-                    " + teklif.Revzno + @"<br>
-                    " + teklif.TarihFormatted + @"<br>
-                    " + teklif.TeslimTarihiFormatted + @"<br>
-                    " + teklif.Proje + @"<br>
-                    " + teklif.Temsilciadi + @"<br>
-                    </p>
-	            </td>
-	            <td style='width:200px;'><img style='" + logo_img_style + @"' src='" + path + @"'></td>
+	            <td style='width:200px;float: center;'><img style='" + logo_img_style + @"' src='" + path + @"'></td>
               </tr>
               </table>
             ";
 
             if (teklifDetays != null && teklifDetays.Count != 0)
             {
-                str += "<table class='table table-striped'>";
+                str += "<table class='table table-sm'>";
                 str += @"
  
                     <tr>
@@ -140,7 +155,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                     str += Cell(item.Ebat);
                     str += Cell(item.Marka);
                     str += Cell(item.Mensei);
-                    str += Cell(item.Miktar);
+                    str += Cell(item.Miktar, alignRight: true);
 
                     switch (teklifPdfType)
                     {
@@ -170,15 +185,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
                     str += "</tr>";
                 }
-
+ 
                 str += "<tr>";
-                str += Cell("");
-                str += Cell("TOPLAM BEDEL",true);
-                str += Cell("");
-                str += Cell("");
-                str += Cell("");
-                str += Cell("");
-                str += Cell("");
+                str += "<td colspan=7 style='text-align: right;padding-right: 20px;'><b>TOPLAM BEDEL</b></td>";
                 str += Cell(teklif.Dovizdokuid,true,true);
                 str += Cell(toptutar,true,true);
                 str += "</tr>";
@@ -186,25 +195,13 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 if (teklifPdfType == SharedEnums.TeklifPdfType.Iskontolu)
                 {
                     str += "<tr>";
-                    str += Cell("");
-                    str += Cell("İSKONTO TOPLAMI",true);
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
+                    str += "<td colspan=7 style='text-align: right;padding-right: 20px;'><b>İSKONTO TOPLAMI</b></td>";
                     str += Cell(teklif.Dovizdokuid,true,true);
                     str += Cell(topisktutar,true,true);
                     str += "</tr>";
 
                     str += "<tr>";
-                    str += Cell("");
-                    str += Cell("GENEL TOPLAM",true);
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
+                    str += "<td colspan=7 style='text-align: right;padding-right: 20px;'><b>GENEL TOPLAM</b></td>";
                     str += Cell(teklif.Dovizdokuid,true,true);
                     str += Cell(toptutar-topisktutar,true,true);
                     str += "</tr>";
@@ -213,25 +210,13 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 if (teklifPdfType == SharedEnums.TeklifPdfType.NetKdv)
                 {
                     str += "<tr>";
-                    str += Cell("");
-                    str += Cell("KDV TOPLAMI",true);
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
+                    str += "<td colspan=7 style='text-align: right;padding-right: 20px;'><b>KDV TOPLAMI</b></td>";
                     str += Cell(teklif.Dovizdokuid,true,true);
                     str += Cell(topkdvtutar,true,true);
                     str += "</tr>";
 
                     str += "<tr>";
-                    str += Cell("");
-                    str += Cell("GENEL TOPLAM",true);
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
-                    str += Cell("");
+                    str += "<td colspan=7 style='text-align: right;padding-right: 20px;'><b>GENEL TOPLAM</b></td>";
                     str += Cell(teklif.Dovizdokuid,true,true);
                     str += Cell(toptutar + topkdvtutar,true,true);
                     str += "</tr>";
