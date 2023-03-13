@@ -56,7 +56,9 @@
                 <MudTh>Alış Fiyatı 2</MudTh>
             }
             <MudTh>Alış Döviz</MudTh>
-            <MudTh>MAKPA Satılabilir Miktar</MudTh>
+            <MudTh>MAKPA Stok</MudTh>
+            <MudTh>Arıza Stok</MudTh>
+            <MudTh>2.El Stok</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd>
@@ -83,7 +85,9 @@
                 <MudTd DataLabel="Alış Fiyatı">@context.AlisFiyati2Formatted</MudTd>
             }
             <MudTd DataLabel="Alış Döviz">@context.AlisFiyatiDoviz</MudTd>
-            <MudTd DataLabel="MAKPA Satılabilir Miktar">@context.StokMiktariMakpa</MudTd>
+            <MudTd DataLabel="MAKPA Stok">@context.StokMiktariMakpa</MudTd>
+            <MudTd DataLabel="Arıza Stok">@context.StokMiktariAriza</MudTd>
+            <MudTd DataLabel="2.El Stok">@context.StokMiktari2el</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />

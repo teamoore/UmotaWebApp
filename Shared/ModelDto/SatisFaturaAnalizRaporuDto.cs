@@ -41,6 +41,19 @@ namespace UmotaWebApp.Shared.ModelDto
         public string malzemeozelkod1adi { get; set; }
         public string malzemeozelkod2 { get; set; }
         public string malzemeozelkod2adi { get; set; }
+        public double? AlisFiyati { get; set; }
+        public string AlisFiyatiDoviz { get; set; }
+        public double? AlisTutarTL { get; set; }
+        public double? GkUsdKur { get; set; }
+        public double? GkEurKur { get; set; }
+
+        public string AlisFiyatiFormatted
+        {
+            get
+            {
+                return this.AlisFiyati.HasValue ? String.Format("{0:N2}", this.AlisFiyati.Value) : "";
+            }
+        }
 
         public string fiyatFormatted
         {
@@ -139,5 +152,60 @@ namespace UmotaWebApp.Shared.ModelDto
             }
         }
 
+        public double AlisFiyatiTL
+        {
+            get
+            {
+                double kur = 1;
+                if (this.AlisFiyatiDoviz == "EUR")
+                {
+                    kur = this.GkEurKur.Value;
+                }
+                else
+                {
+                    if (this.AlisFiyatiDoviz == "USD")
+                    {
+                        kur = this.GkUsdKur.Value;
+                    }
+                }
+                
+                return this.AlisFiyati.Value * kur;
+            }
+        }
+        public string AlisFiyatiTLFormatted
+        {
+            get
+            {
+                return String.Format("{0:N2}", this.AlisFiyatiTL);
+            }
+        }
+        public double AlisTutariTL
+        {
+            get
+            {
+                return this.AlisFiyatiTL * this.miktar.Value;
+            }
+        }
+        public string AlisTutariTLFormatted
+        {
+            get
+            {
+                return String.Format("{0:N2}", this.AlisTutariTL);
+            }
+        }
+        public double AlisSatisFarkTutariTL
+        {
+            get
+            {
+                return this.kdvmat.Value - this.AlisTutariTL;
+            }
+        }
+        public string AlisSatisFarkTutariTLFormatted
+        {
+            get
+            {
+                return String.Format("{0:N2}", this.AlisSatisFarkTutariTL);
+            }
+        }
     }
 }

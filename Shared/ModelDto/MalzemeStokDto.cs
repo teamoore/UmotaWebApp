@@ -33,6 +33,8 @@ namespace UmotaWebApp.Shared.ModelDto
         public double? RezervMiktari { get; set; }
         public double? StokMiktari2 { get; set; }
         public double? StokMiktariMakpa { get; set; }
+        public double? StokMiktariAriza { get; set; }
+        public double? StokMiktari2el { get; set; }
         public double? BekleyenAlimSiparisMiktar { get; set; }
         public DateTime? BekleyenAlimSiparisTeslimTarihi { get; set; }
         public double? BekleyenOneriSatisSiparisMiktar { get; set; }

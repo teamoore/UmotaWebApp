@@ -34,6 +34,11 @@
         <MudTh>EUR Kur</MudTh>
         <MudTh>Fiyat (EUR)</MudTh>
         <MudTh>Fiyat</MudTh>
+        <MudTh>Alış Fiyatı</MudTh>
+        <MudTh>Alış Fiyatı Döviz</MudTh>
+        <MudTh>Alış Fiyatı TL</MudTh>
+        <MudTh>Alış Tutarı TL</MudTh>
+        <MudTh>Alış-Satış Fark Tutarı TL</MudTh>
         <MudTh>KDV Matrahı</MudTh>
         <MudTh>KDV Tutarı</MudTh>
         <MudTh>Maliyet Tutarı</MudTh>
@@ -71,6 +76,11 @@
         <MudTd DataLabel="EUR Kur" Style="text-align:right">@context.eurkur</MudTd>
         <MudTd DataLabel="Fiyat (EUR)" Style="text-align:right">@context.fiyateurFormatted</MudTd>
         <MudTd DataLabel="Fiyat" Style="text-align:right">@context.fiyatFormatted</MudTd>
+        <MudTd DataLabel="Alış Fiyatı" Style="text-align:right">@context.AlisFiyatiFormatted</MudTd>
+        <MudTd DataLabel="Alış Fiyatı Döviz" Style="text-align:right">@context.AlisFiyatiDoviz</MudTd>
+        <MudTd DataLabel="Alış Fiyatı TL" Style="text-align:right">@context.AlisFiyatiTLFormatted</MudTd>
+        <MudTd DataLabel="Alış Tutarı TL" Style="text-align:right">@context.AlisTutariTLFormatted</MudTd>
+        <MudTd DataLabel="Alış-Satış Fark Tutarı TL" Style="text-align:right">@context.AlisSatisFarkTutariTLFormatted</MudTd>
         <MudTd DataLabel="KDV Matrahı" Style="text-align:right">@context.kdvmatFormatted</MudTd>
         <MudTd DataLabel="KDV Tutarı" Style="text-align:right">@context.kdvtutFormatted</MudTd>
         <MudTd DataLabel="Maliyet Tutarı" Style="text-align:right">@context.maliyettutFormatted</MudTd>
@@ -241,7 +251,7 @@
 
     public async Task DownloadCsv()
     {
-        var content = @"Cari Özel Kod3;Cari Özel Kod3 Açıklama;Cari Kodu;Cari Adı;Marka;Malzeme Kodu;Malzeme Adı;Fatura No;Yıl;Ay;Fatura Tarihi;Miktar;EUR Kur;Fiyat (EUR);Fiyat;KDV Matrahı;KDV Tutarı;Maliyet Tutarı;Kar Tutarı;Kar%;İndirim Tutarı;İndirim %;Sipariş No;Satış Elemanı;Satır Açıklaması;Cari Özel Kod 2;Fatura Açıklama 1;Fatura Açıklama 2;Malzeme Grubu Kodu;Malzeme Grubu Adı;Malzeme Grubu 1 Kodu;Malzeme Grubu 1 Adı;Malzeme Grubu 2 Kodu;Malzeme Grubu 2 Adı;Fatura Türü
+        var content = @"Cari Özel Kod3;Cari Özel Kod3 Açıklama;Cari Kodu;Cari Adı;Marka;Malzeme Kodu;Malzeme Adı;Fatura No;Yıl;Ay;Fatura Tarihi;Miktar;EUR Kur;Fiyat (EUR);Fiyat;Alış Fiyatı;Alış Fiyatı Döviz;Alış Fiyatı TL;Alış Tutarı TL;Alış-Satış Fark Tutarı TL;KDV Matrahı;KDV Tutarı;Maliyet Tutarı;Kar Tutarı;Kar%;İndirim Tutarı;İndirim %;Sipariş No;Satış Elemanı;Satır Açıklaması;Cari Özel Kod 2;Fatura Açıklama 1;Fatura Açıklama 2;Malzeme Grubu Kodu;Malzeme Grubu Adı;Malzeme Grubu 1 Kodu;Malzeme Grubu 1 Adı;Malzeme Grubu 2 Kodu;Malzeme Grubu 2 Adı;Fatura Türü
         ";
 
         foreach (var item in items)
@@ -249,8 +259,9 @@
             content += item.cariozelkod3 + ";" + item.cariozelkod3aciklama + ";" + item.carikodu + ";" + item.caritanim + ";" +
                 item.marka + ";" + item.malzkodu + ";" + item.malztanim + ";" +
                 item.fatno + ";" + item.fattaryil + ";" + item.fattaray + ";" + item.faturatarihiFormatted + ";" +
-                item.miktar + ";" + item.eurkur + ";" + item.fiyateurFormatted + ";" + item.fiyatFormatted + ";" + item.kdvmatFormatted + ";" +
-                item.kdvtutFormatted + ";" + item.maliyettutFormatted + ";" + item.kartutFormatted + ";" + item.karoranFormatted + ";" + item.indirimtutFormatted + ";" +
+                item.miktar + ";" + item.eurkur + ";" + item.fiyateurFormatted + ";" + item.fiyatFormatted + ";" + 
+                item.AlisFiyatiFormatted + ";" + item.AlisFiyatiDoviz + ";" + item.AlisFiyatiTLFormatted + ";" + item.AlisTutariTLFormatted + ";" + item.AlisSatisFarkTutariTLFormatted + ";" +
+                item.kdvmatFormatted + ";" + item.kdvtutFormatted + ";" + item.maliyettutFormatted + ";" + item.kartutFormatted + ";" + item.karoranFormatted + ";" + item.indirimtutFormatted + ";" +
                 item.indirimoranFormatted + ";" + item.siparisno + ";" + item.satici + ";" + item.satiraciklama + ";" + item.cariozelkod2 + ";" + item.faturaaciklama1 + ";" +
                 item.faturaaciklama2 + ";" + item.malzemegrupkodu + ";" + item.malzemegrupadi + ";" + item.malzemeozelkod1 + ";" + item.malzemeozelkod1adi + ";" +
                 item.malzemeozelkod2 + ";" + item.malzemeozelkod2adi + ";" + item.faturaturadi +
