@@ -22,6 +22,26 @@
                 </div>
             </div>
 
+            <div class="form-group"><div class="row">
+                    <div class="col-md-2">
+                        <label>Cari Kodu</label>
+                        <InputText @bind-Value="cariModel.Carikodu" class="form-control" placeholder="Cari Kodu" disabled />
+                    </div>
+                    <div class="col-md-8">
+                        <label>Cari Adı</label>
+                        <div class="row">
+                            <div class="col">
+                                <InputText @bind-Value="cariModel.Cariadi" class="form-control" placeholder="Cari Adı"/>
+                            </div>
+                            <div class="col">
+                                <MudButton Variant="Variant.Filled" IconColor="Color.Secondary" StartIcon="@Icons.Material.Filled.FindInPage" OnClick="CariListesiAc" Size=Size.Medium>Bul</MudButton>
+                                <MudButton Variant="Variant.Filled" IconColor="Color.Secondary" StartIcon="@Icons.Material.Filled.AddCard" OnClick="YeniCariEkle" Size=Size.Medium>Yeni Cari</MudButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <div class="row">
                     <div class="col-md-6">
@@ -95,8 +115,6 @@
     [Parameter]
     public int? logref { get; set; }
     [Parameter]
-    public int? CariKartRef { get; set; }
-    [Parameter]
     public int? modalForm { get; set; }
 
     [CascadingParameter] IModalService modal { get; set; }
@@ -135,7 +153,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma Dönem Seçili değil");
 
-            cariModel = await httpClient.GetServiceResponseAsync<KisilerDto>(UrlHelper.CariKartGetirLogRef + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+            cariModel = await httpClient.GetServiceResponseAsync<KisilerDto>(UrlHelper.KisiGetir + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
         }
         catch (Exception ex)
@@ -175,10 +193,7 @@
                 var reff = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=kisiler&firmaId=" + selectedFirmaDonem.firma_no.Value);
 
                 cariModel.Logref = reff;
-
-                var carikart = await httpClient.GetServiceResponseAsync<CariKartDto>(UrlHelper.CariKartGetirLogRef + "?logref=" + CariKartRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
-                cariModel.Cariref = CariKartRef;
-                cariModel.Cariadi = carikart.Adi;
+                //cariModel.Cariref = CariKartRef;
                 cariModel.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
                 cariModel.Insdate = DateTime.Now;
             }
@@ -194,12 +209,12 @@
 
             if (isUpdate)
             {
-                cariModel = await httpClient.PostGetServiceResponseAsync<KisilerDto, KisilerRequestDto>(UrlHelper.CariKartKisiGuncelle, request);
+                cariModel = await httpClient.PostGetServiceResponseAsync<KisilerDto, KisilerRequestDto>(UrlHelper.KisiGuncelle, request);
                 Snackbar.Add("Kişi güncellendi", severity: Severity.Success);
             }
             else
             {
-                cariModel = await httpClient.PostGetServiceResponseAsync<KisilerDto, KisilerRequestDto>(UrlHelper.CariKartKisiKaydet, request);
+                cariModel = await httpClient.PostGetServiceResponseAsync<KisilerDto, KisilerRequestDto>(UrlHelper.KisiKaydet, request);
                 Snackbar.Add("Kişi eklendi", severity: Severity.Success);
             }
 
@@ -228,7 +243,7 @@
         if (modalForm.HasValue)
             await ModalInstance.CloseAsync();
         else
-            navigation.NavigateTo("/cari_kartf");
+            navigation.NavigateTo("/kisi_listef");
     }
 
     protected override Task OnParametersSetAsync()
@@ -247,7 +262,6 @@
         if (isUpdate)
         {
             await KartGetir();
-            return;
         }
         loadingCompleted = true;
     }
@@ -274,6 +288,50 @@
             ex.ErrorList = err;
 
             throw ex;
+        }
+    }
+
+    public async Task CariListesiAc()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (VCariKartDto)result.Data;
+                cariModel.Cariadi = cariSecim.Adi;
+                cariModel.Carikodu = cariSecim.Kodu;
+                cariModel.Cariref = cariSecim.Logref;
+            }
+
+        }
+    }
+
+    public async Task YeniCariEkle()
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+
+        var cariForm = modal.Show<CariKartEkleGuncelleComponent>("Yeni Cari Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var cariSecim = (CariKartDto)result.Data;
+                cariModel.Cariadi = cariSecim.Adi;
+                cariModel.Carikodu = cariSecim.Kodu;
+                cariModel.Cariref = cariSecim.Logref;
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-﻿@page "/cari_kartf"
+﻿@page "/kisi_listef"
 
 <HeaderSearchBar header="header" onAddNewButtonClicked="CreateCariKart" onDoneButtonClicked="HeaderSearch"
                  ShowButtons="false"
@@ -9,7 +9,7 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@cariler" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true" Filter="new Func<VCariKartDto,bool>(FilterFunc1)">
+<MudTable Items="@cariler" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true" Filter="new Func<KisilerDto,bool>(FilterFunc1)">
     <ToolBarContent>
         <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="CreateCariKart" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
         @*<MudSpacer />*@
@@ -17,37 +17,28 @@
     </ToolBarContent>
     <HeaderContent>
         <MudTh>#</MudTh>
-        <MudTh>Türü</MudTh>
-        <MudTh>Kodu</MudTh>
-        <MudTh>Ünvanı</MudTh>
-        <MudTh>Tabela Ünvanı</MudTh>
-        <MudTh>Adres 1</MudTh>
-        <MudTh>İlçe</MudTh>
-        <MudTh>Şehir</MudTh>
-        <MudTh>Ülke</MudTh>
-        <MudTh>Telefon</MudTh>
+        <MudTh>Kişi Adı</MudTh>
+        <MudTh>Firma Adı</MudTh>
+        <MudTh>Bölüm</MudTh>
+        <MudTh>Pozisyon</MudTh>
+        <MudTh>Cep Telefonu</MudTh>
+        <MudTh>İş Telefonu</MudTh>
         <MudTh>E-posta</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd>
-            @if (context.Caritip == 1)
-            {
-                <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => CariKartGuncelle(context.Logref))" Size="Size.Medium" />
-            }
+        <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => CariKartGuncelle(context.Logref))" Size="Size.Medium" />
         </MudTd>
-        <MudTd DataLabel="Türü">@context.Caritipadi</MudTd>
-        <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
-        <MudTd DataLabel="Ünvanı">@context.Adi</MudTd>
-        <MudTd DataLabel="Tabela Ünvanı">@context.Adi2</MudTd>
-        <MudTd DataLabel="Adres 1">@context.Adres1</MudTd>
-        <MudTd DataLabel="İlçe">@context.Ilce</MudTd>
-        <MudTd DataLabel="Şehir">@context.Il</MudTd>
-        <MudTd DataLabel="Ülke">@context.Ulke</MudTd>
-        <MudTd DataLabel="Telefon">@context.Tel1</MudTd>
+        <MudTd DataLabel="Kişi Adı">@context.Tamadi</MudTd>
+        <MudTd DataLabel="Firma Adı">@context.Cariadi</MudTd>
+        <MudTd DataLabel="Bölüm">@context.Bolum</MudTd>
+        <MudTd DataLabel="Pozisyon">@context.Pozisyon</MudTd>
+        <MudTd DataLabel="Cep Telefonu">@context.Ceptel</MudTd>
+        <MudTd DataLabel="İş Telefonu">@context.Istel</MudTd>
         <MudTd DataLabel="E-posta">@context.Mail</MudTd>
-        </RowTemplate>
+    </RowTemplate>
     <PagerContent>
-        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı"/>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
     </PagerContent>
 </MudTable>
 
@@ -71,30 +62,31 @@
 
     public HeaderBarSearch header = new HeaderBarSearch();
 
-    public List<VCariKartDto> cariler = new List<VCariKartDto>();
+    public List<KisilerDto> cariler = new List<KisilerDto>();
     private string _searchString;
     private bool _sortNameByLength;
     private bool loadingCompleted = false;
 
-    private bool FilterFunc1(VCariKartDto element) => FilterFunc(element, _searchString);
+    private bool FilterFunc1(KisilerDto element) => FilterFunc(element, _searchString);
 
-    private bool FilterFunc(VCariKartDto element, string searchString)
+    private bool FilterFunc(KisilerDto element, string searchString)
     {
         if (string.IsNullOrWhiteSpace(searchString))
             return true;
-        if (element.Adi != null && element.Adi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Tamadi != null && element.Tamadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.Adi2 != null && element.Adi2.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Cariadi != null && element.Cariadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
-        if (element.Ilce != null && element.Il != null && element.Adres1 != null
-            && $"{element.Ilce} {element.Il} {element.Adres1}".Contains(searchString, StringComparison.OrdinalIgnoreCase))
+        if (element.Bolum != null && element.Bolum.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Pozisyon != null && element.Pozisyon.Contains(searchString, StringComparison.OrdinalIgnoreCase))
             return true;
         return false;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        header.HeaderText = "Cari Kartlar";
+        header.HeaderText = "Kişiler";
         await LoadCariler();
     }
 
@@ -108,16 +100,16 @@
                 throw new Exception("Firma dönem seçilmedi");
 
 
-            var request = new VCariKartsRequestDto();
+            var request = new KisilerRequestDto();
             request.SearchText = header.SearchText;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
-            var result = await httpClient.PostGetServiceResponseAsync<List<VCariKartDto>, VCariKartsRequestDto>(UrlHelper.VCariKartAra, request);
+            var result = await httpClient.PostGetServiceResponseAsync<List<KisilerDto>, KisilerRequestDto>(UrlHelper.KisiAra, request);
             cariler = result;
             loadingCompleted = true;
 
             if (cariler == null || cariler.Count == 0)
-            {                
+            {
                 Snackbar.Add(string.Format("{0} için sonuç bulunamadı", header.SearchText), severity: Severity.Warning);
                 loadingCompleted = true;
             }
@@ -139,7 +131,7 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma dönem seçilmedi");
 
-            cariler = await httpClient.GetServiceResponseAsync<List<VCariKartDto>>(UrlHelper.VCariKartListesi + "?firmaId=" + selectedFirmaDonem.firma_no.Value);
+            cariler = await httpClient.GetServiceResponseAsync<List<KisilerDto>>(UrlHelper.KisiListesi + "?firmaId=" + selectedFirmaDonem.firma_no.Value);
             loadingCompleted = true;
         }
         catch (Exception)

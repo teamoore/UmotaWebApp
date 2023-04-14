@@ -10,6 +10,7 @@ namespace UmotaWebApp.Shared.ModelDto
     {
         public KisilerDto Kisiler { get; set; }
         public short FirmaId { get; set; }
+        public string SearchText { get; set; }
 
     }
 }

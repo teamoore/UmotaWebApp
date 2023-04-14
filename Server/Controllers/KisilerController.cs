@@ -46,7 +46,67 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
-        [HttpPost("savekisi")]
+        [HttpGet("get")]
+        public async Task<ServiceResponse<KisilerDto>> KisiGetir(int logref, string firmaId)
+        {
+            try
+            {
+                return new ServiceResponse<KisilerDto>()
+                {
+                    Value = await KisilerService.GetKisi(logref, firmaId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<KisilerDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("list")]
+        public async Task<ServiceResponse<List<KisilerDto>>> GetKisilerr(string firmaId)
+        {
+            try
+            {
+                return new ServiceResponse<List<KisilerDto>>()
+                {
+                    Value = await KisilerService.GetKisiler(firmaId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<KisilerDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("search")]
+        public async Task<ServiceResponse<List<KisilerDto>>> CariKartAra(KisilerRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<List<KisilerDto>>()
+                {
+                    Value = await KisilerService.SearchKisiler(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<KisilerDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("save")]
         public async Task<ServiceResponse<KisilerDto>> KisiKaydet(KisilerRequestDto request)
         {
             try
@@ -65,5 +125,26 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("update")]
+        public async Task<ServiceResponse<KisilerDto>> KisiGuncelle(KisilerRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<KisilerDto>
+                {
+                    Value = await KisilerService.UpdateKisi(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<KisilerDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
     }
 }

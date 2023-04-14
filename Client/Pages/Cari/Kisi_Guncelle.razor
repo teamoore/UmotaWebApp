@@ -1,0 +1,29 @@
+﻿@page "/kisi_guncelle/{logref:int}"
+
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+<KisiEkleGuncelleComponent logref="logref"></KisiEkleGuncelleComponent>
+
+@code
+{
+    [Parameter]
+    public int? logref { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Kişi Güncelle";
+        return Task.CompletedTask;
+    }
+
+    public void goBack()
+    {
+        navigation.NavigateTo("/kisi_listef");
+    }
+
+
+}

@@ -1,0 +1,24 @@
+﻿@page "/kisi_ekle"
+
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+<KisiEkleGuncelleComponent></KisiEkleGuncelleComponent>
+
+@code
+{
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Yeni Kişi Oluştur";
+        return Task.CompletedTask;
+    }
+
+    public void goBack()
+    {
+        navigation.NavigateTo("/kisi_listef");
+    }
+}

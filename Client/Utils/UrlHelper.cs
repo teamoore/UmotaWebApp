@@ -36,8 +36,8 @@ namespace UmotaWebApp.Client.Utils
         public const string CariKartKaydet = "/api/carikart/save";
         public const string CariKartGuncelle = "/api/carikart/update";
         public const string CariKartKisiGetir = "/api/kisiler/getcarikisiler";
-        public const string CariKartKisiKaydet = "/api/kisiler/savekisi";
-        public const string CariKartKisiGuncelle = "/api/kisiler/updatekisi";
+        public const string CariKartKisiKaydet = "/api/kisiler/save";
+        public const string CariKartKisiGuncelle = "/api/kisiler/update";
         public const string RefNoAl = "/api/helper/RefNoAl";
         public const string FisNoAl = "/api/helper/GenerateRef";
         public const string CariSektorList = "/api/helper/GetCariSektorList";
@@ -98,5 +98,10 @@ namespace UmotaWebApp.Client.Utils
         public const string FileDelete = "/api/FileUpload/delete";
         public const string PdfServisBilgilendirme = "api/Pdf/CreateServisBilgilendirmePdfDocumentSendMail";
         public const string PdfMusteriBilgilendirme = "api/Pdf/CreateMusteriBilgilendirmePdfDocumentSendMail";
+        public const string KisiListesi = "/api/kisiler/list";
+        public const string KisiGetir = "/api/kisiler/get";
+        public const string KisiAra = "/api/kisiler/search";    
+        public const string KisiKaydet = "/api/kisiler/save";
+        public const string KisiGuncelle = "/api/kisiler/update";
     }
 }
