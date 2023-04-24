@@ -14,5 +14,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<IEnumerable<SisSabitlerDetayDto>> GetSabitDetayList(int tip);
         public Task<IEnumerable<SpeCodesDto>> GetCariSektorList(int logofirmno);
         public Task<string> FisNoAlLogo(string table, string keyField, int firmaId, int logofirmaId);
+        public Task<IEnumerable<string>> GetTeslimSekliList();
     }
 }

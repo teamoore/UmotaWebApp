@@ -349,7 +349,7 @@
 
     TeklifDto teklif = new TeklifDto();
 
-    public List<string> TeslimSekliListesi { get; set; }
+    public IEnumerable<string> TeslimSekliListesi { get; set; }
 
     public List<PersonelDto> PersonelListesi { get; set; }
 
@@ -567,7 +567,7 @@
     {
         try
         {
-            var result = await httpClient.GetServiceResponseAsync<List<string>>("/api/helper/GetTeslimSekliList");
+            var result = await httpClient.GetServiceResponseAsync<IEnumerable<string>>("/api/helper/GetTeslimSekliList");
             if (result != null)
             {
                 TeslimSekliListesi = result;

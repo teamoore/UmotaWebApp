@@ -53,7 +53,7 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("GetTeslimSekliList")]
-        public Task<ServiceResponse<List<string>>> GetTeslimSekliList()
+        public async Task<ServiceResponse<IEnumerable<string>>> GetTeslimSekliList()
         {
             try
             {
@@ -64,20 +64,19 @@ namespace UmotaWebApp.Server.Controllers
                 list.Add("KARGO ALICI ÖDEMELİ");
                 list.Add("İHRACAT");
 
-                var result = new ServiceResponse<List<string>>()
+                return new ServiceResponse<IEnumerable<string>>()
                 {
-                    Value = list
+                    Value = await RefService.GetTeslimSekliList()
                 };
 
-                return Task.FromResult(result);
             }
             catch (Exception ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
-                var e = new ServiceResponse<List<string>>();
+                var e = new ServiceResponse<IEnumerable<string>>();
                 e.SetException(ex);
-                return Task.FromResult(e);
+                return e;
             }
         }
 

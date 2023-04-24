@@ -123,5 +123,17 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
 
         }
+        public async Task<IEnumerable<string>> GetTeslimSekliList()
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
+            {
+                string LogoDbName = Configuration["LogoDbName"];
+                string sqlstring = "SELECT SDEF from " + LogoDbName + ".[dbo].L_SHPTYPES with(nolock) order by SDEF";
+
+                IEnumerable<string> dbResponse;
+                dbResponse = await db.QueryAsync<string>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
+            }
+        }
     }
 }
