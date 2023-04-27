@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Data.Models;
 using UmotaWebApp.Server.Extensions;
+using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
@@ -51,6 +52,29 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
+                //var cariRow = await dbContext.V001CariKarts.Where(x => x.Logref != request.CariKart.Logref && x.Kodu == request.CariKart.Kodu).SingleOrDefaultAsync();
+                //if (cariRow != null)
+                //    throw new ApiException("Cari Kodu daha önceden kullanılmış");
+
+                if (!string.IsNullOrWhiteSpace(request.CariKart.Adi))
+                {
+                    var cariRow = await dbContext.V001CariKarts.Where(x => x.Logref != request.CariKart.Logref && x.Adi == request.CariKart.Adi).ToListAsync();
+                    if (cariRow.Count > 0)
+                        throw new ApiException("Cari Adı daha önceden kullanılmış");
+                }
+                if (!string.IsNullOrWhiteSpace(request.CariKart.Vdno))
+                {
+                    var cariRow = await dbContext.V001CariKarts.Where(x => x.Logref != request.CariKart.Logref && x.Vdno == request.CariKart.Vdno).ToListAsync();
+                    if (cariRow.Count > 0)
+                        throw new ApiException("Girilen Vergi/TC No daha önceden kullanılmış");
+                }
+                if (!string.IsNullOrWhiteSpace(request.CariKart.Tel1))
+                {
+                    var cariRow = await dbContext.V001CariKarts.Where(x => x.Logref != request.CariKart.Logref && x.Tel1 == request.CariKart.Tel1).ToListAsync();
+                    if (cariRow.Count > 0)
+                        throw new ApiException("Girilen Telefon No daha önceden kullanılmış");
+                }
+
                 var cariKart = Mapper.Map<CariKart>(request.CariKart);
                 await dbContext.CariKarts.AddAsync(cariKart);
                 await dbContext.SaveChangesAsync();

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Data.Models;
 using UmotaWebApp.Server.Extensions;
+using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
@@ -50,7 +51,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
             {
-                IQueryable<KisilerDto> qry = dbContext.V015Kisilers.OrderBy(x => x.Tamadi)
+                IQueryable<KisilerDto> qry = dbContext.V015Kisilers.Take(100).OrderBy(x => x.Tamadi)
                             .ProjectTo<KisilerDto>(Mapper.ConfigurationProvider);
 
                 return await qry.ToListAsync();

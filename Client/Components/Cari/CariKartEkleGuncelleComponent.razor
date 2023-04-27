@@ -289,7 +289,14 @@
             }
             else
             {
-                cariModel = await httpClient.PostGetServiceResponseAsync<CariKartDto, CariKartRequestDto>(UrlHelper.CariKartKaydet, request);
+                //cariModel = await httpClient.PostGetServiceResponseAsync<CariKartDto, CariKartRequestDto>(UrlHelper.CariKartKaydet, request);
+
+                var result = await httpClient.PostAsJsonAsync(UrlHelper.CariKartKaydet, request);
+
+                var response = await result.Content.ReadFromJsonAsync<ServiceResponse<CariKartDto>>();
+                if (!response.Success)
+                    throw new Exception(response.Message);
+
                 Snackbar.Add("Cari kart eklendi", severity: Severity.Success);
             }
 
