@@ -176,7 +176,7 @@
 
                 cariModel.Logref = reff;
 
-                var carikart = await httpClient.GetServiceResponseAsync<CariKartDto>(UrlHelper.CariKartGetirLogRef + "?logref=" + CariKartRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+                var carikart = await httpClient.GetServiceResponseAsync<VCariKartDto>(UrlHelper.VCariKartGetir + "?logref=" + CariKartRef + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
                 cariModel.Cariref = CariKartRef;
                 cariModel.Cariadi = carikart.Adi;
                 cariModel.Insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
