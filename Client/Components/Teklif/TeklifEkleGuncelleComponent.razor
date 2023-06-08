@@ -379,7 +379,7 @@
         teklif.Teklifno = await yetkiHelper.FisNoAl("teklif","teklifno");
         teklif.Tarih = DateTime.Now;
         teklif.TeslimSekli = "MÜŞTERİ TESLİM";
-        this.teklif.Notlar = Utils.Consts.TeklifSozlesmesi;
+        VarolanSozlesme();
     }
 
     public async Task GetTeklif()
@@ -698,9 +698,14 @@
         }
     }
 
-    public void VarolanSozlesme()
+    public async Task VarolanSozlesme()
     {
-        this.teklif.Notlar = Utils.Consts.TeklifSozlesmesi;
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo)
+            this.teklif.Notlar = Utils.Consts.TeklifSozlesmesiMakpa;
+        else
+            this.teklif.Notlar = Utils.Consts.TeklifSozlesmesi;
     }
 
     public async Task SevkAdresiSec()
