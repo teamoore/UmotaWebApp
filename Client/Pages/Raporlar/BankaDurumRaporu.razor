@@ -107,9 +107,7 @@
                 throw new Exception("Firma Dönem Seçili değil");
 
             var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
-
+            
             var filterForm = modal.Show<Pages.Raporlar.BankaDurumRaporuFilters>("Rapor Seçenekleri", opt);
             var result = await filterForm.Result;
 

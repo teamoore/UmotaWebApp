@@ -459,8 +459,7 @@
     public async Task CariListesiAc()
     {
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
         var result = await cariForm.Result;
 
@@ -480,8 +479,7 @@
     public async Task YeniCariEkle()
     {
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var parameters = new ModalParameters();
         parameters.Add("modalForm", 1);
 
@@ -506,8 +504,7 @@
             return;
 
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var parameters = new ModalParameters();
         parameters.Add("modalForm", 1);
         parameters.Add("CariKartRef", record.CariRef);

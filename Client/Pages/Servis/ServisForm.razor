@@ -643,8 +643,7 @@
         public async Task MusteriSec()
         {
             var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
+            
             var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
             var result = await cariForm.Result;
 
@@ -665,8 +664,7 @@
         public async Task BayiSec()
         {
             var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
+            
             var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
             var result = await cariForm.Result;
 
@@ -687,8 +685,7 @@
         public async Task ServisSec()
         {
             var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
+            
             var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
             var result = await cariForm.Result;
 
@@ -726,8 +723,7 @@
                 return;
 
             var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
+            
             var parameters = new ModalParameters();
             parameters.Add("CariKartRef", CariKartRef);
 
@@ -750,8 +746,7 @@
                 record.Logref = record.Logref = await yetkiHelper.RefNoAl("servis");
 
             var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
+            
             var parameters = new ModalParameters();
             parameters.Add("modalForm", 1);
             parameters.Add("servisref", record.Logref);
@@ -772,8 +767,7 @@
         public async Task MalzemeGuncelle(int logref)
         {
             var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
+            
             var parameters = new ModalParameters();
             parameters.Add("modalForm", 1);
             parameters.Add("servisref", record.Logref);

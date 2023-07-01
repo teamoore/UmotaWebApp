@@ -164,6 +164,10 @@
         {
             _showProgress = true;
 
+            var result = await client.GetServiceResponseAsync<List<SisFirmaDonemDto>>("/api/TalepDetay/AllTalepDetay");
+
+            var xxx = await client.PostAsJsonAsync("api/TalepDetay/CreateTalepDetay", new object());
+
             var httpReqResponse = await client.PostAsJsonAsync(UrlHelper.Login, request);
 
             if (httpReqResponse.IsSuccessStatusCode)

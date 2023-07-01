@@ -1,6 +1,7 @@
 ﻿using System;
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using Prizma.Core.Model;
 using UmotaWebApp.Server.Data.Models;
 using UmotaWebApp.Shared.ModelDto;
 
@@ -63,6 +64,8 @@ namespace UmotaWebApp.Server.Services.Extensions
             CreateMap<Servi, ServisLog>().ReverseMap();
             CreateMap<ServisMalzemeler, ServisMalzemelerLog>().ReverseMap();
             CreateMap<ImageData, ImageDataDto>().ReverseMap();
+
+            CreateMap<TalepDetay, TalepDetayDTO>().ReverseMap();
         }
     }
 

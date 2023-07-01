@@ -113,8 +113,7 @@
     private async Task EkleSec()
     {
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var Form = modal.Show<Pages.Malzeme.Malzeme_MarkaEkle>("Marka Ekle", options: opt);
         var result = await Form.Result;
 

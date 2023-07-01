@@ -42,6 +42,10 @@ namespace UmotaWebApp.Server.Extensions
                 dbServer, dbname, dbUser, dbPassword);
         }
 
+        public static string GetPrizmeDbConnection(this IConfiguration configuration)
+        {
+            return configuration.GetConnectionString("PrizmaConnection");
+        }
 
         public static string GetUmotaObjectName(this IConfiguration configuration,string objectName, string firmaId = null)
         {
