@@ -13,30 +13,34 @@ namespace UmotaWebApp.Server.Controllers
     public class TalepDetayController : ControllerBase
     {
         private readonly ITalepDetayService _talepDetayService;
+        private readonly IMahalService _mahalService;
         private readonly IMapper _mapper;
 
-        public TalepDetayController(ITalepDetayService talepDetayService, IMapper mapper)
+        public TalepDetayController(ITalepDetayService talepDetayService, IMapper mapper, IMahalService mahalService)
         {
             _talepDetayService = talepDetayService;
             _mapper = mapper;
+            _mahalService = mahalService;
         }
 
         [HttpPost("CreateTalepDetay")]
         public async Task<ActionResult<TalepDetay>> CreateTalepDetay(TalepDetayDTO talepDetayDTO)
         {
             var talepDetay = _mapper.Map<TalepDetayDTO, TalepDetay>(talepDetayDTO);
-            var musics = await _talepDetayService.CreateTalepDetay(talepDetay);
+            var response = await _talepDetayService.CreateTalepDetay(talepDetay);
             
-            return Ok(musics);
+            return Ok(response);
         }
 
         [HttpGet("AllTalepDetay")]
         public async Task<ActionResult<TalepDetayDTO>> AllTalepDetay()
         {            
-            var musics = await _talepDetayService.GetTalepDetayList();
-            var musicResources = _mapper.Map<IEnumerable<TalepDetay>, IEnumerable<TalepDetayDTO>>(musics);
+            var td = await _talepDetayService.GetTalepDetayList();
+            var m = await _mahalService.GetMahalsList();
 
-            return Ok(musicResources);
+            var tdList = _mapper.Map<IEnumerable<TalepDetay>, IEnumerable<TalepDetayDTO>>(td);
+
+            return Ok(tdList);
         }
     }
 }

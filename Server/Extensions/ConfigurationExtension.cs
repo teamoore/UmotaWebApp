@@ -10,19 +10,21 @@ namespace UmotaWebApp.Server.Extensions
     {
         public static string GetUmotaConnectionString(this IConfiguration configuration, string firmaId = null)
         {
-            var dbname = configuration["masterDbName"];
-            var dbUser = configuration["masterDbUser"];
-            var dbPassword = configuration["masterDbPassword"];
-            var dbServer = configuration["masterServer"];
+            return configuration.GetConnectionString("UmotaConnection");
 
-            if (!string.IsNullOrEmpty(firmaId))
-            {
-                string firmano = "00" + firmaId;
-                dbname = dbname + "_" + firmano.Substring(firmano.Length- 3, 3);
-            }
+            //var dbname = configuration["masterDbName"];
+            //var dbUser = configuration["masterDbUser"];
+            //var dbPassword = configuration["masterDbPassword"];
+            //var dbServer = configuration["masterServer"];
 
-            return string.Format("Server={0};Database={1};user={2};password={3};",
-                dbServer, dbname, dbUser, dbPassword);
+            //if (!string.IsNullOrEmpty(firmaId))
+            //{
+            //    string firmano = "00" + firmaId;
+            //    dbname = dbname + "_" + firmano.Substring(firmano.Length- 3, 3);
+            //}
+
+            //return string.Format("Server={0};Database={1};user={2};password={3};",
+            //    dbServer, dbname, dbUser, dbPassword);
         }
 
         public static string GetUmotaImageDbConnectionString(this IConfiguration configuration, string firmaId = null)

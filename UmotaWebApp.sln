@@ -11,13 +11,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmotaWebApp.Server.Data", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmotaWebApp.Shared", "Shared\UmotaWebApp.Shared.csproj", "{176D98A0-1B64-48B2-B496-293C14CEF385}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmotawebApp.Domain", "UmotawebApp.Domain\UmotawebApp.Domain.csproj", "{2890535A-C6DE-4522-B102-F684B60EA7E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prizma.Core", "Prizma.Core\Prizma.Core.csproj", "{6559CC43-6B42-46DE-B894-9629BA4F11C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prizma.Core", "Prizma.Core\Prizma.Core.csproj", "{6559CC43-6B42-46DE-B894-9629BA4F11C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prizma.Services", "Prizma.Services\Prizma.Services.csproj", "{884084D2-DC86-48B9-A05F-C78E210F427A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prizma.Services", "Prizma.Services\Prizma.Services.csproj", "{884084D2-DC86-48B9-A05F-C78E210F427A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prizma.Data", "Prizma.Data\Prizma.Data.csproj", "{9D87EF4E-14DF-43A6-8AC4-9F88D03C0CAB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prizma.Data", "Prizma.Data\Prizma.Data.csproj", "{9D87EF4E-14DF-43A6-8AC4-9F88D03C0CAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +39,6 @@ Global
 		{176D98A0-1B64-48B2-B496-293C14CEF385}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{176D98A0-1B64-48B2-B496-293C14CEF385}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{176D98A0-1B64-48B2-B496-293C14CEF385}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2890535A-C6DE-4522-B102-F684B60EA7E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2890535A-C6DE-4522-B102-F684B60EA7E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2890535A-C6DE-4522-B102-F684B60EA7E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2890535A-C6DE-4522-B102-F684B60EA7E8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6559CC43-6B42-46DE-B894-9629BA4F11C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6559CC43-6B42-46DE-B894-9629BA4F11C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6559CC43-6B42-46DE-B894-9629BA4F11C6}.Release|Any CPU.ActiveCfg = Release|Any CPU

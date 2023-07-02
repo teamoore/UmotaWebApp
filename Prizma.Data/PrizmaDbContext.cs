@@ -13,6 +13,7 @@ namespace Prizma.Data
     public class PrizmaDbContext : DbContext
     {
         public DbSet<TalepDetay> TalepDetays { get; set; }
+        public DbSet<Mahal> Mahals { get; set; }
 
         public PrizmaDbContext(DbContextOptions<PrizmaDbContext> dbContextOptions) : base(dbContextOptions)
         {
@@ -21,6 +22,8 @@ namespace Prizma.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfiguration(new TalepDetayConfiguration());
+            modelBuilder.ApplyConfiguration(new MahalConfiguration());
+                        
         }
     }
 }

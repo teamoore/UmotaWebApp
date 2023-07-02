@@ -7,8 +7,8 @@ namespace UmotaWebApp.Server.Mapping
     public class MappingProfile : Profile
     {
         public MappingProfile() {
-            CreateMap<TalepDetay, TalepDetayDTO>();
-            CreateMap<TalepDetayDTO, TalepDetay>();
+            CreateMap<Mahal, TalepDetayDTO>();
+            CreateMap<TalepDetayDTO, Mahal>();
 
         }
     }

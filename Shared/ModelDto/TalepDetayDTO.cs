@@ -17,5 +17,11 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? insdate { get; set; }
         public string? upduser { get; set; }
         public DateTime? upddate { get; set; }
+
+        public int mahal1ref { get; private set; }
+        public int mahal2ref { get; private set; }
+        public int mahal3ref { get; private set; }
+        public int mahal4ref { get; private set; }
+        public int mahal5ref { get; private set; }
     }
 }

@@ -13,13 +13,15 @@ namespace Prizma.Data
     {
         private readonly PrizmaDbContext _context;
         private TalepDetayRepository _talepdetayRepository;
+        private MahalRepository _mahalRepository;
 
         public UnitOfWork(PrizmaDbContext context)
         {
             _context = context;
         }
 
-        public ITalepDetayRepository TalepDetays => _talepdetayRepository = _talepdetayRepository ?? new TalepDetayRepository(_context);
+        public ITalepDetayRepository TalepDetayRepository => _talepdetayRepository = _talepdetayRepository ?? new TalepDetayRepository(_context);
+        public IMahalRepository MahalRepository => _mahalRepository = _mahalRepository ?? new MahalRepository(_context);
 
         public async Task<int> CommitAsync()
         {

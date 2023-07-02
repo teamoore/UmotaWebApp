@@ -21,6 +21,21 @@ namespace Prizma.Data.Configurations
                    .ValueGeneratedNever()
                    .HasColumnName("logref");
 
+            builder.Property(e => e.mahal1ref)
+                    .HasColumnName("mahal1ref");
+
+            builder.Property(e => e.mahal2ref)
+                    .HasColumnName("mahal2ref");
+
+            builder.Property(e => e.mahal3ref)
+                    .HasColumnName("mahal3ref");
+
+            builder.Property(e => e.mahal4ref)
+                    .HasColumnName("mahal4ref");
+
+            builder.Property(e => e.mahal5ref)
+                    .HasColumnName("mahal5ref");
+
             builder.Property(e => e.Aciklama)
                     .HasMaxLength(255)
                     .IsUnicode(false)
@@ -50,6 +65,7 @@ namespace Prizma.Data.Configurations
                 .IsUnicode(false)
                 .HasColumnName("upduser")
                 .UseCollation("SQL_Latin1_General_CP1254_CI_AS");
+
 
         }
     }

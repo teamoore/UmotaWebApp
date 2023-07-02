@@ -9,10 +9,8 @@ namespace Prizma.Core
 {
     public interface IUnitOfWork : IDisposable
     {
-        //IMusicRepository Musics { get; }
-        //IArtistRepository Artists { get; }
-
-        ITalepDetayRepository TalepDetays { get; }
+        ITalepDetayRepository TalepDetayRepository { get; }
+        IMahalRepository MahalRepository { get; }
         Task<int> CommitAsync();
     }
 }

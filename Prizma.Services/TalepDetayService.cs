@@ -21,7 +21,7 @@ namespace Prizma.Services
 
         public async Task<TalepDetay> CreateTalepDetay(TalepDetay talepDetay)
         {
-            await _unitOfWork.TalepDetays.AddAsync(talepDetay);
+            await _unitOfWork.TalepDetayRepository.AddAsync(talepDetay);
             await _unitOfWork.CommitAsync();
 
             return talepDetay;
@@ -29,7 +29,7 @@ namespace Prizma.Services
 
         public async Task<IEnumerable<TalepDetay>> GetTalepDetayList()
         {
-            return await _unitOfWork.TalepDetays.GetAllAsync();
+            return await _unitOfWork.TalepDetayRepository.GetAllAsync();
         }
     }
 }
