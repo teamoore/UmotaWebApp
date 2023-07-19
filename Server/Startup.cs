@@ -61,19 +61,19 @@ namespace UmotaWebApp.Server
 
             //services.AddSingleton(emailConfig);
 
-            //services.AddScoped<ISisKullaniciService, SisKullaniciService>();
-            //services.AddScoped<ISisFirmaService, SisFirmaService>();
-            //services.AddScoped<ISisMenuService, SisMenuService>();
-            //services.AddScoped<ICariKartService, CariKartService>();
-            //services.AddScoped<IRefGenerator, RefGeneratorService>();
+            services.AddScoped<ISisKullaniciService, SisKullaniciService>();
+            services.AddScoped<ISisFirmaService, SisFirmaService>();
+            services.AddScoped<ISisMenuService, SisMenuService>();
+            services.AddScoped<ICariKartService, CariKartService>();
+            services.AddScoped<IRefGenerator, RefGeneratorService>();
             //services.AddScoped<ITeklifService, TeklifService>();
             //services.AddScoped<ITeklifDetayService, TeklifDetayService>();
             //services.AddScoped<IMalzemeKartService, MalzemeKartService>();
             //services.AddScoped<IPersonelService, PersonelService>();
-            //services.AddScoped<ISisFirmaDonemService, SisFirmaDonemService>();
-            //services.AddScoped<IDovizService, DovizService>();
+            services.AddScoped<ISisFirmaDonemService, SisFirmaDonemService>();
+            services.AddScoped<IDovizService, DovizService>();
             //services.AddScoped<IFaaliyetService, FaaliyetService>();
-            //services.AddScoped<IPdfGenerator, PdfGeneratorService>();
+            services.AddScoped<IPdfGenerator, PdfGeneratorService>();
             //services.AddScoped<IVCariKartService, VCariKartService>();
             //services.AddScoped<IKisilerService, KisilerService>();
             //services.AddScoped<IVMalzemeKartService, VMalzemeKartService>();
@@ -82,8 +82,8 @@ namespace UmotaWebApp.Server
             //services.AddScoped<ITakvimService, TakvimService>();
             //services.AddScoped<IVazifeService, VazifeService>();
             //services.AddScoped<ICariRaporService, CariRaporService>();
-            //services.AddScoped<IServisService, ServisService>();
-            //services.AddScoped<IFileUpload, FileUploadService>();
+            services.AddScoped<IServisService, ServisService>();
+            services.AddScoped<IFileUpload, FileUploadService>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddTransient<ITalepDetayService, TalepDetayService>();

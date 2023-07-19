@@ -11,11 +11,11 @@
         <MudSpacer />
         <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="ShowDonemFirmalar">@_selectedFirma</MudButton>
 
-        <MudIconButton OnClick="GoToVazifeler">
+@*        <MudIconButton OnClick="GoToVazifeler">
             <MudBadge Content="_vazifeSayisi" Color="Color.Error" Overlap="true">
                 <MudIcon Icon="@Icons.Material.Filled.Task" Color="Color.Warning" />
             </MudBadge>
-        </MudIconButton>
+        </MudIconButton>*@
             
         <MudText Typo="Typo.h5" Class="ml-3">&nbsp;</MudText>
         <MudMenu FullWidth="true">
@@ -90,10 +90,10 @@
 
             _selectedFirma = selectedFirmaDonem.aciklama;
 
-            _vazifeSayisi = await vazifeHelper.CountRecords(new VazifeRequestDto()
-            {
-                User = loginStr
-            });
+            //_vazifeSayisi = await vazifeHelper.CountRecords(new VazifeRequestDto()
+            //{
+            //    User = loginStr
+            //});
         }
         else
         {
