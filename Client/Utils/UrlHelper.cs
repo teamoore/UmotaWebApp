@@ -103,5 +103,7 @@ namespace UmotaWebApp.Client.Utils
         public const string KisiAra = "/api/kisiler/search";    
         public const string KisiKaydet = "/api/kisiler/save";
         public const string KisiGuncelle = "/api/kisiler/update";
+
+        public const string TalepDetayListesi = "/api/talepdetay/AllTalepDetay";
     }
 }

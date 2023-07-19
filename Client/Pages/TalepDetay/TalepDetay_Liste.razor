@@ -1,7 +1,150 @@
 ﻿@page "/talepdetay_liste"
 
-<h3>TalepDetay_Liste</h3>
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="true"
+                 onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick" ShowSearchSection="true"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+<MudTable Items="@mainDataList" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
+    <ToolBarContent>
+        @if (menuYetkiDto.Insert)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTalep" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
+        }
+
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>Açıklama</MudTh>
+        <MudTh>Miktar</MudTh>
+        <MudTh>Birim</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+   
+        <MudTd DataLabel="Durum">@context.Aciklama</MudTd>
+        <MudTd DataLabel="Teklif No">@context.Miktar</MudTd>
+        <MudTd DataLabel="Rvz No">@context.BirimRef</MudTd>
+         
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
+
 
 @code {
 
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    TalepDetayHelper mainDataHelper { get; set; }
+
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+    public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
+    public List<TalepDetayDTO> mainDataList { get; set; }
+    public TalepDetayRequestDto mainDataRequest = new TalepDetayRequestDto();
+
+    private string formName = "talepdetay_liste";
+    private string insertPage = "not_implemented";
+    private string updatePage = "not_implemented";
+    private string headerText = "Talep Detay Listesi";
+    private bool loadingCompleted { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            header.HeaderText = headerText;
+
+            menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
+      
+            await LoadList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    private async Task LoadList()
+    {
+        if (menuYetkiDto.View == false)
+        {
+            loadingCompleted = true;
+            throw new Exception("Bu sayfayı görme yetkiniz yok");
+        }
+
+        mainDataList = await mainDataHelper.LoadRecords(mainDataRequest);
+        loadingCompleted = true;
+    }
+
+
+    private async Task BtnAraClick()
+    {
+        mainDataRequest.SearchText = header.SearchText;
+        mainDataRequest.TopRowCount = 0;
+        loadingCompleted = false;
+        this.StateHasChanged();
+        await LoadList();
+        if (mainDataList == null || mainDataList.Count == 0)
+            Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+    }
+
+    private async Task BtnDetayliAraClick()
+    {
+        try
+        {
+            var opt = new ModalOptions();
+
+            modalParameters = new ModalParameters();
+            modalParameters.Add("mainRequest", mainDataRequest);
+
+            var filterForm = modal.Show<Components.Teklif.TeklifDetayliAraComponent>("Detaylı Arama", modalParameters, opt);
+            var result = await filterForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+
+    }
+
+    public void YeniTalep()
+    {
+        navigation.NavigateTo("/" + insertPage);
+    }
 }
