@@ -13,5 +13,7 @@ namespace UmotaWebApp.Shared.ModelDto
 
         public string SearchText { get; set; }
         public int TopRowCount { get; set; }
+
+        public TalepDetayDTO TalepDetay { get; set; }
     }
 }

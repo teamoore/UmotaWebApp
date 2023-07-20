@@ -1,0 +1,205 @@
+﻿<EditForm Model="talepDetayDTO">
+    <DataAnnotationsValidator />
+
+    @if (loadingCompleted == false)
+    {
+        <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+    }
+
+    <div class="mt-12">
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-3">
+                    <label>Marka</label>
+                    <InputText @bind-Value="talepDetayDTO.Aciklama" class="form-control" placeholder="Açıklama" />
+                </div>
+                <div class="col-md-3">
+                    <label>Menşei</label>
+                    <InputNumber @bind-Value="talepDetayDTO.Miktar" class="form-control" placeholder="Miktar" />
+                </div>
+                <div class="col-md-3">
+                    <label>Ebat</label>
+                    <InputNumber @bind-Value="talepDetayDTO.BirimRef" class="form-control" placeholder="Birim" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="form-group">
+        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Kaydediliyor...</MudText>
+            }
+            else
+            {
+                <MudText>Kaydet</MudText>
+            }
+        </MudButton>
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+</EditForm>
+
+@code {
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Parameter]
+    public int? logRef { get; set; }
+
+    [Parameter]
+    public EventCallback OnVazgecClicked { get; set; }
+
+    public bool IsUpdate { get; set; }
+    private bool loadingCompleted = false;
+    private bool _processing = false;
+
+    TalepDetayDTO talepDetayDTO = new TalepDetayDTO();
+
+    public async Task ValidSubmit()
+    {
+        if (IsUpdate)
+            await UpdateTalepDetay();
+        else
+            await SaveTalepDetay();
+    }
+
+    private async Task UpdateTalepDetay()
+    {
+        try
+        {
+            SayfaValidation();
+            _processing = true;
+
+            talepDetayDTO.upddate = DateTime.Now;
+            talepDetayDTO.upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            talepDetayDTO.status = 1;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+  
+            Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
+
+        }
+        catch (ApiException exx)
+        {
+            Snackbar.Add(exx.Message, severity: Severity.Warning);
+            return;
+        }
+        catch (ClientException e)
+        {
+            foreach (var item in e.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    private async Task SaveTalepDetay()
+    {
+        try
+        {
+            SayfaValidation();
+
+            _processing = true;
+            await LogRefUret();
+
+            talepDetayDTO.insdate = DateTime.Now;
+            talepDetayDTO.insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            talepDetayDTO.status = 0;
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            var request = new TalepDetayRequestDto();
+            request.TalepDetay = talepDetayDTO;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
+
+        }
+        catch (ClientException e)
+        {
+            foreach (var item in e.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    public void SayfaValidation()
+    {
+        var err = new List<string>();
+
+        if (talepDetayDTO.Aciklama == null)
+            err.Add("Açıklama giriniz");
+
+        if (talepDetayDTO.Miktar == 0)
+            err.Add("Miktar sıfırdan büyük olmalı");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Talep Detay Hatası");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
+
+    public Task Vazgec()
+    {
+        navigation.NavigateTo("/talepdetay_liste");
+        return Task.CompletedTask;
+    }
+
+    public async Task LogRefUret()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma dönem seçilmedi");
+
+
+        var result2 = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=talepdetay&firmaId=" + selectedFirmaDonem.firma_no.Value);
+        talepDetayDTO.logref = result2;
+    }
+}
