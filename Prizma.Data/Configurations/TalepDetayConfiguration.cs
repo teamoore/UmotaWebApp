@@ -14,7 +14,7 @@ namespace Prizma.Data.Configurations
         public void Configure(EntityTypeBuilder<TalepDetay> builder)
         {
             builder.HasKey(e => e.logref);
-            
+
             builder.ToTable("talep_detay");
 
             builder.Property(e => e.logref)
@@ -66,6 +66,33 @@ namespace Prizma.Data.Configurations
                 .HasColumnName("upduser")
                 .UseCollation("SQL_Latin1_General_CP1254_CI_AS");
 
+            builder.Property(e => e.Aktivite1Ref)
+                    .HasColumnName("aktivite1ref");
+            builder.Property(e => e.Aktivite2Ref)
+                    .HasColumnName("aktivite2ref");
+            builder.Property(e => e.Aktivite3Ref)
+                    .HasColumnName("aktivite3ref"); 
+            builder.Property(e => e.Aktivite4Ref)
+                    .HasColumnName("aktivite4ref");
+            builder.Property(e => e.Aktivite5Ref)
+                    .HasColumnName("aktivite5ref");
+
+            builder.Property(e => e.ParLogRef)
+                     .HasColumnName("parlogref");
+
+            builder.Property(e => e.SiraNo).HasColumnName("sirano");
+
+            builder.Property(e => e.SipMiktar).HasColumnName("sipmiktar");
+
+            builder.Property(e => e.FisMiktar).HasColumnName("fismiktar");
+
+            builder.Property(e => e.KalanMiktar).HasColumnName("kalanmiktar");
+
+            builder.Property(e => e.PlSipMiktar).HasColumnName("plsipmiktar");
+
+            builder.Property(e => e.PlFisMiktar).HasColumnName("plfismiktar");
+
+            builder.Property(e => e.Marka).HasColumnName("marka");
 
         }
     }

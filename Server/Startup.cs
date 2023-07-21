@@ -69,7 +69,7 @@ namespace UmotaWebApp.Server
             //services.AddScoped<ITeklifService, TeklifService>();
             //services.AddScoped<ITeklifDetayService, TeklifDetayService>();
             //services.AddScoped<IMalzemeKartService, MalzemeKartService>();
-            //services.AddScoped<IPersonelService, PersonelService>();
+            services.AddScoped<IPersonelService, PersonelService>();
             services.AddScoped<ISisFirmaDonemService, SisFirmaDonemService>();
             services.AddScoped<IDovizService, DovizService>();
             //services.AddScoped<IFaaliyetService, FaaliyetService>();

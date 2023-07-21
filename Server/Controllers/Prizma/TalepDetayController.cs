@@ -32,12 +32,26 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpPost("CreateTalepDetay")]
-        public async Task<ActionResult<TalepDetay>> CreateTalepDetay(TalepDetayDTO talepDetayDTO)
+        public async Task<ServiceResponse<TalepDetayDTO>> CreateTalepDetay(TalepDetayRequestDto request)
         {
-            var talepDetay = _mapper.Map<TalepDetayDTO, TalepDetay>(talepDetayDTO);
-            var response = await _talepDetayService.CreateTalepDetay(talepDetay);
-            
-            return Ok(response);
+            var result = new ServiceResponse<TalepDetayDTO>();
+            try
+            {
+                var response = await _talepDetayService.CreateTalepDetay(request.TalepDetay);
+                var tdDto = _mapper.Map<TalepDetay, TalepDetayDTO>(response);
+                result.Value = tdDto;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<TalepDetayDTO>();
+                e.SetException(ex);
+                return e;
+            }
+
+            return result;
         }
 
         [HttpPost("AllTalepDetay")]

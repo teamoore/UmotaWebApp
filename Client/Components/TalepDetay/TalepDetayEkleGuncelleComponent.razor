@@ -11,15 +11,15 @@
         <div class="form-group">
             <div class="row">
                 <div class="col-md-3">
-                    <label>Marka</label>
+                    <label>Açıklama</label>
                     <InputText @bind-Value="talepDetayDTO.Aciklama" class="form-control" placeholder="Açıklama" />
                 </div>
                 <div class="col-md-3">
-                    <label>Menşei</label>
+                    <label>Miktar</label>
                     <InputNumber @bind-Value="talepDetayDTO.Miktar" class="form-control" placeholder="Miktar" />
                 </div>
                 <div class="col-md-3">
-                    <label>Ebat</label>
+                    <label>Birim</label>
                     <InputNumber @bind-Value="talepDetayDTO.BirimRef" class="form-control" placeholder="Birim" />
                 </div>
             </div>
@@ -67,6 +67,9 @@
     [Inject]
     YetkiHelper yetkiHelper { get; set; }
 
+    [Inject]
+    TalepDetayHelper mainDataHelper { get; set; }
+
     [Parameter]
     public int? logRef { get; set; }
 
@@ -78,84 +81,42 @@
     private bool _processing = false;
 
     TalepDetayDTO talepDetayDTO = new TalepDetayDTO();
+    private string tableName = "talep_detay";
+    private string listPage = "talepdetay_liste";
 
     public async Task ValidSubmit()
     {
         if (IsUpdate)
-            await UpdateTalepDetay();
+            await UpdateRecord();
         else
-            await SaveTalepDetay();
+            await SaveRecord();
     }
 
-    private async Task UpdateTalepDetay()
+    private async Task UpdateRecord()
     {
         try
         {
-            SayfaValidation();
-            _processing = true;
-
-            talepDetayDTO.upddate = DateTime.Now;
-            talepDetayDTO.upduser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            talepDetayDTO.status = 1;
-
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-  
-            Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
-
+            SubmitValidation();
         }
-        catch (ApiException exx)
+        catch (ClientException ex)
         {
-            Snackbar.Add(exx.Message, severity: Severity.Warning);
-            return;
-        }
-        catch (ClientException e)
-        {
-            foreach (var item in e.ErrorList)
+            foreach (var item in ex.ErrorList)
             {
                 Snackbar.Add(item, severity: Severity.Warning);
             }
             return;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
-        finally
-        {
-            _processing = false;
-        }
-    }
 
-    private async Task SaveTalepDetay()
-    {
         try
         {
-            SayfaValidation();
-
             _processing = true;
-            await LogRefUret();
 
-            talepDetayDTO.insdate = DateTime.Now;
-            talepDetayDTO.insuser = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-            talepDetayDTO.status = 0;
+            await mainDataHelper.UpdateRecord(talepDetayDTO);
 
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-
-            var request = new TalepDetayRequestDto();
-            request.TalepDetay = talepDetayDTO;
-            request.FirmaId = selectedFirmaDonem.firma_no.Value;
-
-            Snackbar.Add("Teklif güncellendi", severity: Severity.Success);
-
-        }
-        catch (ClientException e)
-        {
-            foreach (var item in e.ErrorList)
-            {
-                Snackbar.Add(item, severity: Severity.Warning);
-            }
-            return;
+            navigation.NavigateTo("/" + listPage);
         }
         catch (Exception ex)
         {
@@ -167,7 +128,44 @@
         }
     }
 
-    public void SayfaValidation()
+    private async Task SaveRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            //talepDetayDTO.logref = await yetkiHelper.RefNoAl(tableName);
+            await mainDataHelper.SaveRecord(talepDetayDTO);
+
+            navigation.NavigateTo("/" + listPage);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    public void SubmitValidation()
     {
         var err = new List<string>();
 

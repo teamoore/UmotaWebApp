@@ -48,9 +48,26 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return result;
         }
 
-        public Task<TalepDetayDTO> SaveRecord(TalepDetayDTO request)
+        public async Task<TalepDetayDTO> SaveRecord(TalepDetayDTO td)
         {
-            throw new System.NotImplementedException();
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            td.insdate = DateTime.Now;
+            td.insuser = kullanicikodu;
+            td.status = 0;
+
+            var request = new TalepDetayRequestDto();
+            request.TalepDetay = td;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<TalepDetayDTO, TalepDetayRequestDto>(UrlHelper.TalepDetayKaydet, request);
+
+            return result;
         }
 
         public Task<TalepDetayDTO> UpdateRecord(TalepDetayDTO request)
