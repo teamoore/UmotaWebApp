@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Prizma.Data
 {
-    public class UnitOfWork : IUnitOfWork
+    public sealed class UnitOfWork : IUnitOfWork
     {
         private readonly PrizmaDbContext _context;
         private TalepDetayRepository _talepdetayRepository;
@@ -23,7 +23,6 @@ namespace Prizma.Data
 
         public ITalepDetayRepository TalepDetayRepository => _talepdetayRepository = _talepdetayRepository ?? new TalepDetayRepository(_context);
         public IMahalRepository MahalRepository => _mahalRepository = _mahalRepository ?? new MahalRepository(_context);
-
         public ITalepFisRepository TalepFisRepository => _talepfRepository = _talepfRepository ?? new TalepFisRepository(_context);
 
         public async Task<int> CommitAsync()

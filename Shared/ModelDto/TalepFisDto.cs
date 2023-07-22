@@ -11,7 +11,7 @@ namespace UmotaWebApp.Shared.ModelDto
         public string FisNo { get;  set; }
         public DateTime Tarih { get;  set; }
         public DateTime Saat { get;  set; }
-        public int TurRef { get;  set; }
+        public int TurRef { get; set; }
         public int ProjeRef { get;  set; }
         public string TalepEden { get;  set; }
         public DateTime TeslimTarihi { get;  set; }
@@ -19,6 +19,8 @@ namespace UmotaWebApp.Shared.ModelDto
         public int Oncelik { get;  set; }
         public string? Aciklama { get;  set; }
         public int? LgFirmaNo { get;  set; }
+
+        public int TeslimYeriRef { get; set; }
 
         public int logref { get; set; }
         public byte status { get; set; }
