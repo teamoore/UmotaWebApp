@@ -104,7 +104,8 @@ namespace UmotaWebApp.Client.Utils
         public const string KisiKaydet = "/api/kisiler/save";
         public const string KisiGuncelle = "/api/kisiler/update";
 
-        public const string TalepDetayListesi = "/api/talepdetay/AllTalepDetay";
-        public const string TalepDetayKaydet = "/api/talepdetay/CreateTalepDetay";
+        public const string TalepDetayListesi = "/api/talep/AllTalepDetay";
+        public const string TalepDetayKaydet = "/api/talep/CreateTalepDetay";
+        public const string TalepFisKaydet = "/api/talep/CreateTalepFis";
     }
 }

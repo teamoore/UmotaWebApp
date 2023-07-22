@@ -16,19 +16,41 @@ namespace UmotaWebApp.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TalepDetayController : ControllerBase
+    public class TalepController : ControllerBase
     {
         private readonly ITalepDetayService _talepDetayService;
+        private readonly ITalepFisService _talepFisService;
         private readonly IMahalService _mahalService;
         private readonly IMapper _mapper;
-        public ILogger<TalepDetayController> Logger { get; }
+        public ILogger<TalepController> Logger { get; }
 
-        public TalepDetayController(ITalepDetayService talepDetayService, IMapper mapper, IMahalService mahalService, ILogger<TalepDetayController> logger)
+        public TalepController(ITalepDetayService talepDetayService, IMapper mapper, IMahalService mahalService, ILogger<TalepController> logger, ITalepFisService talepFisService)
         {
             _talepDetayService = talepDetayService;
             _mapper = mapper;
             _mahalService = mahalService;
             Logger = logger;
+            _talepFisService = talepFisService;
+        }
+
+        [HttpPost("CreateTalepFis")]
+        public async Task<ServiceResponse<TalepFisDto>> CreateTalepDetay(TalepFisRequestDto request)
+        {
+            var result = new ServiceResponse<TalepFisDto>();
+            try
+            {
+                var response = await _talepFisService.CreateTalepFis(request.TalepFis);
+                var tdDto = _mapper.Map<TalepFis, TalepFisDto>(response);
+                result.Value = tdDto;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);                 
+                result.SetException(ex);
+            }
+
+            return result;
         }
 
         [HttpPost("CreateTalepDetay")]
@@ -45,10 +67,7 @@ namespace UmotaWebApp.Server.Controllers
             catch (Exception ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<TalepDetayDTO>();
-                e.SetException(ex);
-                return e;
+                result.SetException(ex);
             }
 
             return result;
@@ -69,10 +88,8 @@ namespace UmotaWebApp.Server.Controllers
             catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<List<TalepDetayDTO>>();
-                e.SetException(ex);
-                return e;
+                result.SetException(ex);
+ 
             }
             catch (Exception ex)
             {
