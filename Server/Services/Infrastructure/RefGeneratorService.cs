@@ -47,7 +47,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             if (string.IsNullOrEmpty(firmaId))
                 throw new Exception("Firma Dönem seçimi yapınız");
 
-            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
+            using (SqlConnection db = new SqlConnection(Configuration.GetPrizmeDbConnection()))
             {
                 var p = new DynamicParameters();
                 p.Add("@tablename", tablename);

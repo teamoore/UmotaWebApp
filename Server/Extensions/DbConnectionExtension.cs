@@ -15,7 +15,7 @@ namespace UmotaWebApp.Server.Extensions
         {
             using var serviceProvider = collection.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
-            var companyDb = configuration.GetUmotaConnectionString(null);
+            var companyDb = configuration.GetPrizmeDbConnection();
             collection.AddTransient<DbConnection, SqlConnection>(i => new SqlConnection(companyDb));
             
             return collection;

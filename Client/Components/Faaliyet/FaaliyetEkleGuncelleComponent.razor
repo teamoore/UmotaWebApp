@@ -391,8 +391,7 @@
     public async Task CariListesiAc()
     {
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var cariForm = modal.Show<Pages.Cari.Cari_Sec>("Cari Seç", opt);
         var result = await cariForm.Result;
 
@@ -413,8 +412,7 @@
     public async Task YeniCariEkle()
     {
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var parameters = new ModalParameters();
         parameters.Add("modalForm", 1);
 
@@ -442,8 +440,7 @@
             return;
 
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var parameters = new ModalParameters();
         parameters.Add("modalForm", 1);
         parameters.Add("CariKartRef", mainRecord.Cariref);
@@ -622,8 +619,7 @@
     public async Task MalzemeListesiAc()
     {
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var form = modal.Show<Pages.Malzeme.Malzeme_Sec>("Malzeme Seç", options: opt);
         var result = await form.Result;
 
@@ -675,8 +671,7 @@
     {
 
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var parameters = new ModalParameters();
         parameters.Add("modalForm", 1);
         parameters.Add("vazifeTipi", vazifeTipi);
@@ -704,8 +699,7 @@
     {
 
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var parameters = new ModalParameters();
         parameters.Add("modalForm", 1);
 
@@ -717,16 +711,7 @@
 
         parameters.Add("GorevTakvimi", gt);
 
-        var cariForm = modal.Show<Pages.Takvim.Takvim_Ekle_Guncelle>("Yeni Takvim Ekle", parameters: parameters, options: opt);
-        var result = await cariForm.Result;
-
-        if (!result.Cancelled)
-        {
-            if (result.Data != null)
-            {
-            }
-
-        }
+        
     }
 
 }
