@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Prizma.Core\Prizma.Core.csproj" />
+    <ProjectReference Include="..\Shared\UmotaWebApp.Shared.csproj" />
   </ItemGroup>
 
 </Project>

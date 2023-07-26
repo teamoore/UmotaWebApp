@@ -7,11 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentValidation" Version="11.6.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Shared\UmotaWebApp.Shared.csproj" />
+    <PackageReference Include="Microsoft.TestPlatform.ObjectModel" Version="17.6.3" />
+    <PackageReference Include="Microsoft.TestPlatform.TestHost" Version="17.6.3" />
   </ItemGroup>
 
 </Project>

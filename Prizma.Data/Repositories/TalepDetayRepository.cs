@@ -23,7 +23,8 @@ namespace Prizma.Data.Repositories
 
         public async Task<IEnumerable<TalepDetay>> GetTalepDetayListAsync()
         {
-            return await dbContext.TalepDetays.ToListAsync();
+            var list = await dbContext.TalepDetays.ToListAsync();
+            return list;
         }
     }
 }

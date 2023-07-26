@@ -12,12 +12,13 @@ namespace Prizma.Core.Model
         {
                 
         }
+        public int ProjeRef { get; private set; }
         public string? Kodu { get; private set; }
         public string Adi { get; private set; }
         public int? DurumRef { get; private set; }
         public byte Active { get;  private set; }
 
-        public static Mahal Create(int logref, string kodu, string adi)
+        public static Mahal Create(int logref, string kodu, string adi, int projeRef)
         {
             if (logref <= 0)
                 throw new ArgumentOutOfRangeException(nameof(logref));
@@ -29,7 +30,8 @@ namespace Prizma.Core.Model
             {
                 logref = logref,
                 Kodu = kodu,
-                Adi = adi
+                Adi = adi,
+                ProjeRef = projeRef
             };
         }
 

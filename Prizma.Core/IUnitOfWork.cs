@@ -11,6 +11,8 @@ namespace Prizma.Core
     {
         ITalepDetayRepository TalepDetayRepository { get; }
         IMahalRepository MahalRepository { get; }
+        ITalepFisRepository TalepFisRepository { get; }
+
         Task<int> CommitAsync();
     }
 }

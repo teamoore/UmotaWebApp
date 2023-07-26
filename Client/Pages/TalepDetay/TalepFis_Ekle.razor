@@ -1,0 +1,25 @@
+﻿@page "/talepfis_ekle"
+
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+<TalepFisEkleGuncelleComponent OnVazgecClicked="goBackList"></TalepFisEkleGuncelleComponent>
+
+@code {
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Talep Oluştur";
+        return Task.CompletedTask;
+    }
+
+    public void goBackList()
+    {
+        navigation.NavigateTo("/talepfis_liste");
+    }
+
+}

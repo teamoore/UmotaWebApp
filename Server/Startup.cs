@@ -69,7 +69,7 @@ namespace UmotaWebApp.Server
             //services.AddScoped<ITeklifService, TeklifService>();
             //services.AddScoped<ITeklifDetayService, TeklifDetayService>();
             //services.AddScoped<IMalzemeKartService, MalzemeKartService>();
-            //services.AddScoped<IPersonelService, PersonelService>();
+            services.AddScoped<IPersonelService, PersonelService>();
             services.AddScoped<ISisFirmaDonemService, SisFirmaDonemService>();
             services.AddScoped<IDovizService, DovizService>();
             //services.AddScoped<IFaaliyetService, FaaliyetService>();
@@ -88,6 +88,7 @@ namespace UmotaWebApp.Server
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddTransient<ITalepDetayService, TalepDetayService>();
             services.AddTransient<IMahalService, MahalService>();
+            services.AddTransient<ITalepFisService, TalepFisService>();
 
             var architectureFolder = (IntPtr.Size == 8) ? "64 bit" : "32 bit";
             var wkHtmlToPdfPath = Path.Combine(Environment.CurrentDirectory, $"wkhtmltox\\v0.12.4\\{architectureFolder}\\libwkhtmltox");
