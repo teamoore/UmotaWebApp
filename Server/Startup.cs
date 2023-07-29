@@ -89,6 +89,7 @@ namespace UmotaWebApp.Server
             services.AddTransient<ITalepDetayService, TalepDetayService>();
             services.AddTransient<IMahalService, MahalService>();
             services.AddTransient<ITalepFisService, TalepFisService>();
+            services.AddTransient<IProjeService, ProjeService>();
 
             var architectureFolder = (IntPtr.Size == 8) ? "64 bit" : "32 bit";
             var wkHtmlToPdfPath = Path.Combine(Environment.CurrentDirectory, $"wkhtmltox\\v0.12.4\\{architectureFolder}\\libwkhtmltox");

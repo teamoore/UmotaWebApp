@@ -56,7 +56,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
             request.TalepFis = tf;
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
 
-            var result = await httpClient.PostGetServiceResponseAsync<TalepFisDto, TalepFisRequestDto>(UrlHelper.TalepFisKaydet, request);
+            var result = await httpClient.PostGetServiceResponseAsync<TalepFisDto, TalepFisRequestDto>(UrlHelper.TalepFisKaydet, request, ThrowSuccessException: true);
 
             return result;
         }

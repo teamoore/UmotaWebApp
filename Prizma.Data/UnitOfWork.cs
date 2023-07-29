@@ -15,6 +15,7 @@ namespace Prizma.Data
         private TalepDetayRepository _talepdetayRepository;
         private MahalRepository _mahalRepository;
         private ITalepFisRepository _talepfRepository;
+        private IProjeRepository _projeRepository;
 
         public UnitOfWork(PrizmaDbContext context)
         {
@@ -24,6 +25,7 @@ namespace Prizma.Data
         public ITalepDetayRepository TalepDetayRepository => _talepdetayRepository = _talepdetayRepository ?? new TalepDetayRepository(_context);
         public IMahalRepository MahalRepository => _mahalRepository = _mahalRepository ?? new MahalRepository(_context);
         public ITalepFisRepository TalepFisRepository => _talepfRepository = _talepfRepository ?? new TalepFisRepository(_context);
+        public IProjeRepository ProjeRepository => _projeRepository = _projeRepository ?? new ProjeRepository(_context);
 
         public async Task<int> CommitAsync()
         {

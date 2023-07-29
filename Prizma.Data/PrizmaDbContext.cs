@@ -15,6 +15,8 @@ namespace Prizma.Data
         public DbSet<TalepDetay> TalepDetays { get; set; }
         public DbSet<Mahal> Mahals { get; set; }
         public DbSet<TalepFis> TalepFis { get; set; }
+        public DbSet<Proje> Proje { get; set; }
+
 
         public PrizmaDbContext(DbContextOptions<PrizmaDbContext> dbContextOptions) : base(dbContextOptions)
         {
@@ -24,7 +26,8 @@ namespace Prizma.Data
         {
             modelBuilder.ApplyConfiguration(new TalepDetayConfiguration());
             modelBuilder.ApplyConfiguration(new MahalConfiguration());
-            modelBuilder.ApplyConfiguration(new TalepFisConfiguration());                        
+            modelBuilder.ApplyConfiguration(new TalepFisConfiguration());
+            modelBuilder.ApplyConfiguration(new ProjeConfiguration());
         }
     }
 }

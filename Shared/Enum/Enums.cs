@@ -14,5 +14,14 @@ namespace UmotaWebApp.Shared.Enum
             Net = 1,
             NetKdv = 2
         }
+
+        public enum TalepFisDurum
+        {
+            Oneri = 180,
+            OnaySurecinde = 181,
+            Onaylandi = 182,
+            Karsilaniyor = 183,
+            Karsilandi = 184
+        }
     }
 }

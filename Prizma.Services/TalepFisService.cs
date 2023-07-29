@@ -23,11 +23,13 @@ namespace Prizma.Services
         public async Task<TalepFis> CreateTalepFis(TalepFisDto tf)
         {
             var yeniTalep = TalepFis.Create(tf.logref, tf.TurRef, tf.ProjeRef, tf.TalepEden);
+            yeniTalep.ChangeTeslimatBilgileri(tf.TeslimYeriRef, tf.TeslimTarihi);
+            yeniTalep.ChangeAciklama(tf.Aciklama);
 
             var talepValidator = new TalepFisValidator();
             talepValidator.ValidateAndThrow(yeniTalep);
 
-            await _unitOfWork.TalepFisRepository.AddAsync(yeniTalep);
+            await _unitOfWork.TalepFisRepository.CreateTalepFisAsync(yeniTalep);
             await _unitOfWork.CommitAsync();
 
             return yeniTalep;

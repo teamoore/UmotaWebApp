@@ -13,6 +13,7 @@ namespace Prizma.Core
         public TalepFisValidator()
         {
             RuleFor(x => x.Tarih).LessThanOrEqualTo(x => x.TeslimTarihi).WithMessage("Teslim tarihi, talep tarihinden önce olamaz");
+            RuleFor(x => x.TeslimTarihi).GreaterThan(x => x.Tarih.AddDays(3)).WithMessage("Teslim tarihi, talep edilen tarihten en az 3 gün fazla olmalıdır");
         }
     }
 }
