@@ -53,6 +53,25 @@ namespace UmotaWebApp.Server.Controllers
             return result;
         }
 
+        [HttpPost("GetTalepFisList")]
+        public async Task<ServiceResponse<List<TalepFisDto>>> GetTalepDetayListAsnyc(TalepFisRequestDto request)
+        {
+            var result = new ServiceResponse<List<TalepFisDto>>();
+            try
+            {
+                var response = await _talepFisService.GetTalepFisListAsync();
+                result.Value = response;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+                result.SetException(ex);
+            }
+
+            return result;
+        }
+
+
         [HttpPost("CreateTalepDetay")]
         public async Task<ServiceResponse<TalepDetayDTO>> CreateTalepDetay(TalepDetayRequestDto request)
         {

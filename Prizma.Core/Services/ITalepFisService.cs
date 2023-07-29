@@ -11,5 +11,7 @@ namespace Prizma.Core.Services
     public interface ITalepFisService
     {
         Task<TalepFis> CreateTalepFis(TalepFisDto talepFisDto);
+
+        Task<List<TalepFisDto>> GetTalepFisListAsync();
     }
 }

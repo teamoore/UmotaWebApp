@@ -16,17 +16,18 @@ namespace Prizma.Core.Model
         public DateTime Saat { get; private set; }
         public int TurRef { get; private set; }
         public int ProjeRef { get; private set; }
-        public string TalepEden { get; private set; }
+        public string? TalepEden { get; private set; }
         public DateTime TeslimTarihi { get; private set; }
-        public byte DurumRef { get; private set; }
-        public int Oncelik { get; private set; }
+        public int DurumRef { get; private set; }
+        public byte Oncelik { get; private set; }
         public string? Aciklama { get; private set; }
         public int? LgFirmaNo { get; private set; }
         public int TeslimYeriRef { get; private set; }
+               
 
         #endregion
 
-        private static TalepFis _talepFis = new TalepFis() { FisNo = "000", Tarih = DateTime.Now, Saat = DateTime.Now, TurRef = 188, Aciklama = "", DurumRef = (byte)TalepFisDurum.Oneri, Oncelik = 1, TalepEden = "Umota", insdate = DateTime.Now, insuser = "Umota", TeslimTarihi = DateTime.Now.AddDays(3), TeslimYeriRef = 187 };
+        private static TalepFis _talepFis = new TalepFis() { FisNo = "000", Tarih = DateTime.Now, Saat = DateTime.Now, TurRef = 188, Aciklama = "", DurumRef = (int)TalepFisDurum.Oneri, Oncelik = 1, TalepEden = "Umota", insdate = DateTime.Now, insuser = "Umota", TeslimTarihi = DateTime.Now.AddDays(3), TeslimYeriRef = 187 };
 
         private TalepFis()
         {
@@ -46,7 +47,7 @@ namespace Prizma.Core.Model
 
         public void ChangeDurum(TalepFisDurum durum)
         {
-            this.DurumRef = (byte)durum;
+            this.DurumRef = (int)durum;
         }
         
         public void ChangeTeslimatBilgileri(int teslimYeri, DateTime teslimTarihi)

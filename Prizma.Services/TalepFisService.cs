@@ -34,5 +34,10 @@ namespace Prizma.Services
 
             return yeniTalep;
         }
+
+        public async Task<List<TalepFisDto>> GetTalepFisListAsync()
+        {
+            return await _unitOfWork.TalepFisRepository.GetTalepFisListAsync();
+        }
     }
 }
