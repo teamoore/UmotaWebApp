@@ -67,6 +67,7 @@ namespace UmotaWebApp.Server.Services.Extensions
 
             CreateMap<TalepDetay, TalepDetayDTO>().ReverseMap();
             CreateMap<TalepFis, TalepFisDto>().ReverseMap();
+            CreateMap<Proje,ProjeDto>().ReverseMap();
         }
     }
 

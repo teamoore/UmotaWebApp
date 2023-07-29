@@ -19,9 +19,12 @@ namespace Prizma.Data.Repositories
         { 
         }
         
-        public Task<TalepFis> CreateTalepFisAsync(TalepFis entity)
+        public async Task<TalepFis> CreateTalepFisAsync(TalepFis entity)
         {
-            throw new NotImplementedException();
+            await dbContext.TalepFis.AddAsync(entity);
+            await dbContext.SaveChangesAsync();
+
+            return entity;
         }
     }
 }

@@ -17,7 +17,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prizma.Services", "Prizma.S
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prizma.Data", "Prizma.Data\Prizma.Data.csproj", "{9D87EF4E-14DF-43A6-8AC4-9F88D03C0CAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UmotaWebApp.Test", "UmotaWebApp.Test\UmotaWebApp.Test.csproj", "{C0866EC9-39D7-40CE-BBD9-835E3193D209}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UmotaWebApp.Test", "UmotaWebApp.Test\UmotaWebApp.Test.csproj", "{C0866EC9-39D7-40CE-BBD9-835E3193D209}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{8AD69255-36D2-48B1-B212-1FA64FDA143B}"
+	ProjectSection(SolutionItems) = preProject
+		GelistirmeAsamasindaKarsilasilanDurumlar.sql = GelistirmeAsamasindaKarsilasilanDurumlar.sql
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
