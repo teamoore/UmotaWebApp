@@ -12,6 +12,6 @@ namespace Prizma.Core.Repositories
     {
         Task<TalepFis> CreateTalepFisAsync(TalepFis entity);
 
-        Task<List<TalepFisDto>> GetTalepFisListAsync();
+        Task<List<TalepFisDto>> GetTalepFisListAsync(string kullanici);
     }
 }

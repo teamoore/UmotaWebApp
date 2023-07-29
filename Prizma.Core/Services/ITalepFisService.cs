@@ -12,6 +12,6 @@ namespace Prizma.Core.Services
     {
         Task<TalepFis> CreateTalepFis(TalepFisDto talepFisDto);
 
-        Task<List<TalepFisDto>> GetTalepFisListAsync();
+        Task<List<TalepFisDto>> GetTalepFisListAsync(TalepFisRequestDto request);
     }
 }

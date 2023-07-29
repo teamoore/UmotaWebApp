@@ -29,10 +29,12 @@ namespace Prizma.Data.Repositories
             return entity;
         }
 
-        public async Task<List<TalepFisDto>> GetTalepFisListAsync()
+        public async Task<List<TalepFisDto>> GetTalepFisListAsync(string kullanici)
         {
             var qry = from t in dbContext.TalepFis
                       join p in dbContext.Proje on t.ProjeRef equals p.logref
+                      where t.insuser == kullanici
+                      orderby t.insdate descending
                       select new TalepFisDto()
                       {
                           ProjeAdi = p.Adi,

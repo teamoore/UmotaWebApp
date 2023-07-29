@@ -59,7 +59,7 @@ namespace UmotaWebApp.Server.Controllers
             var result = new ServiceResponse<List<TalepFisDto>>();
             try
             {
-                var response = await _talepFisService.GetTalepFisListAsync();
+                var response = await _talepFisService.GetTalepFisListAsync(request);
                 result.Value = response;
             }
             catch (Exception ex)
