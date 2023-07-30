@@ -8,6 +8,7 @@ namespace UmotaWebApp.Shared.ModelDto
 {
     public class TalepFisDto
     {
+        public string TeslimYeri { get; set; }
         public string ProjeAdi { get; set; }
         public string FisNo { get;  set; }
         public DateTime Tarih { get;  set; }
@@ -16,6 +17,8 @@ namespace UmotaWebApp.Shared.ModelDto
         public int? ProjeRef { get;  set; }
         public string? TalepEden { get;  set; }
         public DateTime TeslimTarihi { get;  set; }
+
+    
         public int DurumRef { get;  set; }
         public byte Oncelik { get;  set; }
         public string? Aciklama { get;  set; }

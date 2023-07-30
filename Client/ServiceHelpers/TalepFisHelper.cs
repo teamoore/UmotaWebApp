@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UmotaWebApp.Client.Utils;
+using UmotaWebApp.Shared;
 using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Client.ServiceHelpers
@@ -43,7 +44,10 @@ namespace UmotaWebApp.Client.ServiceHelpers
                 throw new Exception("Firma Dönem Seçili değil");
                         
             request.FirmaId = selectedFirmaDonem.firma_no.Value;
-            
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            request.kullanicikodu = kullanicikodu;
+
             var result = await httpClient.PostGetServiceResponseAsync<List<TalepFisDto>, TalepFisRequestDto>(UrlHelper.TalepFisListesi, request, ThrowSuccessException: true);
 
             return result;
@@ -74,6 +78,24 @@ namespace UmotaWebApp.Client.ServiceHelpers
         public Task<TalepFisDto> UpdateRecord(TalepFisDto request)
         {
             throw new System.NotImplementedException();
+        }
+
+        public async Task<List<V030_TalepFis>> LoadRecords_ViewV030TalepFis(TalepFisRequestDto request)
+        {
+
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            request.kullanicikodu = kullanicikodu;
+
+            var result = await httpClient.PostGetServiceResponseAsync<List<V030_TalepFis>, TalepFisRequestDto>(UrlHelper.TalepV030TalepFisList, request, ThrowSuccessException: true);
+
+            return result;
         }
     }
 }

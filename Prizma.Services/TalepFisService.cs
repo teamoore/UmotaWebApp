@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UmotaWebApp.Shared;
 using UmotaWebApp.Shared.ModelDto;
 
 namespace Prizma.Services
@@ -38,6 +39,11 @@ namespace Prizma.Services
         public async Task<List<TalepFisDto>> GetTalepFisListAsync(TalepFisRequestDto request)
         {
             return await _unitOfWork.TalepFisRepository.GetTalepFisListAsync(request.kullanicikodu);
+        }
+
+        public async Task<List<V030_TalepFis>> GetV030_TalepFisListAsync(TalepFisRequestDto request)
+        {
+            return await _unitOfWork.TalepFisRepository.GetV030_TalepFisListAsync(request);
         }
     }
 }

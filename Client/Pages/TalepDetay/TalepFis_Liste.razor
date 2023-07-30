@@ -9,7 +9,7 @@
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
 
-<MudTable Items="@mainDataList" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
+<MudTable Items="@mainDataListView" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
     <ToolBarContent>
         @if (menuYetkiDto.Insert)
         {
@@ -20,8 +20,9 @@
 
     <HeaderContent>
         <MudTh>Proje Adı</MudTh>
-        <MudTh>Satış Temsilcisi</MudTh>
+        <MudTh>Talep Eden</MudTh>
         <MudTh>Teslim Tarihi</MudTh>
+        <MudTh>Teslim Yeri</MudTh>
         <MudTh>Açıklama</MudTh>
         <MudTh>Kaydı Giren</MudTh>
 
@@ -30,8 +31,9 @@
             <MudTd DataLabel="Proje Adı">@context.ProjeAdi</MudTd>
             <MudTd DataLabel="Talep Açan">@context.TalepEden</MudTd>
             <MudTd DataLabel="Teslim Tarihi">@context.TeslimTarihi</MudTd>
+        <MudTd DataLabel="Teslim Tarihi">@context.TeslimYeriAdi</MudTd>
             <MudTd DataLabel="Açıklama">@context.Aciklama</MudTd>
-            <MudTd DataLabel="Kaydı Giren">@context.insuser</MudTd>
+            <MudTd DataLabel="Kaydı Giren">@context.InsUser</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
@@ -69,6 +71,8 @@
     public HeaderBarSearch header = new HeaderBarSearch();
     public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
     public List<TalepFisDto> mainDataList { get; set; }
+    public List<V030_TalepFis> mainDataListView { get; set; }
+
     public TalepFisRequestDto mainDataRequest = new();
 
     private string formName = "talepfis_liste";
@@ -115,7 +119,7 @@
             throw new Exception("Bu sayfayı görme yetkiniz yok");
         }
 
-        mainDataList = await mainDataHelper.LoadRecords(mainDataRequest);
+        mainDataListView = await mainDataHelper.LoadRecords_ViewV030TalepFis(mainDataRequest);
         loadingCompleted = true;
     }
 

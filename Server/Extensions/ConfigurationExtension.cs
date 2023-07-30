@@ -49,6 +49,11 @@ namespace UmotaWebApp.Server.Extensions
             return configuration.GetConnectionString("PrizmaConnection");
         }
 
+        public static string GetMasterDbConnection(this IConfiguration configuration)
+        {
+            return configuration.GetConnectionString("UmotaConnection");
+        }
+
         public static string GetUmotaObjectName(this IConfiguration configuration,string objectName, string firmaId = null)
         {
             var dbname = configuration["masterDbName"];
