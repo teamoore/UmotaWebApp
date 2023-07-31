@@ -102,6 +102,11 @@ namespace UmotaWebApp.Server
                 config.UseSqlServer(Configuration.GetPrizmeDbConnection());
             });
 
+            services.AddDbContext<MasterDbContext>(config =>
+            {
+                config.UseSqlServer(Configuration.GetMasterDbConnection());
+            });
+
 
             services.AddDbContext<UmotaMasterDbContext>(config =>
             {

@@ -36,7 +36,7 @@
                                     <option value="000">@Utils.Mesajlar.Seciniz</option>
                                     @foreach (var item in talepTuruList)
                                     {
-                                        <option value="@item.Kodu">@item.Adi</option>
+                                        <option value="@item.Ikodu">@item.Adi</option>
                                     }
                                 }
                             </InputSelect>
@@ -283,7 +283,7 @@
 
     public Task Vazgec()
     {
-        //navigation.NavigateTo("/talepfis_liste");
+        navigation.NavigateTo("/talepfis_liste");
         return Task.CompletedTask;
     }
 

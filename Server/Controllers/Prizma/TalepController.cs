@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
+using UmotaWebApp.Shared;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ServiceResponses;
@@ -52,6 +53,43 @@ namespace UmotaWebApp.Server.Controllers
 
             return result;
         }
+
+        [HttpPost("GetTalepFisList")]
+        public async Task<ServiceResponse<List<TalepFisDto>>> GetTalepDetayListAsnyc(TalepFisRequestDto request)
+        {
+            var result = new ServiceResponse<List<TalepFisDto>>();
+            try
+            {
+                var response = await _talepFisService.GetTalepFisListAsync(request);
+                result.Value = response;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+                result.SetException(ex);
+            }
+
+            return result;
+        }
+
+        [HttpPost("GetV030TalepFisList")]
+        public async Task<ServiceResponse<List<V030_TalepFis>>> GetV030TalepFisListsnyc(TalepFisRequestDto request)
+        {
+            var result = new ServiceResponse<List<V030_TalepFis>>();
+            try
+            {
+                var response = await _talepFisService.GetV030_TalepFisListAsync(request);
+                result.Value = response;
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+                result.SetException(ex);
+            }
+
+            return result;
+        }
+
 
         [HttpPost("CreateTalepDetay")]
         public async Task<ServiceResponse<TalepDetayDTO>> CreateTalepDetay(TalepDetayRequestDto request)
