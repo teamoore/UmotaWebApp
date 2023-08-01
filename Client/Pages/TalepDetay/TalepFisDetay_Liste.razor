@@ -4,6 +4,26 @@
 {
     <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
 }
+
+<MudBreadcrumbs Items="_items"></MudBreadcrumbs>
+
+<MudTable Items="talepfis" Hover="true" Breakpoint="Breakpoint.Sm">
+    <HeaderContent>
+        <MudTh>Proje Adı</MudTh>
+        <MudTh>Proje Şirketi</MudTh>
+        <MudTh>Açılma Tarihi</MudTh>
+        <MudTh>Teslim Tarihi</MudTh>
+        <MudTh>Durum</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.ProjeAdi</MudTd>
+        <MudTd DataLabel="Sign">@context.ProjeSirketAdi</MudTd>
+        <MudTd DataLabel="Name">@context.Tarih.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Name">@context.TeslimTarihi.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Name">@context.DurumAdi</MudTd>
+    </RowTemplate>
+</MudTable>
+
 @code {
     [Parameter]
     public int talepRef { get; set; }
@@ -30,5 +50,47 @@
     [Inject]
     YetkiHelper yetkiHelper { get; set; }
 
+    [Inject]
+    TalepFisHelper mainDataHelper { get; set; }
+
+    public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
+    List<V030_TalepFis> talepfis = new();
+    public TalepFisRequestDto talepfisRequest = new();
+
+    private string formName = "talepfisdetay_liste";
     private bool loadingCompleted { get; set; }
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Talep Listesi", href: "talepfis_liste"),
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
+
+            await LoadTalepFis();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    private async Task LoadTalepFis()
+    {
+        if (menuYetkiDto.View == false)
+        {
+            loadingCompleted = true;
+            throw new Exception("Bu sayfayı görme yetkiniz yok");
+        }
+
+        talepfisRequest.TalepFis = new TalepFisDto() { logref = this.talepRef };
+
+        talepfis = await mainDataHelper.LoadRecords_ViewV030TalepFis(talepfisRequest);
+        _items.Add(new BreadcrumbItem(string.Format("({0}) {1}", talepfis.First().ProjeKodu, talepfis.First().ProjeAdi), href: formName + "/" + talepRef));
+
+        loadingCompleted = true;
+    }
 }

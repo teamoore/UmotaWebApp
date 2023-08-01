@@ -54,6 +54,12 @@ namespace Prizma.Data.Repositories
         {
             var qry = dbContext.v030_TalepFis.Where(x => x.InsUser == request.kullanicikodu);
 
+            if (request.TalepFis != null)
+            {
+                if (request.TalepFis.logref != 0)
+                    qry = qry.Where(x => x.LogRef == request.TalepFis.logref);
+            }
+
             return await qry.ToListAsync();
         }
     }
