@@ -13,6 +13,7 @@
     <None Remove="CustomException\" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="ScaffoldModels\" />
     <Folder Include="ServiceResponses\" />
   </ItemGroup>
   <ItemGroup>

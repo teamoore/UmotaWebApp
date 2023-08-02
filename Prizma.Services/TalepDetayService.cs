@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UmotaWebApp.Shared.ModelDto;
+using UmotaWebApp.Shared.ModelDto.Request;
+using UmotaWebApp.Shared.ViewModel;
 
 namespace Prizma.Services
 {
@@ -37,6 +39,11 @@ namespace Prizma.Services
         public async Task<IEnumerable<TalepDetay>> GetTalepDetayList()
         {
             return await _unitOfWork.TalepDetayRepository.GetTalepDetayListAsync();
+        }
+
+        public async Task<IEnumerable<V031_TalepDetay>> GetTalepFisDetayListAsnyc(TalepFisDetayRequestDto request)
+        {
+            return await _unitOfWork.TalepDetayRepository.GetTalepFisDetayListAsnyc(request);
         }
     }
 }
