@@ -29,9 +29,17 @@ namespace Prizma.Data.Repositories
             return list;
         }
 
-        public Task<IEnumerable<V031_TalepDetay>> GetTalepFisDetayListAsnyc(TalepFisDetayRequestDto request)
+        public async Task<IEnumerable<V031_TalepDetay>> GetTalepFisDetayListAsnyc(TalepFisDetayRequestDto request)
         {
-            throw new NotImplementedException();
+            var qry = dbContext.v031_TalepFisDetay.AsQueryable();
+
+            if (request.TalepFisDetay != null)
+            {
+                if (request.TalepFisDetay.Parlogref != 0)
+                    qry = qry.Where(x => x.Parlogref == request.TalepFisDetay.Parlogref);
+            }
+
+            return await qry.Take(250).ToListAsync();
         }
     }
 }
