@@ -74,7 +74,7 @@
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                     @foreach (var item in teslimYeriList)
                                     {
-                                        <option value="@item.Kodu">@item.Adi</option>
+                                        <option value="@item.SabitDetayId">@item.Adi</option>
                                     }
                                 }
                             </InputSelect>
@@ -84,6 +84,15 @@
                         <div class="col-md-3">
                             <label>Teslim Tarihi</label>
                             <InputDate @bind-Value="talepFis.TeslimTarihi" class="form-control" placeholder="Teslim Tarihi" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Öncelik</label>
+                            <InputSelect class="form-control" @bind-Value="talepFis.Oncelik">
+                                <option value="0">@Utils.Mesajlar.Seciniz</option>
+                                <option value="2" selected>Normal</option>
+                                <option value="3">Yüksek</option>
+                            </InputSelect>
                         </div>
                     </div>
 
@@ -250,10 +259,10 @@
             _processing = true;
 
             talepFis.logref = await yetkiHelper.RefNoAl(tableName);
-            await mainDataHelper.SaveRecord(talepFis);
+            talepFis = await mainDataHelper.SaveRecord(talepFis);
 
             Snackbar.Add("Talep oluşturuldu", severity: Severity.Success);
-            navigation.NavigateTo("/" + listPage);
+            navigation.NavigateTo("/talepfisdetay_liste/" + talepFis.logref);
         }
         catch (Exception ex)
         {
