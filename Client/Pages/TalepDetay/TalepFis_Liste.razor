@@ -35,6 +35,8 @@
         <MudTd>
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
                 <MudMenuItem OnClick="(() => TalepFisDetay(context.LogRef))">Talep Detay</MudMenuItem>
+                <MudMenuItem OnClick="(() => TalepFisDetayEkle(context.LogRef))">Detay Ekle</MudMenuItem>
+
             </MudMenu>
         </MudTd>
         <MudTd DataLabel="Durum">@context.DurumAdi</MudTd>
@@ -192,6 +194,10 @@
         return Task.CompletedTask;
     }
 
-
+    private Task TalepFisDetayEkle(int logref)
+    {
+        navigation.NavigateTo("/talepdetay_ekle/" + logref);
+        return Task.CompletedTask;
+    }
 
 }

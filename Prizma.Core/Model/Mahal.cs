@@ -16,7 +16,8 @@ namespace Prizma.Core.Model
         public string? Kodu { get; private set; }
         public string Adi { get; private set; }
         public int? DurumRef { get; private set; }
-        public byte Active { get;  private set; }
+        public byte? Active { get;  private set; }
+        public int TurRef { get; private set; }
 
         public static Mahal Create(int logref, string kodu, string adi, int projeRef)
         {

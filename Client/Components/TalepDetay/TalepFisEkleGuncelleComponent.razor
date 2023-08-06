@@ -33,7 +33,7 @@
                             <InputSelect class="form-control" @bind-Value="talepFis.TurRef">
                                 @if (talepTuruList != null)
                                 {
-                                    <option value="000">@Utils.Mesajlar.Seciniz</option>
+                                    <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                     @foreach (var item in talepTuruList)
                                     {
                                         <option value="@item.Ikodu">@item.Adi</option>
@@ -262,7 +262,7 @@
             talepFis = await mainDataHelper.SaveRecord(talepFis);
 
             Snackbar.Add("Talep oluşturuldu", severity: Severity.Success);
-            navigation.NavigateTo("/talepfisdetay_liste/" + talepFis.logref);
+            navigation.NavigateTo("/talepdetay_ekle/" + talepFis.logref);
         }
         catch (Exception ex)
         {

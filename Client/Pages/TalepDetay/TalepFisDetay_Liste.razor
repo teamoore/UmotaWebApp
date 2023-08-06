@@ -7,7 +7,7 @@
 
 <MudBreadcrumbs Items="_items"></MudBreadcrumbs>
 
-<MudTable Items="talepfis" Hover="true" Breakpoint="Breakpoint.Sm">
+<MudTable Items="talepfis" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
     <HeaderContent>
         <MudTh>Proje Adı</MudTh>
         <MudTh>Proje Şirketi</MudTh>
@@ -22,6 +22,35 @@
         <MudTd DataLabel="Name">@context.TeslimTarihi.Value.ToString("dd.MM.yyyy")</MudTd>
         <MudTd DataLabel="Name">@context.DurumAdi</MudTd>
     </RowTemplate>
+</MudTable>
+
+<MudDivider DividerType="DividerType.Middle" Class="my-6" />
+
+<MudTable Items="talepDetays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
+
+    <ToolBarContent>
+        @if (menuYetkiDto.Insert)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTalepDetay" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
+        } &nbsp;
+    </ToolBarContent>
+
+    <HeaderContent>
+        <MudTh>Aktivite 1</MudTh>
+        <MudTh>Aktivite 2</MudTh>
+        <MudTh>Teslim Yeri</MudTh>
+        <MudTh>Miktar</MudTh>
+        <MudTh>Birim</MudTh>
+    </HeaderContent>
+
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.Aktivite1adi</MudTd>
+        <MudTd DataLabel="Sign">@context.Aktivite2adi</MudTd>
+        <MudTd DataLabel="Name">@context.Teslimyeriadi</MudTd>
+        <MudTd DataLabel="Name">@context.Miktar</MudTd>
+        <MudTd DataLabel="Name">@context.Birimadi</MudTd>
+    </RowTemplate>
+
 </MudTable>
 
 @code {
@@ -53,6 +82,9 @@
     [Inject]
     TalepFisHelper mainDataHelper { get; set; }
 
+    [Inject]
+    TalepDetayHelper talepDetayHelper { get; set; }
+
     public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
     List<V030_TalepFis> talepfis = new();
     public TalepFisRequestDto talepfisRequest = new();
@@ -64,6 +96,8 @@
         new BreadcrumbItem("Talep Listesi", href: "talepfis_liste"),
     };
 
+    List<V031_TalepDetay> talepDetays = new();
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -71,6 +105,7 @@
             menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
 
             await LoadTalepFis();
+            await LoadTalepDetayList();
         }
         catch (Exception ex)
         {
@@ -92,5 +127,18 @@
         _items.Add(new BreadcrumbItem(string.Format("({0}) {1}", talepfis.First().ProjeKodu, talepfis.First().ProjeAdi), href: formName + "/" + talepRef));
 
         loadingCompleted = true;
+    }
+
+    private async Task LoadTalepDetayList()
+    {
+        var request = new TalepFisDetayRequestDto();
+        request.TalepFisDetay = new V031_TalepDetay() {  Parlogref = talepfis.First().LogRef };
+
+        talepDetays = await talepDetayHelper.LoadViewRecords(request);
+    }
+
+    private void YeniTalepDetay()
+    {
+        navigation.NavigateTo("/talepdetay_ekle/" + this.talepfis.First().LogRef);
     }
 }

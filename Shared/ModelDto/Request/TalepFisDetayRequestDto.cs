@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UmotaWebApp.Shared.ViewModel;
+
 
 namespace UmotaWebApp.Shared.ModelDto.Request
 {

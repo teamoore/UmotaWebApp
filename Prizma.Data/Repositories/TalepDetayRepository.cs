@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UmotaWebApp.Shared.ModelDto.Request;
-using UmotaWebApp.Shared.ViewModel;
+using UmotaWebApp.Shared;
 
 namespace Prizma.Data.Repositories
 {
@@ -39,7 +39,7 @@ namespace Prizma.Data.Repositories
                     qry = qry.Where(x => x.Parlogref == request.TalepFisDetay.Parlogref);
             }
 
-            return await qry.Take(250).ToListAsync();
+            return await qry.Take(100).ToListAsync();
         }
     }
 }

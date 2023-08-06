@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace UmotaWebApp.Shared.ViewModel
+namespace UmotaWebApp.Shared
 {
     public class V031_TalepDetay
     {

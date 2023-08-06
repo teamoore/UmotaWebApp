@@ -1,7 +1,7 @@
 ﻿using Prizma.Core.Model;
+using UmotaWebApp.Shared;
 using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ModelDto.Request;
-using UmotaWebApp.Shared.ViewModel;
 
 namespace Prizma.Core.Services
 {

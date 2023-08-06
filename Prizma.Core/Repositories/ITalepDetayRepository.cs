@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UmotaWebApp.Shared.ModelDto.Request;
-using UmotaWebApp.Shared.ViewModel;
+using UmotaWebApp.Shared;
 
 namespace Prizma.Core.Repositories
 {
