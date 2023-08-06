@@ -11,6 +11,7 @@ using UmotaWebApp.Server.Services.Infrastructure;
 using UmotaWebApp.Shared;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
+using UmotaWebApp.Shared.ModelDto.Request;
 using UmotaWebApp.Shared.ServiceResponses;
 
 namespace UmotaWebApp.Server.Controllers
@@ -137,6 +138,34 @@ namespace UmotaWebApp.Server.Controllers
 
             return result;
              
+        }
+        
+
+        [HttpPost("GetTalepFisDetayListAsnyc")]
+        public async Task<ServiceResponse<List<V031_TalepDetay>>> GetTalepFisDetayListAsnyc(TalepFisDetayRequestDto request)
+        {
+            var result = new ServiceResponse<List<V031_TalepDetay>>();
+            try
+            {
+                var td = await _talepDetayService.GetTalepFisDetayListAsnyc(request);
+
+                result.Value = td.ToList();
+
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+                result.SetException(ex);
+
+            }
+            catch (Exception ex)
+            {
+                result.SetException(ex);
+                Logger.Log(LogLevel.Error, ex.Message);
+            }
+
+            return result;
+
         }
     }
 }

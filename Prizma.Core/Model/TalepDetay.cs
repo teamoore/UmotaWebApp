@@ -43,19 +43,49 @@ namespace Prizma.Core.Model
 
         #endregion
 
-        public static TalepDetay Create(string aciklama,double miktar, int birimRef) 
+        public static TalepDetay Create(int logref,int parlogref, string aciklama,double miktar, int birimRef) 
         {
             return new TalepDetay
             {
+                logref = logref,
+                ParLogRef = parlogref,
                 Aciklama = aciklama,
                 Miktar = miktar,
                 BirimRef = birimRef
             };
         }
 
+        public void ChangeMahal(int mahal1,int mahal2,int mahal3, int mahal4, int mahal5) 
+        {
+            this.mahal1ref = mahal1;
+            this.mahal2ref = mahal2;
+            this.mahal3ref = mahal3;
+            this.mahal4ref = mahal4;
+            this.mahal5ref = mahal5;
+        }
+
+        public void ChangeAktivite(int aktivite1,int aktivite2, int aktivite3)
+        {
+            this.Aktivite1Ref = aktivite1;
+            this.Aktivite2Ref = aktivite2;
+            this.Aktivite3Ref = aktivite3;
+        }
+
+        public void ChangeTeslimat(int teslimyeri, DateTime teslimTarihi)
+        {
+            this.TeslimYeriRef = teslimyeri;
+            this.TeslimTarihi = teslimTarihi;
+        }
+
         public void ChangeMiktar(double miktar)
         {
             this.Miktar = miktar;
+        }
+
+        public void ChangeInserter(string insuser,DateTime insdate)
+        {
+            this.insuser = insuser;
+            this.insdate = insdate;
         }
 
     }

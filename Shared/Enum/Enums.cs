@@ -23,5 +23,13 @@ namespace UmotaWebApp.Shared.Enum
             Karsilaniyor = 183,
             Karsilandi = 184
         }
+
+        public enum MahalTur
+        {
+            Etap = 163,
+            Bolum = 164,
+            Blok = 165,
+            Kat = 166
+        }
     }
 }

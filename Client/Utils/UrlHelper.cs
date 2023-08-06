@@ -109,7 +109,13 @@ namespace UmotaWebApp.Client.Utils
         public const string TalepFisKaydet = "/api/talep/CreateTalepFis";
         public const string TalepFisListesi = "/api/talep/GetTalepFisList";
         public const string TalepV030TalepFisList = "/api/talep/GetV030TalepFisList";
+        public const string TalepV031TalepDetayList = "/api/talep/GetTalepFisDetayListAsnyc";
 
         public const string ProjeListesi = "/api/proje/GetProjeList";
+
+        public const string AktiviteTumListe = "/api/Aktivite/GetAll";
+        public const string AktiviteBagliListe = "/api/Aktivite/GetRelated";
+
+        public const string MahalListesi = "/api/Mahal/GetMahals";
     }
 }

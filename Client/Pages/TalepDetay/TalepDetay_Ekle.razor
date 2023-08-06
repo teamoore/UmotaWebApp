@@ -1,25 +1,86 @@
-﻿@page "/talepdetay_ekle"
+﻿@page "/talepdetay_ekle/{talepRef:int}"
 
 <HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
 
-<TalepDetayEkleGuncelleComponent OnVazgecClicked="goBackTeklifList"></TalepDetayEkleGuncelleComponent>
+<MudTable Items="talepfis" Hover="true" Breakpoint="Breakpoint.Sm">
+    <HeaderContent>
+        <MudTh>Proje Adı</MudTh>
+        <MudTh>Proje Şirketi</MudTh>
+        <MudTh>Açılma Tarihi</MudTh>
+        <MudTh>Teslim Tarihi</MudTh>
+        <MudTh>Durum</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Nr">@context.ProjeAdi</MudTd>
+        <MudTd DataLabel="Sign">@context.ProjeSirketAdi</MudTd>
+        <MudTd DataLabel="Name">@context.Tarih.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Name">@context.TeslimTarihi.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Name">@context.DurumAdi</MudTd>
+    </RowTemplate>
+</MudTable>
+
+<TalepDetayEkleGuncelleComponent OnVazgecClicked="goBackTeklifList" TalepFisLogRef="this.talepRef"></TalepDetayEkleGuncelleComponent>
 
 @code {
+
+    [Parameter]
+    public int talepRef { get; set; }
 
     [Inject]
     NavigationManager navigation { get; set; }
 
     public HeaderBarSearch header = new HeaderBarSearch();
+    public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
 
-    protected override Task OnInitializedAsync()
+    List<V030_TalepFis> talepfis = new();
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    TalepFisHelper talepFisDataHelper { get; set; }
+
+    public TalepFisRequestDto talepfisRequest = new();
+
+    private string formName = "talepdetay_ekle";
+    private bool loadingCompleted { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
-        header.HeaderText = "Talep Oluştur";
-        return Task.CompletedTask;
+        header.HeaderText = "Talep Detay Oluştur";
+        try
+        {
+            menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
+
+            await LoadTalepFis();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
     }
 
     public void goBackTeklifList()
     {
         navigation.NavigateTo("/talepdetay_liste");
+    }
+
+    private async Task LoadTalepFis()
+    {
+        if (menuYetkiDto.View == false)
+        {
+            loadingCompleted = true;
+            throw new Exception("Bu sayfayı görme yetkiniz yok");
+        }
+
+        talepfisRequest.TalepFis = new TalepFisDto() { logref = this.talepRef };
+
+        talepfis = await talepFisDataHelper.LoadRecords_ViewV030TalepFis(talepfisRequest);
+        
+        loadingCompleted = true;
     }
 
 }

@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UmotaWebApp.Shared.ModelDto.Request;
+using UmotaWebApp.Shared;
 
 namespace Prizma.Data.Repositories
 {
@@ -25,6 +27,19 @@ namespace Prizma.Data.Repositories
         {
             var list = await dbContext.TalepDetays.ToListAsync();
             return list;
+        }
+
+        public async Task<IEnumerable<V031_TalepDetay>> GetTalepFisDetayListAsnyc(TalepFisDetayRequestDto request)
+        {
+            var qry = dbContext.v031_TalepFisDetay.AsQueryable();
+
+            if (request.TalepFisDetay != null)
+            {
+                if (request.TalepFisDetay.Parlogref != 0)
+                    qry = qry.Where(x => x.Parlogref == request.TalepFisDetay.Parlogref);
+            }
+
+            return await qry.Take(100).ToListAsync();
         }
     }
 }

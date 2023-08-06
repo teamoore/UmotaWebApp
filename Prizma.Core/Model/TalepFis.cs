@@ -27,7 +27,7 @@ namespace Prizma.Core.Model
 
         #endregion
 
-        private static TalepFis _talepFis = new TalepFis() { FisNo = "000", Tarih = DateTime.Now, Saat = DateTime.Now, TurRef = 188, Aciklama = "", DurumRef = (int)TalepFisDurum.Oneri, Oncelik = 1, TalepEden = "Umota", insdate = DateTime.Now, insuser = "Umota", TeslimTarihi = DateTime.Now.AddDays(3), TeslimYeriRef = 187 };
+        private static TalepFis _talepFis = new TalepFis() { FisNo = "000", Tarih = DateTime.Now, Saat = DateTime.Now, TurRef = 188, Aciklama = "", DurumRef = (int)TalepFisDurum.Oneri, Oncelik = 2, TalepEden = "Umota", insdate = DateTime.Now, insuser = "Umota", TeslimTarihi = DateTime.Now.AddDays(3), TeslimYeriRef = 187};
 
         private TalepFis()
         {
