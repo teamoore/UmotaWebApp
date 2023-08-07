@@ -2,7 +2,7 @@
 
 <HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
 
-<MudTable Items="talepfis" Hover="true" Breakpoint="Breakpoint.Sm">
+<MudTable Items="talepfis" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
     <HeaderContent>
         <MudTh>Proje Adı</MudTh>
         <MudTh>Proje Şirketi</MudTh>
@@ -18,6 +18,8 @@
         <MudTd DataLabel="Name">@context.DurumAdi</MudTd>
     </RowTemplate>
 </MudTable>
+
+<MudDivider DividerType="DividerType.Middle" Class="my-6" />
 
 <TalepDetayEkleGuncelleComponent OnVazgecClicked="goBackTeklifList" TalepFisLogRef="this.talepRef"></TalepDetayEkleGuncelleComponent>
 
@@ -65,7 +67,7 @@
 
     public void goBackTeklifList()
     {
-        navigation.NavigateTo("/talepdetay_liste");
+        navigation.NavigateTo("/talepfisdetay_liste/" + this.talepRef);
     }
 
     private async Task LoadTalepFis()

@@ -14,7 +14,8 @@ namespace UmotaWebApp.Client.ServiceHelpers
         {
             TalepTuru = 50,
             TalepTeslimYeri = 52,
-            TalepOnayTuru = 54
+            TalepOnayTuru = 54,
+            Birimler = 53
         }
 
         protected HttpClient httpClient { get; set; }

@@ -45,6 +45,21 @@ namespace Prizma.Core.Model
             return yeniTalepFis;
         }
 
+        public void ChangeOncelik(byte oncelik)
+        {
+            this.Oncelik = oncelik;
+        }
+
+        public void ChangeInserter(string insuser)
+        {
+            this.insuser = insuser;
+        }
+
+        public void ChangeFisNo(string fisno)
+        {
+            this.FisNo = fisno;
+        }
+
         public void ChangeDurum(TalepFisDurum durum)
         {
             this.DurumRef = (int)durum;

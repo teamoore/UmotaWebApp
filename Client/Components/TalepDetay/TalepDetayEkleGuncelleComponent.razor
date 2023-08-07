@@ -147,7 +147,16 @@
                         </div>
                         <div class="col-md-3">
                             <label>Birim</label>
-                            <InputNumber @bind-Value="talepDetayDTO.BirimRef" class="form-control" placeholder="Birim" />
+                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.BirimRef">
+                                @if (birimList != null)
+                                {
+                                    <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                    @foreach (var item in birimList)
+                                    {
+                                        <option value="@item.SabitDetayId">@item.Adi</option>
+                                    }
+                                }
+                            </InputSelect>
                         </div>
                     </div>
                 </div>
@@ -273,6 +282,8 @@
     List<V005Mahal> bolumList = new();
     List<V005Mahal> blokList = new();
     List<V005Mahal> katList = new();
+
+    List<SisSabitlerDetayDto> birimList = new();
 
     V030_TalepFis talepfis = new();
 
@@ -415,6 +426,8 @@
     {
         teslimYeriList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.TalepTeslimYeri);
         aktivite1List = await aktiviteHelper.LoadRecords(new AktiviteRequestDto(){ ParLogRef = 0});
+        birimList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.Birimler);
+
         loadingCompleted = true;
     }
 
