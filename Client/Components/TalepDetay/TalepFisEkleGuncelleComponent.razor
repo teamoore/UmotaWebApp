@@ -36,7 +36,7 @@
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                     @foreach (var item in talepTuruList)
                                     {
-                                        <option value="@item.Ikodu">@item.Adi</option>
+                                        <option value="@item.SabitDetayId">@item.Adi</option>
                                     }
                                 }
                             </InputSelect>
@@ -187,6 +187,7 @@
     TalepFisDto talepFis = new() { Tarih = DateTime.Now, Saat = DateTime.Now, TeslimTarihi = DateTime.Now.AddDays(3)};
     List<SisSabitlerDetayDto> teslimYeriList = new();
     List<SisSabitlerDetayDto> talepTuruList = new();
+    
     List<ProjeDto> projeler = new();
 
     private string tableName = "talep_fis";
@@ -311,6 +312,8 @@
     {
         teslimYeriList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.TalepTeslimYeri);
         talepTuruList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.TalepTuru);
+
+
         projeler = await projeHelper.LoadRecords();
 
         this.talepFis.FisNo = "001-01-0002";

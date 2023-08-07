@@ -26,6 +26,9 @@ namespace Prizma.Services
             var yeniTalep = TalepFis.Create(tf.logref, tf.TurRef, tf.ProjeRef, tf.TalepEden);
             yeniTalep.ChangeTeslimatBilgileri(tf.TeslimYeriRef, tf.TeslimTarihi);
             yeniTalep.ChangeAciklama(tf.Aciklama);
+            yeniTalep.ChangeFisNo(tf.FisNo);
+            yeniTalep.ChangeInserter(tf.insuser);
+            yeniTalep.ChangeOncelik(tf.Oncelik);
 
             var talepValidator = new TalepFisValidator();
             talepValidator.ValidateAndThrow(yeniTalep);
