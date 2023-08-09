@@ -15,7 +15,7 @@
                     <div class="row">
                         <div class="col-md-3">
                             <label>Etap</label>
-                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.mahal1ref" @oninput="LoadBolum">
+                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.mahal1ref" @bind-Value:after="LoadBolum">
                                 @if (etapList != null)
                                 {
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -29,7 +29,7 @@
 
                         <div class="col-md-3">
                             <label>Bölüm</label>
-                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.mahal2ref" @oninput="LoadBlok">
+                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.mahal2ref" @bind-Value:after="LoadBlok">
                                 @if (bolumList != null)
                                 {
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -40,10 +40,10 @@
                                 }
                             </InputSelect>
                         </div>
-                    
+
                         <div class="col-md-3">
                             <label>Blok</label>
-                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.mahal3ref" @oninput="LoadKat">
+                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.mahal3ref" @bind-Value:after="LoadKat">
                                 @if (blokList != null)
                                 {
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -77,9 +77,9 @@
                 <div class="form-group">
                     <div class="row">
 
-                          <div class="col-md-3">
+                        <div class="col-md-3">
                             <label>Aktivite 1</label>
-                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.Aktivite1Ref" @oninput="LoadAktivite2">
+                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.Aktivite1Ref" @bind-Value:after="LoadAktivite2">
                                 @if (aktivite1List != null)
                                 {
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -93,7 +93,7 @@
 
                         <div class="col-md-3">
                             <label>Aktivite 2</label>
-                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.Aktivite2Ref" @oninput="LoadAktivite3">
+                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.Aktivite2Ref" @bind-Value:after="LoadAktivite3">
                                 @if (aktivite2List != null)
                                 {
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -133,7 +133,7 @@
                             <label>Teknik Özellikler / Notlar</label>
                             <InputText @bind-Value="talepDetayDTO.Aciklama" class="form-control" placeholder="Teknik Özellikler / Notlar" />
                         </div>
-                        
+
                     </div>
                 </div>
 
@@ -212,7 +212,7 @@
     </MudCard>
 
 
-  
+
 </EditForm>
 
 @code {
@@ -425,51 +425,62 @@
     public async Task LoadSelectBoxdata()
     {
         teslimYeriList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.TalepTeslimYeri);
-        aktivite1List = await aktiviteHelper.LoadRecords(new AktiviteRequestDto(){ ParLogRef = 0});
+        aktivite1List = await aktiviteHelper.LoadRecords(new AktiviteRequestDto() { ParLogRef = 0 });
         birimList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.Birimler);
 
         loadingCompleted = true;
     }
 
-    public async Task LoadAktivite2()
+    protected async Task LoadAktivite2()
     {
+
         loadingCompleted = false;
+        aktivite2List.Clear();
+
         aktivite2List = await aktiviteHelper.LoadRecords(new AktiviteRequestDto() { ParLogRef = talepDetayDTO.Aktivite1Ref });
-        aktivite3List = new();
+        aktivite3List.Clear();
 
         loadingCompleted = true;
+        this.StateHasChanged();
     }
 
     public async Task LoadAktivite3()
     {
         loadingCompleted = false;
+        aktivite3List.Clear();
+
         aktivite3List = await aktiviteHelper.LoadRecords(new AktiviteRequestDto() { ParLogRef = talepDetayDTO.Aktivite2Ref });
 
         loadingCompleted = true;
+
+        this.StateHasChanged();
     }
 
     public async Task LoadEtap()
     {
-        etapList = await mahalHelper.LoadRecords(new MahalRequestDto() { TurRef = (int)SharedEnums.MahalTur.Etap , ProjeRef = talepfis.ProjeRef.Value });
-
+        etapList = await mahalHelper.LoadRecords(new MahalRequestDto() { TurRef = (int)SharedEnums.MahalTur.Etap, ProjeRef = talepfis.ProjeRef.Value });
+        this.StateHasChanged();
     }
 
     public async Task LoadBolum()
     {
-        bolumList = await mahalHelper.LoadRecords(new MahalRequestDto() { TurRef = (int)SharedEnums.MahalTur.Bolum , ProjeRef = talepfis.ProjeRef.Value });
-        blokList = new();
-        katList = new();
+        bolumList = await mahalHelper.LoadRecords(new MahalRequestDto() { TurRef = (int)SharedEnums.MahalTur.Bolum, ProjeRef = talepfis.ProjeRef.Value });
+        blokList.Clear();
+        katList.Clear();
+        this.StateHasChanged();
     }
 
     public async Task LoadBlok()
     {
         blokList = await mahalHelper.LoadRecords(new MahalRequestDto() { TurRef = (int)SharedEnums.MahalTur.Blok, ProjeRef = talepfis.ProjeRef.Value });
-        katList = new();
+        katList.Clear();
+        this.StateHasChanged();
     }
 
     public async Task LoadKat()
     {
         katList = await mahalHelper.LoadRecords(new MahalRequestDto() { TurRef = (int)SharedEnums.MahalTur.Kat, ProjeRef = talepfis.ProjeRef.Value });
+        this.StateHasChanged();
     }
 
     private async Task LoadTalepFis()
@@ -483,4 +494,6 @@
 
         loadingCompleted = true;
     }
+
+     
 }
