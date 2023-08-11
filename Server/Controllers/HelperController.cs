@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
+using UmotaWebApp.Shared;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ServiceResponses;
@@ -129,6 +130,46 @@ namespace UmotaWebApp.Server.Controllers
                 return new ServiceResponse<IEnumerable<SisSabitlerDetayDto>>()
                 {
                     Value = await RefService.GetSabitDetayList(tip)
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<IEnumerable<SisSabitlerDetayDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("GetKaynakList")]
+        public async Task<ServiceResponse<IEnumerable<V002_Kaynak>>> GetKaynakList(int aktivite3LogRef)
+        {
+            try
+            {
+                return new ServiceResponse<IEnumerable<V002_Kaynak>>()
+                {
+                    Value = await RefService.GetKaynakList(aktivite3LogRef)
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<IEnumerable<V002_Kaynak>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("GetKaynakBirimKoduList")]
+        public async Task<ServiceResponse<IEnumerable<SisSabitlerDetayDto>>> GetKaynakBirimKoduList(int kaynakLogRef)
+        {
+            try
+            {
+                return new ServiceResponse<IEnumerable<SisSabitlerDetayDto>>()
+                {
+                    Value = await RefService.GetKaynakBirimKoduList(kaynakLogRef)
                 };
             }
             catch (Exception ex)

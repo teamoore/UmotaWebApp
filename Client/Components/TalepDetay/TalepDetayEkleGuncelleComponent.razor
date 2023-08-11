@@ -107,13 +107,27 @@
 
                         <div class="col-md-3">
                             <label>Aktivite 3</label>
-                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.Aktivite3Ref">
+                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.Aktivite3Ref" @bind-Value:after="LoadKaynak">
                                 @if (aktivite3List != null)
                                 {
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                     @foreach (var item in aktivite3List)
                                     {
                                         <option value="@item.Logref">@item.Kodu @item.Adi</option>
+                                    }
+                                }
+                            </InputSelect>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Kaynak</label>
+                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.Aktivite5Ref" @bind-Value:after="LoadBirim">
+                                @if (kaynakList != null)
+                                {
+                                    <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                    @foreach (var item in kaynakList)
+                                    {
+                                        <option value="@item.Logref">@item.Adi</option>
                                     }
                                 }
                             </InputSelect>
@@ -153,7 +167,7 @@
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                     @foreach (var item in birimList)
                                     {
-                                        <option value="@item.SabitDetayId">@item.Adi</option>
+                                        <option value="@item.SabitDetayId">@item.Kodu</option>
                                     }
                                 }
                             </InputSelect>
@@ -277,6 +291,7 @@
     List<V001Aktivite> aktivite1List = new();
     List<V001Aktivite> aktivite2List = new();
     List<V001Aktivite> aktivite3List = new();
+    List<V002_Kaynak> kaynakList = new();
 
     List<V005Mahal> etapList = new();
     List<V005Mahal> bolumList = new();
@@ -426,7 +441,6 @@
     {
         teslimYeriList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.TalepTeslimYeri);
         aktivite1List = await aktiviteHelper.LoadRecords(new AktiviteRequestDto() { ParLogRef = 0 });
-        birimList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.Birimler);
 
         loadingCompleted = true;
     }
@@ -439,6 +453,8 @@
 
         aktivite2List = await aktiviteHelper.LoadRecords(new AktiviteRequestDto() { ParLogRef = talepDetayDTO.Aktivite1Ref });
         aktivite3List.Clear();
+        kaynakList.Clear();
+        birimList.Clear();
 
         loadingCompleted = true;
         this.StateHasChanged();
@@ -450,6 +466,33 @@
         aktivite3List.Clear();
 
         aktivite3List = await aktiviteHelper.LoadRecords(new AktiviteRequestDto() { ParLogRef = talepDetayDTO.Aktivite2Ref });
+        kaynakList.Clear();
+        birimList.Clear();
+
+        loadingCompleted = true;
+
+        this.StateHasChanged();
+    }
+
+    public async Task LoadKaynak()
+    {
+        loadingCompleted = false;
+        kaynakList.Clear();
+
+        kaynakList = await sabitHelper.GetKaynakList(talepDetayDTO.Aktivite3Ref);
+        birimList.Clear();
+
+        loadingCompleted = true;
+
+        this.StateHasChanged();
+    }
+
+    public async Task LoadBirim()
+    {
+        loadingCompleted = false;
+        birimList.Clear();
+
+        birimList = await sabitHelper.GetKaynakBirimKoduList(talepDetayDTO.Aktivite5Ref);
 
         loadingCompleted = true;
 
