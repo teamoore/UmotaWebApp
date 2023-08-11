@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using UmotaWebApp.Shared;
 using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
@@ -15,5 +16,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<IEnumerable<SpeCodesDto>> GetCariSektorList(int logofirmno);
         public Task<string> FisNoAlLogo(string table, string keyField, int firmaId, int logofirmaId);
         public Task<IEnumerable<string>> GetTeslimSekliList();
+
+        public Task<IEnumerable<V002_Kaynak>> GetKaynakList(int aktivite3LogRef);
+
+        public Task<IEnumerable<SisSabitlerDetayDto>> GetKaynakBirimKoduList(int kaynakLogRef);
     }
 }

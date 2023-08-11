@@ -12,6 +12,7 @@ using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Server.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
+using UmotaWebApp.Shared;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
@@ -132,6 +133,29 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
                 IEnumerable<string> dbResponse;
                 dbResponse = await db.QueryAsync<string>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
+            }
+        }
+
+        public async Task<IEnumerable<V002_Kaynak>> GetKaynakList(int aktivite3LogRef)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetPrizmeDbConnection()))
+            {
+                string sqlstring = string.Format("select logref,adi from [dbo].[v002_kaynak] where aktiviteref = {0}", aktivite3LogRef);
+                IEnumerable<V002_Kaynak> dbResponse;
+                dbResponse = await db.QueryAsync<V002_Kaynak>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
+            }
+        }
+
+        public async Task<IEnumerable<SisSabitlerDetayDto>> GetKaynakBirimKoduList(int kaynakLogRef)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetPrizmeDbConnection()))
+            {
+                string sqlstring = string.Format(@"select b.sabit_detay_id as SabitDetayId,b.kodu as Kodu from kaynak_birim a with(nolock) inner join UmoYAPI..sis_sabitler_detay b with(nolock) on a.birimref = b.sabit_detay_id where a.parlogref = {0} order by b.kodu", kaynakLogRef);
+
+                IEnumerable<SisSabitlerDetayDto> dbResponse;
+                dbResponse = await db.QueryAsync<SisSabitlerDetayDto>(sqlstring, commandType: CommandType.Text);
                 return dbResponse;
             }
         }
