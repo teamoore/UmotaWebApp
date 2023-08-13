@@ -182,6 +182,26 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpGet("GetMaxTalepFisNo")]
+        public async Task<ServiceResponse<int>> GetMaxTalepFisNo()
+        {
+            try
+            {
+                return new ServiceResponse<int>()
+                {
+                    Value = await RefService.GetMaxTalepFisNo()
+                };
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
         [HttpGet("RefNoAl")]
         public async Task<ServiceResponse<int>> RefNoAl(string tablename, string firmaId)
         {

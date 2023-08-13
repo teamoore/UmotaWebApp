@@ -20,5 +20,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public Task<IEnumerable<V002_Kaynak>> GetKaynakList(int aktivite3LogRef);
 
         public Task<IEnumerable<SisSabitlerDetayDto>> GetKaynakBirimKoduList(int kaynakLogRef);
+
+        public Task<int> GetMaxTalepFisNo();
+
     }
 }

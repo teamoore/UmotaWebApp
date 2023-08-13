@@ -73,5 +73,19 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             return result;
         }
+
+        public async Task<int> GetMaxTalepFisNo()
+        {
+            var result = 0;
+            try
+            {
+                result = await httpClient.GetServiceResponseAsync<int>("/api/helper/GetMaxTalepFisNo");
+            }
+            catch (Exception)
+            {
+            }
+
+            return result;
+        }
     }
 }
