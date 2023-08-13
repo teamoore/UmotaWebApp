@@ -36,7 +36,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                                     keyField
                                     + ") from " + table + "),'00000')) as value"
                                     , commandType: CommandType.Text);
-                                                return result;
+                return result;
             }
 
 
@@ -113,7 +113,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 string LogoDbName = Configuration["LogoDbName"];
                 string LogoFirmaNo = logofirmaId.ToString("000");
-                string tblName = LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_"+ table + "]";
+                string tblName = LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_" + table + "]";
 
                 var result = await db.QueryFirstAsync<string>("select dbo.GenerateNewCode(isnull((select max(" +
                                     keyField
@@ -156,6 +156,17 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
                 IEnumerable<SisSabitlerDetayDto> dbResponse;
                 dbResponse = await db.QueryAsync<SisSabitlerDetayDto>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
+            }
+        }
+
+        public async Task<int> GetMaxTalepFisNo()
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetPrizmeDbConnection()))
+            {
+                string sqlstring = "select  max(convert(int,right(right(fisno,6),len(right(fisno,6))-charindex('-',right(fisno,6))))) as MaxNumber from v030_talep_fis with(nolock)";
+           
+                var dbResponse = await db.QuerySingleAsync<int>(sqlstring, commandType: CommandType.Text);
                 return dbResponse;
             }
         }
