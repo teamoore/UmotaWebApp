@@ -36,6 +36,7 @@
     </ToolBarContent>
 
     <HeaderContent>
+        <MudTh>#</MudTh>
         <MudTh>Aktivite 1</MudTh>
         <MudTh>Aktivite 2</MudTh>
         <MudTh>Teslim Yeri</MudTh>
@@ -44,6 +45,11 @@
     </HeaderContent>
 
     <RowTemplate>
+        <MudTd>
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
+                <MudMenuItem OnClick="(() => TaleDetayGuncelle(context.Logref))">Güncelle</MudMenuItem>
+            </MudMenu>
+        </MudTd>
         <MudTd DataLabel="Nr">@context.Aktivite1adi</MudTd>
         <MudTd DataLabel="Sign">@context.Aktivite2adi</MudTd>
         <MudTd DataLabel="Name">@context.Teslimyeriadi</MudTd>
@@ -56,6 +62,7 @@
 @code {
     [Parameter]
     public int talepRef { get; set; }
+
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
@@ -140,5 +147,10 @@
     private void YeniTalepDetay()
     {
         navigation.NavigateTo("/talepdetay_ekle/" + this.talepfis.First().LogRef);
+    }
+
+    private void TaleDetayGuncelle(int talepDetayLogRef)
+    {
+        navigation.NavigateTo("/talepdetay_ekle/" + this.talepfis.First().LogRef + "/" + talepDetayLogRef.ToString());
     }
 }

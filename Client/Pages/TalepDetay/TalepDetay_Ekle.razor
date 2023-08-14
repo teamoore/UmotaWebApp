@@ -1,4 +1,4 @@
-﻿@page "/talepdetay_ekle/{talepRef:int}"
+﻿@page "/talepdetay_ekle/{talepRef:int}/{talepDetayLogRef:int?}"
 
 <HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
 
@@ -21,12 +21,15 @@
 
 <MudDivider DividerType="DividerType.Middle" Class="my-6" />
 
-<TalepDetayEkleGuncelleComponent OnVazgecClicked="goBackTeklifList" TalepFisLogRef="this.talepRef"></TalepDetayEkleGuncelleComponent>
+<TalepDetayEkleGuncelleComponent OnVazgecClicked="goBackTeklifList" TalepFisLogRef="this.talepRef" talepDetayLogRef="this.talepDetayLogRef"></TalepDetayEkleGuncelleComponent>
 
 @code {
 
     [Parameter]
     public int talepRef { get; set; }
+
+    [Parameter]
+    public int? talepDetayLogRef { get; set; }
 
     [Inject]
     NavigationManager navigation { get; set; }

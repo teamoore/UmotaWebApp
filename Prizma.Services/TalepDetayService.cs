@@ -41,6 +41,11 @@ namespace Prizma.Services
             return yeniTalep;
         }
 
+        public async Task<TalepDetay> GetTalepDetay(int logref)
+        {
+            return await _unitOfWork.TalepDetayRepository.SingleOrDefaultAsync(x => x.logref == logref);
+        }
+
         public async Task<IEnumerable<TalepDetay>> GetTalepDetayList()
         {
             return await _unitOfWork.TalepDetayRepository.GetTalepDetayListAsync();
