@@ -160,13 +160,13 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             }
         }
 
-        public async Task<int> GetMaxTalepFisNo()
+        public async Task<string> GetMaxTalepFisNo(string projekodu, string talepturkodu)
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetPrizmeDbConnection()))
             {
-                string sqlstring = "select  max(convert(int,right(right(fisno,6),len(right(fisno,6))-charindex('-',right(fisno,6))))) as MaxNumber from v030_talep_fis with(nolock)";
+                string sqlstring = "select dbo.GenerateNewCode (isnull((select max(fisno) num from v030_talep_fis with(nolock) where projekodu='"+projekodu+"' and turkodu = '"+talepturkodu+"'),'"+projekodu.Substring(0,3)+"-"+talepturkodu.Substring(0,2)+"-000000') ) as num";
            
-                var dbResponse = await db.QuerySingleAsync<int>(sqlstring, commandType: CommandType.Text);
+                var dbResponse = await db.QuerySingleAsync<string>(sqlstring, commandType: CommandType.Text);
                 return dbResponse;
             }
         }

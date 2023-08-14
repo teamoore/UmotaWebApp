@@ -27,22 +27,6 @@
                     <MudDivider DividerType="DividerType.Middle" Class="my-6" />
 
                     <div class="row">
-
-                        <div class="col-md-3">
-                            <label>Talep Türü</label>
-                            <InputSelect class="form-control" @bind-Value="talepFis.TurRef" @bind-Value:after="GenerateTalepFisnNo">
-                                @if (talepTuruList != null)
-                                {
-                                    <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                    @foreach (var item in talepTuruList)
-                                    {
-                                        <option value="@item.SabitDetayId">@item.Adi</option>
-                                    }
-                                }
-                            </InputSelect>
-
-                        </div>
-
                         <div class="col-md-3">
                             <label>Proje</label>
                             <InputSelect class="form-control" @bind-Value="talepFis.ProjeRef" @bind-Value:after="GenerateTalepFisnNo">
@@ -55,9 +39,20 @@
                                     }
                                 }
                             </InputSelect>
-
                         </div>
-
+                        <div class="col-md-3">
+                            <label>Talep Türü</label>
+                            <InputSelect class="form-control" @bind-Value="talepFis.TurRef" @bind-Value:after="GenerateTalepFisnNo">
+                                @if (talepTuruList != null)
+                                {
+                                    <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                    @foreach (var item in talepTuruList)
+                                    {
+                                        <option value="@item.SabitDetayId">@item.Adi</option>
+                                    }
+                                }
+                            </InputSelect>
+                        </div>
                     </div>
 
                     <MudDivider DividerType="DividerType.Middle" Class="my-6"/>
@@ -279,8 +274,17 @@
     {
         var err = new List<string>();
 
+        if (talepFis.ProjeRef == null || talepFis.ProjeRef == 0)
+            err.Add("Proje boş geçilemez");
+
+        if (talepFis.TurRef == null || talepFis.TurRef == 0)
+            err.Add("Talep Türü boş geçilemez");
+
+        if (talepFis.TalepEden == null)
+            err.Add("Talep Eden boş geçilemez");
+
         if (talepFis.Aciklama == null)
-            err.Add("Açıklama giriniz");
+            err.Add("Açıklama boş geçilemez");
 
         if (err.Count > 0)
         {
@@ -323,20 +327,23 @@
 
     private async Task GenerateTalepFisnNo()
     {
-        var projeKodu = "000";
-        var proje = projeler.FirstOrDefault(x => x.logref == this.talepFis.ProjeRef);
-        if (proje != null)
-            projeKodu = proje.Kodu;
+        if (this.talepFis.ProjeRef != null && this.talepFis.TurRef != null)
+        {
+            var projeKodu = "000";
+            var proje = projeler.FirstOrDefault(x => x.logref == this.talepFis.ProjeRef);
+            if (proje != null)
+                projeKodu = proje.Kodu;
 
-        var turKodu = "000";
-        var tur = talepTuruList.FirstOrDefault(x => x.SabitDetayId == this.talepFis.TurRef);
-        if (tur != null)
-            turKodu = tur.Kodu;
+            var turKodu = "00";
+            var tur = talepTuruList.FirstOrDefault(x => x.SabitDetayId == this.talepFis.TurRef);
+            if (tur != null)
+                turKodu = tur.Kodu;
 
-        var maxKod = await sabitHelper.GetMaxTalepFisNo() + 1;
-        var sonKod = maxKod.ToString();
+            var maxKod = await sabitHelper.GetMaxTalepFisNo(projeKodu, turKodu);
 
-        this.talepFis.FisNo = projeKodu + "-" + turKodu + "-" + sonKod.PadLeft(6, '0');
+            this.talepFis.FisNo = maxKod;
+
+        }
     }
 
     protected override async Task OnInitializedAsync()

@@ -183,20 +183,20 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("GetMaxTalepFisNo")]
-        public async Task<ServiceResponse<int>> GetMaxTalepFisNo()
+        public async Task<ServiceResponse<string>> GetMaxTalepFisNo(string projekodu, string talepturkodu)
         {
             try
             {
-                return new ServiceResponse<int>()
+                return new ServiceResponse<string>()
                 {
-                    Value = await RefService.GetMaxTalepFisNo()
+                    Value = await RefService.GetMaxTalepFisNo(projekodu, talepturkodu)
                 };
             }
             catch (Exception ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
-                var e = new ServiceResponse<int>();
+                var e = new ServiceResponse<string>();
                 e.SetException(ex);
                 return e;
             }
