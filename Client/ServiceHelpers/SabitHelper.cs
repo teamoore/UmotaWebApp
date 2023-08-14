@@ -13,6 +13,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
         public enum SabitTurler
         {
             TalepTuru = 50,
+            TalepDurumu = 51,
             TalepTeslimYeri = 52,
             TalepOnayTuru = 54
         }

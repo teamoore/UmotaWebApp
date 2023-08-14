@@ -15,6 +15,8 @@ namespace Prizma.Core
 
         IProjeRepository ProjeRepository { get; }
 
+        ISiparisRepository SiparisRepository { get; }
+
         Task<int> CommitAsync();
     }
 }

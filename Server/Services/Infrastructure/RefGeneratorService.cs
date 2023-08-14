@@ -82,7 +82,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
             {
-                string sqlstring = string.Format("SELECT [sabit_detay_id],[tip],[kodu],[ikodu],[adi],[yabanci_adi],[siralama],[ozel_kod1],[ozel_kod2],[ozel_kod3],[ozel_kod4],[ozel_kod5],[ozel_kod6],[ozel_kod7],[ozel_kod8],[ozel_kod9],[ozel_kod10],[ozel_kod11],[ozel_kod12],[izin],[renk1],[renk2] FROM [dbo].[sis_sabitler_detay] where tip = {0}", tip);
+                string sqlstring = string.Format("SELECT [sabit_detay_id] as SabitDetayID,[tip],[kodu],[ikodu],[adi],[yabanci_adi],[siralama],[ozel_kod1],[ozel_kod2],[ozel_kod3],[ozel_kod4],[ozel_kod5],[ozel_kod6],[ozel_kod7],[ozel_kod8],[ozel_kod9],[ozel_kod10],[ozel_kod11],[ozel_kod12],[izin],[renk1],[renk2] FROM [dbo].[sis_sabitler_detay] where tip = {0}", tip);
                 IEnumerable<SisSabitlerDetayDto> dbResponse;
                 dbResponse = await db.QueryAsync<SisSabitlerDetayDto>(sqlstring, commandType: CommandType.Text);
                 return dbResponse;

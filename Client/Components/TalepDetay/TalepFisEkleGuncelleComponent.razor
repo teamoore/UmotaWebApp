@@ -33,10 +33,10 @@
                             <InputSelect class="form-control" @bind-Value="talepFis.TurRef">
                                 @if (talepTuruList != null)
                                 {
-                                    <option value="000">@Utils.Mesajlar.Seciniz</option>
+                                    <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                     @foreach (var item in talepTuruList)
                                     {
-                                        <option value="@item.Ikodu">@item.Adi</option>
+                                        <option value="@item.SabitDetayId">@item.Adi</option>
                                     }
                                 }
                             </InputSelect>
@@ -74,7 +74,7 @@
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
                                     @foreach (var item in teslimYeriList)
                                     {
-                                        <option value="@item.Kodu">@item.Adi</option>
+                                        <option value="@item.SabitDetayId">@item.Adi</option>
                                     }
                                 }
                             </InputSelect>
