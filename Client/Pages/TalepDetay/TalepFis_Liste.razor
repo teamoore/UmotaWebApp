@@ -20,16 +20,16 @@
 
     <HeaderContent>
         <MudTh>#</MudTh>
-        <MudTh>Onay Durumu</MudTh>
-        <MudTh>Talep Türü</MudTh>
-        <MudTh>Proje Adı</MudTh>
-        <MudTh>Talep Eden</MudTh>
         <MudTh>Talep Tarihi</MudTh>
+        <MudTh>Talep No</MudTh>
+        <MudTh>Proje Adı</MudTh>
+        <MudTh>Talep Türü</MudTh>
+        <MudTh>Talep Eden</MudTh>
         <MudTh>Teslim Tarihi</MudTh>
         <MudTh>Teslim Yeri</MudTh>
         <MudTh>Açıklama</MudTh>
+        <MudTh>Durumu</MudTh>
         <MudTh>Kaydı Giren</MudTh>
-
     </HeaderContent>
     <RowTemplate>
         <MudTd>
@@ -39,14 +39,15 @@
 
             </MudMenu>
         </MudTd>
-        <MudTd DataLabel="Durum">@context.DurumAdi</MudTd>
-        <MudTd DataLabel="Talep Türü">@context.TurAdi</MudTd>
-        <MudTd DataLabel="Proje Adı">@context.ProjeAdi</MudTd>
-        <MudTd DataLabel="Talep Açan">@context.TalepEden</MudTd>
         <MudTd DataLabel="Talep Tarihi">@context.Tarih.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Talep No">@context.FisNo</MudTd>
+        <MudTd DataLabel="Proje Adı">@context.ProjeAdi</MudTd>
+        <MudTd DataLabel="Talep Türü">@context.TurAdi</MudTd>
+        <MudTd DataLabel="Talep Eden">@context.TalepEden</MudTd>
         <MudTd DataLabel="Teslim Tarihi">@context.TeslimTarihi.Value.ToString("dd.MM.yyyy")</MudTd>
-        <MudTd DataLabel="Teslim Tarihi">@context.TeslimYeriAdi</MudTd>
+        <MudTd DataLabel="Teslim Yeri">@context.TeslimYeriAdi</MudTd>
         <MudTd DataLabel="Açıklama">@context.Aciklama</MudTd>
+        <MudTd DataLabel="Durumu">@context.DurumAdi</MudTd>
         <MudTd DataLabel="Kaydı Giren">@context.InsUser</MudTd>
     </RowTemplate>
     <PagerContent>
@@ -150,7 +151,7 @@
         loadingCompleted = false;
         this.StateHasChanged();
         await LoadList();
-        if (mainDataList == null || mainDataList.Count == 0)
+        if (mainDataListView == null || mainDataListView.Count == 0)
             Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
     }
 
@@ -163,7 +164,7 @@
             modalParameters = new ModalParameters();
             modalParameters.Add("mainRequest", mainDataRequest);
 
-            var filterForm = modal.Show<Components.Teklif.TeklifDetayliAraComponent>("Detaylı Arama", modalParameters, opt);
+            var filterForm = modal.Show<Components.TalepDetay.TalepDetayliAraComponent>("Detaylı Arama", modalParameters, opt);
             var result = await filterForm.Result;
 
             if (!result.Cancelled)
@@ -176,7 +177,7 @@
                     loadingCompleted = false;
                     this.StateHasChanged();
                     await LoadList();
-                    if (mainDataList == null || mainDataList.Count == 0)
+                    if (mainDataListView == null || mainDataListView.Count == 0)
                         Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
                 }
             }
