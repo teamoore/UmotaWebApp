@@ -24,40 +24,47 @@
     </RowTemplate>
 </MudTable>
 
-<MudDivider DividerType="DividerType.Middle" Class="my-6" />
+<MudTabs Outlined="true" Position="Position.Top" Rounded="true" Border="true"
+         ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
+    <MudTabPanel Text="Talep Detayları">
+        <MudTable Items="talepDetays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
 
-<MudTable Items="talepDetays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
+            <ToolBarContent>
+                @if (menuYetkiDto.Insert)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTalepDetay" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
+                } &nbsp;
+            </ToolBarContent>
 
-    <ToolBarContent>
-        @if (menuYetkiDto.Insert)
-        {
-            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTalepDetay" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
-        } &nbsp;
-    </ToolBarContent>
+            <HeaderContent>
+                <MudTh>#</MudTh>
+                <MudTh>Aktivite 1</MudTh>
+                <MudTh>Aktivite 2</MudTh>
+                <MudTh>Teslim Yeri</MudTh>
+                <MudTh>Miktar</MudTh>
+                <MudTh>Birim</MudTh>
+            </HeaderContent>
 
-    <HeaderContent>
-        <MudTh>#</MudTh>
-        <MudTh>Aktivite 1</MudTh>
-        <MudTh>Aktivite 2</MudTh>
-        <MudTh>Teslim Yeri</MudTh>
-        <MudTh>Miktar</MudTh>
-        <MudTh>Birim</MudTh>
-    </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
+                        <MudMenuItem OnClick="(() => TaleDetayGuncelle(context.Logref))">Güncelle</MudMenuItem>
+                    </MudMenu>
+                </MudTd>
+                <MudTd DataLabel="Nr">@context.Aktivite1adi</MudTd>
+                <MudTd DataLabel="Sign">@context.Aktivite2adi</MudTd>
+                <MudTd DataLabel="Name">@context.Teslimyeriadi</MudTd>
+                <MudTd DataLabel="Name">@context.Miktar</MudTd>
+                <MudTd DataLabel="Name">@context.Birimadi</MudTd>
+            </RowTemplate>
 
-    <RowTemplate>
-        <MudTd>
-            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
-                <MudMenuItem OnClick="(() => TaleDetayGuncelle(context.Logref))">Güncelle</MudMenuItem>
-            </MudMenu>
-        </MudTd>
-        <MudTd DataLabel="Nr">@context.Aktivite1adi</MudTd>
-        <MudTd DataLabel="Sign">@context.Aktivite2adi</MudTd>
-        <MudTd DataLabel="Name">@context.Teslimyeriadi</MudTd>
-        <MudTd DataLabel="Name">@context.Miktar</MudTd>
-        <MudTd DataLabel="Name">@context.Birimadi</MudTd>
-    </RowTemplate>
+        </MudTable>
 
-</MudTable>
+    </MudTabPanel>
+    <MudTabPanel Text="Onay Durumları">
+        <MudText>Content Two</MudText>
+    </MudTabPanel>
+</MudTabs>
 
 @code {
     [Parameter]
