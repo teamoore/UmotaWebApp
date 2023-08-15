@@ -25,6 +25,7 @@ namespace Prizma.Core.Model
         public int? Aktivite3Ref { get; private set; }
         public int? Aktivite4Ref { get; private set; }
         public int? Aktivite5Ref { get; private set; }
+        public int? KaynakRef { get; private set; }
 
         public int? TeslimYeriRef { get; private set; }
         public DateTime? TeslimTarihi { get; private set; }
@@ -43,7 +44,7 @@ namespace Prizma.Core.Model
 
         #endregion
 
-        public static TalepDetay Create(int logref,int parlogref, string aciklama,double miktar, int birimRef) 
+        public static TalepDetay Create(int logref,int parlogref, string aciklama, double miktar, int birimRef, string marka) 
         {
             return new TalepDetay
             {
@@ -51,7 +52,8 @@ namespace Prizma.Core.Model
                 ParLogRef = parlogref,
                 Aciklama = aciklama,
                 Miktar = miktar,
-                BirimRef = birimRef
+                BirimRef = birimRef,
+                Marka = marka
             };
         }
 
@@ -82,6 +84,10 @@ namespace Prizma.Core.Model
             this.Miktar = miktar;
         }
 
+        public void ChangeKaynak(int kaynakref)
+        {
+            this.KaynakRef = kaynakref;
+        }
         public void ChangeInserter(string insuser,DateTime insdate)
         {
             this.insuser = insuser;

@@ -11,6 +11,7 @@
     <HeaderContent>
         <MudTh>Proje Adı</MudTh>
         <MudTh>Talep Türü</MudTh>
+        <MudTh>Talep No</MudTh>
         <MudTh>Talep Tarihi</MudTh>
         <MudTh>Teslim Tarihi</MudTh>
         <MudTh>Durum</MudTh>
@@ -18,6 +19,7 @@
     <RowTemplate>
         <MudTd DataLabel="Proje Adı">@context.ProjeAdi</MudTd>
         <MudTd DataLabel="Talep Türü">@context.TurAdi</MudTd>
+        <MudTd DataLabel="Talep No">@context.FisNo</MudTd>
         <MudTd DataLabel="Talep Tarihi">@context.Tarih.Value.ToString("dd.MM.yyyy")</MudTd>
         <MudTd DataLabel="Teslim Tarihi">@context.TeslimTarihi.Value.ToString("dd.MM.yyyy")</MudTd>
         <MudTd DataLabel="Durum">@context.DurumAdi</MudTd>

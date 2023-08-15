@@ -33,6 +33,8 @@ namespace Prizma.Data.Configurations
             builder.Property(e => e.Aktivite4Ref).HasColumnName("aktivite4ref");
             builder.Property(e => e.Aktivite5Ref).HasColumnName("aktivite5ref");
 
+            builder.Property(e => e.KaynakRef).HasColumnName("kaynakref");
+
             builder.Property(e => e.Aciklama)
                     .HasMaxLength(255)
                     .IsUnicode(false)

@@ -5,17 +5,19 @@
 <MudTable Items="talepfis" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
     <HeaderContent>
         <MudTh>Proje Adı</MudTh>
-        <MudTh>Proje Şirketi</MudTh>
-        <MudTh>Açılma Tarihi</MudTh>
+        <MudTh>Talep Türü</MudTh>
+        <MudTh>Talep No</MudTh>
+        <MudTh>Talep Tarihi</MudTh>
         <MudTh>Teslim Tarihi</MudTh>
         <MudTh>Durum</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Nr">@context.ProjeAdi</MudTd>
-        <MudTd DataLabel="Sign">@context.ProjeSirketAdi</MudTd>
-        <MudTd DataLabel="Name">@context.Tarih.Value.ToString("dd.MM.yyyy")</MudTd>
-        <MudTd DataLabel="Name">@context.TeslimTarihi.Value.ToString("dd.MM.yyyy")</MudTd>
-        <MudTd DataLabel="Name">@context.DurumAdi</MudTd>
+        <MudTd DataLabel="Proje Adı">@context.ProjeAdi</MudTd>
+        <MudTd DataLabel="Talep Türü">@context.TurAdi</MudTd>
+        <MudTd DataLabel="Talep No">@context.FisNo</MudTd>
+        <MudTd DataLabel="Talep Tarihi">@context.Tarih.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Teslim Tarihi">@context.TeslimTarihi.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Durum">@context.DurumAdi</MudTd>
     </RowTemplate>
 </MudTable>
 

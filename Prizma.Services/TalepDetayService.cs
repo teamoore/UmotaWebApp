@@ -25,10 +25,11 @@ namespace Prizma.Services
 
         public async Task<TalepDetay> CreateTalepDetay(TalepDetayDTO td)
         {
-            var yeniTalep = TalepDetay.Create(td.logref,td.ParLogRef, td.Aciklama, td.Miktar, td.BirimRef);
+            var yeniTalep = TalepDetay.Create(td.logref,td.ParLogRef, td.Aciklama, td.Miktar, td.BirimRef, td.Marka);
 
             yeniTalep.ChangeMahal(td.mahal1ref,td.mahal2ref,td.mahal3ref,td.mahal4ref,td.mahal5ref);
             yeniTalep.ChangeAktivite(td.Aktivite1Ref, td.Aktivite2Ref, td.Aktivite3Ref);
+            yeniTalep.ChangeKaynak(td.KaynakRef);
             yeniTalep.ChangeTeslimat(td.TeslimYeriRef, td.TeslimTarihi);
             yeniTalep.ChangeInserter(td.insuser, td.insdate.Value);
 
