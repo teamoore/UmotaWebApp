@@ -277,6 +277,9 @@
     [Parameter]
     public int TalepFisLogRef { get; set; }
 
+    [Parameter]
+    public int? talepDetayLogRef { get; set; }
+
     List<SisSabitlerDetayDto> teslimYeriList = new();
 
     public bool IsUpdate { get; set; }
@@ -310,6 +313,8 @@
         {
             loadingCompleted = true;
             await LoadTalepFis();
+            await LoadTalepDetayData();
+
             await LoadSelectBoxdata();
             await LoadEtap();
 
@@ -327,6 +332,24 @@
             await UpdateRecord();
         else
             await SaveRecord();
+    }
+
+    public async Task LoadTalepDetayData()
+    {
+        this.IsUpdate = this.talepDetayLogRef.HasValue;
+        if (!this.IsUpdate)
+            return;
+
+        talepDetayDTO =  await mainDataHelper.LoadRecord(talepDetayLogRef.Value);
+
+        await LoadBolum();
+        await LoadBlok();
+        await LoadKat();
+
+
+        await LoadAktivite2();
+        await LoadAktivite3();
+        await LoadBirimForExistingData();
     }
 
     private async Task UpdateRecord()
@@ -353,7 +376,7 @@
 
             await mainDataHelper.UpdateRecord(talepDetayDTO);
 
-            navigation.NavigateTo("/" + listPage);
+            navigation.NavigateTo("/talepfisdetay_liste/" + TalepFisLogRef.ToString());
         }
         catch (Exception ex)
         {
@@ -422,7 +445,7 @@
 
     public Task Vazgec()
     {
-        navigation.NavigateTo("/talepdetay_liste");
+        navigation.NavigateTo("/talepfisdetay_liste/" + TalepFisLogRef.ToString());
         return Task.CompletedTask;
     }
 
@@ -495,6 +518,16 @@
         birimList = await sabitHelper.GetKaynakBirimKoduList(talepDetayDTO.KaynakRef);
 
         loadingCompleted = true;
+
+        this.StateHasChanged();
+    }
+
+    public async Task LoadBirimForExistingData()
+    {
+        birimList.Clear();
+        birimList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.Birimler);
+
+        birimList.RemoveAll(x => x.SabitDetayId != talepDetayDTO.BirimRef);
 
         this.StateHasChanged();
     }

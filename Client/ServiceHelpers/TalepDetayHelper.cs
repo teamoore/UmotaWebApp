@@ -26,9 +26,23 @@ namespace UmotaWebApp.Client.ServiceHelpers
             throw new System.NotImplementedException();
         }
 
-        public Task<TalepDetayDTO> LoadRecord(int logref)
+        public async Task<TalepDetayDTO> LoadRecord(int logref)
         {
-            throw new System.NotImplementedException();
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+  
+            var request = new TalepDetayRequestDto();
+            request.TalepDetay = new TalepDetayDTO() { logref = logref };
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<TalepDetayDTO, TalepDetayRequestDto>(UrlHelper.TalepDetayGetir, request, ThrowSuccessException: true);
+
+            return result;
         }
 
         public Task<List<TalepDetayDTO>> LoadRecords()
@@ -85,9 +99,25 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return result;
         }
 
-        public Task<TalepDetayDTO> UpdateRecord(TalepDetayDTO request)
+        public async Task<TalepDetayDTO> UpdateRecord(TalepDetayDTO td)
         {
-            throw new System.NotImplementedException();
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            td.upddate = DateTime.Now;
+            td.upduser = kullanicikodu;
+            
+            var request = new TalepDetayRequestDto();
+            request.TalepDetay = td;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<TalepDetayDTO, TalepDetayRequestDto>(UrlHelper.TalepDetayGuncelle, request, ThrowSuccessException: true);
+
+            return result;
         }
     }
 }

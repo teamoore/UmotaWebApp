@@ -12,5 +12,9 @@ namespace Prizma.Core.Services
         Task<IEnumerable<TalepDetay>> GetTalepDetayList();
 
         Task<IEnumerable<V031_TalepDetay>> GetTalepFisDetayListAsnyc(TalepFisDetayRequestDto request);
+
+        Task<TalepDetay> GetTalepDetay(int logref);
+
+        Task<TalepDetay> Update(TalepDetayRequestDto request);
     }
 }
