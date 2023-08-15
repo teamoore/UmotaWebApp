@@ -26,46 +26,60 @@
     </RowTemplate>
 </MudTable>
 
-<MudDivider DividerType="DividerType.Middle" Class="my-6" />
+<MudTabs Outlined="true" Position="Position.Top" Rounded="true" Border="true"
+         ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
+    <MudTabPanel Text="Talep Detayları">
+        <MudTable Items="talepDetays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
 
-<MudTable Items="talepDetays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
+            <ToolBarContent>
+                @if (menuYetkiDto.Insert)
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTalepDetay" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
+                } &nbsp;
+            </ToolBarContent>
 
-    <ToolBarContent>
-        @if (menuYetkiDto.Insert)
-        {
-            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTalepDetay" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
-        } &nbsp;
-    </ToolBarContent>
+            <HeaderContent>
+                <MudTh>#</MudTh>
+                <MudTh>Aktivite 1</MudTh>
+                <MudTh>Aktivite 2</MudTh>
+                <MudTh>Aktivite 3</MudTh>
+                <MudTh>Kaynak Kodu</MudTh>
+                <MudTh>Kaynak Adı</MudTh>
+                <MudTh>Marka</MudTh>
+                <MudTh>Teknik Özellikler / Notlar</MudTh>
+                <MudTh>Miktar</MudTh>
+                <MudTh>Birim</MudTh>
+            </HeaderContent>
 
-    <HeaderContent>
-        <MudTh>Aktivite 1</MudTh>
-        <MudTh>Aktivite 2</MudTh>
-        <MudTh>Aktivite 3</MudTh>
-        <MudTh>Kaynak Kodu</MudTh>
-        <MudTh>Kaynak Adı</MudTh>
-        <MudTh>Marka</MudTh>
-        <MudTh>Teknik Özellikler / Notlar</MudTh>
-        <MudTh>Miktar</MudTh>
-        <MudTh>Birim</MudTh>
-    </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
+                        <MudMenuItem OnClick="(() => TaleDetayGuncelle(context.Logref))">Güncelle</MudMenuItem>
+                    </MudMenu>
+                </MudTd>
+                <MudTd DataLabel="Aktivite 1">@context.Aktivite1adi</MudTd>
+                <MudTd DataLabel="Aktivite 2">@context.Aktivite2adi</MudTd>
+                <MudTd DataLabel="Aktivite 3">@context.Aktivite3adi</MudTd>
+                <MudTd DataLabel="Kaynak Kodu">@context.Kaynakkodu</MudTd>
+                <MudTd DataLabel="Kaynak Adı">@context.Kaynakadi</MudTd>
+                <MudTd DataLabel="Marka">@context.Marka</MudTd>
+                <MudTd DataLabel="Teknik Özellikler / Notlar">@context.Aciklama</MudTd>
+                <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
+                <MudTd DataLabel="Birim">@context.Birimadi</MudTd>
+            </RowTemplate>
 
-    <RowTemplate>
-        <MudTd DataLabel="Aktivite 1">@context.Aktivite1adi</MudTd>
-        <MudTd DataLabel="Aktivite 2">@context.Aktivite2adi</MudTd>
-        <MudTd DataLabel="Aktivite 3">@context.Aktivite3adi</MudTd>
-        <MudTd DataLabel="Kaynak Kodu">@context.Kaynakkodu</MudTd>
-        <MudTd DataLabel="Kaynak Adı">@context.Kaynakadi</MudTd>
-        <MudTd DataLabel="Marka">@context.Marka</MudTd>
-        <MudTd DataLabel="Teknik Özellikler / Notlar">@context.Aciklama</MudTd>
-        <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
-        <MudTd DataLabel="Birim">@context.Birimadi</MudTd>
-    </RowTemplate>
+        </MudTable>
 
-</MudTable>
+    </MudTabPanel>
+    <MudTabPanel Text="Onay Durumları">
+        <MudText>Content Two</MudText>
+    </MudTabPanel>
+</MudTabs>
 
 @code {
     [Parameter]
     public int talepRef { get; set; }
+
 
     [CascadingParameter] IModalService modal { get; set; }
     [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
@@ -142,7 +156,7 @@
     private async Task LoadTalepDetayList()
     {
         var request = new TalepFisDetayRequestDto();
-        request.TalepFisDetay = new V031_TalepDetay() {  Parlogref = talepfis.First().LogRef };
+        request.TalepFisDetay = new V031_TalepDetay() { Parlogref = talepfis.First().LogRef };
 
         talepDetays = await talepDetayHelper.LoadViewRecords(request);
     }
@@ -150,5 +164,10 @@
     private void YeniTalepDetay()
     {
         navigation.NavigateTo("/talepdetay_ekle/" + this.talepfis.First().LogRef);
+    }
+
+    private void TaleDetayGuncelle(int talepDetayLogRef)
+    {
+        navigation.NavigateTo("/talepdetay_ekle/" + this.talepfis.First().LogRef + "/" + talepDetayLogRef.ToString());
     }
 }
