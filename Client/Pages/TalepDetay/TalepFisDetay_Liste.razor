@@ -10,17 +10,19 @@
 <MudTable Items="talepfis" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
     <HeaderContent>
         <MudTh>Proje Adı</MudTh>
-        <MudTh>Proje Şirketi</MudTh>
-        <MudTh>Açılma Tarihi</MudTh>
+        <MudTh>Talep Türü</MudTh>
+        <MudTh>Talep No</MudTh>
+        <MudTh>Talep Tarihi</MudTh>
         <MudTh>Teslim Tarihi</MudTh>
         <MudTh>Durum</MudTh>
     </HeaderContent>
     <RowTemplate>
-        <MudTd DataLabel="Nr">@context.ProjeAdi</MudTd>
-        <MudTd DataLabel="Sign">@context.ProjeSirketAdi</MudTd>
-        <MudTd DataLabel="Name">@context.Tarih.Value.ToString("dd.MM.yyyy")</MudTd>
-        <MudTd DataLabel="Name">@context.TeslimTarihi.Value.ToString("dd.MM.yyyy")</MudTd>
-        <MudTd DataLabel="Name">@context.DurumAdi</MudTd>
+        <MudTd DataLabel="Proje Adı">@context.ProjeAdi</MudTd>
+        <MudTd DataLabel="Talep Türü">@context.TurAdi</MudTd>
+        <MudTd DataLabel="Talep No">@context.FisNo</MudTd>
+        <MudTd DataLabel="Talep Tarihi">@context.Tarih.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Teslim Tarihi">@context.TeslimTarihi.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Durum">@context.DurumAdi</MudTd>
     </RowTemplate>
 </MudTable>
 
@@ -38,17 +40,25 @@
     <HeaderContent>
         <MudTh>Aktivite 1</MudTh>
         <MudTh>Aktivite 2</MudTh>
-        <MudTh>Teslim Yeri</MudTh>
+        <MudTh>Aktivite 3</MudTh>
+        <MudTh>Kaynak Kodu</MudTh>
+        <MudTh>Kaynak Adı</MudTh>
+        <MudTh>Marka</MudTh>
+        <MudTh>Teknik Özellikler / Notlar</MudTh>
         <MudTh>Miktar</MudTh>
         <MudTh>Birim</MudTh>
     </HeaderContent>
 
     <RowTemplate>
-        <MudTd DataLabel="Nr">@context.Aktivite1adi</MudTd>
-        <MudTd DataLabel="Sign">@context.Aktivite2adi</MudTd>
-        <MudTd DataLabel="Name">@context.Teslimyeriadi</MudTd>
-        <MudTd DataLabel="Name">@context.Miktar</MudTd>
-        <MudTd DataLabel="Name">@context.Birimadi</MudTd>
+        <MudTd DataLabel="Aktivite 1">@context.Aktivite1adi</MudTd>
+        <MudTd DataLabel="Aktivite 2">@context.Aktivite2adi</MudTd>
+        <MudTd DataLabel="Aktivite 3">@context.Aktivite3adi</MudTd>
+        <MudTd DataLabel="Kaynak Kodu">@context.Kaynakkodu</MudTd>
+        <MudTd DataLabel="Kaynak Adı">@context.Kaynakadi</MudTd>
+        <MudTd DataLabel="Marka">@context.Marka</MudTd>
+        <MudTd DataLabel="Teknik Özellikler / Notlar">@context.Aciklama</MudTd>
+        <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
+        <MudTd DataLabel="Birim">@context.Birimadi</MudTd>
     </RowTemplate>
 
 </MudTable>

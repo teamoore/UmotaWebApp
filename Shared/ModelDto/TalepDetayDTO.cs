@@ -18,6 +18,7 @@ namespace UmotaWebApp.Shared.ModelDto
         public int Aktivite3Ref { get; set; }
         public int Aktivite4Ref { get; set; }
         public int Aktivite5Ref { get; set; }
+        public int KaynakRef { get; set; }
 
         public int TeslimYeriRef { get; set; }
         public DateTime TeslimTarihi { get; set; }

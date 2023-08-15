@@ -121,7 +121,7 @@
 
                         <div class="col-md-3">
                             <label>Kaynak</label>
-                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.Aktivite5Ref" @bind-Value:after="LoadBirim">
+                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.KaynakRef" @bind-Value:after="LoadBirim">
                                 @if (kaynakList != null)
                                 {
                                     <option value="-1">@Utils.Mesajlar.Seciniz</option>
@@ -492,7 +492,7 @@
         loadingCompleted = false;
         birimList.Clear();
 
-        birimList = await sabitHelper.GetKaynakBirimKoduList(talepDetayDTO.Aktivite5Ref);
+        birimList = await sabitHelper.GetKaynakBirimKoduList(talepDetayDTO.KaynakRef);
 
         loadingCompleted = true;
 
@@ -533,7 +533,8 @@
 
         talepfis = (await talepFisHelper.LoadRecords_ViewV030TalepFis(talepfisRequest)).FirstOrDefault();
 
-        talepDetayDTO.TeslimTarihi = talepfis.TeslimTarihi.HasValue ? talepfis.TeslimTarihi.Value : DateTime.Now.AddDays(2);
+        talepDetayDTO.TeslimTarihi = talepfis.TeslimTarihi.HasValue ? talepfis.TeslimTarihi.Value : talepfis.Tarih.Value.AddDays(4);
+        talepDetayDTO.TeslimYeriRef = talepfis.TeslimYeriRef.HasValue ? talepfis.TeslimYeriRef.Value : -1;
 
         loadingCompleted = true;
     }

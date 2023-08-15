@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace UmotaWebApp.Shared.ModelDto
 {
-    public class TalepFisRequestDto
+    public class SiparisViewRequestDto
     {
         public short FirmaId { get; set; }
         public string kullanicikodu { get; set; }
@@ -15,8 +15,8 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? BaslangicTarih { get; set; }
         public DateTime? BitisTarih { get; set; }
         public int? ProjeRef { get; set; }
-        public int? TalepDurumu { get; set; }
+        public int? SiparisDurumu { get; set; }
         public int? OnayDurumu { get; set; }
-        public TalepFisDto TalepFis { get; set; }
+        public SiparisDto Siparis { get; set; }
     }
 }
