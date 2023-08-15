@@ -52,18 +52,17 @@ namespace Prizma.Data.Repositories
 
         public async Task<List<V030_TalepFis>> GetV030_TalepFisListAsync(TalepFisRequestDto request)
         {
-            var qry = dbContext.v030_TalepFis.Where(x => x.InsUser == request.kullanicikodu);
+            var qry = dbContext.v030_TalepFis.AsQueryable();
           
-
             if (request.TalepFis != null)
             {
                 if (request.TalepFis.logref != 0)
                     qry = qry.Where(x => x.LogRef == request.TalepFis.logref); 
                 
-                if (request.TalepDurumu != 0)
+                if (request.TalepDurumu.HasValue)
                 qry = qry.Where(x => x.DurumRef == request.TalepDurumu);
 
-                if (request.ProjeRef != 0)
+                if (request.ProjeRef.HasValue)
                     qry = qry.Where(x => x.ProjeRef == request.ProjeRef);
             }
 
