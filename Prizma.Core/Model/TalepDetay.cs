@@ -77,9 +77,10 @@ namespace Prizma.Core.Model
             this.TeslimTarihi = teslimTarihi;
         }
 
-        public void ChangeMiktar(double miktar)
+        public void ChangeMiktar(double miktar, int birimRef)
         {
             this.Miktar = miktar;
+            this.BirimRef = birimRef;
         }
 
         public void ChangeInserter(string insuser,DateTime insdate)

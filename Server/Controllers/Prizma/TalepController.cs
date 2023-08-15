@@ -186,5 +186,25 @@ namespace UmotaWebApp.Server.Controllers
             return result;
 
         }
+
+        [HttpPost("UpdateTalepDetay")]
+        public async Task<ServiceResponse<TalepDetayDTO>> UpdateTalepDetay(TalepDetayRequestDto request)
+        {
+            var result = new ServiceResponse<TalepDetayDTO>();
+            try
+            {
+                var response = await _talepDetayService.Update(request);
+                var tdDto = _mapper.Map<TalepDetay, TalepDetayDTO>(response);
+                result.Value = tdDto;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+                result.SetException(ex);
+            }
+
+            return result;
+        }
     }
 }
