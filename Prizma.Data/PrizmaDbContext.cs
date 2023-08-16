@@ -19,7 +19,8 @@ namespace Prizma.Data
         public DbSet<Proje> Proje { get; set; }
         public DbSet<V030_TalepFis> v030_TalepFis { get; set; }
         public DbSet<V031_TalepDetay> v031_TalepFisDetay { get; set; }
-
+        public DbSet<TalepOnay> TalepOnaay { get; set; }
+        public DbSet<V032_TalepOnay> v032_TalepOnay { get; set; }
         public DbSet<V001Aktivite> v001Aktivite { get; set; }
 
         public DbSet<V005Mahal> v005Mahal { get; set; }
@@ -40,6 +41,8 @@ namespace Prizma.Data
             modelBuilder.ApplyConfiguration(new v031TalepFisDetayConfiguration());
             modelBuilder.ApplyConfiguration(new v001AktiviteConfiguration());
             modelBuilder.ApplyConfiguration(new v005MahalConfiguration());
+            modelBuilder.ApplyConfiguration(new TalepOnayConfiguration());
+            modelBuilder.ApplyConfiguration(new v032TalepOnayConfiguration());
         }
     }
 }

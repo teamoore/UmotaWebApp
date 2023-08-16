@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using UmotaWebApp.Client.Utils;
 using UmotaWebApp.Shared;
 using UmotaWebApp.Shared.ModelDto;
+using UmotaWebApp.Shared.ModelDto.Request;
 
 namespace UmotaWebApp.Client.ServiceHelpers
 {
@@ -94,6 +95,24 @@ namespace UmotaWebApp.Client.ServiceHelpers
             request.kullanicikodu = kullanicikodu;
 
             var result = await httpClient.PostGetServiceResponseAsync<List<V030_TalepFis>, TalepFisRequestDto>(UrlHelper.TalepV030TalepFisList, request, ThrowSuccessException: true);
+
+            return result;
+        }
+        public async Task<List<V032_TalepOnay>> GetTalepFisOnayListAsnyc(int talepref)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new TalepOnayRequestDto();
+            request.TalepRef = talepref;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            request.kullanicikodu = kullanicikodu;
+
+            var result = await httpClient.PostGetServiceResponseAsync<List<V032_TalepOnay>, TalepOnayRequestDto>(UrlHelper.TalepFisOnayListeGetir, request , ThrowSuccessException: true);
 
             return result;
         }
