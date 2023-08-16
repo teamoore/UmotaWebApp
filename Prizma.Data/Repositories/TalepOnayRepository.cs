@@ -32,5 +32,21 @@ namespace Prizma.Data.Repositories
 
             return await qry.Take(100).ToListAsync();
         }
+
+        public Task<int> TalepOnayRota(TalepOnayRequestDto request)
+        {
+            FormattableString sql = $"[dbo].[UmotaSP_TalepOnayRotaProc] @TalepRef = {request.TalepRef},@KullaniciKodu = {request.kullanicikodu}";
+            var result = dbContext.Database.ExecuteSql(sql);
+
+            return Task.FromResult(result);
+        }
+
+        public Task<int> TalepDurumGuncelle(TalepOnayRequestDto request)
+        {
+            FormattableString sql = $"[dbo].[UmotaSP_TalepDurumGuncelle] @TalepRef = {request.TalepRef},@KullaniciKodu = {request.kullanicikodu}";
+            var result = dbContext.Database.ExecuteSql(sql);
+
+            return Task.FromResult(result);
+        }
     }
 }

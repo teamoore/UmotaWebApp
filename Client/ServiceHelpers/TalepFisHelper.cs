@@ -116,5 +116,43 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             return result;
         }
+
+        public async Task<int> TalepOnayRota(int talepRef)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new TalepOnayRequestDto();
+            request.TalepRef = talepRef;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            request.kullanicikodu = kullanicikodu;
+
+            var result = await httpClient.PostGetServiceResponseAsync<int, TalepOnayRequestDto>(UrlHelper.TalepOnayRota, request, ThrowSuccessException: true);
+
+            return result;
+        }
+
+        public async Task<int> TalepDurumGuncelle(int talepRef)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var request = new TalepOnayRequestDto();
+            request.TalepRef = talepRef;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            request.kullanicikodu = kullanicikodu;
+
+            var result = await httpClient.PostGetServiceResponseAsync<int, TalepOnayRequestDto>(UrlHelper.TalepDurumGuncelle, request, ThrowSuccessException: true);
+
+            return result;
+        }
     }
 }

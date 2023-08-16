@@ -13,5 +13,9 @@ namespace Prizma.Core.Repositories
     public interface ITalepOnayRepository : IRepository<TalepOnay>
     {
         Task<IEnumerable<V032_TalepOnay>> GetTalepFisOnayListAsnyc(TalepOnayRequestDto request);
+
+        Task<int> TalepOnayRota(TalepOnayRequestDto request);
+
+        Task<int> TalepDurumGuncelle(TalepOnayRequestDto request);
     }
 }
