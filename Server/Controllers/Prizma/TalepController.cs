@@ -22,17 +22,19 @@ namespace UmotaWebApp.Server.Controllers
     {
         private readonly ITalepDetayService _talepDetayService;
         private readonly ITalepFisService _talepFisService;
+        private readonly ITalepOnayService _talepOnayService;
         private readonly IMahalService _mahalService;
         private readonly IMapper _mapper;
         public ILogger<TalepController> Logger { get; }
 
-        public TalepController(ITalepDetayService talepDetayService, IMapper mapper, IMahalService mahalService, ILogger<TalepController> logger, ITalepFisService talepFisService)
+        public TalepController(ITalepDetayService talepDetayService, IMapper mapper, IMahalService mahalService, ILogger<TalepController> logger, ITalepFisService talepFisService, ITalepOnayService talepOnayService)
         {
             _talepDetayService = talepDetayService;
             _mapper = mapper;
             _mahalService = mahalService;
             Logger = logger;
             _talepFisService = talepFisService;
+            _talepOnayService = talepOnayService;
         }
 
         [HttpPost("CreateTalepFis")]
@@ -205,6 +207,33 @@ namespace UmotaWebApp.Server.Controllers
             }
 
             return result;
+        }
+
+        [HttpPost("GetTalepFisOnayListAsnyc")]
+        public async Task<ServiceResponse<List<V032_TalepOnay>>> GetTalepFisOnayListAsnyc(TalepOnayRequestDto request)
+        {
+            var result = new ServiceResponse<List<V032_TalepOnay>>();
+            try
+            {
+                var td = await _talepOnayService.GetTalepFisOnayListAsnyc(request);
+
+                result.Value = td.ToList();
+
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+                result.SetException(ex);
+
+            }
+            catch (Exception ex)
+            {
+                result.SetException(ex);
+                Logger.Log(LogLevel.Error, ex.Message);
+            }
+
+            return result;
+
         }
     }
 }

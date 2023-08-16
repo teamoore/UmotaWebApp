@@ -72,7 +72,27 @@
 
     </MudTabPanel>
     <MudTabPanel Text="Onay Durumları">
-        <MudText>Content Two</MudText>
+        <MudTable Items="talepOnays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
+
+            <HeaderContent>
+                <MudTh>Onay Türü</MudTh>
+                <MudTh>Onay Durumu</MudTh>
+                <MudTh>Onay Yetkili Kullanıcılar</MudTh>
+                <MudTh>İşlemi Yapan</MudTh>
+                <MudTh>İşlem Tarihi</MudTh>
+                <MudTh>Açıklama</MudTh>
+            </HeaderContent>
+
+            <RowTemplate>
+                <MudTd DataLabel="Onay Türü">@context.OnayTipAdi</MudTd>
+                <MudTd DataLabel="Onay Durumu">@context.OnayAdi</MudTd>
+                <MudTd DataLabel="Onay Yetkili Kullanıcılar">@context.OnayUser</MudTd>
+                <MudTd DataLabel="İşlemi Yapan">@context.upduser</MudTd>
+                <MudTd DataLabel="İşlem Tarihi">@context.upddate</MudTd>
+                <MudTd DataLabel="Açıklama">@context.Aciklama</MudTd>
+            </RowTemplate>
+
+        </MudTable>
     </MudTabPanel>
 </MudTabs>
 
@@ -121,6 +141,7 @@
     };
 
     List<V031_TalepDetay> talepDetays = new();
+    List<V032_TalepOnay> talepOnays = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -130,6 +151,7 @@
 
             await LoadTalepFis();
             await LoadTalepDetayList();
+            await LoadTalepOnayList();
         }
         catch (Exception ex)
         {
@@ -159,6 +181,11 @@
         request.TalepFisDetay = new V031_TalepDetay() { Parlogref = talepfis.First().LogRef };
 
         talepDetays = await talepDetayHelper.LoadViewRecords(request);
+    }
+
+    private async Task LoadTalepOnayList()
+    {
+        talepOnays = await mainDataHelper.GetTalepFisOnayListAsnyc(talepfis.First().LogRef);
     }
 
     private void YeniTalepDetay()
