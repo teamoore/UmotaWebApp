@@ -235,5 +235,41 @@ namespace UmotaWebApp.Server.Controllers
             return result;
 
         }
+
+        [HttpPost("TalepOnayRota")]
+        public async Task<ServiceResponse<int>> TalepOnayRota(TalepOnayRequestDto request)
+        {
+            var result = new ServiceResponse<int>();
+
+            try
+            {
+                result.Value = await _talepOnayService.TalepOnayRota(request);
+            }
+            catch (Exception ex)
+            {
+                result.SetException(ex);
+                Logger.Log(LogLevel.Error, ex.Message);
+            }
+
+            return result;
+        }
+
+        [HttpPost("TalepDurumGuncelle")]
+        public async Task<ServiceResponse<int>> TalepDurumGuncelle(TalepOnayRequestDto request)
+        {
+            var result = new ServiceResponse<int>();
+
+            try
+            {
+                result.Value = await _talepOnayService.TalepDurumGuncelle(request);
+            }
+            catch (Exception ex)
+            {
+                result.SetException(ex);
+                Logger.Log(LogLevel.Error, ex.Message);
+            }
+
+            return result;
+        }
     }
 }

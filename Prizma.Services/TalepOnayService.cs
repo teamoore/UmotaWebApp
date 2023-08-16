@@ -23,5 +23,15 @@ namespace Prizma.Services
         {
             return await _unitOfWork.TalepOnayRepository.GetTalepFisOnayListAsnyc(request);
         }
+
+        public async Task<int> TalepDurumGuncelle(TalepOnayRequestDto request)
+        {
+            return await _unitOfWork.TalepOnayRepository.TalepDurumGuncelle(request);
+        }
+
+        public async Task<int> TalepOnayRota(TalepOnayRequestDto request)
+        {
+           return await _unitOfWork.TalepOnayRepository.TalepOnayRota(request);
+        }
     }
 }

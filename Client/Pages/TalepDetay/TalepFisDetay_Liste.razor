@@ -72,6 +72,15 @@
 
     </MudTabPanel>
     <MudTabPanel Text="Onay Durumları">
+
+        <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
+            <MudButton>Onay</MudButton>
+            <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown">
+                <MudMenuItem OnClick="() => OnayaGonder()">Onaya Gönder</MudMenuItem>
+                <MudMenuItem OnClick="() => Onayla()">Onayla</MudMenuItem>
+            </MudMenu>
+        </MudButtonGroup>
+
         <MudTable Items="talepOnays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
 
             <HeaderContent>
@@ -196,5 +205,17 @@
     private void TaleDetayGuncelle(int talepDetayLogRef)
     {
         navigation.NavigateTo("/talepdetay_ekle/" + this.talepfis.First().LogRef + "/" + talepDetayLogRef.ToString());
+    }
+
+    private async Task OnayaGonder()
+    {
+        await mainDataHelper.TalepOnayRota(this.talepRef);
+        Snackbar.Add("Onaya Gönderildi", severity: Severity.Success);
+    }
+
+    private async Task Onayla()
+    {
+        await mainDataHelper.TalepDurumGuncelle(this.talepRef);
+        Snackbar.Add("Onaylandı", severity: Severity.Success);
     }
 }
