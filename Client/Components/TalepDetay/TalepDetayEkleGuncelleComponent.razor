@@ -349,7 +349,10 @@
 
         await LoadAktivite2();
         await LoadAktivite3();
-        await LoadBirimForExistingData();
+        await LoadKaynak();
+        await LoadBirim();
+
+        //await LoadBirimForExistingData();
     }
 
     private async Task UpdateRecord()
@@ -375,6 +378,7 @@
             _processing = true;
 
             await mainDataHelper.UpdateRecord(talepDetayDTO);
+            Snackbar.Add("Güncellendi", severity: Severity.Success);
 
             navigation.NavigateTo("/talepfisdetay_liste/" + TalepFisLogRef.ToString());
         }
@@ -414,6 +418,7 @@
             talepDetayDTO.ParLogRef = talepfis.LogRef;
 
             await mainDataHelper.SaveRecord(talepDetayDTO);
+            Snackbar.Add("Kaydedildi", severity: Severity.Success);
 
             navigation.NavigateTo("/talepfisdetay_liste/" + this.talepfis.LogRef);
         }
