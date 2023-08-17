@@ -54,6 +54,20 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return a;
         }
 
+        public async Task<bool> GetKullaniciYetkisi(string kullanici_kodu, string yetkikodu)
+        {
+            var yetki = false;
+
+            var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanici_kodu + "&yetkikodu=" + yetkikodu);
+
+            if (result == null)
+                return yetki;
+
+            yetki = result == 1;
+
+            return yetki;
+        }
+
         public async Task <int>RefNoAl(string tablename)
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);

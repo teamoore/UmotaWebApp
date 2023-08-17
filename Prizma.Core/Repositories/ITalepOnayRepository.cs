@@ -17,5 +17,7 @@ namespace Prizma.Core.Repositories
         Task<int> TalepOnayRota(TalepOnayRequestDto request);
 
         Task<int> TalepDurumGuncelle(TalepOnayRequestDto request);
+        Task<int> TalepGetOnayLineRef(TalepOnayRequestDto request);
+        Task<int> TalepOnayla(TalepOnayRequestDto request);
     }
 }

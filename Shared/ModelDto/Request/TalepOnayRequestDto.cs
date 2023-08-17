@@ -11,6 +11,9 @@ namespace UmotaWebApp.Shared.ModelDto.Request
         public short FirmaId { get; set; }
         public string kullanicikodu { get; set; }
         public int TalepRef { get; set; }
+        public int OnayLineRef { get; set; }
+        public int OnayDurumu { get; set; }
+        public string Aciklama { get; set; }
 
     }
 }

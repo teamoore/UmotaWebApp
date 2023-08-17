@@ -1,9 +1,12 @@
 ﻿using Azure.Core;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Prizma.Core.Model;
 using Prizma.Core.Repositories;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -44,6 +47,32 @@ namespace Prizma.Data.Repositories
         public Task<int> TalepDurumGuncelle(TalepOnayRequestDto request)
         {
             FormattableString sql = $"[dbo].[UmotaSP_TalepDurumGuncelle] @TalepRef = {request.TalepRef},@KullaniciKodu = {request.kullanicikodu}";
+            var result = dbContext.Database.ExecuteSql(sql);
+
+            return Task.FromResult(result);
+        }
+        public Task<int> TalepGetOnayLineRef(TalepOnayRequestDto request)
+        {
+            var parameterReturn = new SqlParameter
+            {
+                ParameterName = "ReturnValue",
+                SqlDbType = System.Data.SqlDbType.Int,
+                Direction = System.Data.ParameterDirection.Output,
+            };
+
+            string sql = $"EXEC @returnValue = [dbo].[UmotaSP_TalepGetOnayLineRef] @TalepRef = {request.TalepRef},@KullaniciKodu = {request.kullanicikodu}";
+            var result = dbContext.Database.ExecuteSqlRaw(sql, parameterReturn);
+            int returnValue = (int)parameterReturn.Value;
+            return Task.FromResult(returnValue);
+
+            //FormattableString sql = $"[dbo].[UmotaSP_TalepGetOnayLineRef] @TalepRef = {request.TalepRef},@KullaniciKodu = {request.kullanicikodu}";
+            //var result = dbContext.Database.ExecuteSql(sql);
+
+            //return Task.FromResult(result);
+        }
+        public Task<int> TalepOnayla(TalepOnayRequestDto request)
+        {
+            FormattableString sql = $"[dbo].[UmotaSP_TalepOnayla] @TalepRef = {request.TalepRef},@KullaniciKodu = {request.kullanicikodu},@OnayLineRef = {request.OnayLineRef},@OnayIKodu = {request.OnayDurumu},@Aciklama = {request.Aciklama}";
             var result = dbContext.Database.ExecuteSql(sql);
 
             return Task.FromResult(result);

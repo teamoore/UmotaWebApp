@@ -17,5 +17,12 @@ namespace UmotaWebApp.Client.Utils.ClientEnums
         {
             Satis = 3
         }
+        public enum OnayDurumu
+        {
+            Bekliyor = 1,
+            Onaylandi = 3,
+            GeriGonderildi = 4,
+            Iptal = 5
+        }
     }
 }

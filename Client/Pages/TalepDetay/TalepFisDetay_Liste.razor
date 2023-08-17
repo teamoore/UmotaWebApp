@@ -76,8 +76,16 @@
         <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
             <MudButton>Onay</MudButton>
             <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown">
-                <MudMenuItem OnClick="() => OnayaGonder()">Onaya Gönder</MudMenuItem>
-                <MudMenuItem OnClick="() => Onayla()">Onayla</MudMenuItem>
+                @if ((talepOnays.Count == 0) && (kullanici_kodu == talepfis.First().InsUser || KullaniciYetkisi_TalepOzelOnay == true))
+                {
+                    <MudMenuItem OnClick="() => OnayaGonder()">Onaya Gönder</MudMenuItem>
+                }
+                @if ((talepOnays.Count > 0) && (OnayLineRef > 0))
+                {
+                    <MudMenuItem OnClick="() => Onayla(Enums.OnayDurumu.Onaylandi)">Onayla</MudMenuItem>
+                    <MudMenuItem OnClick="() => Onayla(Enums.OnayDurumu.GeriGonderildi)">Geri Gönder</MudMenuItem>
+                    <MudMenuItem OnClick="() => Onayla(Enums.OnayDurumu.Iptal)">İptal</MudMenuItem>
+                }
             </MudMenu>
         </MudButtonGroup>
 
@@ -138,6 +146,9 @@
     [Inject]
     TalepDetayHelper talepDetayHelper { get; set; }
 
+    [Inject]
+    TalepFisHelper talepFisHelper { get; set; }
+
     public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
     List<V030_TalepFis> talepfis = new();
     public TalepFisRequestDto talepfisRequest = new();
@@ -151,16 +162,22 @@
 
     List<V031_TalepDetay> talepDetays = new();
     List<V032_TalepOnay> talepOnays = new();
+    private string kullanici_kodu = "";
+    private bool KullaniciYetkisi_TalepOzelOnay = false;
+    private int OnayLineRef = 0;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
+            KullaniciYetkisi_TalepOzelOnay = await yetkiHelper.GetKullaniciYetkisi(kullanici_kodu, Consts.KullaniciYetkisi_TalepOzelOnay);
 
             await LoadTalepFis();
             await LoadTalepDetayList();
             await LoadTalepOnayList();
+            await GetOnayLineRef();
         }
         catch (Exception ex)
         {
@@ -211,11 +228,20 @@
     {
         await mainDataHelper.TalepOnayRota(this.talepRef);
         Snackbar.Add("Onaya Gönderildi", severity: Severity.Success);
+        await LoadTalepOnayList();
+        await GetOnayLineRef();
     }
 
-    private async Task Onayla()
+    private async Task Onayla(Enums.OnayDurumu onaydurumu)
     {
-        await mainDataHelper.TalepDurumGuncelle(this.talepRef);
+        await mainDataHelper.TalepOnayla(this.talepRef, this.OnayLineRef, (int)onaydurumu, "");
         Snackbar.Add("Onaylandı", severity: Severity.Success);
+        await LoadTalepOnayList();
+        await GetOnayLineRef();
+    }
+
+    private async Task GetOnayLineRef()
+    {
+        OnayLineRef = await talepFisHelper.TalepGetOnayLineRef(this.talepRef);
     }
 }
