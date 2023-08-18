@@ -95,6 +95,8 @@
     private string updatePage = "talepfis_ekle";
     private string headerText = "Talep Listesi";
     private bool loadingCompleted { get; set; }
+    private bool TumTalepleriGormeYetkisi = false;
+    private string kullanici_kodu = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -102,7 +104,9 @@
         {
             header.HeaderText = headerText;
 
+            kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
+            TumTalepleriGormeYetkisi = await yetkiHelper.GetKullaniciYetkisi(kullanici_kodu, Consts.KullaniciYetkisi_TumTalepleriGorme);
 
             await NewDataRequest();
             await LoadList();
@@ -123,6 +127,7 @@
         mainDataRequest.FirmaId = selectedFirmaDonem.firma_no.Value;
         mainDataRequest.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
         mainDataRequest.TopRowCount = 100;
+        mainDataRequest.TumTalepleriGormeYetkisi = TumTalepleriGormeYetkisi;
 
     }
 
@@ -172,7 +177,7 @@
                 if (result.Data != null)
                 {
                     mainDataRequest = (TalepFisRequestDto)result.Data;
-                    mainDataRequest.SearchText = header.SearchText;
+                    header.SearchText = mainDataRequest.SearchText;
                     mainDataRequest.TopRowCount = 0;
                     loadingCompleted = false;
                     this.StateHasChanged();

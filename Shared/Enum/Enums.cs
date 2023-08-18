@@ -31,5 +31,13 @@ namespace UmotaWebApp.Shared.Enum
             Blok = 165,
             Kat = 166
         }
+        public enum OnayDurumu
+        {
+            Bekliyor = 1,
+            Onaylandi = 3,
+            GeriGonderildi = 4,
+            Iptal = 5
+        }
+
     }
 }

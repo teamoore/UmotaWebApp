@@ -21,6 +21,21 @@
                     </div>
                 </div>
                 <div class="row">
+                    <div class="col-md-12">
+                        <label>Talep Türü</label>
+                        <InputSelect @bind-Value="taleprequest.TurRef" class="form-control">
+                            @if (TurList != null)
+                            {
+                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                @foreach (var item in TurList)
+                                {
+                                    <option value="@item.SabitDetayId">@item.Adi</option>
+                                }
+                            }
+                        </InputSelect>
+                    </div>
+                </div>
+                <div class="row">
                     <div class="col-md-6">
                         <label>Başlangıç Tarih</label>
                         <InputDate @bind-Value="taleprequest.BaslangicTarih" class="form-control"></InputDate>
@@ -32,30 +47,25 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6">
-                        <label>Talep Durumu</label>
-                        <InputSelect @bind-Value="taleprequest.TalepDurumu" class="form-control">
-                            @if (TalepDurumList != null)
-                            {
-                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                @foreach (var item in TalepDurumList)
-                                {
-                                    <option value="@item.SabitDetayId">@item.Adi</option>
-                                }
-                            }
-                        </InputSelect>
                     </div>
                     <div class="col-md-6">
-                        <label>Onay Durumu</label>
-                        <InputSelect @bind-Value="taleprequest.OnayDurumu" class="form-control">
-                            <option value=0>Onay Bekleyenler</option>
-                            <option value=1>Onayladıklarım</option>
-                            <option value=2>Hepsi</option>
-                        </InputSelect>
+                        <MudSwitch @bind-Checked="taleprequest.OnayBekleyen" Class="mud-width-full" Color="Color.Primary">Onayımı Bekleyenler</MudSwitch>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <label>Açıklama</label>
+@*                         <MudSelect T="string" Label="Talep Durumu" MultiSelection="true" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))" @bind-Value="taleprequest.DurumIKoduSecimList" @bind-SelectedValues="options">
+ *@                        <MudSelect T="string" Label="Talep Durumu" MultiSelection="true" @bind-Value="taleprequest.DurumIKoduSecimList" @bind-SelectedValues="options">
+                            @foreach (var item in TalepDurumList)
+                            {
+                                <MudSelectItem T="string" Value="@item.Ikodu.ToString()">@item.Adi</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label>Genel Arama</label>
                         <InputText @bind-Value="taleprequest.SearchText" class="form-control" />
                     </div>
                 </div>
@@ -103,12 +113,15 @@
     TalepFisRequestDto taleprequest = new TalepFisRequestDto();
     List<ProjeDto> projeler = new();
     List<SisSabitlerDetayDto> TalepDurumList = new();
+    List<SisSabitlerDetayDto> TurList = new();
 
+    private IEnumerable<string> options { get; set; } = new HashSet<string>() { "1", "2", "3", "4", "7" };
 
     protected override async Task OnInitializedAsync()
     {
         projeler = await projeHelper.LoadRecords();
         TalepDurumList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.TalepDurumu);
+        TurList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.TalepTuru);
 
         if (mainRequest != null)
             taleprequest = mainRequest;
@@ -122,6 +135,11 @@
     public async Task Vazgec()
     {
         await ModalInstance.CloseAsync();
+    }
+
+    private string GetMultiSelectionText(List<string> selectedValues)
+    {
+        return string.Join(", ", selectedValues.Select(x => x));
     }
 
 }
