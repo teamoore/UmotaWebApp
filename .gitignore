@@ -365,3 +365,4 @@ FodyWeavers.xsd
 *.xlsx
 *.docx
 *.pdf
+/Server/Media/Uploads
