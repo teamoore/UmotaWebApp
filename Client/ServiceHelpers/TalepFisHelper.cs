@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Microsoft.AspNetCore.Components.Forms;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -151,6 +152,21 @@ namespace UmotaWebApp.Client.ServiceHelpers
             request.kullanicikodu = kullanicikodu;
 
             var result = await httpClient.PostGetServiceResponseAsync<int, TalepOnayRequestDto>(UrlHelper.TalepDurumGuncelle, request, ThrowSuccessException: true);
+
+            return result;
+        }
+
+        public async Task<bool> UploadTalepDosya(TalepDosyaRequestDto request)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            request.InsUser = kullanicikodu;
+
+            var result = await httpClient.PostGetServiceResponseAsync<bool, TalepDosyaRequestDto>(UrlHelper.TalepUploadDosya, request, ThrowSuccessException: true);
 
             return result;
         }

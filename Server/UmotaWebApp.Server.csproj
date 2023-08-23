@@ -73,6 +73,7 @@
   </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Media\Uploads\" />
     <Folder Include="Services\Extensions\" />
     <Folder Include="wwwroot\dosyalar\" />
   </ItemGroup>

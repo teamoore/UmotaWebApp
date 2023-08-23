@@ -1,4 +1,5 @@
 ﻿using Prizma.Core;
+using Prizma.Core.Model;
 using Prizma.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UmotaWebApp.Shared;
+using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Shared.ModelDto.Request;
 
 namespace Prizma.Services
@@ -32,6 +34,15 @@ namespace Prizma.Services
         public async Task<int> TalepOnayRota(TalepOnayRequestDto request)
         {
            return await _unitOfWork.TalepOnayRepository.TalepOnayRota(request);
+        }
+
+        public async Task<bool> UploadTalepDosya(TalepDosyaRequestDto request)
+        {
+            var td = TalepDosya.Create(request.FileName, request.FileType, request.TalepLogRef, request.InsUser);
+            await _unitOfWork.TalepDosyaRepository.CreateTalepDosya(td);
+            await _unitOfWork.CommitAsync();
+
+            return true;
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿@page "/talepfisdetay_liste/{talepRef:int}"
+@using System
+@using System.IO
 
 @if (loadingCompleted == false)
 {
@@ -103,6 +105,20 @@
 
         </MudTable>
     </MudTabPanel>
+    <MudTabPanel Text="Dosyalar">
+
+        <div class="row">
+            <div class="col-4">
+                <div class="form-group">
+                    <label>File</label>
+                    <InputFile OnChange="OnChooseFile" />               
+                </div>
+                @* Call the SubmitFileAsync in the @onclick event *@
+                <button type="submit" class="btn btn-success btn-block m-1" @onclick="SubmitFileAsync">Upload</button>
+            </div>
+        </div>
+
+    </MudTabPanel>
 </MudTabs>
 
 @code {
@@ -138,6 +154,10 @@
     [Inject]
     TalepDetayHelper talepDetayHelper { get; set; }
 
+
+    [Inject]
+    UploadHelper uploadHelper { get; set; }
+
     public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
     List<V030_TalepFis> talepfis = new();
     public TalepFisRequestDto talepfisRequest = new();
@@ -151,6 +171,13 @@
 
     List<V031_TalepDetay> talepDetays = new();
     List<V032_TalepOnay> talepOnays = new();
+
+    private long _uploaded = 0;
+    private double _percentage = 0;
+    private Stream _fileStream = null;
+    private string _selectedFileName = null;
+    private string _fileType = "";
+    private IBrowserFile selectedFile;
 
     protected override async Task OnInitializedAsync()
     {
@@ -218,4 +245,54 @@
         await mainDataHelper.TalepDurumGuncelle(this.talepRef);
         Snackbar.Add("Onaylandı", severity: Severity.Success);
     }
+
+    #region Dosya Yükleme
+
+    public void OnChooseFile(InputFileChangeEventArgs e)
+    {
+        // Get the selected file
+        var file = e.File;
+        _fileType = e.File.ContentType;
+        selectedFile = e.File;
+
+        // Check if the file is null then return from the method
+        if (file == null)
+            return;
+
+        // Validate the extension if requried (Client-Side)
+
+        // Set the value of the stream by calling OpenReadStream and pass the maximum number of bytes allowed because by default it only allows 512KB
+        // I used the value 5000000 which is about 50MB
+        using (var stream = file.OpenReadStream(50000000))
+        {
+            _fileStream = stream;
+            _selectedFileName = file.Name;
+        }
+    }
+
+
+    public async Task SubmitFileAsync()
+    {
+        FileDataDto request = new();
+        request.FileType = _fileType;
+
+        var buffers = new byte[selectedFile.Size];
+        var maxSize = 1024 * 1024 * 8; //8 Mb
+        await selectedFile.OpenReadStream(maxAllowedSize: maxSize).ReadAsync(buffers);
+
+        request.Data = buffers;
+        request.FileName = _selectedFileName;
+        request.FileType = _fileType;
+
+        var response = await uploadHelper.Upload(request);
+
+        TalepDosyaRequestDto request2 = new();
+        request2.FileName = response.FileName;
+        request2.FileType = response.ImageType;
+        request2.TalepLogRef = talepRef;
+
+        var resp2 = await mainDataHelper.UploadTalepDosya(request2);
+    }
+
+    #endregion
 }

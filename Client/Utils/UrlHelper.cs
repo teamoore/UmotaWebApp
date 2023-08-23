@@ -115,6 +115,7 @@ namespace UmotaWebApp.Client.Utils
         public const string TalepFisOnayListeGetir = "/api/talep/GetTalepFisOnayListAsnyc";
         public const string TalepOnayRota = "/api/talep/TalepOnayRota";
         public const string TalepDurumGuncelle = "/api/talep/TalepDurumGuncelle";
+        public const string TalepUploadDosya = "/api/talep/UploadTalepDosya";
 
         public const string ProjeListesi = "/api/proje/GetProjeList";
 

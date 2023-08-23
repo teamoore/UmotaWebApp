@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Prizma.Core.Model;
 using Prizma.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
@@ -262,6 +264,24 @@ namespace UmotaWebApp.Server.Controllers
             try
             {
                 result.Value = await _talepOnayService.TalepDurumGuncelle(request);
+            }
+            catch (Exception ex)
+            {
+                result.SetException(ex);
+                Logger.Log(LogLevel.Error, ex.Message);
+            }
+
+            return result;
+        }
+
+        [HttpPost("UploadTalepDosya")]
+        public async Task<ServiceResponse<bool>> UploadTalepDosya(TalepDosyaRequestDto request)
+        { 
+            var result = new ServiceResponse<bool>();
+
+            try
+            {
+                result.Value = await _talepOnayService.UploadTalepDosya(request);
             }
             catch (Exception ex)
             {

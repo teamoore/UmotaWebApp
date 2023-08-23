@@ -18,13 +18,14 @@ namespace Prizma.Data.Repositories
 
         public TalepDosyaRepository(PrizmaDbContext dbContext) : base(dbContext)
         {
-            
+
         }
 
         public async Task<TalepDosya> CreateTalepDosya(TalepDosya entity)
         {
-            await dbContext.TalepDosya.AddAsync(entity);
 
+            await dbContext.TalepDosya.AddAsync(entity);
+            
             return entity;
         }
 
