@@ -11,6 +11,7 @@ namespace UmotaWebApp.Shared.ModelDto
         public short FirmaId { get; set; }
         public string kullanicikodu { get; set; }
         public string SearchText { get; set; }
+        public string SearchTextSatir { get; set; }
         public int TopRowCount { get; set; }
         public DateTime? BaslangicTarih { get; set; }
         public DateTime? BitisTarih { get; set; }

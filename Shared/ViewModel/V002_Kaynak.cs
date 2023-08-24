@@ -24,17 +24,17 @@ namespace UmotaWebApp.Shared
 
         public int Aktiviteref { get; set; }
 
-        public byte? Active { get; set; }
+        public byte? active { get; set; }
 
-        public int? Status { get; set; }
+        public int? status { get; set; }
 
-        public string Insuser { get; set; }
+        public string insuser { get; set; }
 
-        public DateTime? Insdate { get; set; }
+        public DateTime? insdate { get; set; }
 
-        public string Upduser { get; set; }
+        public string upduser { get; set; }
 
-        public DateTime? Upddate { get; set; }
+        public DateTime? upddate { get; set; }
 
         public double? Kdvyuz { get; set; }
 

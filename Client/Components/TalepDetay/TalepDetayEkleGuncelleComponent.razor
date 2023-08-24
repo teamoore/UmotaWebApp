@@ -9,7 +9,7 @@
     <MudCard>
         <MudCardContent>
 
-            <div class="mt-12">
+            <div class="mt-6">
 
                 <div class="form-group">
                     <div class="row">
@@ -120,17 +120,25 @@
                         </div>
 
                         <div class="col-md-3">
-                            <label>Kaynak</label>
-                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.KaynakRef" @bind-Value:after="LoadBirim">
-                                @if (kaynakList != null)
-                                {
-                                    <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                    @foreach (var item in kaynakList)
-                                    {
-                                        <option value="@item.Logref">@item.Adi</option>
-                                    }
-                                }
-                            </InputSelect>
+
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <label>Kaynak</label>
+                                    <InputSelect class="form-control" @bind-Value="talepDetayDTO.KaynakRef" @bind-Value:after="LoadBirim">
+                                        @if (kaynakList != null)
+                                        {
+                                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                            @foreach (var item in kaynakList)
+                                            {
+                                                <option value="@item.Logref">@item.Adi</option>
+                                            }
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <div class="col-md-3">
+                                    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Search" Size="Size.Small" OnClick="KaynakSec" />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -140,14 +148,11 @@
                 <div class="form-group">
                     <div class="row">
                         <div class="col-md-3">
-                            <label>Marka</label>
-                            <InputText @bind-Value="talepDetayDTO.Marka" class="form-control" placeholder="Marka" />
+                            <MudTextField @bind-Value="talepDetayDTO.Marka" Label="Marka" Variant="Variant.Outlined" />
                         </div>
-                        <div class="col-md-3">
-                            <label>Teknik Özellikler / Notlar</label>
-                            <InputText @bind-Value="talepDetayDTO.Aciklama" class="form-control" placeholder="Teknik Özellikler / Notlar" />
+                        <div class="col-md-6">
+                            <MudTextField @bind-Value="talepDetayDTO.Aciklama" Label="Teknik Özellikler / Notlar" Lines=2 Variant="Variant.Outlined" />
                         </div>
-
                     </div>
                 </div>
 
@@ -172,34 +177,31 @@
                                 }
                             </InputSelect>
                         </div>
+                        <div class="col-md-3">
+                            <label>Teslim Yeri</label>
+                            <InputSelect class="form-control" @bind-Value="talepDetayDTO.TeslimYeriRef">
+                                @if (teslimYeriList != null)
+                                {
+                                    <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                    @foreach (var item in teslimYeriList)
+                                    {
+                                        <option value="@item.SabitDetayId">@item.Adi</option>
+                                    }
+                                }
+                            </InputSelect>
+
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Teslim Tarihi</label>
+                            <InputDate @bind-Value="talepDetayDTO.TeslimTarihi" class="form-control" placeholder="Teslim Tarihi" />
+                        </div>
                     </div>
                 </div>
 
                 <MudDivider DividerType="DividerType.Middle" Class="my-6" />
 
                 <div class="row">
-
-
-
-                    <div class="col-md-3">
-                        <label>Teslim Yeri</label>
-                        <InputSelect class="form-control" @bind-Value="talepDetayDTO.TeslimYeriRef">
-                            @if (teslimYeriList != null)
-                            {
-                                <option value="-1">@Utils.Mesajlar.Seciniz</option>
-                                @foreach (var item in teslimYeriList)
-                                {
-                                    <option value="@item.SabitDetayId">@item.Adi</option>
-                                }
-                            }
-                        </InputSelect>
-
-                    </div>
-
-                    <div class="col-md-3">
-                        <label>Teslim Tarihi</label>
-                        <InputDate @bind-Value="talepDetayDTO.TeslimTarihi" class="form-control" placeholder="Teslim Tarihi" />
-                    </div>
 
                 </div>
 
@@ -436,8 +438,17 @@
     {
         var err = new List<string>();
 
-        if (talepDetayDTO.Miktar == 0)
+        if (talepDetayDTO.Aktivite3Ref <= 0)
+            err.Add("Aktivite seçiniz");
+
+        if (talepDetayDTO.KaynakRef <= 0)
+            err.Add("Kaynak seçiniz");
+
+        if (talepDetayDTO.Miktar <= 0)
             err.Add("Miktar sıfırdan büyük olmalı");
+
+        if (talepDetayDTO.BirimRef <= 0)
+            err.Add("Birim seçiniz");
 
         if (err.Count > 0)
         {
@@ -577,5 +588,39 @@
         loadingCompleted = true;
     }
 
-     
+    public async Task KaynakSec()
+    {
+        var opt = new ModalOptions();
+        var parameters = new ModalParameters();
+        parameters.Add("AktiviteRef", talepDetayDTO.Aktivite3Ref);
+
+        var form = modal.Show<Components.Kaynak.KaynakSecListeComponent>("Kaynak Seç", parameters: parameters, options: opt);
+        var result = await form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var secim = (V002_Kaynak)result.Data;
+                if (talepDetayDTO.Aktivite1Ref != secim.Aktiviteref3)
+                {
+                    talepDetayDTO.Aktivite1Ref = secim.Aktiviteref3.Value;
+                    await LoadAktivite2();
+                }
+                if (talepDetayDTO.Aktivite2Ref != secim.Aktiviteref2)
+                {
+                    talepDetayDTO.Aktivite2Ref = secim.Aktiviteref2.Value;
+                    await LoadAktivite3();
+                }
+                if (talepDetayDTO.Aktivite3Ref != secim.Aktiviteref)
+                {
+                    talepDetayDTO.Aktivite3Ref = secim.Aktiviteref;
+                    await LoadKaynak();
+                    await LoadBirim();
+                }
+                talepDetayDTO.KaynakRef = secim.Logref;
+            }
+        }
+    }
+
 }

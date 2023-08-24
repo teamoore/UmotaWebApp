@@ -36,7 +36,7 @@
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
                 <MudMenuItem OnClick="(() => TalepFisDetay(context.LogRef))">Talep Detay</MudMenuItem>
                 <MudMenuItem OnClick="(() => TalepFisDetayEkle(context.LogRef))">Detay Ekle</MudMenuItem>
-
+                <MudMenuItem OnClick="(() => TalepFisDetayIncele(context.LogRef))">Talep Satırları</MudMenuItem>
             </MudMenu>
         </MudTd>
         <MudTd DataLabel="Talep Tarihi">@context.Tarih.Value.ToString("dd.MM.yyyy")</MudTd>
@@ -128,7 +128,7 @@
         mainDataRequest.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
         mainDataRequest.TopRowCount = 100;
         mainDataRequest.TumTalepleriGormeYetkisi = TumTalepleriGormeYetkisi;
-
+        mainDataRequest.SQLStringOrderBy = "insdate desc";
     }
 
     private async Task LoadList()
@@ -206,4 +206,21 @@
         return Task.CompletedTask;
     }
 
+    private async Task TalepFisDetayIncele(int logref)
+    {
+        var opt = new ModalOptions();
+        opt.Size = ModalSize.Large;
+        var parameters = new ModalParameters();
+        parameters.Add("TalepFisRef", logref);
+
+        var form = modal.Show<Components.TalepDetay.TalepDetayInceleComponent>("Talep Satırları", parameters: parameters, options: opt);
+        var result = await form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+            }
+        }
+    }
 }

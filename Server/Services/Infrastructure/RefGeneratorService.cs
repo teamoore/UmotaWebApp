@@ -141,7 +141,9 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetPrizmeDbConnection()))
             {
-                string sqlstring = string.Format("select logref,adi from [dbo].[v002_kaynak] where aktiviteref = {0}", aktivite3LogRef);
+                string sqlstring = "select logref,adi,aktiviteref,aktiviteref2,aktiviteref3,aktiviteadi from [dbo].[v002_kaynak] with(nolock) where [active] = 0";
+                if (aktivite3LogRef != null && aktivite3LogRef > 0)
+                    sqlstring += string.Format(" and aktiviteref = {0}", aktivite3LogRef);
                 IEnumerable<V002_Kaynak> dbResponse;
                 dbResponse = await db.QueryAsync<V002_Kaynak>(sqlstring, commandType: CommandType.Text);
                 return dbResponse;

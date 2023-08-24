@@ -133,6 +133,22 @@ namespace Prizma.Data.Repositories
                     sql += " or a.fisno like @SearchText";
                     sql += " )";
                 }
+
+                if (!string.IsNullOrWhiteSpace(request.SearchTextSatir))
+                {
+                    parameters.Add(new SqlParameter("@SearchTextSatir", "%" + request.SearchTextSatir + "%"));
+                    sql += " and exists ( select aa.logref from v031_talep_detay aa with(nolock) where aa.parlogref = a.logref";
+                    sql += " and ( aa.aciklama like @SearchTextSatir";
+                    sql += " or aa.marka like @SearchTextSatir";
+                    sql += " or aa.kaynakadi like @SearchTextSatir";
+                    sql += " or aa.aktivite3adi like @SearchTextSatir";
+                    sql += " ))";
+                }
+
+                if (!string.IsNullOrWhiteSpace(request.SQLStringOrderBy))
+                {
+                    sql += " order by " + request.SQLStringOrderBy;
+                }
             }
 
 
