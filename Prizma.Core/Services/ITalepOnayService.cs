@@ -17,5 +17,7 @@ namespace Prizma.Core.Services
 
         Task<int> TalepDurumGuncelle(TalepOnayRequestDto request);
 
+        Task<bool> UploadTalepDosya(TalepDosyaRequestDto request);
+
     }
 }

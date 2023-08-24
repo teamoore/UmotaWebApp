@@ -26,6 +26,8 @@ namespace Prizma.Data
         public DbSet<V005Mahal> v005Mahal { get; set; }
         public DbSet<V040_Siparis> v040_Siparis { get; set; }
 
+        public DbSet<TalepDosya> TalepDosya { get; set; }
+
         public PrizmaDbContext(DbContextOptions<PrizmaDbContext> dbContextOptions) : base(dbContextOptions)
         {
         }
@@ -43,6 +45,7 @@ namespace Prizma.Data
             modelBuilder.ApplyConfiguration(new v005MahalConfiguration());
             modelBuilder.ApplyConfiguration(new TalepOnayConfiguration());
             modelBuilder.ApplyConfiguration(new v032TalepOnayConfiguration());
+            modelBuilder.ApplyConfiguration(new TalepDosyaConfiguration());
         }
     }
 }

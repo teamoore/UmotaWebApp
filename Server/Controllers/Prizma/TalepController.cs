@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Prizma.Core.Model;
 using Prizma.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
@@ -24,10 +26,11 @@ namespace UmotaWebApp.Server.Controllers
         private readonly ITalepFisService _talepFisService;
         private readonly ITalepOnayService _talepOnayService;
         private readonly IMahalService _mahalService;
+        private readonly ITalepDosyaService _talepDosyaService;
         private readonly IMapper _mapper;
         public ILogger<TalepController> Logger { get; }
 
-        public TalepController(ITalepDetayService talepDetayService, IMapper mapper, IMahalService mahalService, ILogger<TalepController> logger, ITalepFisService talepFisService, ITalepOnayService talepOnayService)
+        public TalepController(ITalepDetayService talepDetayService, IMapper mapper, IMahalService mahalService, ILogger<TalepController> logger, ITalepFisService talepFisService, ITalepOnayService talepOnayService, ITalepDosyaService talepDosyaService)
         {
             _talepDetayService = talepDetayService;
             _mapper = mapper;
@@ -35,6 +38,7 @@ namespace UmotaWebApp.Server.Controllers
             Logger = logger;
             _talepFisService = talepFisService;
             _talepOnayService = talepOnayService;
+            _talepDosyaService = talepDosyaService;
         }
 
         [HttpPost("CreateTalepFis")]
@@ -262,6 +266,45 @@ namespace UmotaWebApp.Server.Controllers
             try
             {
                 result.Value = await _talepOnayService.TalepDurumGuncelle(request);
+            }
+            catch (Exception ex)
+            {
+                result.SetException(ex);
+                Logger.Log(LogLevel.Error, ex.Message);
+            }
+
+            return result;
+        }
+
+        [HttpPost("UploadTalepDosya")]
+        public async Task<ServiceResponse<bool>> UploadTalepDosya(TalepDosyaRequestDto request)
+        { 
+            var result = new ServiceResponse<bool>();
+
+            try
+            {
+                result.Value = await _talepOnayService.UploadTalepDosya(request);
+            }
+            catch (Exception ex)
+            {
+                result.SetException(ex);
+                Logger.Log(LogLevel.Error, ex.Message);
+            }
+
+            return result;
+        }
+
+        [HttpPost("GetTalepDosyalar")]
+        public async Task<ServiceResponse<List<TalepDosyaDto>>> GetTalepDosyalar([FromBody] int talepref)
+        {
+            var result = new ServiceResponse<List<TalepDosyaDto>>();
+
+            try
+            {
+                var response = await _talepDosyaService.GetDosyalar(talepref);
+                var td = _mapper.Map<IEnumerable<TalepDosya>, IEnumerable<TalepDosyaDto>>(response);
+
+                result.Value = td.ToList();
             }
             catch (Exception ex)
             {
