@@ -118,6 +118,21 @@
             </div>
         </div>
 
+        <div class="row">
+            <MudTable Items="talepDosyalar" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
+                <HeaderContent>
+                    <MudTh>Dosya Adı</MudTh>
+                    <MudTh>#</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Dosya Adı">@context.DosyaAdi</MudTd>                   
+                    <MudTd>
+                        <a href="/Media/Uploads/@context.DosyaAdi" download="@context.DosyaAdi" >indir</a>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </div>
+
     </MudTabPanel>
 </MudTabs>
 
@@ -171,6 +186,8 @@
 
     List<V031_TalepDetay> talepDetays = new();
     List<V032_TalepOnay> talepOnays = new();
+    List<TalepDosyaDto> talepDosyalar = new();
+
 
     private long _uploaded = 0;
     private double _percentage = 0;
@@ -188,6 +205,7 @@
             await LoadTalepFis();
             await LoadTalepDetayList();
             await LoadTalepOnayList();
+            await LoadTalepDosyalar();
         }
         catch (Exception ex)
         {
@@ -292,6 +310,14 @@
         request2.TalepLogRef = talepRef;
 
         var resp2 = await mainDataHelper.UploadTalepDosya(request2);
+        await LoadTalepDosyalar();
+
+        this.StateHasChanged();
+    }
+
+    public async Task LoadTalepDosyalar()
+    {
+        talepDosyalar = await mainDataHelper.TalepDosyaGetAll(talepRef);
     }
 
     #endregion

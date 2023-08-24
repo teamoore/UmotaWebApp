@@ -11,5 +11,7 @@ namespace Prizma.Core.Services
     public interface ITalepDosyaService
     {
         Task<TalepDosya> CreateTalepDosya(TalepDosyaDto talepDosya);
+
+        Task<List<TalepDosya>> GetDosyalar(int talepref);
     }
 }

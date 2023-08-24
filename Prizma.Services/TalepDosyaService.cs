@@ -28,5 +28,11 @@ namespace Prizma.Services
 
             return talepdosyasi;
         }
+
+        public async Task<List<TalepDosya>> GetDosyalar(int talepref)
+        {
+           var result = await _unitOfWork.TalepDosyaRepository.GetDosyalar(talepref);
+           return result;
+        }
     }
 }

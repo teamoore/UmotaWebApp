@@ -10,5 +10,7 @@ namespace Prizma.Core.Repositories
     public interface ITalepDosyaRepository : IRepository<TalepDosya>
     {
         Task<TalepDosya> CreateTalepDosya(TalepDosya entity);
+
+        Task<List<TalepDosya>> GetDosyalar(int talepref);
     }
 }

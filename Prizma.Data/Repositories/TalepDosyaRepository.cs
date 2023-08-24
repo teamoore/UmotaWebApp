@@ -1,4 +1,5 @@
-﻿using Prizma.Core.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using Prizma.Core.Model;
 using Prizma.Core.Repositories;
 using System;
 using System.Collections.Generic;
@@ -29,5 +30,9 @@ namespace Prizma.Data.Repositories
             return entity;
         }
 
+        public async Task<List<TalepDosya>> GetDosyalar(int talepref)
+        {
+           return await dbContext.TalepDosya.Where(x => x.TalepLogRef == talepref).ToListAsync();
+        }
     }
 }

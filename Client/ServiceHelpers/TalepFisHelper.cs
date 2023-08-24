@@ -170,5 +170,17 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             return result;
         }
+
+        public async Task<List<TalepDosyaDto>> TalepDosyaGetAll(int talepref)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+            
+            var result = await httpClient.PostGetServiceResponseAsync<List<TalepDosyaDto>, int>(UrlHelper.TalepDosyaGetAll, talepref, ThrowSuccessException: true);
+
+            return result;
+        }
     }
 }
