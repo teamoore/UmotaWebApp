@@ -118,6 +118,26 @@ namespace UmotaWebApp.Server.Controllers
             return result;
         }
 
+        [HttpPost("UpdateTalepFis")]
+        public async Task<ServiceResponse<TalepFisDto>> UpdateTalepFis(TalepFisRequestDto request)
+        {
+            var result = new ServiceResponse<TalepFisDto>();
+            try
+            {
+                var response = await _talepFisService.UpdateTalepFis(request.TalepFis);
+                var tdDto = _mapper.Map<TalepFis, TalepFisDto>(response);
+                result.Value = tdDto;
+
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+                result.SetException(ex);
+            }
+
+            return result;
+        }
+
         [HttpPost("AllTalepDetay")]
         public async Task<ServiceResponse<List<TalepDetayDTO>>> AllTalepDetay(TalepDetayRequestDto request)
         {

@@ -18,5 +18,10 @@ namespace UmotaWebApp.Shared.ModelDto
         public int? TalepDurumu { get; set; }
         public int? OnayDurumu { get; set; }
         public TalepFisDto TalepFis { get; set; }
+
+        public TalepFisRequestDto()
+        {
+            this.TalepFis = new TalepFisDto();
+        }
     }
 }

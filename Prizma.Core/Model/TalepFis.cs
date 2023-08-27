@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UmotaWebApp.Shared.ModelDto;
 using static UmotaWebApp.Shared.Enum.SharedEnums;
 
 namespace Prizma.Core.Model
@@ -76,6 +77,17 @@ namespace Prizma.Core.Model
             this.Aciklama = aciklama;
         }
         
+        public void UpdateTalepFis(TalepFisDto tf)
+        {
+            this.Aciklama = tf.Aciklama;
+            this.TalepEden = tf.TalepEden;
+            this.TeslimTarihi = tf.TeslimTarihi;
+            this.TeslimYeriRef = tf.TeslimYeriRef;
+            this.TurRef = tf.TurRef.HasValue ? tf.TurRef.Value : 188;
+            this.ProjeRef = tf.ProjeRef.HasValue ? tf.ProjeRef.Value : 0;
+            this.upduser = tf.upduser;
+            this.upddate = tf.upddate;
+        }
         
     }
 }
