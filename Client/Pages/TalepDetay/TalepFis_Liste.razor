@@ -1,5 +1,6 @@
 ﻿@page "/talepfis_liste"
 
+
 <HeaderSearchBar header="header"
                  ShowButtons="false" ShowFilterButton="true"
                  onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick" ShowSearchSection="true"></HeaderSearchBar>
@@ -34,8 +35,15 @@
     <RowTemplate>
         <MudTd>
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
-                <MudMenuItem OnClick="(() => TalepFisDetay(context.LogRef))">Talep Detay</MudMenuItem>
-                <MudMenuItem OnClick="(() => TalepFisDetayEkle(context.LogRef))">Detay Ekle</MudMenuItem>
+                <MudMenuItem OnClick="(() => TalepFisGuncelle(context.LogRef))">
+                    <MudIcon Icon="far fa-edit" Color="Color.Primary" /> Talep Güncelle
+                </MudMenuItem>
+                <MudMenuItem OnClick="(() => TalepFisDetay(context.LogRef))">
+                    <MudIcon Icon="fas fa-info-circle" Color="Color.Primary" /> Talep Detay
+                </MudMenuItem>
+                <MudMenuItem OnClick="(() => TalepFisDetayEkle(context.LogRef))">
+                    <MudIcon Icon="fas fa-plus-circle" Color="Color.Primary" />
+                    Detay Ekle</MudMenuItem>
 
             </MudMenu>
         </MudTd>
@@ -198,6 +206,12 @@
     private Task TalepFisDetayEkle(int logref)
     {
         navigation.NavigateTo("/talepdetay_ekle/" + logref);
+        return Task.CompletedTask;
+    }
+
+    private Task TalepFisGuncelle(int logref)
+    {
+        navigation.NavigateTo("/talepfis_ekle/" + logref);
         return Task.CompletedTask;
     }
 

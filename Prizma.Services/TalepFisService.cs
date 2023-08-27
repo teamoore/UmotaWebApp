@@ -48,5 +48,18 @@ namespace Prizma.Services
         {
             return await _unitOfWork.TalepFisRepository.GetV030_TalepFisListAsync(request);
         }
+
+        public async Task<TalepFis> UpdateTalepFis(TalepFisDto talepFisDto)
+        {
+            var row = await _unitOfWork.TalepFisRepository.SingleOrDefaultAsync(x => x.logref == talepFisDto.logref);
+
+            if (row == null)
+                throw new System.NullReferenceException("Talep bulunamadı");
+
+            row.UpdateTalepFis(talepFisDto);
+
+            await _unitOfWork.CommitAsync();
+            return row;
+        }
     }
 }

@@ -77,9 +77,25 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return result;
         }
 
-        public Task<TalepFisDto> UpdateRecord(TalepFisDto request)
+        public async Task<TalepFisDto> UpdateRecord(TalepFisDto tf)
         {
-            throw new System.NotImplementedException();
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+            tf.upddate = DateTime.Now;
+            tf.upduser = kullanicikodu;
+            
+            var request = new TalepFisRequestDto();
+            request.TalepFis = tf;
+            request.FirmaId = selectedFirmaDonem.firma_no.Value;
+
+            var result = await httpClient.PostGetServiceResponseAsync<TalepFisDto, TalepFisRequestDto>(UrlHelper.TalepFisGuncelle, request, ThrowSuccessException: true);
+
+            return result;
         }
 
         public async Task<List<V030_TalepFis>> LoadRecords_ViewV030TalepFis(TalepFisRequestDto request)

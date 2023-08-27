@@ -348,6 +348,34 @@
 
     protected override async Task OnInitializedAsync()
     {
+        IsUpdate = this.logRef.HasValue;
+
+        if (IsUpdate)
+            await LoadTalepFisData();
+
         await LoadSelectBoxdata();
+    }
+
+    private async Task LoadTalepFisData()
+    {
+        TalepFisRequestDto talepfisRequest = new();
+        talepfisRequest.TalepFis = new TalepFisDto() { logref = this.logRef.Value };
+
+        var response = await mainDataHelper.LoadRecords_ViewV030TalepFis(talepfisRequest);
+        var tfview = response.FirstOrDefault();
+
+        talepFis.FisNo = tfview.FisNo;
+        talepFis.insdate = tfview.InsDate;
+        talepFis.insuser = tfview.InsUser;
+        talepFis.DurumRef = tfview.DurumRef.HasValue ? tfview.DurumRef.Value : 0;
+        talepFis.Aciklama = tfview.Aciklama;
+        talepFis.Oncelik = tfview.Oncelik.HasValue ? tfview.Oncelik.Value : byte.Parse("0");
+        talepFis.ProjeAdi = tfview.ProjeAdi;
+        talepFis.ProjeRef = tfview.ProjeRef;
+        talepFis.TalepEden = tfview.TalepEden;
+        talepFis.TeslimTarihi = tfview.TeslimTarihi.HasValue ? tfview.TeslimTarihi.Value : DateTime.Now.AddDays(3);
+        talepFis.TeslimYeriRef = tfview.TeslimYeriRef.HasValue ? tfview.TeslimYeriRef.Value : 187;
+        talepFis.logref = tfview.LogRef;
+        talepFis.TurRef = tfview.TurRef;
     }
 }

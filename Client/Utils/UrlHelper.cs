@@ -124,5 +124,6 @@ namespace UmotaWebApp.Client.Utils
         public const string AktiviteBagliListe = "/api/Aktivite/GetRelated";
 
         public const string MahalListesi = "/api/Mahal/GetMahals";
+        public const string TalepFisGuncelle = "/api/talep/UpdateTalepFis";
     }
 }

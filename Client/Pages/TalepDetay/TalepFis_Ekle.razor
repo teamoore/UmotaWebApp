@@ -1,13 +1,16 @@
-﻿@page "/talepfis_ekle"
+﻿@page "/talepfis_ekle/{talepLogRef:int?}"
 
 <HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
 
-<TalepFisEkleGuncelleComponent OnVazgecClicked="goBackList"></TalepFisEkleGuncelleComponent>
+<TalepFisEkleGuncelleComponent OnVazgecClicked="goBackList" logRef="talepLogRef"></TalepFisEkleGuncelleComponent>
 
 @code {
 
     [Inject]
     NavigationManager navigation { get; set; }
+
+    [Parameter]
+    public int? talepLogRef { get; set; }
 
     public HeaderBarSearch header = new HeaderBarSearch();
 
