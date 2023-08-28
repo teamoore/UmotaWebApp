@@ -31,13 +31,16 @@
 <MudTabs Outlined="true" Position="Position.Top" Rounded="true" Border="true"
          ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
     <MudTabPanel Text="Talep Detayları">
-        <MudTable Items="talepDetays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
+        <MudTable Items="talepDetays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true" Filter="new Func<V031_TalepDetay,bool>(FilterFunc1)">
 
             <ToolBarContent>
                 @if (menuYetkiDto.Insert)
                 {
                     <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTalepDetay" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
-                } &nbsp;
+                } &nbsp; &nbsp; &nbsp;
+                <MudText Typo="Typo.h6">Talep Satırları</MudText>
+                <MudSpacer />
+                <MudTextField @bind-Value="_searchString" Placeholder="Satırlarda Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
             </ToolBarContent>
 
             <HeaderContent>
@@ -78,12 +81,20 @@
         <MudButtonGroup Color="Color.Primary" Variant="Variant.Outlined">
             <MudButton>Onay</MudButton>
             <MudMenu Icon="@Icons.Material.Filled.ArrowDropDown">
-                <MudMenuItem OnClick="() => OnayaGonder()">Onaya Gönder</MudMenuItem>
-                <MudMenuItem OnClick="() => Onayla()">Onayla</MudMenuItem>
+                @if ((talepOnays.Count == 0) && (kullanici_kodu == talepfis.First().InsUser || KullaniciYetkisi_TalepOzelOnay == true))
+                {
+                    <MudMenuItem OnClick="() => OnayaGonder()">Onaya Gönder</MudMenuItem>
+                }
+                @if ((talepOnays.Count > 0) && (OnayLineRef > 0))
+                {
+                    <MudMenuItem OnClick="() => Onayla(Enums.OnayDurumu.Onaylandi)">Onayla</MudMenuItem>
+                    <MudMenuItem OnClick="() => Onayla(Enums.OnayDurumu.GeriGonderildi)">Geri Gönder</MudMenuItem>
+                    <MudMenuItem OnClick="() => Onayla(Enums.OnayDurumu.Iptal)">İptal</MudMenuItem>
+                }
             </MudMenu>
         </MudButtonGroup>
 
-        <MudTable Items="talepOnays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true">
+        <MudTable Items="talepOnays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true" RowStyleFunc="TableRowStyleFunc">
 
             <HeaderContent>
                 <MudTh>Onay Türü</MudTh>
@@ -95,6 +106,7 @@
             </HeaderContent>
 
             <RowTemplate>
+                @* <MudTd DataLabel="Onay Türü" Style="@(@context.Active == 1 ? $"background:{Colors.Red.Lighten3};" : $"background:{Colors.LightGreen.Lighten3};")">@context.OnayTipAdi</MudTd> *@
                 <MudTd DataLabel="Onay Türü">@context.OnayTipAdi</MudTd>
                 <MudTd DataLabel="Onay Durumu">@context.OnayAdi</MudTd>
                 <MudTd DataLabel="Onay Yetkili Kullanıcılar">@context.OnayUser</MudTd>
@@ -169,6 +181,9 @@
     [Inject]
     TalepDetayHelper talepDetayHelper { get; set; }
 
+    [Inject]
+    TalepFisHelper talepFisHelper { get; set; }
+
 
     [Inject]
     UploadHelper uploadHelper { get; set; }
@@ -195,16 +210,40 @@
     private string _selectedFileName = null;
     private string _fileType = "";
     private IBrowserFile selectedFile;
+    private string kullanici_kodu = "";
+    private bool KullaniciYetkisi_TalepOzelOnay = false;
+    private static int OnayLineRef = 0;
+    private string _searchString = "";
+
+    private bool FilterFunc1(V031_TalepDetay element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(V031_TalepDetay element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Aciklama != null && element.Aciklama.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Kaynakadi != null && element.Kaynakadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Marka != null && element.Marka.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
+    }
+
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
+            kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
             menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
+            KullaniciYetkisi_TalepOzelOnay = await yetkiHelper.GetKullaniciYetkisi(kullanici_kodu, Consts.KullaniciYetkisi_TalepOzelOnay);
 
             await LoadTalepFis();
             await LoadTalepDetayList();
             await LoadTalepOnayList();
+            await GetOnayLineRef();
             await LoadTalepDosyalar();
         }
         catch (Exception ex)
@@ -256,12 +295,61 @@
     {
         await mainDataHelper.TalepOnayRota(this.talepRef);
         Snackbar.Add("Onaya Gönderildi", severity: Severity.Success);
+        await LoadTalepOnayList();
+        await GetOnayLineRef();
     }
 
-    private async Task Onayla()
+    private async Task Onayla(Enums.OnayDurumu onaydurumu)
     {
-        await mainDataHelper.TalepDurumGuncelle(this.talepRef);
+        await mainDataHelper.TalepOnayla(this.talepRef, OnayLineRef, (int)onaydurumu, "");
         Snackbar.Add("Onaylandı", severity: Severity.Success);
+        await LoadTalepOnayList();
+        await GetOnayLineRef();
+    }
+
+    private async Task GetOnayLineRef()
+    {
+        OnayLineRef = await talepFisHelper.TalepGetOnayLineRef(this.talepRef);
+    }
+
+    private static string TableRowStyleFunc(V032_TalepOnay exampleItem, int index)
+    {
+        if (exampleItem.Active == 0)
+        {
+            if (exampleItem.logref == OnayLineRef)
+            {
+                // return "background:" + Colors.Orange.Lighten3;
+                return "text-decoration-line: underline;";
+            }
+            else
+            {
+                switch (exampleItem.OnayIKodu)
+                {
+                    // case (int)Enums.OnayDurumu.Bekliyor:
+                    //     return "background:" + Colors.Yellow.Lighten3;
+                    case (int)Enums.OnayDurumu.Onaylandi:
+                        // return "background:" + Colors.Green.Lighten4;
+                        return "font-style: italic;";
+                    // case (int)Enums.OnayDurumu.Iptal:
+                    //     return "background:" + Colors.Red.Lighten3;
+                    default: return "";
+
+                }
+            }
+        } else
+        {
+            //return "background:" + Colors.Grey.Lighten1;
+            return "text-decoration: line-through;";
+        }
+
+        // => exampleItem.OnayIKodu switch
+        //    {
+        //        (int)Enums.OnayDurumu.Bekliyor => "background:" + Colors.Yellow.Lighten4,
+        //        (int)Enums.OnayDurumu.Onaylandi => "background:" + Colors.Green.Lighten4,
+        //        (int)Enums.OnayDurumu.Iptal => "background:" + Colors.Red.Lighten4,
+        //        _ => string.Empty,
+        //    };
+       
     }
 
     #region Dosya Yükleme

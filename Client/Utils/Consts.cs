@@ -278,6 +278,36 @@ namespace UmotaWebApp.Client.Utils
         public const string MakpaLogoFirmaNo = "102";
         public const string GASTROMOREFirmaNo = "200";
 
+        public const string KullaniciYetkisi_KaynakOnaylama = "Y001";
+        public const string KullaniciYetkisi_TumTalepleriGorme = "Y002";
+        public const string KullaniciYetkisi_TalepOzelOnay = "Y003";
+        public const string KullaniciYetkisi_TalepStokGirebilir = "Y004";
+        public const string KullaniciYetkisi_SiparisOzelOnay = "Y005";
+        public const string KullaniciYetkisi_SozlesmeOzelOnay = "Y006";
+        public const string KullaniciYetkisi_HakedisOzelOnay = "Y007";
+        public const string KullaniciYetkisi_AktiviteOnaylama = "Y008";
+        public const string KullaniciYetkisi_TumProjeleriGorme = "Y009";
+        public const string KullaniciYetkisi_TumProjeTalepleriGorme = "Y010";
+        public const string KullaniciYetkisi_TumSiparisleriGorme = "Y011";
+        public const string KullaniciYetkisi_TumProjeSiparisleriGorme = "Y012";
+        public const string KullaniciYetkisi_TumIrsaliyeleriGorme = "Y013";
+        public const string KullaniciYetkisi_TumProjeIrsaliyeleriGorme = "Y014";
+        public const string KullaniciYetkisi_TumFaturalariGorme = "Y015";
+        public const string KullaniciYetkisi_TumProjeFaturalariGorme = "Y016";
+        public const string KullaniciYetkisi_FaturaOzelOnay = "Y017";
+        public const string KullaniciYetkisi_HakedisYBFSatirOnay = "Y018";
+        public const string KullaniciYetkisi_ButceOzelOnay = "Y019";
+        public const string KullaniciYetkisi_HakedisOncekiMiktarGiris = "Y020";
+        public const string KullaniciYetkisi_SiparisMiktarindanFazlaSatinalma = "Y021";
+        public const string KullaniciYetkisi_MalzemeOnaylama = "Y022";
+        public const string KullaniciYetkisi_HizmetOnaylama = "Y023";
+        public const string KullaniciYetkisi_MalzemeFisOzelOnay = "Y024";
+        public const string KullaniciYetkisi_HakedisBirimFiyatDegistirme = "Y025";
+        public const string KullaniciYetkisi_YoneticiMenu = "Y026";
+        public const string KullaniciYetkisi_TopluOnay = "Y027";
+        public const string KullaniciYetkisi_HakedisOzelSilme = "Y028";
+
+
         public const string TeklifSozlesmesi = @"1.Fiyatlarımıza KDV dahil değildir. Teklifteki fiyatlarımız iskonto yapılmış net fiyatlardır. 
 2.Döviz kuru ödemenin gerçekleştiği veya faturanın kesildiği günden hesaplanacaktır. GARANTİ bankası döviz satış kuru esas alınacaktır.   
 3.Her türlü tesisat işleri (Elektrik, Sıcak-Soğuk Su, Sifon ve Sübab, LG,NG veya Havagazı ,Havalandırma vs….)teklif dışıdır. 

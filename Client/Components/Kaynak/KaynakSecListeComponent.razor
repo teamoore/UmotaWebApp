@@ -1,0 +1,98 @@
+﻿<div class="container">
+    <EditForm Model="searchDto" OnValidSubmit="LoadList">
+        <div class="form">
+
+            <div class="form-group">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <InputText @bind-Value="searchDto.searchString" class="form-control" />
+                    </div>
+                    <div class="col-md-8">
+                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.FindInPage"
+                                   OnClick="LoadList" Color="Color.Primary" Size="Size.Medium">Bul</MudButton>
+                        <MudButton Variant="Variant.Filled"
+                                   OnClick="Vazgec" Color="Color.Secondary" Size="Size.Medium">Vazgeç</MudButton>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </EditForm>
+
+    @if (!loadingCompleted)
+    {
+        <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+    }
+
+    <MudTable Items="@items" FixedFooter="true" FixedHeader="true" Dense="true" Hover="true" Bordered="true" Striped="true">
+        <HeaderContent>
+            <MudTh>#</MudTh>
+            <MudTh>Kaynak Kodu</MudTh>
+            <MudTh>Kaynak Adı</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <MudFab Color="Color.Primary" StartIcon="@Icons.Filled.Check" Size="Size.Small" OnClick="(() => Sec(context))" />
+            </MudTd>
+            <MudTd DataLabel="Kaynak Kodu">@context.Kodu</MudTd>
+            <MudTd DataLabel="Kaynak Adı">@context.Adi</MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+        </PagerContent>
+    </MudTable>
+</div>
+
+@code
+{
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    SabitHelper sabitHelper { get; set; }
+
+    [Inject]
+    KaynakHelper kaynakHelper { get; set; }
+
+    [Parameter]
+    public int? AktiviteRef { get; set; }
+
+    public List<V002_Kaynak> items { get; set; }
+
+    public KaynakRequestDto searchDto = new KaynakRequestDto();
+
+    private string _searchString;
+    private bool _sortNameByLength;
+    private bool loadingCompleted = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // await LoadList();
+    }
+
+    private async Task LoadList()
+    {
+        loadingCompleted = false;
+        searchDto.AktiviteRef = AktiviteRef;
+        items = await kaynakHelper.LoadRecords(searchDto);
+        // items = await sabitHelper.GetKaynakList(AktiviteRef.Value);
+        loadingCompleted = true;
+    }
+
+    public async Task Sec(V002_Kaynak secim)
+    {
+        await ModalInstance.CloseAsync(ModalResult.Ok<V002_Kaynak>(secim));
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+}
