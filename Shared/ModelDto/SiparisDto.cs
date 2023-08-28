@@ -10,7 +10,6 @@ namespace UmotaWebApp.Shared.ModelDto
     {
         public int logref { get; set; }
         public byte status { get; set; }
-
         public string? insuser { get; set; }
         public DateTime? insdate { get; set; }
         public string? upduser { get; set; }

@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace UmotaWebApp.Shared.ModelDto.Request
 {
-    public class TalepOnayRequestDto
+    public class KaynakRequestDto
     {
         public short FirmaId { get; set; }
         public string kullanicikodu { get; set; }
-        public int TalepRef { get; set; }
-        public int OnayLineRef { get; set; }
-        public int OnayDurumu { get; set; }
-        public string Aciklama { get; set; }
+        public int? AktiviteRef { get; set; }
+        public string searchString { get; set; }
 
+        public KaynakRequestDto() { }
     }
 }

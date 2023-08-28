@@ -16,6 +16,8 @@ namespace Prizma.Core.Services
         Task<int> TalepOnayRota(TalepOnayRequestDto request);
 
         Task<int> TalepDurumGuncelle(TalepOnayRequestDto request);
+        Task<int> TalepGetOnayLineRef(TalepOnayRequestDto request);
+        Task<int> TalepOnayla(TalepOnayRequestDto request);
 
         Task<bool> UploadTalepDosya(TalepDosyaRequestDto request);
 

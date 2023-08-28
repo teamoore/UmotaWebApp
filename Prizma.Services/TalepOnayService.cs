@@ -44,5 +44,13 @@ namespace Prizma.Services
 
             return true;
         }
+        public async Task<int> TalepGetOnayLineRef(TalepOnayRequestDto request)
+        {
+            return await _unitOfWork.TalepOnayRepository.TalepGetOnayLineRef(request);
+        }
+        public async Task<int> TalepOnayla(TalepOnayRequestDto request)
+        {
+            return await _unitOfWork.TalepOnayRepository.TalepOnayla(request);
+        }
     }
 }

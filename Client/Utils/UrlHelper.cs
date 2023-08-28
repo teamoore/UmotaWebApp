@@ -115,6 +115,8 @@ namespace UmotaWebApp.Client.Utils
         public const string TalepFisOnayListeGetir = "/api/talep/GetTalepFisOnayListAsnyc";
         public const string TalepOnayRota = "/api/talep/TalepOnayRota";
         public const string TalepDurumGuncelle = "/api/talep/TalepDurumGuncelle";
+        public const string TalepGetOnayLineRef = "/api/talep/TalepGetOnayLineRef";
+        public const string TalepOnayla = "/api/talep/TalepOnayla";
         public const string TalepUploadDosya = "/api/talep/UploadTalepDosya";
         public const string TalepDosyaGetAll = "/api/talep/GetTalepDosyalar";
 
@@ -125,5 +127,6 @@ namespace UmotaWebApp.Client.Utils
 
         public const string MahalListesi = "/api/Mahal/GetMahals";
         public const string TalepFisGuncelle = "/api/talep/UpdateTalepFis";
+        public const string KaynakGetList = "/api/Kaynak/GetList";
     }
 }

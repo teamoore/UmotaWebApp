@@ -21,6 +21,7 @@ namespace Prizma.Core
 
         ITalepDosyaRepository TalepDosyaRepository { get; }
 
+        IKaynakRepository KaynakRepository { get; }
         Task<int> CommitAsync();
     }
 }
