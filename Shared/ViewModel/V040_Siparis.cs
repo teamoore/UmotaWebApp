@@ -23,15 +23,22 @@ namespace UmotaWebApp.Shared
         public byte? DosyaEki { get; set; }
         public int? lgFirmaNo { get; set; }
         public int? DovizRefRD { get; set; }
+        public double? DovizkuruRD { get; set; }
         public int? DovizRefID { get; set; }
-        public int? NetToplamID { get; set; }
-        public int? NetToplamTL { get; set; }
-        public int? NetToplamRD { get; set; }
+        public byte DovizKurTurID { get; set; }
+        public double? DovizKuruID { get; set; }
+        public double? NetToplamID { get; set; }
+        public double? NetToplamTL { get; set; }
+        public double? NetToplamRD { get; set; }
+        public byte Iptal { get; set; }
+        public string? IptalUser { get; set; }
+        public DateTime? IptalDate { get; set; }
+        public string? IptalNedeni { get; set; }
+
         public int? DurumiKodu { get; set; }
         public string? DurumAdi { get; set; }
         public int? Renk1 { get; set; }
         public int? Renk2 { get; set; }
-
         public string? ProjeKodu { get; set; }
         public string? ProjeAdi { get; set; }
         public int? ProjeSirketRef { get; set; }

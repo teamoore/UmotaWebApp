@@ -74,7 +74,7 @@ namespace UmotaWebApp.Server
             services.AddScoped<IDovizService, DovizService>();
             //services.AddScoped<IFaaliyetService, FaaliyetService>();
             services.AddScoped<IPdfGenerator, PdfGeneratorService>();
-            //services.AddScoped<IVCariKartService, VCariKartService>();
+            services.AddScoped<IVCariKartService, VCariKartService>();
             //services.AddScoped<IKisilerService, KisilerService>();
             //services.AddScoped<IVMalzemeKartService, VMalzemeKartService>();
             //services.AddScoped<IDashboardInfo, DashboardInfo>();
@@ -91,6 +91,7 @@ namespace UmotaWebApp.Server
             services.AddTransient<ITalepFisService, TalepFisService>();
             services.AddTransient<IProjeService, ProjeService>();
             services.AddTransient<ISiparisService, SiparisService>();
+            services.AddTransient<ISiparisDetayService, SiparisDetayService>();
             services.AddTransient<IAktiviteService, AktiviteService>();
             services.AddTransient<ITalepOnayService, TalepOnayService>();
             services.AddScoped<ITalepDosyaService, TalepDosyaService>();

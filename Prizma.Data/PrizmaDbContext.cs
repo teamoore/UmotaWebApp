@@ -22,12 +22,11 @@ namespace Prizma.Data
         public DbSet<TalepOnay> TalepOnaay { get; set; }
         public DbSet<V032_TalepOnay> v032_TalepOnay { get; set; }
         public DbSet<V001Aktivite> v001Aktivite { get; set; }
-
         public DbSet<V005Mahal> v005Mahal { get; set; }
+        public DbSet<Siparis> Siparis { get; set; }
         public DbSet<V040_Siparis> v040_Siparis { get; set; }
-
+        public DbSet<V041_SiparisDetay> v041_SiparisDetay { get; set; }
         public DbSet<TalepDosya> TalepDosya { get; set; }
-
         public DbSet<Kaynak> Kaynak { get; set; }
         public DbSet<V002_Kaynak> v002_Kaynak { get; set; }
 
@@ -43,6 +42,7 @@ namespace Prizma.Data
             modelBuilder.ApplyConfiguration(new ProjeConfiguration());
             modelBuilder.ApplyConfiguration(new v030TalepFisConfiguration());
             modelBuilder.ApplyConfiguration(new v040SiparisConfiguration());
+            modelBuilder.ApplyConfiguration(new V041SiparisDetayConfiguration());
             modelBuilder.ApplyConfiguration(new v031TalepFisDetayConfiguration());
             modelBuilder.ApplyConfiguration(new v001AktiviteConfiguration());
             modelBuilder.ApplyConfiguration(new v005MahalConfiguration());
@@ -51,6 +51,7 @@ namespace Prizma.Data
             modelBuilder.ApplyConfiguration(new KaynakConfiguration());
             modelBuilder.ApplyConfiguration(new V002KaynakConfiguration());
             modelBuilder.ApplyConfiguration(new TalepDosyaConfiguration());
+            modelBuilder.ApplyConfiguration(new SiparisConfiguration());
         }
     }
 }

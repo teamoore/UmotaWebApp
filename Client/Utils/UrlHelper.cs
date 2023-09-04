@@ -128,5 +128,11 @@ namespace UmotaWebApp.Client.Utils
         public const string MahalListesi = "/api/Mahal/GetMahals";
         public const string TalepFisGuncelle = "/api/talep/UpdateTalepFis";
         public const string KaynakGetList = "/api/Kaynak/GetList";
+
+        public const string SiparisLoadRecordsFromView = "/api/siparis/LoadRecordsFromView";
+        public const string SiparisLoadRecordFromView = "/api/siparis/LoadRecordFromView";
+        public const string SiparisSaveRecord = "/api/siparis/SaveRecord";
+        public const string SiparisUpdateRecord = "/api/siparis/UpdateRecord";
+        public const string SiparisV041SiparisDetayList = "/api/siparis/GetSiparisDetayListAsnyc";
     }
 }

@@ -13,11 +13,13 @@ namespace UmotaWebApp.Client.ServiceHelpers
     {
         public enum SabitTurler
         {
+            DovizKodlari = 1,
             TalepTuru = 50,
             TalepDurumu = 51,
             TalepTeslimYeri = 52,
             TalepOnayTuru = 54,
-            Birimler = 53
+            Birimler = 53,
+            SiparisDurumu = 61
         }
 
         protected HttpClient httpClient { get; set; }

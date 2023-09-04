@@ -533,7 +533,7 @@
             teklif.Logref = await yetkiHelper.RefNoAl("teklif");
             teklif.Teklifno = await yetkiHelper.FisNoAl("teklif","teklifno");
             teklif.Dovizref = 20;
-            teklif.Dovizkuru = await yetkiHelper.DovizKuruAl(teklif.Dovizref.Value, teklif.Tarih.Value);
+            teklif.Dovizkuru = await yetkiHelper.DovizKuruAl(teklif.Dovizref.Value, teklif.Tarih.Value,4);
             teklif.Tarih = teklif.Tarih.HasValue ? teklif.Tarih : DateTime.Now;
             teklif.Saat = teklif.Saat.HasValue ? teklif.Saat : DateTime.Now;
             teklif.Trcode = 1;
@@ -635,7 +635,7 @@
                 throw new Exception("Döviz tipi seçmelisiniz");
             }
             _DovizKuruState = "Çekiliyor...";
-            teklif.Dovizkuruid = await yetkiHelper.DovizKuruAl(teklif.Dovizrefid.Value, teklif.Tarih.Value);
+            teklif.Dovizkuruid = await yetkiHelper.DovizKuruAl(teklif.Dovizrefid.Value, teklif.Tarih.Value,4);
             _DovizKuruState = "Güncel";
             this.StateHasChanged();
         }

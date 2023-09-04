@@ -20,7 +20,7 @@ namespace Prizma.Data.Repositories
 
         public async Task<List<Proje>> GetProjeListAsync()
         {
-            return await dbContext.Proje.Where(x => x.Active == 0).ToListAsync();
+            return await dbContext.Proje.Where(x => x.status < 2 && x.Active == 0).ToListAsync();
         }
     }
 }
