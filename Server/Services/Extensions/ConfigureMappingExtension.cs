@@ -3,6 +3,7 @@ using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using Prizma.Core.Model;
 using UmotaWebApp.Server.Data.Models;
+using UmotaWebApp.Shared;
 using UmotaWebApp.Shared.ModelDto;
 
 namespace UmotaWebApp.Server.Services.Extensions
@@ -69,7 +70,11 @@ namespace UmotaWebApp.Server.Services.Extensions
             CreateMap<TalepFis, TalepFisDto>().ReverseMap();
             CreateMap<Proje,ProjeDto>().ReverseMap();
             CreateMap<Mahal, MahalDto>().ReverseMap();
-            CreateMap<TalepDosya, TalepDosyaDto>().ReverseMap();    
+            CreateMap<TalepDosya, TalepDosyaDto>().ReverseMap();
+            CreateMap<Siparis, SiparisDto>().ReverseMap();
+            CreateMap<SiparisDetay, SiparisDetayDto>().ReverseMap();
+            CreateMap<V040_Siparis, SiparisDto>().ReverseMap();
+            CreateMap<V041_SiparisDetay, SiparisDetayDto>().ReverseMap();
         }
     }
 

@@ -38,10 +38,11 @@ namespace UmotaWebApp.Shared.ModelDto
         public string Ozelkod5 { get; set; }
         public int? Odemeplanref { get; set; }
         public string Odmplnkodu { get; set; }
-        public short? Active { get; set; }
+        public byte? Active { get; set; }
         public short? Status { get; set; }
         public short? Isperscomp { get; set; }
         public string Vdno { get; set; }
         public string Sektor { get; set; }
+        public int? lgfirmano { get; set; }
     }
 }

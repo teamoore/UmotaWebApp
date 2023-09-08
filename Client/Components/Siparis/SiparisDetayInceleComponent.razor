@@ -1,0 +1,99 @@
+﻿<div class="container">
+
+    @if (!loadingCompleted)
+    {
+        <MudProgressCircular Color="Color.Success" Indeterminate="true" />
+    }
+
+    <MudTable Items="Detays" Hover="true" Breakpoint="Breakpoint.Sm" Bordered="true" Striped="true" Filter="new Func<V041_SiparisDetay,bool>(FilterFunc1)">
+
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Sipariş Satırları</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Satırlarda Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+
+        <HeaderContent>
+            <MudTh>Aktivite 1</MudTh>
+            <MudTh>Aktivite 2</MudTh>
+            <MudTh>Aktivite 3</MudTh>
+            <MudTh>Kaynak Kodu</MudTh>
+            <MudTh>Kaynak Adı</MudTh>
+            <MudTh>Açıklama</MudTh>
+            <MudTh>Miktar</MudTh>
+            <MudTh>Birim</MudTh>
+        </HeaderContent>
+
+        <RowTemplate>
+            <MudTd DataLabel="Aktivite 1">@context.Aktivite1adi</MudTd>
+            <MudTd DataLabel="Aktivite 2">@context.Aktivite2adi</MudTd>
+            <MudTd DataLabel="Aktivite 3">@context.Aktivite3adi</MudTd>
+            <MudTd DataLabel="Kaynak Kodu">@context.Kaynakkodu</MudTd>
+            <MudTd DataLabel="Kaynak Adı">@context.Kaynakadi</MudTd>
+            <MudTd DataLabel="Açıklama">@context.Aciklama</MudTd>
+            <MudTd DataLabel="Miktar">@context.Miktar</MudTd>
+            <MudTd DataLabel="Birim">@context.Birimadi</MudTd>
+        </RowTemplate>
+
+    </MudTable>
+</div>
+
+@code
+{
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    SiparisDetayHelper DetayHelper { get; set; }
+
+    [Parameter]
+    public int? SiparisRef { get; set; }
+
+    public List<V041_SiparisDetay> Detays { get; set; }
+
+    private string _searchString;
+    private bool loadingCompleted = true;
+
+    private bool FilterFunc1(V041_SiparisDetay element) => FilterFunc(element, _searchString);
+
+    private bool FilterFunc(V041_SiparisDetay element, string searchString)
+    {
+        if (string.IsNullOrWhiteSpace(searchString))
+            return true;
+        if (element.Aciklama != null && element.Aciklama.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        if (element.Kaynakadi != null && element.Kaynakadi.Contains(searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+        return false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadList();
+    }
+
+    private async Task LoadList()
+    {
+        loadingCompleted = false;
+        var request = new SiparisDetayRequestDto();
+        request.SiparisDetay = new V041_SiparisDetay() { Parlogref = SiparisRef };
+        Detays = await DetayHelper.LoadViewRecords(request);
+        loadingCompleted = true;
+    }
+
+    public async Task Sec(V041_SiparisDetay secim)
+    {
+        await ModalInstance.CloseAsync(ModalResult.Ok<V041_SiparisDetay>(secim));
+    }
+
+    public async Task Vazgec()
+    {
+        await ModalInstance.CloseAsync();
+    }
+}

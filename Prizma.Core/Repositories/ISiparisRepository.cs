@@ -11,6 +11,7 @@ namespace Prizma.Core.Repositories
 {
     public interface ISiparisRepository : IRepository<Siparis>
     {
-        Task<List<V040_Siparis>> GetV040_Siparis(SiparisViewRequestDto request);
+        Task<List<V040_Siparis>> LoadRecordsFromView(SiparisRequestDto request);
+        Task<Siparis> SaveRecord(Siparis entity);
     }
 }

@@ -14,13 +14,10 @@ namespace Prizma.Core
         ITalepFisRepository TalepFisRepository { get; }
         IProjeRepository ProjeRepository { get; }
         IAktiviteRepository AktiviteRepository { get; }
-
         ISiparisRepository SiparisRepository { get; }
-
+        ISiparisDetayRepository SiparisDetayRepository { get; }
         ITalepOnayRepository TalepOnayRepository { get; }
-
         ITalepDosyaRepository TalepDosyaRepository { get; }
-
         IKaynakRepository KaynakRepository { get; }
         Task<int> CommitAsync();
     }

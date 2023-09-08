@@ -90,7 +90,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             return result;
         }
-        public async Task<double> DovizKuruAl(int dovizturu, DateTime tarih)
+        public async Task<double> DovizKuruAl(int dovizturu, DateTime tarih, byte kurturu)
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
@@ -106,7 +106,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             var requestDovizKuru = new DovizKuruRequestDto();
             requestDovizKuru.KurTarihi = tarih;
-            requestDovizKuru.KurTuru = 4;
+            requestDovizKuru.KurTuru = kurturu;
             requestDovizKuru.DovizTuru = dovizturu;
             requestDovizKuru.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
 

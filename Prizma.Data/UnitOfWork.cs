@@ -19,6 +19,7 @@ namespace Prizma.Data
         private IAktiviteRepository _aktiviteRepository;
 
         private ISiparisRepository _siparisRepository;
+        private ISiparisDetayRepository _siparisDetayRepository;
         private ITalepOnayRepository _taleponayRepository;
         private IKaynakRepository _kaynakRepository;
         private ITalepDosyaRepository _talepdosyaRepository;
@@ -33,11 +34,10 @@ namespace Prizma.Data
         public ITalepFisRepository TalepFisRepository => _talepfRepository = _talepfRepository ?? new TalepFisRepository(_context);
         public IProjeRepository ProjeRepository => _projeRepository = _projeRepository ?? new ProjeRepository(_context);
         public IAktiviteRepository AktiviteRepository => _aktiviteRepository = _aktiviteRepository ?? new AktiviteRepository(_context);
-
         public ISiparisRepository SiparisRepository => _siparisRepository = _siparisRepository ?? new SiparisRepository(_context);
+        public ISiparisDetayRepository SiparisDetayRepository => _siparisDetayRepository = _siparisDetayRepository ?? new SiparisDetayRepository(_context);
         public ITalepOnayRepository TalepOnayRepository => _taleponayRepository = _taleponayRepository ?? new TalepOnayRepository(_context);
         public IKaynakRepository KaynakRepository => _kaynakRepository = _kaynakRepository ?? new KaynakRepository(_context);
-
         public ITalepDosyaRepository TalepDosyaRepository => _talepdosyaRepository = _talepdosyaRepository ?? new TalepDosyaRepository(_context);
 
         public async Task<int> CommitAsync()

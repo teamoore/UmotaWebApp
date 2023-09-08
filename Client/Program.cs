@@ -49,6 +49,8 @@ namespace UmotaWebApp.Client
             builder.Services.AddScoped<AktiviteHelper>();
             builder.Services.AddScoped<MahalHelper>();
             builder.Services.AddScoped<KaynakHelper>();
+            builder.Services.AddScoped<SiparisHelper>();
+            builder.Services.AddScoped<SiparisDetayHelper>();
 
             builder.Services.AddAuthorizationCore();
 

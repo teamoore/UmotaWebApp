@@ -68,6 +68,8 @@
             [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
             [CascadingParameter] ModalParameters modalParameters { get; set; }
 
+            [Parameter]
+            public int? lgfirmano { get; set; }
 
             [Inject]
             NavigationManager navigation { get; set; }
@@ -116,8 +118,8 @@
                     var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
                     if (selectedFirmaDonem == null)
                         throw new Exception("Firma dönem seçilmedi");
-
                     cari.FirmaId = selectedFirmaDonem.firma_no.Value;
+                    cari.lgfirmano = lgfirmano; // parametreden gelecek login olunan firmadan farklı olabilir.
 
                     cariler = await httpClient.PostGetServiceResponseAsync<List<VCariKartDto>, VCariKartsRequestDto>(UrlHelper.VCariKartAra, cari);
 
@@ -145,7 +147,6 @@
                     var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
                     if (selectedFirmaDonem == null)
                         throw new Exception("Firma dönem seçilmedi");
-
 
                     var cari = await httpClient.GetServiceResponseAsync<VCariKartDto>(UrlHelper.VCariKartGetir + "?logref=" + logref + "&firmaId=" + selectedFirmaDonem.firma_no.ToString());
                     if (cari != null)

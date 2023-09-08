@@ -1,0 +1,28 @@
+﻿@page "/siparis_ekle/{siparisRef:int?}"
+
+<HeaderSearchBar header="header" ShowSearchSection="false"></HeaderSearchBar>
+
+<SiparisEkleGuncelleComponent OnVazgecClicked="goBackList" logRef="siparisRef"></SiparisEkleGuncelleComponent>
+
+@code {
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Parameter]
+    public int? siparisRef { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Sipariş Bilgileri";
+        return Task.CompletedTask;
+    }
+
+    public void goBackList()
+    {
+        navigation.NavigateTo("/siparis_liste");
+    }
+
+}
