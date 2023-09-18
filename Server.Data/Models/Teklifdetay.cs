@@ -78,5 +78,6 @@ namespace UmotaWebApp.Server.Data.Models
         public DateTime? Upddate { get; set; }
         public int? Siplogref { get; set; }
         public int? FiltreHarRef { get; set; }
+        public string Mahal { get; set; }
     }
 }

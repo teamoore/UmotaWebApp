@@ -165,6 +165,7 @@
             <MudTh>#</MudTh>
         }
         <MudTh>Poz No</MudTh>
+        <MudTh>Mahal</MudTh>
         <MudTh>Stok Kodu</MudTh>
         <MudTh>Stok Adı</MudTh>
         <MudTh>Marka</MudTh>
@@ -197,6 +198,7 @@
             </MudTd>
         }
         <MudTd DataLabel="Poz No">@context.Sipnosira</MudTd>
+        <MudTd DataLabel="Mahal">@context.Mahal</MudTd>
         <MudTd DataLabel="Stok Kodu">@context.Malzkodu</MudTd>
         <MudTd DataLabel="Stok Adı">@context.Malzadi</MudTd>
         <MudTd DataLabel="Marka">@context.Marka</MudTd>
@@ -607,7 +609,7 @@
 
     public async Task DownloadCsv()
     {
-        var content = @"Poz No;Stok Kodu;Stok Adı;Marka;Menşei;Miktar;Birim;Net Fiyat;Tutar";
+        var content = @"Poz No;Mahal;Stok Kodu;Stok Adı;Marka;Menşei;Miktar;Birim;Net Fiyat;Tutar";
 
         @if (@maliyetGorYonetici)
         {
@@ -623,7 +625,7 @@
 
         foreach (var item in teklifDetayList)
         {
-            content += item.Sipnosira + ";'" + item.Malzkodu + ";" + item.Malzadi + ";" + item.Marka + ";" +item.Mensei + ";" +  item.Miktar + ";"
+            content += item.Sipnosira + ";" + item.Mahal + ";" + item.Malzkodu + ";" + item.Malzadi + ";" + item.Marka + ";" + item.Mensei + ";" + item.Miktar + ";"
                 + item.Birimkodu + ";" + Helper.FormattedDouble(item.NetFiyatid) + ";" + Helper.FormattedDouble(item.Kdvmatrahid) + ";";
 
             @if(@maliyetGorYonetici)

@@ -87,6 +87,7 @@ namespace UmotaWebApp.Shared.ModelDto
         public string Satsipno { get; set; }
         public int? Satmalzlogref { get; set; }
         public string MontajYeri { get; set; }
+        public string Mahal { get; set; }
 
         private double? _netFiyatid = 0;
         public double? NetFiyatid

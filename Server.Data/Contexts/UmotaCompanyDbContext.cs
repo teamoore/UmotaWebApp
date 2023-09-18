@@ -3664,6 +3664,8 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasMaxLength(21)
                     .IsUnicode(false)
                     .HasColumnName("upduser");
+                
+                entity.Property(e => e.Mahal).HasColumnName("mahal");
             });
 
             modelBuilder.Entity<TeklifdetayLog>(entity =>
@@ -3862,6 +3864,8 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasMaxLength(21)
                     .IsUnicode(false)
                     .HasColumnName("upduser");
+
+                entity.Property(e => e.Mahal).HasColumnName("mahal");
             });
 
             modelBuilder.Entity<UmtMuhasebeTablo>(entity =>
@@ -5083,6 +5087,8 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasMaxLength(21)
                     .IsUnicode(false)
                     .HasColumnName("upduser");
+
+                entity.Property(e => e.Mahal).HasColumnName("mahal");
             });
 
             modelBuilder.Entity<V011TeklifRotum>(entity =>

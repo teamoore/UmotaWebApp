@@ -86,5 +86,6 @@ namespace UmotaWebApp.Server.Data.Models
         public string Satsipno { get; set; }
         public int? Satmalzlogref { get; set; }
         public string MontajYeri { get; set; }
+        public string Mahal { get; set; }
     }
 }

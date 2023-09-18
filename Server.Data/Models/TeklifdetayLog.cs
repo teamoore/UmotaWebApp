@@ -79,5 +79,6 @@ namespace UmotaWebApp.Server.Data.Models
         public int Recref { get; set; }
         public int? Siplogref { get; set; }
         public int? FiltreHarRef { get; set; }
+        public string Mahal { get; set; }
     }
 }
