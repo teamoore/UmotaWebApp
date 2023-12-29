@@ -1,25 +1,30 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <DockerComposeProjectPath>../../docker-compose.dcproj</DockerComposeProjectPath>
     <UserSecretsId>6460630d-5f11-4fe0-b930-aa6496cd28d0</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference Include="Dapper" Version="2.0.143" />
     <PackageReference Include="Dapper.SqlBuilder" Version="2.0.78" />
     <PackageReference Include="DinkToPdf" Version="1.0.8" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.13" />
-    <PackageReference Include="AutoMapper" Version="11.0.0" />
-    <PackageReference Include="Blazored.LocalStorage" Version="4.1.5" />
-    <PackageReference Include="Blazored.Modal" Version="6.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.13" />
-    <PackageReference Include="NETCore.MailKit" Version="2.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="7.0.8" />
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
+    <PackageReference Include="Blazored.Modal" Version="7.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.8" />
+    <PackageReference Include="NETCore.MailKit" Version="2.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Client\UmotaWebApp.Client.csproj" />
+    <ProjectReference Include="..\Prizma.Core\Prizma.Core.csproj" />
+    <ProjectReference Include="..\Prizma.Data\Prizma.Data.csproj" />
+    <ProjectReference Include="..\Prizma.Services\Prizma.Services.csproj" />
     <ProjectReference Include="..\Shared\UmotaWebApp.Shared.csproj" />
     <ProjectReference Include="..\Server.Data\UmotaWebApp.Server.Data.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>

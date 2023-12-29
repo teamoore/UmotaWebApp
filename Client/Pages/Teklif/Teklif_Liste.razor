@@ -197,8 +197,7 @@
         try
         {
             var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
+            
             modalParameters = new ModalParameters();
             modalParameters.Add("mainRequest", mainDataRequest);
 
@@ -257,8 +256,7 @@
     public async Task TeklifDurumDegistir(int logref, int? admin)
     {
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var parameters = new ModalParameters();
         parameters.Add("logRef", logref);
 
@@ -287,8 +285,7 @@
     public async Task TeklifDurumDetay(int logref)
     {
         var opt = new ModalOptions();
-        opt.ContentScrollable = true;
-
+        
         var parameters = new ModalParameters();
         parameters.Add("teklifref", logref);
 

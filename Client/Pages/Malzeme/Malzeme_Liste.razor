@@ -164,8 +164,7 @@
             // }
 
             var opt = new ModalOptions();
-            opt.ContentScrollable = true;
-
+            
             var filterForm = modal.Show<Pages.Malzeme.Stok_Liste_Filters>("Arama Seçenekleri", opt);
             var result = await filterForm.Result;
 

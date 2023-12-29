@@ -7,9 +7,6 @@
 
         <div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3">
 
-
-            <img src="/img/logo.png" />
-
             <EditForm Model="@request" OnValidSubmit="LoginProcess">
                 <DataAnnotationsValidator />
 
@@ -163,6 +160,10 @@
         try
         {
             _showProgress = true;
+
+            //var result = await client.GetServiceResponseAsync<List<SisFirmaDonemDto>>("/api/TalepDetay/AllTalepDetay");
+
+            //var xxx = await client.PostAsJsonAsync("api/TalepDetay/CreateTalepDetay", new object());
 
             var httpReqResponse = await client.PostAsJsonAsync(UrlHelper.Login, request);
 

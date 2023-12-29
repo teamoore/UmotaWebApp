@@ -37,12 +37,15 @@ namespace UmotaWebApp.Client
             builder.Services.AddScoped<TeklifHelper>();
             builder.Services.AddScoped<VazifeHelper>();
             builder.Services.AddScoped<KullaniciHelper>();
-            builder.Services.AddScoped<Radzen.DialogService>();
             builder.Services.AddScoped<Helper>();
             builder.Services.AddScoped<DownloadHelper>();
             builder.Services.AddScoped<KisiHelper>();
             builder.Services.AddScoped<ServisHelper>();
             builder.Services.AddScoped<UploadHelper>();
+            builder.Services.AddScoped<TalepDetayHelper>();
+            builder.Services.AddScoped<TalepFisHelper>();
+            builder.Services.AddScoped<SabitHelper>();
+
             builder.Services.AddAuthorizationCore();
 
             builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();

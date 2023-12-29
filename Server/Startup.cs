@@ -24,6 +24,11 @@ using UmotaWebApp.Server.Services.Email;
 using UmotaWebApp.Server.Services;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.AspNetCore.Http;
+using Prizma.Core.Repositories;
+using Prizma.Services;
+using Prizma.Core.Services;
+using Prizma.Core;
+using Prizma.Data;
 
 namespace UmotaWebApp.Server
 {
@@ -49,36 +54,41 @@ namespace UmotaWebApp.Server
 
             services.AddDbConnection();
 
-            services.AddScoped<IEmailSender, EmailSender>();
-            var emailConfig = Configuration
-                    .GetSection("EmailConfiguration")
-                    .Get<EmailConfiguration>();
+            //services.AddScoped<IEmailSender, EmailSender>();
+            //var emailConfig = Configuration
+            //        .GetSection("EmailConfiguration")
+            //        .Get<EmailConfiguration>();
 
-            services.AddSingleton(emailConfig);
+            //services.AddSingleton(emailConfig);
 
             services.AddScoped<ISisKullaniciService, SisKullaniciService>();
             services.AddScoped<ISisFirmaService, SisFirmaService>();
             services.AddScoped<ISisMenuService, SisMenuService>();
             services.AddScoped<ICariKartService, CariKartService>();
             services.AddScoped<IRefGenerator, RefGeneratorService>();
-            services.AddScoped<ITeklifService, TeklifService>();
-            services.AddScoped<ITeklifDetayService, TeklifDetayService>();
-            services.AddScoped<IMalzemeKartService, MalzemeKartService>();
+            //services.AddScoped<ITeklifService, TeklifService>();
+            //services.AddScoped<ITeklifDetayService, TeklifDetayService>();
+            //services.AddScoped<IMalzemeKartService, MalzemeKartService>();
             services.AddScoped<IPersonelService, PersonelService>();
             services.AddScoped<ISisFirmaDonemService, SisFirmaDonemService>();
             services.AddScoped<IDovizService, DovizService>();
-            services.AddScoped<IFaaliyetService, FaaliyetService>();
+            //services.AddScoped<IFaaliyetService, FaaliyetService>();
             services.AddScoped<IPdfGenerator, PdfGeneratorService>();
-            services.AddScoped<IVCariKartService, VCariKartService>();
-            services.AddScoped<IKisilerService, KisilerService>();
-            services.AddScoped<IVMalzemeKartService, VMalzemeKartService>();
-            services.AddScoped<IDashboardInfo, DashboardInfo>();
-            services.AddScoped<ITeklifReportService, ReportService>();
-            services.AddScoped<ITakvimService, TakvimService>();
-            services.AddScoped<IVazifeService, VazifeService>();
-            services.AddScoped<ICariRaporService, CariRaporService>();
+            //services.AddScoped<IVCariKartService, VCariKartService>();
+            //services.AddScoped<IKisilerService, KisilerService>();
+            //services.AddScoped<IVMalzemeKartService, VMalzemeKartService>();
+            //services.AddScoped<IDashboardInfo, DashboardInfo>();
+            //services.AddScoped<ITeklifReportService, ReportService>();
+            //services.AddScoped<ITakvimService, TakvimService>();
+            //services.AddScoped<IVazifeService, VazifeService>();
+            //services.AddScoped<ICariRaporService, CariRaporService>();
             services.AddScoped<IServisService, ServisService>();
             services.AddScoped<IFileUpload, FileUploadService>();
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddTransient<ITalepDetayService, TalepDetayService>();
+            services.AddTransient<IMahalService, MahalService>();
+            services.AddTransient<ITalepFisService, TalepFisService>();
 
             var architectureFolder = (IntPtr.Size == 8) ? "64 bit" : "32 bit";
             var wkHtmlToPdfPath = Path.Combine(Environment.CurrentDirectory, $"wkhtmltox\\v0.12.4\\{architectureFolder}\\libwkhtmltox");
@@ -86,7 +96,10 @@ namespace UmotaWebApp.Server
             context.LoadUnmanagedLibrary(wkHtmlToPdfPath);
             services.AddSingleton(typeof(IConverter), new STASynchronizedConverter(new PdfTools()));
 
-
+            services.AddDbContext<PrizmaDbContext>(config =>
+            {
+                config.UseSqlServer(Configuration.GetPrizmeDbConnection());
+            });
 
 
             services.AddDbContext<UmotaMasterDbContext>(config =>
@@ -116,6 +129,10 @@ namespace UmotaWebApp.Server
             services.AddHealthChecks();
 
             services.AddLogging();
+
+            services.AddAutoMapper(typeof(Startup));
+
+             
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -155,6 +172,9 @@ namespace UmotaWebApp.Server
                 endpoints.MapControllers();
                 endpoints.MapFallbackToFile("index.html");
             });
+
+            app.UseSwagger(); 
+            
 
         }
     }

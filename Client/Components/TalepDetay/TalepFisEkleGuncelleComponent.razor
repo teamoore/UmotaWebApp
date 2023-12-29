@@ -1,0 +1,257 @@
+﻿<EditForm Model="talepFis">
+    <DataAnnotationsValidator />
+
+    @if (loadingCompleted == false)
+    {
+        <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+    }
+
+    <div class="mt-12">
+        <div class="form-group">
+            
+            <div class="row">
+
+                <div class="col-md-3">                    
+                    <label>Talep Türü</label>
+                    <InputSelect class="form-control" @bind-Value="talepFis.TurRef">
+                        @if (talepTuruList != null)
+                        {
+                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                            @foreach (var item in talepTuruList)
+                            {
+                                <option value="@item.Kodu">@item.Adi</option>
+                            }
+                        }
+                    </InputSelect>
+
+                </div>
+
+            </div>
+            
+            <div class="row">
+
+                <div class="col-md-3">
+                    <label>Talep Eden</label>
+                    <InputText @bind-Value="talepFis.TalepEden" class="form-control" placeholder="Talep Eden" />
+                </div>
+
+                <div class="col-md-3">                    
+                    <label>Teslim Yeri</label>
+                    <InputSelect class="form-control" @bind-Value="talepFis.TeslimYeriRef">
+                        @if (teslimYeriList != null)
+                        {
+                            <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                            @foreach (var item in teslimYeriList)
+                            {
+                                <option value="@item.Kodu">@item.Adi</option>
+                            }
+                        }
+                    </InputSelect>
+
+                </div>
+
+                <div class="col-md-3">
+                    <label>Teslim Tarihi</label>
+                    <InputDate @bind-Value="talepFis.TeslimTarihi" class="form-control" placeholder="Teslim Tarihi" />
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-9">
+                    <label>Açıklama</label>
+                    <InputText @bind-Value="talepFis.Aciklama" class="form-control" placeholder="Açıklama" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="form-group">
+        <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+            @if (_processing)
+            {
+                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                <MudText Class="ms-2">Kaydediliyor...</MudText>
+            }
+            else
+            {
+                <MudText>Kaydet</MudText>
+            }
+        </MudButton>
+        <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+    </div>
+</EditForm>
+
+@code {
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    SabitHelper sabitHelper { get; set; }
+
+    [Inject]
+    TalepFisHelper mainDataHelper { get; set; }
+
+    [Parameter]
+    public int? logRef { get; set; }
+
+    [Parameter]
+    public EventCallback OnVazgecClicked { get; set; }
+
+
+    public bool IsUpdate { get; set; }
+    private bool loadingCompleted = false;
+    private bool _processing = false;
+
+    TalepFisDto talepFis = new() { Tarih = DateTime.Now, Saat = DateTime.Now, TeslimTarihi = DateTime.Now.AddDays(3), TurRef = -1, TeslimYeriRef = -1 };
+    List<SisSabitlerDetayDto> teslimYeriList = new();
+    List<SisSabitlerDetayDto> talepTuruList = new();
+
+    private string tableName = "talep_fis";
+    private string listPage = "talepfis_liste";
+
+    public async Task ValidSubmit()
+    {
+        if (IsUpdate)
+            await UpdateRecord();
+        else
+            await SaveRecord();
+    }
+
+    private async Task UpdateRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            await mainDataHelper.UpdateRecord(talepFis);
+
+            navigation.NavigateTo("/" + listPage);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    private async Task SaveRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            talepFis.logref = await yetkiHelper.RefNoAl(tableName);
+            await mainDataHelper.SaveRecord(talepFis);
+
+            navigation.NavigateTo("/" + listPage);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    public void SubmitValidation()
+    {
+        var err = new List<string>();
+
+        if (talepFis.Aciklama == null)
+            err.Add("Açıklama giriniz");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Talep Hatası");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
+
+    public Task Vazgec()
+    {
+        //navigation.NavigateTo("/talepfis_liste");
+        return Task.CompletedTask;
+    }
+
+    public async Task LogRefUret()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma dönem seçilmedi");
+
+
+        var result2 = await httpClient.GetServiceResponseAsync<int>(UrlHelper.RefNoAl + "?tablename=talepfis&firmaId=" + selectedFirmaDonem.firma_no.Value);
+        talepFis.logref = result2;
+    }
+
+    public async Task LoadSelectBoxdata()
+    {
+        teslimYeriList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.TalepTeslimYeri);
+        talepTuruList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.TalepTuru);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSelectBoxdata();
+    }
+}
