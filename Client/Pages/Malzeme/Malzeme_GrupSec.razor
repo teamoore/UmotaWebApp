@@ -50,12 +50,12 @@
     {
         var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
-        if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
-        {
-            var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
-            if (ondegerFirmaDonem != null)
-                selectedFirmaDonem = ondegerFirmaDonem;
-        }
+        // if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
+        // {
+        //     var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+        //     if (ondegerFirmaDonem != null)
+        //         selectedFirmaDonem = ondegerFirmaDonem;
+        // }
 
         items = await httpClient.GetServiceResponseAsync<List<SpeCodesDto>>("/api/malzemekart/GetGrupList?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
     }

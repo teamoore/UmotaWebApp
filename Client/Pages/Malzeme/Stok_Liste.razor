@@ -116,12 +116,12 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma dönem seçilmedi");
 
-            if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
-            {
-                var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
-                if (ondegerFirmaDonem != null)
-                    selectedFirmaDonem = ondegerFirmaDonem;
-            }
+            // if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
+            // {
+            //     var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            //     if (ondegerFirmaDonem != null)
+            //         selectedFirmaDonem = ondegerFirmaDonem;
+            // }
 
             loadingCompleted = false;
             this.StateHasChanged();
@@ -155,12 +155,12 @@
             if (selectedFirmaDonem == null)
                 throw new Exception("Firma dönem seçilmedi");
 
-            if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
-            {
-                var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
-                if (ondegerFirmaDonem != null)
-                    selectedFirmaDonem = ondegerFirmaDonem;
-            }
+            // if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
+            // {
+            //     var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            //     if (ondegerFirmaDonem != null)
+            //         selectedFirmaDonem = ondegerFirmaDonem;
+            // }
 
             var opt = new ModalOptions();
             opt.ContentScrollable = true;
