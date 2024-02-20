@@ -45,6 +45,12 @@ namespace UmotaWebApp.Client
             builder.Services.AddScoped<TalepDetayHelper>();
             builder.Services.AddScoped<TalepFisHelper>();
             builder.Services.AddScoped<SabitHelper>();
+            builder.Services.AddScoped<ProjeHelper>();
+            builder.Services.AddScoped<AktiviteHelper>();
+            builder.Services.AddScoped<MahalHelper>();
+            builder.Services.AddScoped<KaynakHelper>();
+            builder.Services.AddScoped<SiparisHelper>();
+            builder.Services.AddScoped<SiparisDetayHelper>();
 
             builder.Services.AddAuthorizationCore();
 

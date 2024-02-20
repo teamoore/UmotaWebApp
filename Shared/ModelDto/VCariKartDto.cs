@@ -43,5 +43,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public short? Isperscomp { get; set; }
         public string Vdno { get; set; }
         public string Sektor { get; set; }
+        public int? lgfirmano { get; set; }
     }
 }

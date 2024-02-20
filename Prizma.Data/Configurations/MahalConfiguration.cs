@@ -17,11 +17,11 @@ namespace Prizma.Data.Configurations
 
             builder.ToTable("mahal");
 
-            builder.Property(e => e.Adi).HasColumnName("Adi");
-            builder.Property(e => e.Kodu).HasColumnName("Kodu");
-            builder.Property(e => e.DurumRef).HasColumnName("DurumRef");
-            builder.Property(e => e.Active).HasColumnName("Active");
-
+            builder.Property(e => e.Adi).HasColumnName("adi");
+            builder.Property(e => e.Kodu).HasColumnName("kodu");
+            builder.Property(e => e.DurumRef).HasColumnName("durumref");
+            builder.Property(e => e.TurRef).HasColumnName("turref");
+            builder.Property(e => e.Active).HasColumnName("active");
 
             builder.Property(e => e.insdate)
                  .HasColumnType("datetime")

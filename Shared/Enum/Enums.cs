@@ -14,5 +14,49 @@ namespace UmotaWebApp.Shared.Enum
             Net = 1,
             NetKdv = 2
         }
+
+        public enum TalepFisDurum
+        {
+            Oneri = 180,
+            OnaySurecinde = 181,
+            Onaylandi = 182,
+            Karsilaniyor = 183,
+            Karsilandi = 184
+        }
+
+        public enum MahalTur
+        {
+            Etap = 163,
+            Bolum = 164,
+            Blok = 165,
+            Kat = 166
+        }
+        public enum OnayDurumu
+        {
+            Bekliyor = 1,
+            Onaylandi = 3,
+            GeriGonderildi = 4,
+            Iptal = 5
+        }
+
+        public enum SiparisDurumIKodu
+        {
+            Bekliyor = 1,
+            OnaySurecinde = 2,
+            Onaylandi = 3,
+            GeriGonderildi = 4,
+            Iptal = 5
+        }
+
+        public enum TalepDurumIKodu
+        {
+            Bekliyor = 1,
+            OnaySurecinde = 2,
+            Onaylandi = 3,
+            Karsilaniyor = 4,
+            Karsilandi = 5,
+            Iptal = 6,
+            GeriGonderildi = 7
+        }
     }
 }

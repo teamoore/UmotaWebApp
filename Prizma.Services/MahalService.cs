@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UmotaWebApp.Shared;
 
 namespace Prizma.Services
 {
@@ -17,6 +18,12 @@ namespace Prizma.Services
         {
             _unitOfWork = unitOfWork;
         }
+
+        public async Task<IEnumerable<V005Mahal>> GetMahals(int turref, int projeref)
+        {
+            return await _unitOfWork.MahalRepository.GetMahals(turref, projeref);
+        }
+
         public async Task<IEnumerable<Mahal>> GetMahalsList()
         {
             return await _unitOfWork.MahalRepository.GetAllAsync();

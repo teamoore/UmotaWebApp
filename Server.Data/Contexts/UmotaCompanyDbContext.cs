@@ -3933,11 +3933,6 @@ namespace UmotaWebApp.Server.Data.Models
                     .IsUnicode(false)
                     .HasColumnName("adi");
 
-                entity.Property(e => e.Adi2)
-                    .HasMaxLength(201)
-                    .IsUnicode(false)
-                    .HasColumnName("adi2");
-
                 entity.Property(e => e.Adres1)
                     .HasMaxLength(201)
                     .IsUnicode(false)
@@ -3970,12 +3965,6 @@ namespace UmotaWebApp.Server.Data.Models
                     .IsUnicode(false)
                     .HasColumnName("ilce");
 
-                entity.Property(e => e.Ilceref).HasColumnName("ilceref");
-
-                entity.Property(e => e.Ilref).HasColumnName("ilref");
-
-                entity.Property(e => e.Isperscomp).HasColumnName("ISPERSCOMP");
-
                 entity.Property(e => e.Kodu)
                     .HasMaxLength(17)
                     .IsUnicode(false)
@@ -3987,13 +3976,6 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasMaxLength(251)
                     .IsUnicode(false)
                     .HasColumnName("mail");
-
-                entity.Property(e => e.Odemeplanref).HasColumnName("odemeplanref");
-
-                entity.Property(e => e.Odmplnkodu)
-                    .HasMaxLength(17)
-                    .IsUnicode(false)
-                    .HasColumnName("odmplnkodu");
 
                 entity.Property(e => e.Ozelkod)
                     .HasMaxLength(15)
@@ -4025,19 +4007,10 @@ namespace UmotaWebApp.Server.Data.Models
                     .IsUnicode(false)
                     .HasColumnName("postakodu");
 
-                entity.Property(e => e.Sektor)
-                    .HasMaxLength(41)
-                    .IsUnicode(false)
-                    .HasColumnName("sektor");
-
                 entity.Property(e => e.Semt)
                     .HasMaxLength(51)
                     .IsUnicode(false)
                     .HasColumnName("semt");
-
-                entity.Property(e => e.Semtref).HasColumnName("semtref");
-
-                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.Property(e => e.Tel1)
                     .HasMaxLength(60)
@@ -4053,8 +4026,6 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasMaxLength(21)
                     .IsUnicode(false)
                     .HasColumnName("ulke");
-
-                entity.Property(e => e.Ulkeref).HasColumnName("ulkeref");
 
                 entity.Property(e => e.Vdadi)
                     .HasMaxLength(31)
@@ -4084,11 +4055,6 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasMaxLength(201)
                     .IsUnicode(false)
                     .HasColumnName("adi");
-
-                entity.Property(e => e.Adi2)
-                    .HasMaxLength(201)
-                    .IsUnicode(false)
-                    .HasColumnName("adi2");
 
                 entity.Property(e => e.Adres1)
                     .HasMaxLength(201)

@@ -12,6 +12,7 @@ using UmotaWebApp.Shared.ModelDto;
 using UmotaWebApp.Server.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
+using UmotaWebApp.Shared;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
@@ -29,13 +30,13 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             if (string.IsNullOrEmpty(firmaId))
                 throw new Exception("Firma Dönem seçimi yapınız");
 
-            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId)))
+            using (SqlConnection db = new SqlConnection(Configuration.GetPrizmeDbConnection()))
             {
                 var result = await db.QueryFirstAsync<string>("select dbo.GenerateNewCode(isnull((select max(" +
                                     keyField
                                     + ") from " + table + "),'00000')) as value"
                                     , commandType: CommandType.Text);
-                                                return result;
+                return result;
             }
 
 
@@ -82,7 +83,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
             {
-                string sqlstring = string.Format("SELECT [sabit_detay_id],[tip],[kodu],[ikodu],[adi],[yabanci_adi],[siralama],[ozel_kod1],[ozel_kod2],[ozel_kod3],[ozel_kod4],[ozel_kod5],[ozel_kod6],[ozel_kod7],[ozel_kod8],[ozel_kod9],[ozel_kod10],[ozel_kod11],[ozel_kod12],[izin],[renk1],[renk2] FROM [dbo].[sis_sabitler_detay] where tip = {0}", tip);
+                string sqlstring = string.Format("SELECT [sabit_detay_id] as SabitDetayId,[tip],[kodu],[ikodu],[adi],[yabanci_adi],[siralama],[ozel_kod1],[ozel_kod2],[ozel_kod3],[ozel_kod4],[ozel_kod5],[ozel_kod6],[ozel_kod7],[ozel_kod8],[ozel_kod9],[ozel_kod10],[ozel_kod11],[ozel_kod12],[izin],[renk1],[renk2] FROM [dbo].[sis_sabitler_detay] where tip = {0}", tip);
                 IEnumerable<SisSabitlerDetayDto> dbResponse;
                 dbResponse = await db.QueryAsync<SisSabitlerDetayDto>(sqlstring, commandType: CommandType.Text);
                 return dbResponse;
@@ -112,7 +113,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             {
                 string LogoDbName = Configuration["LogoDbName"];
                 string LogoFirmaNo = logofirmaId.ToString("000");
-                string tblName = LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_"+ table + "]";
+                string tblName = LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_" + table + "]";
 
                 var result = await db.QueryFirstAsync<string>("select dbo.GenerateNewCode(isnull((select max(" +
                                     keyField
@@ -132,6 +133,52 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
                 IEnumerable<string> dbResponse;
                 dbResponse = await db.QueryAsync<string>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
+            }
+        }
+
+        public async Task<IEnumerable<V002_Kaynak>> GetKaynakList(int aktivite3LogRef)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetPrizmeDbConnection()))
+            {
+                string sqlstring = "select logref,adi,aktiviteref,aktiviteref2,aktiviteref3,aktiviteadi from [dbo].[v002_kaynak] with(nolock) where [active] = 0";
+                if (aktivite3LogRef != null && aktivite3LogRef > 0)
+                    sqlstring += string.Format(" and aktiviteref = {0}", aktivite3LogRef);
+                IEnumerable<V002_Kaynak> dbResponse;
+                dbResponse = await db.QueryAsync<V002_Kaynak>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
+            }
+        }
+
+        public async Task<IEnumerable<SisSabitlerDetayDto>> GetKaynakBirimKoduList(int kaynakLogRef)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetPrizmeDbConnection()))
+            {
+                string sqlstring = string.Format(@"select b.sabit_detay_id as SabitDetayId,b.kodu as Kodu from kaynak_birim a with(nolock) inner join UmoYAPI..sis_sabitler_detay b with(nolock) on a.birimref = b.sabit_detay_id where a.parlogref = {0} order by b.kodu", kaynakLogRef);
+
+                IEnumerable<SisSabitlerDetayDto> dbResponse;
+                dbResponse = await db.QueryAsync<SisSabitlerDetayDto>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
+            }
+        }
+
+        public async Task<string> GetMaxTalepFisNo(string projekodu, string talepturkodu)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetPrizmeDbConnection()))
+            {
+                string sqlstring = "select dbo.GenerateNewCode (isnull((select max(fisno) num from v030_talep_fis with(nolock) where projekodu='"+projekodu+"' and turkodu = '"+talepturkodu+"'),'"+projekodu.Substring(0,3)+"-"+talepturkodu.Substring(0,2)+"-000000') ) as num";
+           
+                var dbResponse = await db.QuerySingleAsync<string>(sqlstring, commandType: CommandType.Text);
+                return dbResponse;
+            }
+        }
+        public async Task<string> GetParamVal(string kodu)
+        {
+            using (SqlConnection db = new SqlConnection(Configuration.GetPrizmeDbConnection()))
+            {
+                string sqlstring = "select isnull((select top 1 deger from parametre with(nolock) where kodu=" + kodu + "),'') as deger";
+
+                var dbResponse = await db.QuerySingleAsync<string>(sqlstring, commandType: CommandType.Text);
                 return dbResponse;
             }
         }

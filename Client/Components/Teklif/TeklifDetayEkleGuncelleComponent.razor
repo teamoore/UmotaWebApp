@@ -1143,7 +1143,7 @@
             }
 
             _DovizKuruState = "Çekiliyor...";
-            teklifDetay.Dovizkuru = await yetkiHelper.DovizKuruAl(teklifDetay.Dovizref.Value, teklif.Tarih.Value);
+            teklifDetay.Dovizkuru = await yetkiHelper.DovizKuruAl(teklifDetay.Dovizref.Value, teklif.Tarih.Value,4);
             _DovizKuruState = "Güncel";
             this.StateHasChanged();
         }

@@ -1,7 +1,251 @@
 ﻿@page "/talepfis_liste"
 
-<h3>TalepFis_Liste</h3>
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="true"
+                 onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick" ShowSearchSection="true"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+<MudTable Items="@mainDataListView" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
+    <ToolBarContent>
+        @if (menuYetkiDto.Insert)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniTalep" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
+        } &nbsp;
+    </ToolBarContent>
+
+
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>Talep Tarihi</MudTh>
+        <MudTh>Talep No</MudTh>
+        <MudTh>Proje Adı</MudTh>
+        <MudTh>Talep Türü</MudTh>
+        <MudTh>Talep Eden</MudTh>
+        <MudTh>Teslim Tarihi</MudTh>
+        <MudTh>Teslim Yeri</MudTh>
+        <MudTh>Açıklama</MudTh>
+        <MudTh>Durumu</MudTh>
+        <MudTh>Kaydı Giren</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
+                @if (menuYetkiDto.Update)
+                {
+                    <MudMenuItem OnClick="(() => TalepFisGuncelle(context.LogRef))">
+                        <MudIcon Icon="far fa-edit" Color="Color.Primary" /> Talep Güncelle
+                    </MudMenuItem>
+                }
+                <MudMenuItem OnClick="(() => TalepFisDetay(context.LogRef))">
+                    <MudIcon Icon="fas fa-info-circle" Color="Color.Primary" /> Talep Detay
+                </MudMenuItem>
+                @if (menuYetkiDto.Update)
+                {
+                    <MudMenuItem OnClick="(() => TalepFisDetayEkle(context.LogRef))">
+                        <MudIcon Icon="fas fa-plus-circle" Color="Color.Primary" /> Detay Ekle
+                    </MudMenuItem>
+                }
+                <MudMenuItem OnClick="(() => TalepFisDetayIncele(context.LogRef))">
+                    <MudIcon Icon="fas fa-info-circle" Color="Color.Primary" />
+                Talep Satırları</MudMenuItem>
+            </MudMenu>
+        </MudTd>
+        <MudTd DataLabel="Talep Tarihi">@context.Tarih.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Talep No">@context.FisNo</MudTd>
+        <MudTd DataLabel="Proje Adı">@context.ProjeAdi</MudTd>
+        <MudTd DataLabel="Talep Türü">@context.TurAdi</MudTd>
+        <MudTd DataLabel="Talep Eden">@context.TalepEden</MudTd>
+        <MudTd DataLabel="Teslim Tarihi">@context.TeslimTarihi.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Teslim Yeri">@context.TeslimYeriAdi</MudTd>
+        <MudTd DataLabel="Açıklama">@context.Aciklama</MudTd>
+        <MudTd DataLabel="Durumu">@context.DurumAdi</MudTd>
+        <MudTd DataLabel="Kaydı Giren">@context.InsUser</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
 
 @code {
 
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    TalepFisHelper mainDataHelper { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+    public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
+    public MenuYetkiDto menuYetkiDtoTalepOzelDegistirme = new MenuYetkiDto();
+    public List<TalepFisDto> mainDataList { get; set; }
+    public List<V030_TalepFis> mainDataListView { get; set; }
+
+    public TalepFisRequestDto mainDataRequest = new();
+
+    private string DBformName = "talepfis_listef";
+    private string insertPage = "talepfis_ekle";
+    private string updatePage = "talepfis_ekle";
+    private string headerText = "Talep Listesi";
+    private bool loadingCompleted { get; set; }
+    private bool TumTalepleriGormeYetkisi = false;
+    private bool TalepOzelDegistirmeYetkisi = false;
+    private string kullanici_kodu = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            header.HeaderText = headerText;
+
+            kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.DBformName);
+            menuYetkiDtoTalepOzelDegistirme = await yetkiHelper.GetKullaniciMenuYetkisi(this.DBformName + "@Deitir2");
+            TumTalepleriGormeYetkisi = await yetkiHelper.GetKullaniciYetkisi(kullanici_kodu, Consts.KullaniciYetkisi_TumTalepleriGorme);
+
+            await NewDataRequest();
+            await LoadList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    private async Task NewDataRequest()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        mainDataRequest.FirmaId = selectedFirmaDonem.firma_no.Value;
+        mainDataRequest.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+        mainDataRequest.TopRowCount = 100;
+        mainDataRequest.TumTalepleriGormeYetkisi = TumTalepleriGormeYetkisi;
+        mainDataRequest.SQLStringOrderBy = "insdate desc";
+    }
+
+    private async Task LoadList()
+    {
+        if (menuYetkiDto.View == false)
+        {
+            loadingCompleted = true;
+            throw new Exception("Bu sayfayı görme yetkiniz yok");
+        }
+
+        mainDataListView = await mainDataHelper.LoadRecords_ViewV030TalepFis(mainDataRequest);
+        loadingCompleted = true;
+    }
+
+
+    public void YeniTalep()
+    {
+        navigation.NavigateTo("/" + insertPage);
+    }
+
+    private async Task BtnAraClick()
+    {
+        mainDataRequest.SearchText = header.SearchText;
+        mainDataRequest.TopRowCount = 0;
+        loadingCompleted = false;
+        this.StateHasChanged();
+        await LoadList();
+        if (mainDataListView == null || mainDataListView.Count == 0)
+            Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+    }
+
+    private async Task BtnDetayliAraClick()
+    {
+        try
+        {
+            var opt = new ModalOptions();
+
+            modalParameters = new ModalParameters();
+            modalParameters.Add("mainRequest", mainDataRequest);
+
+            var filterForm = modal.Show<Components.TalepDetay.TalepDetayliAraComponent>("Detaylı Arama", modalParameters, opt);
+            var result = await filterForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    mainDataRequest = (TalepFisRequestDto)result.Data;
+                    header.SearchText = mainDataRequest.SearchText;
+                    mainDataRequest.TopRowCount = 0;
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+                    await LoadList();
+                    if (mainDataListView == null || mainDataListView.Count == 0)
+                        Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+
+    }
+
+    private Task TalepFisDetay(int logref)
+    {
+        navigation.NavigateTo("/talepfisdetay_liste/" + logref);
+        return Task.CompletedTask;
+    }
+
+    private Task TalepFisDetayEkle(int logref)
+    {
+        navigation.NavigateTo("/talepdetay_ekle/" + logref);
+        return Task.CompletedTask;
+    }
+
+    private Task TalepFisGuncelle(int logref)
+    {
+        navigation.NavigateTo("/talepfis_ekle/" + logref);
+        return Task.CompletedTask;
+    }
+
+    private async Task TalepFisDetayIncele(int logref)
+    {
+        var opt = new ModalOptions();
+        opt.Size = ModalSize.Large;
+        var parameters = new ModalParameters();
+        parameters.Add("TalepFisRef", logref);
+
+        var form = modal.Show<Components.TalepDetay.TalepDetayInceleComponent>("Talep Satırları", parameters: parameters, options: opt);
+        var result = await form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+            }
+        }
+    }
 }

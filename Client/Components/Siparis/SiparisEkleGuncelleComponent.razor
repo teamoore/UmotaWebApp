@@ -1,0 +1,389 @@
+﻿<EditForm Model="mainFormModel">
+    <DataAnnotationsValidator />
+
+    @if (loadingCompleted == false)
+    {
+        <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+    }
+
+    <MudCard>
+        <MudCardContent>
+            <div class="mt-12">
+                <div class="form-group">
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <MudTextField @bind-Value="mainFormModel.FisNo" Label="Sipariş No" ReadOnly="true" Variant="Variant.Outlined" />
+                        </div>
+                        <div class="col-md-3">
+                            <MudTextField @bind-Value="mainFormModel.TarihString" Label="Tarih" ReadOnly="true" Variant="Variant.Outlined" />
+                        </div>
+
+                        <div class="col-md-3">
+                            <MudTextField @bind-Value="mainFormModel.SaatString" Label="Saat" ReadOnly="true" Variant="Variant.Outlined" />
+                        </div>
+
+                    </div>
+                    <MudDivider DividerType="DividerType.Middle" Class="my-6" />
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label>Proje</label>
+                            <InputSelect class="form-control" @bind-Value="mainFormModel.ProjeRef">
+                                @if (projeler != null)
+                                {
+                                    <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                    @foreach (var item in projeler)
+                                    {
+                                        <option value="@item.logref">@item.Adi</option>
+                                    }
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
+                    <MudDivider DividerType="DividerType.Middle" Class="my-6" />
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <MudTextField @bind-Value="mainFormModel.CariKodu" Label="Cari Kodu" Variant="Variant.Outlined" ReadOnly="true" />
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <MudTextField @bind-Value="mainFormModel.CariAdi" Label="Cari Adı" Variant="Variant.Outlined" ReadOnly="true" />
+                                </div>
+                                <div class="col-md-3">
+                                    <MudFab Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Search" Size="Size.Small" OnClick="CariSec" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <MudDivider DividerType="DividerType.Middle" Class="my-6" />
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Para Birimi</label>
+                            <InputSelect class="form-control" @bind-Value="mainFormModel.DovizRefID" @bind-Value:after="DovizKuruAl">
+                                @if (DovizList != null)
+                                {
+                                    <option value="-1">@Utils.Mesajlar.Seciniz</option>
+                                    @foreach (var item in DovizList)
+                                    {
+                                        <option value="@item.SabitDetayId">@item.Kodu</option>
+                                    }
+                                }
+                            </InputSelect>
+
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Kur Türü</label>
+                            <InputSelect class="form-control" @bind-Value="mainFormModel.DovizKurTurID" @bind-Value:after="DovizKuruAl">
+                                <option value="0">@Utils.Mesajlar.Seciniz</option>
+                                <option value="1">Alış</option>
+                                <option value="2">Satış</option>
+                                <option value="3">Efektif Alış</option>
+                                <option value="4">Efektif Satış</option>
+                            </InputSelect>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label>Kur</label>
+                            <InputNumber @bind-Value="mainFormModel.DovizKuruID" class="form-control" placeholder="@_DovizKuruState" />
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Text" Color="Color.Primary">
+
+                <div class="form-group">
+                    <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+                        @if (_processing)
+                        {
+                            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+                            <MudText Class="ms-2">Kaydediliyor...</MudText>
+                        }
+                        else
+                        {
+                            <MudText>Kaydet</MudText>
+                        }
+                    </MudButton>
+                    <CancelButtonComponent Caption="Vazgeç" OnClick="Vazgec" />
+                </div>
+
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+
+
+
+
+
+
+</EditForm>
+
+@code {
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    SabitHelper sabitHelper { get; set; }
+
+    [Inject]
+    ProjeHelper projeHelper { get; set; }
+
+    [Inject]
+    SiparisHelper mainDataHelper { get; set; }
+
+    [Parameter]
+    public int? logRef { get; set; }
+
+    [Parameter]
+    public EventCallback OnVazgecClicked { get; set; }
+
+
+    public bool IsUpdate { get; set; }
+    private bool loadingCompleted = false;
+    private bool _processing = false;
+
+    SiparisDto mainFormModel = new() { Tarih = DateTime.Now, Saat = DateTime.Now };
+    List<SisSabitlerDetayDto> DovizList = new();
+
+    List<ProjeDto> projeler = new();
+
+    private string tableName = "siparis";
+    private string fisNoFieldName = "fisno";
+    private string listPage = "siparis_liste";
+    private string _DovizKuruState = "Döviz Kuru";
+    private string DovizKurTuru = "1";
+
+    public async Task ValidSubmit()
+    {
+        if (IsUpdate)
+            await UpdateRecord();
+        else
+            await SaveRecord();
+    }
+
+    private async Task UpdateRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            await mainDataHelper.UpdateRecord(mainFormModel);
+
+            navigation.NavigateTo("/" + listPage);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    private async Task SaveRecord()
+    {
+        try
+        {
+            SubmitValidation();
+        }
+        catch (ClientException ex)
+        {
+            foreach (var item in ex.ErrorList)
+            {
+                Snackbar.Add(item, severity: Severity.Warning);
+            }
+            return;
+        }
+        catch (Exception)
+        {
+        }
+
+        try
+        {
+            _processing = true;
+
+            mainFormModel.logref = await yetkiHelper.RefNoAl(tableName);
+            await FisNoAl();
+            mainFormModel = await mainDataHelper.SaveRecord(mainFormModel);
+
+            Snackbar.Add("Sipariş oluşturuldu", severity: Severity.Success);
+            navigation.NavigateTo("/siparis_detay_ekle/" + mainFormModel.logref);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            _processing = false;
+        }
+    }
+
+    public void SubmitValidation()
+    {
+        var err = new List<string>();
+
+        if (mainFormModel.ProjeRef == null || mainFormModel.ProjeRef == 0)
+            err.Add("Proje boş geçilemez");
+
+        if (err.Count > 0)
+        {
+            var ex = new ClientException("Kayıt Hatası");
+            ex.ErrorList = err;
+
+            throw ex;
+        }
+    }
+
+    public Task Vazgec()
+    {
+        navigation.NavigateTo("/" + listPage);
+        return Task.CompletedTask;
+    }
+
+    public async Task LoadSelectBoxdata()
+    {
+        DovizList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.DovizKodlari);
+        projeler = await projeHelper.LoadRecords();
+
+        loadingCompleted = true;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsUpdate = this.logRef.HasValue;
+
+        await LoadSelectBoxdata();
+
+        if (IsUpdate)
+            await LoadRecord();
+        else
+            await NewRecord();
+    }
+
+    private async Task LoadRecord()
+    {
+        SiparisRequestDto Request = new SiparisRequestDto() { TopRowCount = 1 };
+        Request.SiparisDto = new SiparisDto() { logref = this.logRef.Value };
+
+        mainFormModel = await mainDataHelper.LoadRecordFromView(Request);
+    }
+
+    private async Task NewRecord()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma dönem seçilmedi");
+        mainFormModel.LgFirmaNo = selectedFirmaDonem.firma_no.Value;
+
+        await FisNoAl();
+
+        var doviz = DovizList.FirstOrDefault(x => x.Kodu == "TL");
+        if (doviz != null)
+            mainFormModel.DovizRefID = doviz.SabitDetayId;
+        DovizKurTuru = await sabitHelper.GetParamVal(Consts.PARAM_SATINALMA_SIPDOVIZKURTURU);
+        mainFormModel.DovizKurTurID = Convert.ToByte(DovizKurTuru);
+        mainFormModel.DovizKuruID = 1;
+
+        List<SisSabitlerDetayDto> DurumList = await sabitHelper.GetSabitDetay(SabitHelper.SabitTurler.SiparisDurumu);
+        var durum = DurumList.FirstOrDefault(x => x.Kodu == "DF");
+        if (durum != null)
+        {
+            mainFormModel.DurumRef = durum.SabitDetayId;
+            mainFormModel.DurumiKodu = durum.Ikodu;
+            mainFormModel.DurumAdi = durum.Adi;
+        }
+    }
+
+    private async Task FisNoAl()
+    {
+        mainFormModel.FisNo = await yetkiHelper.FisNoAl(tableName, fisNoFieldName);
+    }
+
+    public async Task CariSec()
+    {
+        var opt = new ModalOptions();
+        var parameters = new ModalParameters();
+        parameters.Add("lgfirmano", mainFormModel.LgFirmaNo);
+
+        var form = modal.Show<Pages.Cari.Cari_Sec>("Cari Hesap Seç", parameters: parameters, options: opt);
+        var result = await form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var secim = (VCariKartDto)result.Data;
+                mainFormModel.CariRef = secim.Logref;
+                mainFormModel.CariKodu = secim.Kodu;
+                mainFormModel.CariAdi = secim.Adi;
+            }
+        }
+    }
+
+    public async Task DovizKuruAl()
+    {
+        try
+        {
+            if (mainFormModel.DovizRefID > 0 && mainFormModel.DovizKurTurID > 0)
+            {
+                _DovizKuruState = "Çekiliyor...";
+                mainFormModel.DovizKuruID = await yetkiHelper.DovizKuruAl(mainFormModel.DovizRefID, mainFormModel.Tarih, mainFormModel.DovizKurTurID);
+                _DovizKuruState = "Güncel";
+                this.StateHasChanged();
+            } 
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+}

@@ -44,7 +44,7 @@ namespace Prizma.Data.Repositories
 
         public void Remove(TEntity entity)
         {
-            Context.Set<TEntity>().Remove(entity);
+            Context.Set<TEntity>().Remove(entity); 
         }
 
         public void RemoveRange(IEnumerable<TEntity> entities)
@@ -55,6 +55,11 @@ namespace Prizma.Data.Repositories
         public Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
         {
             return Context.Set<TEntity>().SingleOrDefaultAsync(predicate);
+        }
+
+        public void Update(TEntity entity)
+        {
+            Context.Set<TEntity>().Update(entity);
         }
     }
 }

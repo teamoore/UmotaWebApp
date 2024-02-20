@@ -1,0 +1,244 @@
+﻿@page "/siparis_liste"
+
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="true"
+                 onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick" ShowSearchSection="true"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+<MudTable Items="@mainDataListView" FixedHeader="true" Height="500px" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true">
+    <ToolBarContent>
+        @if (menuYetkiDto.Insert)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="YeniKayitEkle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" Title="Yeni Kayıt Ekle" />
+        } &nbsp;
+    </ToolBarContent>
+
+
+    <HeaderContent>
+        <MudTh>#</MudTh>
+        <MudTh>Sipariş Tarihi</MudTh>
+        <MudTh>Sipariş No</MudTh>
+        <MudTh>Proje Adı</MudTh>
+        <MudTh>Cari Kodu</MudTh>
+        <MudTh>Cari Adı</MudTh>
+        <MudTh>Tutar İD</MudTh>
+        <MudTh>Döviz</MudTh>
+        <MudTh>Tutar TL</MudTh>
+        <MudTh>Durumu</MudTh>
+        <MudTh>Kaydı Giren</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" Color="Color.Primary">
+                <MudMenuItem OnClick="(() => Guncelle(context.LogRef))">
+                    <MudIcon Icon="far fa-edit" Color="Color.Primary" /> Güncelle
+                </MudMenuItem>
+                <MudMenuItem OnClick="(() => Detay(context.LogRef))">
+                    <MudIcon Icon="fas fa-info-circle" Color="Color.Primary" /> Detay
+                </MudMenuItem>
+                <MudMenuItem OnClick="(() => DetayEkle(context.LogRef))">
+                    <MudIcon Icon="fas fa-plus-circle" Color="Color.Primary" />
+                    Detay Ekle
+                </MudMenuItem>
+                <MudMenuItem OnClick="(() => DetayIncele(context.LogRef))">
+                    <MudIcon Icon="fas fa-info-circle" Color="Color.Primary" />
+                    Sipariş Satırları
+                </MudMenuItem>
+            </MudMenu>
+        </MudTd>
+        <MudTd DataLabel="Sipariş Tarihi">@context.Tarih.Value.ToString("dd.MM.yyyy")</MudTd>
+        <MudTd DataLabel="Sipariş No">@context.FisNo</MudTd>
+        <MudTd DataLabel="Proje Adı">@context.ProjeAdi</MudTd>
+        <MudTd DataLabel="Cari Kodu">@context.CariKodu</MudTd>
+        <MudTd DataLabel="Cari Adı">@context.CariAdi</MudTd>
+        <MudTd DataLabel="Tutar İD" Style="text-align:right">@context.NetToplamID.Value.ToString("N2")</MudTd>
+        <MudTd DataLabel="Döviz">@context.DovizKoduID</MudTd>
+        <MudTd DataLabel="Tutar TL" Style="text-align:right">@context.NetToplamTL.Value.ToString("N2")</MudTd>
+        <MudTd DataLabel="Durumu">@context.DurumAdi</MudTd>
+        <MudTd DataLabel="Kaydı Giren">@context.InsUser</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+    </PagerContent>
+</MudTable>
+
+
+@code {
+
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    YetkiHelper yetkiHelper { get; set; }
+
+    [Inject]
+    SiparisHelper mainDataHelper { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+    public MenuYetkiDto menuYetkiDto = new MenuYetkiDto();
+    public List<SiparisDto> mainDataList { get; set; }
+    public List<V040_Siparis> mainDataListView { get; set; }
+
+    public SiparisRequestDto mainDataRequest = new();
+
+    private string formName = "siparis_liste";
+    private string insertPage = "siparis_ekle";
+    private string updatePage = "siparis_ekle";
+    private string headerText = "Sipariş Listesi";
+    private bool loadingCompleted { get; set; }
+    private bool TumSiparisleriGormeYetkisi = false;
+    private string kullanici_kodu = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            header.HeaderText = headerText;
+
+            kullanici_kodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+            menuYetkiDto = await yetkiHelper.GetKullaniciMenuYetkisi(this.formName);
+            TumSiparisleriGormeYetkisi = await yetkiHelper.GetKullaniciYetkisi(kullanici_kodu, Consts.KullaniciYetkisi_TumSiparisleriGorme);
+
+            await NewDataRequest();
+            await LoadList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Warning);
+        }
+    }
+
+    private async Task NewDataRequest()
+    {
+        var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+        if (selectedFirmaDonem == null)
+            throw new Exception("Firma Dönem Seçili değil");
+
+        mainDataRequest.FirmaId = selectedFirmaDonem.firma_no.Value;
+        mainDataRequest.kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+        mainDataRequest.TopRowCount = 100;
+        mainDataRequest.TumSiparisleriGormeYetkisi = TumSiparisleriGormeYetkisi;
+        mainDataRequest.SQLStringOrderBy = "insdate desc";
+    }
+
+    private async Task LoadList()
+    {
+        if (menuYetkiDto.View == false)
+        {
+            loadingCompleted = true;
+            throw new Exception("Bu sayfayı görme yetkiniz yok");
+        }
+
+        mainDataListView = await mainDataHelper.LoadRecordsFromView(mainDataRequest);
+        loadingCompleted = true;
+    }
+
+
+    public void YeniKayitEkle()
+    {
+        navigation.NavigateTo("/" + insertPage);
+    }
+
+    private async Task BtnAraClick()
+    {
+        mainDataRequest.SearchText = header.SearchText;
+        mainDataRequest.TopRowCount = 0;
+        loadingCompleted = false;
+        this.StateHasChanged();
+        await LoadList();
+        if (mainDataListView == null || mainDataListView.Count == 0)
+            Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+    }
+
+    private async Task BtnDetayliAraClick()
+    {
+        try
+        {
+            var opt = new ModalOptions();
+
+            modalParameters = new ModalParameters();
+            modalParameters.Add("mainRequest", mainDataRequest);
+
+            var filterForm = modal.Show<Components.Siparis.SiparisDetayliAraComponent>("Detaylı Arama", modalParameters, opt);
+            var result = await filterForm.Result;
+
+            if (!result.Cancelled)
+            {
+                if (result.Data != null)
+                {
+                    mainDataRequest = (SiparisRequestDto)result.Data;
+                    header.SearchText = mainDataRequest.SearchText;
+                    mainDataRequest.TopRowCount = 0;
+                    loadingCompleted = false;
+                    this.StateHasChanged();
+                    await LoadList();
+                    if (mainDataListView == null || mainDataListView.Count == 0)
+                        Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı.", severity: Severity.Warning);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add("Beklenmedik bir hata oluştu. Hata Mesajı:" + ex.Message, severity: Severity.Error);
+        }
+
+    }
+
+    private Task Detay(int logref)
+    {
+        navigation.NavigateTo("/siparis_detay/" + logref);
+        return Task.CompletedTask;
+    }
+
+    private Task DetayEkle(int logref)
+    {
+        navigation.NavigateTo("/siparis_detay_ekle/" + logref);
+        return Task.CompletedTask;
+    }
+
+    private Task Guncelle(int logref)
+    {
+        navigation.NavigateTo("/" + insertPage + "/" + logref);
+        return Task.CompletedTask;
+    }
+
+    private async Task DetayIncele(int logref)
+    {
+        var opt = new ModalOptions();
+        opt.Size = ModalSize.ExtraLarge;
+        var parameters = new ModalParameters();
+        parameters.Add("SiparisRef", logref);
+
+        var form = modal.Show<Components.Siparis.SiparisDetayInceleComponent>("Siparis Satırları", parameters: parameters, options: opt);
+        var result = await form.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+            }
+        }
+    }
+}

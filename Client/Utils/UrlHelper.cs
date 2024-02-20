@@ -107,5 +107,42 @@ namespace UmotaWebApp.Client.Utils
         public const string TalepDetayListesi = "/api/talep/AllTalepDetay";
         public const string TalepDetayKaydet = "/api/talep/CreateTalepDetay";
         public const string TalepFisKaydet = "/api/talep/CreateTalepFis";
+        public const string TalepFisListesi = "/api/talep/GetTalepFisList";
+        public const string TalepV030TalepFisList = "/api/talep/GetV030TalepFisList";
+        public const string TalepV031TalepDetayList = "/api/talep/GetTalepFisDetayListAsnyc";
+        public const string TalepDetayGetir = "/api/talep/GetTalepDetay";
+        public const string TalepDetayGuncelle = "/api/talep/UpdateTalepDetay";
+        public const string TalepFisOnayListeGetir = "/api/talep/GetTalepFisOnayListAsnyc";
+        public const string TalepOnayRota = "/api/talep/TalepOnayRota";
+        public const string TalepDurumGuncelle = "/api/talep/TalepDurumGuncelle";
+        public const string TalepGetOnayLineRef = "/api/talep/TalepGetOnayLineRef";
+        public const string TalepOnayla = "/api/talep/TalepOnayla";
+        public const string TalepUploadDosya = "/api/talep/UploadTalepDosya";
+        public const string TalepDosyaGetAll = "/api/talep/GetTalepDosyalar";
+
+        public const string ProjeListesi = "/api/proje/GetProjeList";
+
+        public const string AktiviteTumListe = "/api/Aktivite/GetAll";
+        public const string AktiviteBagliListe = "/api/Aktivite/GetRelated";
+
+        public const string MahalListesi = "/api/Mahal/GetMahals";
+        public const string TalepFisGuncelle = "/api/talep/UpdateTalepFis";
+        public const string KaynakGetList = "/api/Kaynak/GetList";
+
+        public const string SiparisLoadRecordsFromView = "/api/siparis/LoadRecordsFromView";
+        public const string SiparisLoadRecordFromView = "/api/siparis/LoadRecordFromView";
+        public const string SiparisSaveRecord = "/api/siparis/SaveRecord";
+        public const string SiparisUpdateRecord = "/api/siparis/UpdateRecord";
+        public const string SiparisV041SiparisDetayList = "/api/siparis/GetSiparisDetayListAsnyc";
+        public const string SiparisDetayGetir = "/api/siparis/GetSiparisDetay";
+        public const string SiparisDetayKaydet = "/api/siparis/CreateSiparisDetay";
+        public const string SiparisDetayGuncelle = "/api/siparis/UpdateSiparisDetay";
+        public const string SiparisFisOnayListeGetir = "/api/siparis/GetSiparisFisOnayListAsnyc";
+        public const string SiparisOnayRota = "/api/siparis/SiparisOnayRota";
+        public const string SiparisDurumGuncelle = "/api/siparis/SiparisDurumGuncelle";
+        public const string SiparisGetOnayLineRef = "/api/siparis/SiparisGetOnayLineRef";
+        public const string SiparisOnayla = "/api/siparis/SiparisOnayla";
+        public const string SiparisUploadDosya = "/api/siparis/UploadSiparisDosya";
+        public const string SiparisDosyaGetAll = "/api/siparis/GetSiparisDosyalar";
     }
 }

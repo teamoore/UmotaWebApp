@@ -278,6 +278,71 @@ namespace UmotaWebApp.Client.Utils
         public const string MakpaLogoFirmaNo = "102";
         public const string GASTROMOREFirmaNo = "200";
 
+        public const string KullaniciYetkisi_KaynakOnaylama = "Y001";
+        public const string KullaniciYetkisi_TumTalepleriGorme = "Y002";
+        public const string KullaniciYetkisi_TalepOzelOnay = "Y003";
+        public const string KullaniciYetkisi_TalepStokGirebilir = "Y004";
+        public const string KullaniciYetkisi_SiparisOzelOnay = "Y005";
+        public const string KullaniciYetkisi_SozlesmeOzelOnay = "Y006";
+        public const string KullaniciYetkisi_HakedisOzelOnay = "Y007";
+        public const string KullaniciYetkisi_AktiviteOnaylama = "Y008";
+        public const string KullaniciYetkisi_TumProjeleriGorme = "Y009";
+        public const string KullaniciYetkisi_TumProjeTalepleriGorme = "Y010";
+        public const string KullaniciYetkisi_TumSiparisleriGorme = "Y011";
+        public const string KullaniciYetkisi_TumProjeSiparisleriGorme = "Y012";
+        public const string KullaniciYetkisi_TumIrsaliyeleriGorme = "Y013";
+        public const string KullaniciYetkisi_TumProjeIrsaliyeleriGorme = "Y014";
+        public const string KullaniciYetkisi_TumFaturalariGorme = "Y015";
+        public const string KullaniciYetkisi_TumProjeFaturalariGorme = "Y016";
+        public const string KullaniciYetkisi_FaturaOzelOnay = "Y017";
+        public const string KullaniciYetkisi_HakedisYBFSatirOnay = "Y018";
+        public const string KullaniciYetkisi_ButceOzelOnay = "Y019";
+        public const string KullaniciYetkisi_HakedisOncekiMiktarGiris = "Y020";
+        public const string KullaniciYetkisi_SiparisMiktarindanFazlaSatinalma = "Y021";
+        public const string KullaniciYetkisi_MalzemeOnaylama = "Y022";
+        public const string KullaniciYetkisi_HizmetOnaylama = "Y023";
+        public const string KullaniciYetkisi_MalzemeFisOzelOnay = "Y024";
+        public const string KullaniciYetkisi_HakedisBirimFiyatDegistirme = "Y025";
+        public const string KullaniciYetkisi_YoneticiMenu = "Y026";
+        public const string KullaniciYetkisi_TopluOnay = "Y027";
+        public const string KullaniciYetkisi_HakedisOzelSilme = "Y028";
+
+        public const string PARAM_MODUL_TANIMLAR = "100";
+        public const string PARAM_MODUL_SATINALMA = "200";
+        public const string PARAM_MODUL_HAKEDIS = "500";
+
+        public const string PARAM_TANIMLAR_AKTIVITE_SEVIYESI = "101";
+        public const string PARAM_TANIMLAR_KAYNAKKODU_SEVIYESI = "102";
+        public const string PARAM_TANIMLAR_CARIOZELKODU_ALANI = "103";
+        public const string PARAM_TANIMLAR_CARIOZELKODU_DEGERI = "104";
+        public const string PARAM_TANIMLAR_MALZEMEOZELKODU_ALANI = "105";
+        public const string PARAM_TANIMLAR_MALZEMEOZELKODU_DEGERI = "106";
+        public const string PARAM_TANIMLAR_MALZEME_LOGO_BIRIMSETIKODU = "107";
+
+        public const string PARAM_SATINALMA_SIPDOVIZKURTURU = "201";
+
+        public const string PARAM_HAKEDIS_YEMEKKESINTI_MALZEMEKODU = "501";
+        public const string PARAM_HAKEDIS_YEMEKKESINTI_MALZEMEADI = "502";
+        public const string PARAM_HAKEDIS_YEMEKKESINTI_KDVYUZ = "503";
+        public const string PARAM_HAKEDIS_SAGLIKKESINTI_MALZEMEKODU = "504";
+        public const string PARAM_HAKEDIS_SAGLIKKESINTI_MALZEMEADI = "505";
+        public const string PARAM_HAKEDIS_SAGLIKKESINTI_KDVYUZ = "506";
+        public const string PARAM_HAKEDIS_KAMPKESINTI_MALZEMEKODU = "507";
+        public const string PARAM_HAKEDIS_KAMPKESINTI_MALZEMEADI = "508";
+        public const string PARAM_HAKEDIS_KAMPKESINTI_KDVYUZ = "509";
+        public const string PARAM_HAKEDIS_SIGORTAKESINTI_MALZEMEKODU = "510";
+        public const string PARAM_HAKEDIS_SIGORTAKESINTI_MALZEMEADI = "511";
+        public const string PARAM_HAKEDIS_SIGORTAKESINTI_KDVYUZ = "512";
+        public const string PARAM_HAKEDIS_CEZAKESINTI_MALZEMEKODU = "513";
+        public const string PARAM_HAKEDIS_CEZAKESINTI_MALZEMEADI = "514";
+        public const string PARAM_HAKEDIS_CEZAKESINTI_KDVYUZ = "515";
+        public const string PARAM_HAKEDIS_DIGERKESINTI_MALZEMEKODU = "516";
+        public const string PARAM_HAKEDIS_DIGERKESINTI_MALZEMEADI = "517";
+        public const string PARAM_HAKEDIS_DIGERKESINTI_KDVYUZ = "518";
+        public const string PARAM_HAKEDIS_TUTANAKLI_ISLER_KAYNAKKODU = "519";
+
+
+
         public const string TeklifSozlesmesi = @"1.Fiyatlarımıza KDV dahil değildir. Teklifteki fiyatlarımız iskonto yapılmış net fiyatlardır. 
 2.Döviz kuru ödemenin gerçekleştiği veya faturanın kesildiği günden hesaplanacaktır. GARANTİ bankası döviz satış kuru esas alınacaktır.   
 3.Her türlü tesisat işleri (Elektrik, Sıcak-Soğuk Su, Sifon ve Sübab, LG,NG veya Havagazı ,Havalandırma vs….)teklif dışıdır. 

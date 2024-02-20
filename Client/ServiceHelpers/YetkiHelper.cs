@@ -54,6 +54,20 @@ namespace UmotaWebApp.Client.ServiceHelpers
             return a;
         }
 
+        public async Task<bool> GetKullaniciYetkisi(string kullanici_kodu, string yetkikodu)
+        {
+            var yetki = false;
+
+            var result = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetKullaniciYetkisi + "?kullanicikodu=" + kullanici_kodu + "&yetkikodu=" + yetkikodu);
+
+            if (result == null)
+                return yetki;
+
+            yetki = result == 1;
+
+            return yetki;
+        }
+
         public async Task <int>RefNoAl(string tablename)
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
@@ -76,7 +90,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             return result;
         }
-        public async Task<double> DovizKuruAl(int dovizturu, DateTime tarih)
+        public async Task<double> DovizKuruAl(int dovizturu, DateTime tarih, byte kurturu)
         {
             var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
@@ -92,7 +106,7 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
             var requestDovizKuru = new DovizKuruRequestDto();
             requestDovizKuru.KurTarihi = tarih;
-            requestDovizKuru.KurTuru = 4;
+            requestDovizKuru.KurTuru = kurturu;
             requestDovizKuru.DovizTuru = dovizturu;
             requestDovizKuru.LogoFirmaNo = selectedFirmaDonem.logo_firma.Value;
 
