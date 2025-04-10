@@ -126,5 +126,26 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpPost("saveadres")]
+        public async Task<ServiceResponse<SevkAdresDto>> CariKartAdresKaydet(SevkAdresRequestDto request)
+        {
+            try
+            {
+                return new ServiceResponse<SevkAdresDto>
+                {
+                    Value = await CariKartService.SaveCariKartAdres(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<SevkAdresDto>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
     }
 }

@@ -206,5 +206,26 @@ namespace UmotaWebApp.Server.Controllers
                 return e;
             }
         }
+
+        [HttpGet("CariSevkAdresKoduAl")]
+        public async Task<ServiceResponse<string>> CariSevkAdresKoduAl(int cariref, int firmaId)
+        {
+            try
+            {
+                return new ServiceResponse<string>()
+                {
+                    Value = await RefService.CariSevkAdresKoduAl(cariref, firmaId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<string>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
     }
 }

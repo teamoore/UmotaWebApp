@@ -80,6 +80,7 @@ namespace UmotaWebApp.Server.Data.Models
         public virtual DbSet<Vazife> Vazifes { get; set; }
 
         public virtual DbSet<Takvim> Takvims { get; set; }
+        public virtual DbSet<SevkAdres> SevkAdreses { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -1213,6 +1214,60 @@ namespace UmotaWebApp.Server.Data.Models
                     .HasColumnName("upduser");
 
                 entity.Property(e => e.Varsayilan).HasColumnName("varsayilan");
+            });
+
+            modelBuilder.Entity<SevkAdres>(entity =>
+            {
+                entity.HasKey(e => e.Logref);
+
+                entity.ToTable("sevkadres");
+
+                entity.Property(e => e.Logref)
+                    .ValueGeneratedNever()
+                    .HasColumnName("logref");
+
+                entity.Property(e => e.Clientref).HasColumnName("cariref");
+
+                entity.Property(e => e.Sevkkodu).HasColumnName("sevkkodu");
+
+                entity.Property(e => e.SevkEdilecekBayiAdi).HasColumnName("unvan");
+
+                entity.Property(e => e.Sevkadres1).HasColumnName("adres1");
+
+                entity.Property(e => e.Sevkadres2).HasColumnName("adres2");
+
+                entity.Property(e => e.Ilce).HasColumnName("ilce");
+
+                entity.Property(e => e.Il).HasColumnName("il");
+
+                entity.Property(e => e.Ulke).HasColumnName("ulke");
+
+                entity.Property(e => e.Tel1).HasColumnName("tel1");
+
+                entity.Property(e => e.Tel2).HasColumnName("tel2");
+
+                entity.Property(e => e.Postakodu).HasColumnName("postakodu");
+
+                entity.Property(e => e.Mail).HasColumnName("mail");
+
+                entity.Property(e => e.SevkIlgilisi).HasColumnName("ilgili");
+
+                entity.Property(e => e.Active).HasColumnName("active");
+
+                entity.Property(e => e.Status).HasColumnName("status");
+
+                entity.Property(e => e.Insdate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("insdate");
+
+                entity.Property(e => e.Insuser).HasColumnName("insuser");
+
+                entity.Property(e => e.Upddate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("upddate");
+
+                entity.Property(e => e.Upduser).HasColumnName("upduser");
+
             });
 
             modelBuilder.Entity<KullaniciTanimlari>(entity =>

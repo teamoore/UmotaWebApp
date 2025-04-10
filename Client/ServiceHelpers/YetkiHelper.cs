@@ -110,5 +110,17 @@ namespace UmotaWebApp.Client.ServiceHelpers
             var result = await httpClient.GetServiceResponseAsync<IEnumerable<DovizDto>>(UrlHelper.DovizListesi + "?logofirmno=" + selectedFirmaDonem.logo_firma.Value);
             return result;
         }
+        public async Task<string> CariSevkAdresKoduAl(int cariref)
+        {
+            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+
+            if (selectedFirmaDonem == null)
+                throw new Exception("Firma Dönem Seçili değil");
+
+            var result = await httpClient.GetServiceResponseAsync<string>(UrlHelper.CariSevkAdresKoduAl + "?cariref=" + cariref + "&firmaId=" + selectedFirmaDonem.firma_no.Value);
+
+            return result;
+        }
+
     }
 }

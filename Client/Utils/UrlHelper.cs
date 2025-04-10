@@ -35,6 +35,7 @@ namespace UmotaWebApp.Client.Utils
         public const string CariKartListesi = "/api/carikart/list";
         public const string CariKartKaydet = "/api/carikart/save";
         public const string CariKartGuncelle = "/api/carikart/update";
+        public const string CariKartAdresKaydet = "/api/carikart/saveadres";
         public const string CariKartKisiGetir = "/api/kisiler/getcarikisiler";
         public const string CariKartKisiKaydet = "/api/kisiler/save";
         public const string CariKartKisiGuncelle = "/api/kisiler/update";
@@ -103,5 +104,6 @@ namespace UmotaWebApp.Client.Utils
         public const string KisiAra = "/api/kisiler/search";    
         public const string KisiKaydet = "/api/kisiler/save";
         public const string KisiGuncelle = "/api/kisiler/update";
+        public const string CariSevkAdresKoduAl = "/api/helper/CariSevkAdresKoduAl";
     }
 }

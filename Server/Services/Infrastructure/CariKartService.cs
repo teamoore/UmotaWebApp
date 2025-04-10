@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Dapper;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Server.Data.Models;
@@ -139,6 +142,76 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                             .ProjectTo<CariKartDto>(Mapper.ConfigurationProvider);
 
                 return await qry.SingleOrDefaultAsync();
+            }
+        }
+        public async Task<SevkAdresDto> SaveCariKartAdres(SevkAdresRequestDto request)
+        {
+            var connectionstring = Configuration.GetUmotaConnectionString(firmaId: request.FirmaId.ToString());
+
+            if (request.SevkAdres.Clientref > 0)
+            {
+                using (SqlConnection db = new SqlConnection(connectionstring))
+                {
+                    string LogoDbName = Configuration["LogoDbName"];
+                    string LogoFirmaNo = request.LogoFirmaNo.Value.ToString("000");
+                    string LogoTableName = string.Format("{0}.[dbo].[LG_{1}_SHIPINFO]", LogoDbName, LogoFirmaNo);
+
+                    string sqlstring = string.Format("SELECT COUNT(*) SAY FROM " + LogoTableName + " with(nolock) where CLIENTREF= {0} and CODE= '{1}' ", request.SevkAdres.Clientref, request.SevkAdres.Sevkkodu);
+
+                    int say = await db.QueryFirstAsync<int>(sqlstring, commandType: CommandType.Text);
+
+                    if (say > 0)
+                        throw new ApiException("Bu Carinin aynı Koda sahip başka bir sevk adresi daha var");
+
+                    sqlstring = "INSERT INTO " + LogoTableName;
+                    sqlstring += " ([CLIENTREF],[CODE],[NAME],[SPECODE],[CYPHCODE],[ADDR1],[ADDR2],[CITY],[COUNTRY],[POSTCODE],[TELNRS1],[TELNRS2],[FAXNR],[CAPIBLOCK_CREATEDBY],[CAPIBLOCK_CREADEDDATE],[CAPIBLOCK_CREATEDHOUR],[CAPIBLOCK_CREATEDMIN],[CAPIBLOCK_CREATEDSEC],[CAPIBLOCK_MODIFIEDBY],[CAPIBLOCK_MODIFIEDHOUR],[CAPIBLOCK_MODIFIEDMIN],[CAPIBLOCK_MODIFIEDSEC],[SITEID],[RECSTATUS],[ORGLOGICREF],[TRADINGGRP],[VATNR],[TAXNR],[TAXOFFICE],[TOWNCODE],[TOWN],[DISTRICTCODE],[DISTRICT],[CITYCODE],[COUNTRYCODE],[ACTIVE],[TEXTINC],[EMAILADDR],[INCHANGE],[TELCODES1],[TELCODES2],[FAXCODE],[LONGITUDE],[LATITUTE],[CITYID],[TOWNID],[SHIPBEGTIME1],[SHIPBEGTIME2],[SHIPBEGTIME3],[SHIPENDTIME1],[SHIPENDTIME2],[SHIPENDTIME3],[POSTLABELCODE],[SENDERLABELCODE],[TITLE],[DEFAULTFLG],[TCKNO],[SNAME],[SSURNAME],[POSTCODELEDESP],[SENDERCODELEDESP],[ISPERSCOMP],[GUID]) ";
+                    sqlstring += " VALUES ";
+                    sqlstring += " (@CLIENTREF,@CODE,@NAME,'','',@ADDR1,@ADDR2,@CITY,'TÜRKİYE',@POSTCODE,@TELNRS1,@TELNRS2,'',88,GetDate(),DATEPART(HOUR,GetDate()),DATEPART(MINUTE,GetDate()),DATEPART(SECOND,GetDate()),0,0,0,0,0,0,0,'','','','','',@TOWN,'','','','TR',0,0,@EMAILADDR,@INCHANGE,'','','','','','','',0,0,0,0,0,0,'','',@NAME,0,'','','','','',0,@GUID) ";
+
+                    var p = new DynamicParameters();
+                    p.Add("@CLIENTREF", request.SevkAdres.Clientref);
+                    p.Add("@CODE", request.SevkAdres.Sevkkodu);
+                    p.Add("@NAME", request.SevkAdres.SevkEdilecekBayiAdi);
+                    p.Add("@ADDR1", request.SevkAdres.Sevkadres1);
+                    p.Add("@ADDR2", request.SevkAdres.Sevkadres2);
+                    p.Add("@CITY", request.SevkAdres.Il);
+                    p.Add("@POSTCODE", request.SevkAdres.Postakodu);
+                    p.Add("@TELNRS1", request.SevkAdres.Tel1);
+                    p.Add("@TELNRS2", request.SevkAdres.Tel2);
+                    p.Add("@TOWN", request.SevkAdres.Ilce);
+                    p.Add("@EMAILADDR", request.SevkAdres.Mail);
+                    p.Add("@INCHANGE", request.SevkAdres.SevkIlgilisi);
+                    p.Add("@GUID", Guid.NewGuid().ToString());
+
+                    await db.QueryAsync<double>(sqlstring, p, commandType: CommandType.Text);
+
+
+                    sqlstring = string.Format("SELECT MAX(LOGICALREF) FROM " + LogoTableName + " with(nolock) where CLIENTREF= {0} and CODE= '{1}' ", request.SevkAdres.Clientref, request.SevkAdres.Sevkkodu);
+                    int logref = await db.QueryFirstAsync<int>(sqlstring, commandType: CommandType.Text);
+                    request.SevkAdres.Logref = logref; 
+                }
+
+                return request.SevkAdres;
+            }
+            else
+            {
+                var optionsBuilder = new DbContextOptionsBuilder<UmotaCompanyDbContext>();
+                optionsBuilder.UseSqlServer(connectionstring);
+
+                using (UmotaCompanyDbContext dbContext = new UmotaCompanyDbContext(optionsBuilder.Options))
+                {
+                    if (!string.IsNullOrWhiteSpace(request.SevkAdres.Sevkkodu))
+                    {
+                        var cariRow = await dbContext.V004Sevkadres.Where(x => x.Clientref == request.SevkAdres.Clientref && x.Sevkkodu == request.SevkAdres.Sevkkodu).ToListAsync();
+                        if (cariRow.Count > 0)
+                            throw new ApiException("Bu Carinin aynı Koda sahip başka bir sevk adresi daha var");
+                    }
+
+                    var adresKart = Mapper.Map<SevkAdres>(request.SevkAdres);
+                    await dbContext.SevkAdreses.AddAsync(adresKart);
+                    await dbContext.SaveChangesAsync();
+                    return Mapper.Map<SevkAdresDto>(adresKart);
+                }
             }
         }
     }

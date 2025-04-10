@@ -199,6 +199,10 @@
                                         <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.LocationCity"
                                                    IconColor="Color.Secondary" Size="Size.Small" OnClick="SevkAdresiSec">Sevk Adresi</MudButton>
                                     </div>
+                                    <div class="col-md-3">
+                                        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddCard"
+                                                   IconColor="Color.Secondary" Size="Size.Small" OnClick="SevkAdresiEkle">Yeni Sevk Adresi</MudButton>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -738,4 +742,36 @@
 
         }
     }
+
+    public async Task SevkAdresiEkle()
+    {
+        if (!teklif.Cariref.HasValue)
+            return;
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("modalForm", 1);
+        parameters.Add("CariKartRef", teklif.Cariref);
+
+        var cariForm = modal.Show<CariKartSevkAdresEkleComponent>("Yeni Sevk Adresi Ekle", parameters: parameters, options: opt);
+        var result = await cariForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if (result.Data != null)
+            {
+                var Secim = (SevkAdresDto)result.Data;
+                teklif.Carisevkadrref = Secim.Logref;
+                teklif.SevkEdilecekBayiAdi = Secim.SevkEdilecekBayiAdi;
+                teklif.Sevkkodu = Secim.Sevkkodu;
+                teklif.Sevkadres1 = Secim.Sevkadres1;
+                teklif.Sevkadres2 = Secim.Sevkadres2;
+                teklif.Ilce = Secim.Ilce;
+                teklif.Il = Secim.Il;
+            }
+        }
+    }
+
 }

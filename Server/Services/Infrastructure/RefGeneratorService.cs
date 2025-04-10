@@ -135,5 +135,22 @@ namespace UmotaWebApp.Server.Services.Infrastructure
                 return dbResponse;
             }
         }
+
+        public async Task<string> CariSevkAdresKoduAl(int cariref, int firmaId)
+        {
+            if (firmaId < 1)
+                throw new Exception("Firma Dönem seçimi yapınız");
+
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(firmaId.ToString())))
+            {
+                var carikodu = await db.QueryFirstAsync<string>("select isnull((select kodu from dbo.v001_cari_kart where logref = " + cariref + "),'XX') as value"
+                                    , commandType: CommandType.Text);
+
+                var result = await db.QueryFirstAsync<string>("select dbo.GenerateNewCode(isnull((select max(sevkkodu) from dbo.v004_sevkadres where CLIENTREF = " + cariref+" ),'" + carikodu+"_00000')) as value"
+                                    , commandType: CommandType.Text);
+                return result;
+            }
+        }
+
     }
 }
