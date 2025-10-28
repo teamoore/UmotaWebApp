@@ -59,26 +59,12 @@ namespace UmotaWebApp.Server
             services.AddScoped<ISisKullaniciService, SisKullaniciService>();
             services.AddScoped<ISisFirmaService, SisFirmaService>();
             services.AddScoped<ISisMenuService, SisMenuService>();
-            services.AddScoped<ICariKartService, CariKartService>();
             services.AddScoped<IRefGenerator, RefGeneratorService>();
-            services.AddScoped<ITeklifService, TeklifService>();
-            services.AddScoped<ITeklifDetayService, TeklifDetayService>();
             services.AddScoped<IMalzemeKartService, MalzemeKartService>();
-            services.AddScoped<IPersonelService, PersonelService>();
             services.AddScoped<ISisFirmaDonemService, SisFirmaDonemService>();
             services.AddScoped<IDovizService, DovizService>();
-            services.AddScoped<IFaaliyetService, FaaliyetService>();
-            services.AddScoped<IPdfGenerator, PdfGeneratorService>();
-            services.AddScoped<IVCariKartService, VCariKartService>();
-            services.AddScoped<IKisilerService, KisilerService>();
-            services.AddScoped<IVMalzemeKartService, VMalzemeKartService>();
-            services.AddScoped<IDashboardInfo, DashboardInfo>();
-            services.AddScoped<ITeklifReportService, ReportService>();
-            services.AddScoped<ITakvimService, TakvimService>();
-            services.AddScoped<IVazifeService, VazifeService>();
-            services.AddScoped<ICariRaporService, CariRaporService>();
-            services.AddScoped<IServisService, ServisService>();
             services.AddScoped<IFileUpload, FileUploadService>();
+            services.AddScoped<IRaporService, RaporService>();
 
             var architectureFolder = (IntPtr.Size == 8) ? "64 bit" : "32 bit";
             var wkHtmlToPdfPath = Path.Combine(Environment.CurrentDirectory, $"wkhtmltox\\v0.12.4\\{architectureFolder}\\libwkhtmltox");

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -66,6 +67,34 @@ namespace UmotaWebApp.Server.Controllers
                 var e = new ServiceResponse<FileUploadDto>();
                 e.SetException(ex);
                 return e;
+            }
+        }
+
+        [RequestSizeLimit(long.MaxValue)]
+        [RequestFormLimits(MultipartBodyLengthLimit = long.MaxValue)]
+        [HttpPost("single")]
+        public async Task<IActionResult> Single(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("Dosya yüklenmedi.");
+
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+
+            // Sadece .xls ve .xlsx uzantılarına izin ver
+            if (extension != ".xls" && extension != ".xlsx")
+                return BadRequest("Sadece Excel (.xls, .xlsx) dosyalarına izin verilmektedir.");
+            
+            try
+            {
+                var filePath = Path.Combine("wwwroot/dosyalar", file.FileName);
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await file.CopyToAsync(stream);
+
+                return Ok(new { message = "Yükleme tamamlandı!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
 

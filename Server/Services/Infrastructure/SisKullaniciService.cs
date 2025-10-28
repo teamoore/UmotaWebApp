@@ -1,22 +1,24 @@
-﻿using System;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Dapper;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using UmotaWebApp.Server.Data.Models;
+using UmotaWebApp.Server.Extensions;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
-using Dapper;
-using Microsoft.Data.SqlClient;
-using System.Data;
-using UmotaWebApp.Server.Extensions;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
@@ -35,6 +37,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public string SifreDegistir(string sifre)
         {
+            if (string.IsNullOrWhiteSpace(sifre)) { return ""; }
+
             // SELECT char(ASCII('1')^20) SQL Versiyonu bu şekilde
             string res = sifre;
             int len = sifre.Length;
@@ -54,63 +58,67 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         }
         public async Task<SisKullaniciDto> GetSisKullanici(string kod)
         {
-            var kullanici = await MasterDbContext.SisKullanicis.Where(x => x.KullaniciKodu == kod)
-                .ProjectTo<SisKullaniciDto>(Mapper.ConfigurationProvider).FirstOrDefaultAsync();
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                db.Open();
 
-            if (kullanici == null)
-                throw new ApiException("Kullanıcı bulunamadı");
+                var sql = @$"select top 1 A.ID, 
+                            A.Kodu as KullaniciKodu, A.Adi as KullaniciAdi, A.Sifre KullaniciSifre,
+                            A.Iptal as KullaniciIptal, A.Rol As KullaniciYetkiKodu, A.MailAdres as MailAdres,
+                            A.GrupID as KullaniciMenuProfil, B.Adi As KullaniciMenuProfilAdi
+                     from {Configuration.GetUmotaObjectName("Kullanici")} A 
+                     left outer join {Configuration.GetUmotaObjectName("KullaniciGrup")} B on (A.GrupID = B.ID) 
+                     
+                     where A.Kodu = '{kod}' ";
 
-            return kullanici;
+                var result = await db.QueryAsync<SisKullaniciDto>(sql, commandType: CommandType.Text);
+
+                db.Close();
+
+                return result.SingleOrDefault();
+            }
         }
 
         public async Task<List<SisKullaniciDto>> GetSisKullaniciList()
         {
-            var query = from h in MasterDbContext.SisKullanicis
-                        join y in MasterDbContext.SisMenuProfils on h.KullaniciMenuProfil equals y.ProfilId into ps
-                        from y in ps.DefaultIfEmpty()
-                            //where h.Id < 7
-                        orderby (h.KullaniciKodu)
-                        select new
-                        {
-                            KullaniciKodu = h.KullaniciKodu,
-                            KullaniciAdi = h.KullaniciAdi,
-                            KullaniciYetkiKodu = h.KullaniciYetkiKodu,
-                            KullaniciMenuProfil = h.KullaniciMenuProfil,
-                            MailAdres = h.MailAdres,
-                            LogoUsername = h.LogoUsername,
-                            KullaniciMenuProfilAdi = y.ProfilAdi
-                        };
-
-            return await query.Select(p => new SisKullaniciDto
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
             {
-                KullaniciKodu = p.KullaniciKodu,
-                KullaniciAdi = p.KullaniciAdi,
-                KullaniciYetkiKodu = p.KullaniciYetkiKodu,
-                KullaniciMenuProfil = p.KullaniciMenuProfil,
-                MailAdres = p.MailAdres,
-                LogoUsername = p.LogoUsername,
-                KullaniciMenuProfilAdi = p.KullaniciMenuProfilAdi
-            }).ToListAsync();
+                db.Open();
 
-            //return await MasterDbContext.SisKullanicis
-            //    .ProjectTo<SisKullaniciDto>(Mapper.ConfigurationProvider).ToListAsync();
+                var sql = @$"select
+                            A.Kodu as KullaniciKodu, A.Adi as KullaniciAdi, A.Sifre KullaniciSifre,
+                            A.Iptal as KullaniciIptal, A.Rol As KullaniciYetkiKodu, A.MailAdres as MailAdres,
+                            A.GrupID as KullaniciMenuProfil, B.Adi As KullaniciMenuProfilAdi
+                     from {Configuration.GetUmotaObjectName("Kullanici")} A 
+                     left outer join {Configuration.GetUmotaObjectName("KullaniciGrup")} B on (A.GrupID = B.ID) 
+                     
+                      ";
+
+                var result = await db.QueryAsync<SisKullaniciDto>(sql, commandType: CommandType.Text);
+
+                db.Close();
+
+                return result.ToList();
+            }
         }
 
-        public async Task<SisKullaniciLoginResponseDto> Login(SisKullaniciLoginRequestDto request)
+        public Task<SisKullaniciLoginResponseDto> Login(SisKullaniciLoginRequestDto request)
         {
-            var hashedPassword = SifreDegistir(request.Sifre);
-
-            var kullanici = await MasterDbContext.SisKullanicis.Where(x => x.KullaniciKodu == request.Kod && x.KullaniciSifre == hashedPassword)
-              .ProjectTo<SisKullaniciDto>(Mapper.ConfigurationProvider).FirstOrDefaultAsync();
+            var kullanici = GetSisKullanici(request.Kod).Result;
 
             if (kullanici == null)
-                throw new Exception("Kullanıcı kodu ve/veya şifre hatalı girildi.");
+                throw new Exception("Tanımsız Kullanıcı Kodu");
 
             if (kullanici.KullaniciIptal)
-                throw new Exception("Kullanıcının sisteme girişi engellenmiş. Sistem yöneticinize başvurunuz.");
+               throw new Exception("Kullanıcı bulunamadı");
 
-            var kullanici_donem_yetki = await MasterDbContext.SisFirmaDonemYetkis.Where(x => x.Kodu == kullanici.KullaniciKodu)
-                .ProjectTo<SisFirmaDonemYetkiDto>(Mapper.ConfigurationProvider).ToListAsync();
+            var hashedPassword = SifreDegistir(request.Sifre);
+
+            if (hashedPassword != kullanici.KullaniciSifre)
+               throw new Exception("Şifre hatalı");
+
+            //var kullanici_donem_yetki = await MasterDbContext.SisFirmaDonemYetkis.Where(x => x.Kodu == kullanici.KullaniciKodu)
+            //    .ProjectTo<SisFirmaDonemYetkiDto>(Mapper.ConfigurationProvider).ToListAsync();
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSecurityKey"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -125,29 +133,35 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
             string tokenStr = new JwtSecurityTokenHandler().WriteToken(token);
 
+
             var response = new SisKullaniciLoginResponseDto();
             response.ApiToken = tokenStr;
-            response.KullaniciDto = Mapper.Map<SisKullaniciDto>(kullanici);
-            response.KullaniciFirmaDonemYetkiListesi = kullanici_donem_yetki;
+            response.KullaniciDto = kullanici;
+            //response.KullaniciFirmaDonemYetkiListesi = kullanici_donem_yetki;
 
-            return response;
+            return Task.FromResult(response);
         }
 
         public async Task<int> GetKullaniciYetkisiByKullaniciKodu(string kullanicikodu, string yetkikodu)
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
             {
-                var p = new DynamicParameters();
-                p.Add("@kullanici_kodu", kullanicikodu);
-                p.Add("@yetki_kodu", yetkikodu);
-                p.Add("@ReturnValue", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+                var sql = @$"IF EXISTS(select 1
+                                        from dbo.KullaniciYetkiKodlari a with(nolock)
+		                                inner join [dbo].[Kullanici] b with(nolock) on a.KullaniciID = b.ID
+		                                inner join [dbo].[YetkiKodlari] c with(nolock) on a.YetkiID = c.ID
+                                        where b.Kodu = @KullaniciKodu 
+                                        and c.Kodu = @YetkiKodu
+                                         )
+	                                select 1
+                                ELSE
+	                                select 0 ";
 
-                await db.ExecuteAsync("GetKullaniciYetkisiByKullaniciKodu", p, commandType: CommandType.StoredProcedure);
+                int say = await db.ExecuteScalarAsync<int>(sql, new { KullaniciKodu = kullanicikodu, YetkiKodu = yetkikodu });
 
-                int c = p.Get<int>("@ReturnValue");
+                db.Close();
 
-                return c;
-
+                return say;
             }
 
         }
@@ -172,32 +186,163 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         }
         public async Task<List<SisMenuProfilDto>> GetKullaniciGrupList()
         {
-            return await MasterDbContext.SisMenuProfils
-                .ProjectTo<SisMenuProfilDto>(Mapper.ConfigurationProvider).ToListAsync();
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                db.Open();
+
+                var sql = @$"select
+                            A.ID as ProfilId, A.Adi as ProfilAdi
+                     from {Configuration.GetUmotaObjectName("KullaniciGrup")} A ";
+
+                var result = await db.QueryAsync<SisMenuProfilDto>(sql, commandType: CommandType.Text);
+
+                db.Close();
+
+                return result.ToList();
+            }
         }
         public async Task<SisKullaniciDto> SaveKullanici(SisKullaniciRequestDto request)
         {
             request.SisKullanici.KullaniciSifre = SifreDegistir(request.SisKullanici.KullaniciSifre);
-            var kullanici = Mapper.Map<SisKullanici>(request.SisKullanici);
 
-            await MasterDbContext.SisKullanicis.AddAsync(kullanici);
-            await MasterDbContext.SaveChangesAsync();
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                db.Open();
 
-            return Mapper.Map<SisKullaniciDto>(kullanici);
+                var sql = @$"INSERT INTO [dbo].[Kullanici]
+                                ([Kodu],[Adi],[Sifre],[Rol],[GrupID]
+                                ,[Iptal],[MailAdres],[MailSifre]
+                                ,[LogoUserName],[LogoPassword])
+                        VALUES
+                            (@Kodu, @Adi, @Sifre, @Rol, @GrupID
+                            ,@Iptal, @MailAdres, @MailSifre
+                            ,@LogoUserName, @LogoPassword) ";
+
+                var p = new DynamicParameters();
+                p.Add("@Kodu", request.SisKullanici.KullaniciKodu);
+                p.Add("@Adi", request.SisKullanici.KullaniciAdi);
+                p.Add("@Sifre", request.SisKullanici.KullaniciSifre);
+                p.Add("@Rol", request.SisKullanici.KullaniciYetkiKodu);
+                p.Add("@GrupID", request.SisKullanici.KullaniciMenuProfil);
+                p.Add("@MailAdres", request.SisKullanici.MailAdres);
+                p.Add("@MailSifre", request.SisKullanici.MailSifre);
+                p.Add("@LogoUserName", request.SisKullanici.LogoUsername);
+                p.Add("@LogoPassword", request.SisKullanici.LogoPassword);
+                p.Add("@Iptal", request.SisKullanici.KullaniciIptal);
+
+                await db.ExecuteAsync(sql, p, commandType: CommandType.Text);
+
+                db.Close();
+
+            }
+
+            return request.SisKullanici;
         }
         public async Task<SisKullaniciDto> UpdateKullanici(SisKullaniciRequestDto request)
         {
-            var kullanici = await MasterDbContext.SisKullanicis.Where(x => x.KullaniciKodu == request.SisKullanici.KullaniciKodu).SingleOrDefaultAsync();
+            var kullanici = await GetSisKullanici(request.SisKullanici.KullaniciKodu);
             if (kullanici == null)
                 throw new Exception("Kart bulunamadı");
 
             if (!request.SisKullanici.KullaniciSifre.Equals(kullanici.KullaniciSifre))
                 request.SisKullanici.KullaniciSifre = SifreDegistir(request.SisKullanici.KullaniciSifre);
 
-            Mapper.Map(request.SisKullanici, kullanici);
-            await MasterDbContext.SaveChangesAsync();
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                db.Open();
 
-            return Mapper.Map<SisKullaniciDto>(kullanici);
+                var sql = @$"UPDATE [dbo].[Kullanici]
+                           SET [Kodu] = @Kodu
+                              ,[Adi] = @Adi
+                              ,[Sifre] = @Sifre
+                              ,[Rol] = @Rol
+                              ,[GrupID] = @GrupID
+                              ,[Iptal] = @Iptal
+                              ,[MailAdres] = @MailAdres
+                              ,[MailSifre] = @MailSifre
+                              ,[LogoUserName] = @LogoUserName
+                              ,[LogoPassword] = @LogoPassword
+                         WHERE Kodu = @Kodu ";
+
+                var p = new DynamicParameters();
+                p.Add("@Kodu", request.SisKullanici.KullaniciKodu);
+                p.Add("@Adi", request.SisKullanici.KullaniciAdi);
+                p.Add("@Sifre", request.SisKullanici.KullaniciSifre);
+                p.Add("@Rol", request.SisKullanici.KullaniciYetkiKodu);
+                p.Add("@GrupID", request.SisKullanici.KullaniciMenuProfil);
+                p.Add("@MailAdres", request.SisKullanici.MailAdres);
+                p.Add("@MailSifre", request.SisKullanici.MailSifre);
+                p.Add("@LogoUserName", request.SisKullanici.LogoUsername);
+                p.Add("@LogoPassword", request.SisKullanici.LogoPassword);
+                p.Add("@Iptal", request.SisKullanici.KullaniciIptal);
+
+                await db.ExecuteAsync(sql, p, commandType: CommandType.Text);
+
+                db.Close();
+
+            }
+
+            return request.SisKullanici;
         }
+
+        public async Task<List<KullaniciYetkiDto>> GetKullaniciYetkiList(string kullanicikodu)
+        {
+            var kullanici = await GetSisKullanici(kullanicikodu);
+            if (kullanici == null)
+                throw new Exception("Kart bulunamadı");
+
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                db.Open();
+
+                var sql = @$"select
+                            y.ID, y.Kodu, y.Adi,
+                            CASE WHEN ky.YetkiID IS NOT NULL THEN 1 ELSE 0 END AS Secili
+                            FROM [dbo].[YetkiKodlari] y
+                            LEFT OUTER JOIN [dbo].[KullaniciYetkiKodlari] ky ON (ky.YetkiID = y.ID AND ky.KullaniciID = @KullaniciID)
+                            ORDER BY y.Kodu ";
+
+                var result = await db.QueryAsync<KullaniciYetkiDto>(sql, new { KullaniciID = kullanici.ID });
+
+                db.Close();
+
+                return result.ToList();
+            }
+        }
+
+        public async Task<bool> PostKullaniciYetkiList(KullaniciYetkiPostDto request)
+        {
+            var kullanici = await GetSisKullanici(request.KullaniciKodu);
+            if (kullanici == null)
+                throw new Exception("Kart bulunamadı");
+
+            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString()))
+            {
+                db.Open();
+
+                var sql = @$"Delete from [dbo].[KullaniciYetkiKodlari]
+                                Where KullaniciID = @KullaniciID";
+
+                await db.ExecuteAsync(sql, new { KullaniciID = kullanici.ID });
+
+                foreach (KullaniciYetkiDto item in request.YetkiKodlari)
+                {
+                    sql = @$"INSERT INTO [dbo].[KullaniciYetkiKodlari]
+                                ([KullaniciID],[YetkiID])
+                        VALUES
+                            (@KullaniciID, @YetkiID) ";
+
+                    await db.ExecuteAsync(sql, new { KullaniciID = kullanici.ID, YetkiID = item.ID });
+                }
+
+                db.Close();
+
+            }
+
+            return true;
+        }
+
+
+
     }
 }

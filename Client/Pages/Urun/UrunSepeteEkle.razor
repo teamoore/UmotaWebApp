@@ -1,0 +1,196 @@
+﻿
+@inject HttpClient Http
+@inject CartState CartState
+
+<MudPaper Class="p-4 mx-auto mt-4" MaxWidth="600px">
+
+    @if (urun != null)
+    {
+        <MudGrid>
+            <MudItem xs="12" sm="4">
+                <img src="@urun.imagePath"
+                     alt="@urun.Adi"
+                     style="width:100%; aspect-ratio:1/1; object-fit:contain; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,0.1);" />
+            </MudItem>
+            <MudItem xs="12" sm="8">
+                <MudText Typo="Typo.h5" FontWeight="FontWeight.Bold">@urun.Baslik</MudText>
+
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <MudText Typo="Typo.subtitle2" Color="Color.Secondary">Kod: @urun.Kodu</MudText>
+
+                    @if (hesaplananAdetGormeYetkisi)
+                    {
+                        <MudText Typo="Typo.subtitle2" Color="Color.Primary">
+                            Hesaplanan Adet : @String.Format("{0:N0}", urun.HesaplananAdet)
+                        </MudText>
+                    }
+                </div>
+
+                <!-- Fiyat Bilgileri -->
+                @if(fiyatGormeYetkisi)
+                {
+                    <div style="display:flex; flex-direction:column; align-items:flex-end; margin-top:4px;">
+                        <MudText Typo="Typo.h6" Color="Color.Primary" Bold="true">
+                            @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", urun.Fiyat2)
+                        </MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            @String.Format(new System.Globalization.CultureInfo("tr-TR"), "{0:C}", urun.Fiyat3)
+                        </MudText>
+                    </div>
+                }
+
+            </MudItem>
+        </MudGrid>
+
+        <MudDivider Class="my-3" />
+
+        <MudForm Class="d-flex flex-column" Style="gap: 16px;">
+
+            <MudSelect T="string" Label="Sepet Seç" @bind-Value="selectedSepet.SepetAdi" Required="true">
+                @if (sepetListesi != null)
+                {
+                    @foreach (var sepet in sepetListesi)
+                    {
+                        <MudSelectItem Value="sepet.SepetAdi">@sepet.SepetAdi</MudSelectItem>
+                    }
+                }
+            </MudSelect>
+
+            @if (selectedSepet.SepetAdi == "Yeni Sepet")
+            {
+                <MudTextField Label="Yeni Sepet Adı" @bind-Value="yeniSepetAdi" />
+            }
+
+            <MudNumericField Label="Miktar" @bind-Value="miktar" Min="1" />
+
+            <div class="d-flex mt-4" style="gap: 12px;">
+                <MudButton Color="Color.Success"
+                           Variant="MudBlazor.Variant.Filled"
+                           StartIcon="@Icons.Material.Filled.AddShoppingCart"
+                           Elevation="8"
+                           Style="flex: 1; font-weight: bold; font-size: 1.1rem;"
+                            OnClick="SepeteEkle">
+                    Sepete Ekle
+                </MudButton>
+
+                <MudButton Color="Color.Secondary"
+                           Variant="MudBlazor.Variant.Outlined"
+                           StartIcon="@Icons.Material.Filled.Close"
+                           OnClick="goBackList">
+                    Vazgeç
+                </MudButton>
+            </div>
+
+        </MudForm>
+    }
+    else
+    {
+        <MudProgressCircular Indeterminate="true" />
+    }
+
+</MudPaper>
+
+@code {
+    [Parameter] public int UrunID { get; set; }
+    [Parameter] public int? isModalForm { get; set; }
+    [Parameter] public double? modalMiktar { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+
+    private UrunDto urun;
+    private List<SepetDto> sepetListesi = new();
+    private SepetDto selectedSepet = new();
+    private string yeniSepetAdi = "";
+    private string kullaniciKodu;
+    private double miktar = 1;
+    private bool fiyatGormeYetkisi = true;
+    private bool hesaplananAdetGormeYetkisi = true;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        kullaniciKodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+        // Ürünü yükle (örnek)
+        urun = await Http.GetServiceResponseAsync<UrunDto>(UrlHelper.MalzemeKartGetir + "?logref=" + UrunID + "&firmaId=0");
+        miktar = urun.HesaplananAdet;
+
+        if (modalMiktar.HasValue)
+            miktar = modalMiktar.Value;
+
+        sepetListesi = await Http.GetServiceResponseAsync<List<SepetDto>>(UrlHelper.GetUserSepetList + "?kullanicikodu=" + kullaniciKodu);
+        sepetListesi.Add(new SepetDto { SepetAdi = "Yeni Sepet" });
+
+        // Eğer hiç sepet yoksa "Yeni Sepet" default gelsin
+        if (sepetListesi.Count == 1) // yani sadece "Yeni Sepet" var
+        {
+            selectedSepet = sepetListesi.First(s => s.SepetAdi == "Yeni Sepet");
+            yeniSepetAdi = "Sepetim1";
+        }
+        else
+        {
+            // Liste doluysa son eklenen sepeti seçili getir
+            var sonSepet = sepetListesi
+                .Where(s => s.SepetAdi != "Yeni Sepet")
+                .LastOrDefault();
+
+            selectedSepet = sonSepet ?? sepetListesi.First();
+        }
+    }
+
+    private async Task SepeteEkle()
+    {
+        var sepetAdi = selectedSepet.SepetAdi == "Yeni Sepet" ? yeniSepetAdi : selectedSepet.SepetAdi;
+
+        if (string.IsNullOrWhiteSpace(sepetAdi))
+        {
+            Snackbar.Add("Sepet Adı giriniz", severity: Severity.Error);
+            return;
+        }
+
+        SepetPostDto request = new SepetPostDto
+        {
+            KullaniciKodu = kullaniciKodu,
+            SepetAdi = sepetAdi,
+            UrunID = urun.ID,
+            Miktar = miktar
+        };
+
+        try
+        {
+            int res = await Http.PostGetServiceResponseAsync<int, SepetPostDto>(UrlHelper.PostSepet, request);
+            Snackbar.Add($"Ürün, [{sepetAdi}] adlı Sepete eklendi", severity: Severity.Success);
+
+            CartState.SepetUrunSayisi = await Http.GetServiceResponseAsync<int>(UrlHelper.GetUserSepetCount + "?kullaniciKodu=" + kullaniciKodu);
+            
+            if(isModalForm.HasValue && isModalForm.Value == 2)
+                await ModalInstance.CloseAsync(ModalResult.Ok<double>(miktar));
+            else
+                await goBackList();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+
+    }
+
+    public async Task goBackList()
+    {
+        if (isModalForm.HasValue)
+            await ModalInstance.CloseAsync();
+        else
+            navigation.NavigateTo("/urunliste");
+    }
+
+}

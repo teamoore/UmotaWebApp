@@ -15,22 +15,22 @@
         <ul class="nav flex-column">
             @foreach (var mn in menuList)
             {
-                @if (mn.ParentId == 0)
+                @if (mn.ParentID == null)
                 {
                     <li class="nav-item px-3">
                         <NavLink class="nav-link" href="#" @onclick="()=>GetIsClicked(mn)">
-                            <span aria-hidden="true"></span>@mn.MenuTanimi
+                            <span aria-hidden="true"></span>@mn.Tanimi
                         </NavLink>
                         <ul class="nav flex-column">
                             @foreach (var mn1 in menuList)
                             {
-                                @if (mn.MenuId == mn1.ParentId)
+                                @if (mn.ID == mn1.ParentID)
                                 {
-                                    @if (expandSubNav && mn.MenuId == clickedMenu)
+                                    @if (expandSubNav && mn.ID == clickedMenu)
                                     {
                                         <li class="nav-item px-3" style="font-size: 0.7rem !important;">
-                                            <NavLink class="nav-link" href="@mn1.MenuDfm" @onclick="()=>GetIsClicked(mn1)">
-                                                <span aria-hidden="true"></span>@mn1.MenuTanimi
+                                            <NavLink class="nav-link" href="@mn1.HRef" @onclick="()=>GetIsClicked(mn1)">
+                                                <span aria-hidden="true"></span>@mn1.Tanimi
                                             </NavLink>
                                         </li>
                                     }
@@ -63,15 +63,15 @@
     private bool hasPageName = true;
     private int prevClickedMenu = 0;
 
-    private List<SisMenuDto> menuList = null;
+    private List<MenuItemDto> menuList = null;
 
-    public void GetIsClicked(SisMenuDto mn)
+    public void GetIsClicked(MenuItemDto mn)
     {
-        clickedMenu = mn.MenuId;
+        clickedMenu = mn.ID;
         if (prevClickedMenu != clickedMenu)
         {
             expandSubNav = false;
-            if (mn.MenuTanimi != "")
+            if (mn.Tanimi != "")
             {
                 hasPageName = true;
             }
@@ -100,18 +100,18 @@
     protected override async Task OnInitializedAsync()
     {
         readyPageList = new List<string>();
-        readyPageList.AddRange(new[] { "stek_listef", "r_carilistef", "kullanici_tanimlarif" });
-        readyMenuIds = new int[3] { 77, 96,93 };
+        readyPageList.AddRange(new[] { "UrunAktar", "UrunListe" });
+        readyMenuIds = new int[3] { 9, 14, 15 };
 
 
-        var result = await client.GetFromJsonAsync<ServiceResponse<List<SisMenuDto>>>("api/menu/list");
+        var result = await client.GetFromJsonAsync<ServiceResponse<List<MenuItemDto>>>("api/menu/list");
 
         if (result != null && result.Success)
         {
             menuList = result.Value;
         }
 
-        menuList = menuList.Where(i => readyPageList.Contains(i.MenuDfm) || readyMenuIds.Contains(i.MenuId)).ToList();
+        menuList = menuList.Where(i => readyPageList.Contains(i.Secenek) || readyMenuIds.Contains(i.ID)).ToList();
     }
 
 }

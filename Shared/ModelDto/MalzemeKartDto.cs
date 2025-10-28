@@ -12,6 +12,12 @@ namespace UmotaWebApp.Shared.ModelDto
         public string Kodu { get; set; }
         public string Adi { get; set; }
         public string Adi3 { get; set; }
+        public string Baslik{ get; set; }
+        public string Ozellik { get; set; }
+        public string ResimYolu { get; set; }
+        public string Sezon { get; set; }
+        public List<string> Fotolar { get; set; } = new();
+        public int HesaplananAdet { get; set; }
         public string Birim { get; set; }
         public string Birimset { get; set; }
         public string Mensei { get; set; }
@@ -40,6 +46,7 @@ namespace UmotaWebApp.Shared.ModelDto
         public DateTime? Insdate { get; set; }
         public string Upduser { get; set; }
         public DateTime? Upddate { get; set; }
+
         private double? _kdvNumber;
         public double? KdvNumber
         { 

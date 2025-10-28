@@ -7,103 +7,50 @@ namespace UmotaWebApp.Client.Utils
 {
     public class UrlHelper
     {
-        public const string Login = "api/kullanici/login";
-        public const string GetKullaniciYetkisi = "api/kullanici/GetKullaniciYetkisi";
-        public const string TeklifListesi = "/api/teklif/list";
-        public const string TeklifKaydet = "/api/teklif/save";
-        public const string TeklifGuncelle = "/api/teklif/update";
-        public const string TeklifDurumGuncelle = "/api/teklif/updatedurum";
-        public const string TeklifDurumDetayList = "/api/teklif/teklifdurumlist";
-        public const string TeklifAra = "/api/teklif/search";
-        public const string TeklifGetir = "/api/teklif/get";
-        public const string TeklifSil = "/api/teklif/delete";
-        public const string TeklifKaydetRevize = "/api/teklif/saverevize";
-        public const string MalzemeKartListesi = "/api/malzemekart/list";
-        public const string MalzemeKartAra = "/api/malzemekart/search";
-        public const string MalzemeKartGetir = "/api/malzemekart/get";
-        public const string VMalzemeKartGetir = "/api/vmalzemekart/get";
-        public const string VMalzemeKartListesi = "/api/vmalzemekart/search";
-        public const string MalzemeFiyatGetir = "/api/malzemekart/fiyatgetir";
-        public const string MalzemeMaliyetGetir = "/api/malzemekart/maliyetgetir";
-        public const string MalzemeStokGetir = "/api/malzemekart/stokgetir";
-        public const string MalzemeKartSave = "/api/malzemekart/save";
-        public const string MalzemeKartUpdate = "/api/malzemekart/update";
-        public const string TeklifDetayGetir = "/api/teklifdetay/get";
-        public const string CariKartAra = "/api/carikart/search";
-        public const string CariKartGetir = "/api/carikart/getByKod";
-        public const string CariKartGetirLogRef = "/api/carikart/get";
-        public const string CariKartListesi = "/api/carikart/list";
-        public const string CariKartKaydet = "/api/carikart/save";
-        public const string CariKartGuncelle = "/api/carikart/update";
-        public const string CariKartAdresKaydet = "/api/carikart/saveadres";
-        public const string CariKartKisiGetir = "/api/kisiler/getcarikisiler";
-        public const string CariKartKisiKaydet = "/api/kisiler/save";
-        public const string CariKartKisiGuncelle = "/api/kisiler/update";
         public const string RefNoAl = "/api/helper/RefNoAl";
         public const string FisNoAl = "/api/helper/GenerateRef";
-        public const string CariSektorList = "/api/helper/GetCariSektorList";
-        public const string DovizListesi = "/api/doviz/GetDovizList";
-        public const string DovizKuruGetir = "/api/doviz/GetDovizKur";
-        public const string TeklifDetaySiraNo = "/api/teklifdetay/getsirano";
+        public const string FisNoAlLogo = "/api/helper/fisnoallogo";
+
+        public const string GetMenuList = "/api/menu/List";
+        public const string GetMenuListForUser = "/api/menu/ListForUser";
+        public const string GetUserPermissionsAsync = "/api/menu/GetUserPermissionsAsync";
+        public const string SavePermissionsAsync = "/api/menu/SavePermissionsAsync";
+        public const string GetAllMenusAsync = "/api/menu/GetAllMenusAsync";
+
+        public const string Login = "api/kullanici/login";
+        public const string GetKullaniciYetkisi = "api/kullanici/GetKullaniciYetkisi";
         public const string KullaniciGetByKod = "/api/kullanici/GetByKod";
         public const string KullaniciMenuYetkisi = "/api/kullanici/GetKullaniciMenuYetkisi";
-        public const string FaaliyetListesi = "/api/faaliyet/list";
-        public const string FaaliyetAra = "/api/faaliyet/search";
-        public const string FaaliyetGetir = "/api/faaliyet/get";
-        public const string FaaliyetKaydet = "/api/faaliyet/save";
-        public const string FaaliyetGuncelle = "/api/faaliyet/update";
-        public const string FaaliyetSil = "/api/faaliyet/delete";
-        public const string CariFaaliyetSayisi = "/api/faaliyet/getcarifaaliyetsayisi";
-        public const string VCariKartListesi = "/api/vcarikart/list";
-        public const string VCariKartAra = "/api/vcarikart/search";
-        public const string VCariKartGetir = "/api/vcarikart/get";
-        public const string VCariKartAdresListesi = "/api/vcarikart/adreslist";
-        public const string GetKullaniciListesi = "/api/kullanici/list";
-        public const string GetKullaniciGrupListesi = "/api/kullanici/gruplist";
         public const string KullaniciSave = "/api/kullanici/save";
         public const string KullaniciUpdate = "/api/kullanici/update";
-        public const string DashboardPersonelTeklifSatis = "/api/Dashboard/personelteklif";
-        public const string ReportMusteriOnayiBekliyor = "/api/Report/KacAdetMusteriOnayiBekliyorTeklifVar";
-        public const string CariDurumRaporu = "/api/carirapor/caridurumraporu";
-        public const string CariHesapEkstresi = "/api/carirapor/carihesapekstresi";
-        public const string GetMarkaList = "/api/malzemekart/GetMarkaList";
-        public const string SaveMalzemeMarka = "/api/malzemekart/savemarka";
-        public const string FisNoAlLogo = "/api/helper/fisnoallogo";
-        public const string TakvimKaydet = "/api/Takvim/save";
-        public const string TakvimListesi = "/api/Takvim/list";
-        public const string TakvimGuncelle = "/api/Takvim/update";
-        public const string TakvimGetir = "/api/Takvim/get";
-        public const string SiparisRaporu = "/api/Report/siparisraporu";
-        public const string SatisFaturaAnalizRaporu = "/api/Report/satisfaturaanalizraporu";
-        public const string VazifeGetir = "/api/Vazife/get";
-        public const string VazifeListesi = "/api/Vazife/list";
-        public const string VazifeKaydet = "/api/Vazife/save";
-        public const string VazifeGuncelle = "/api/Vazife/update";
-        public const string VazifeSayisi = "/api/Vazife/count";
-        public const string TahsilatRaporu = "/api/Report/tahsilatraporu";
-        public const string BankaDurumRaporu = "/api/Report/bankadurumraporu";
-        public const string ServisAra = "/api/servis/search";
-        public const string ServisGetir = "/api/servis/get";
-        public const string ServisKaydet = "/api/servis/save";
-        public const string ServisGuncelle = "/api/servis/update";
-        public const string ServisSil = "/api/servis/delete";
-        public const string ServisMalzemelerGetir = "/api/servis/getmalzemeler";
-        public const string ServisMalzemeGetir = "/api/servis/getmalzeme";
-        public const string ServisMalzemeKaydet = "/api/servis/savemalzeme";
-        public const string ServisMalzemeGuncelle = "/api/servis/updatemalzeme";
-        public const string ServisMalzemeSil = "/api/servis/deletemalzeme";
+        public const string GetKullaniciListesi = "/api/kullanici/list";
+        public const string GetKullaniciGrupListesi = "/api/kullanici/gruplist";
+        public const string GetKullaniciYetkiList = "/api/kullanici/GetKullaniciYetkiList";
+        public const string PostKullaniciYetkiList = "/api/kullanici/PostKullaniciYetkiList";
+
+        public const string MalzemeKartListesi = "/api/malzemekart/list";
+        public const string MalzemeKartGetir = "/api/malzemekart/get";
+        public const string MalzemeKartAra = "/api/malzemekart/search";
+        public const string MalzemeFotoGetir = "/api/malzemekart/getfotolist";
+        public const string UrunExelAktar = "/api/malzemekart/UrunExcelAktar";
+
+        public const string GetUserSepetList = "/api/malzemekart/GetUserSepetList";
+        public const string PostSepet = "/api/malzemekart/PostSepet";
+        public const string GetUserSepetCount = "/api/malzemekart/GetUserSepetCount";
+        public const string GetSepetUrunList = "/api/malzemekart/GetSepetUrunList";
+        public const string DeleteUserSepet = "/api/malzemekart/DeleteUserSepet";
+        public const string DeleteSepetUrun = "/api/malzemekart/DeleteSepetUrun";
+
+        public const string DovizListesi = "/api/doviz/GetDovizList";
+        public const string DovizKuruGetir = "/api/doviz/GetDovizKur";
+
         public const string FileUpload = "/api/FileUpload/upload";
         public const string FileUpload2 = "/api/FileUpload/upload2";
+        public const string FileUploadSingle = "/api/FileUpload/single";
         public const string FileSave = "/api/FileUpload/save";
         public const string FileGetList = "/api/FileUpload/list";
         public const string FileDelete = "/api/FileUpload/delete";
-        public const string PdfServisBilgilendirme = "api/Pdf/CreateServisBilgilendirmePdfDocumentSendMail";
-        public const string PdfMusteriBilgilendirme = "api/Pdf/CreateMusteriBilgilendirmePdfDocumentSendMail";
-        public const string KisiListesi = "/api/kisiler/list";
-        public const string KisiGetir = "/api/kisiler/get";
-        public const string KisiAra = "/api/kisiler/search";    
-        public const string KisiKaydet = "/api/kisiler/save";
-        public const string KisiGuncelle = "/api/kisiler/update";
-        public const string CariSevkAdresKoduAl = "/api/helper/CariSevkAdresKoduAl";
+
+        public const string ProjeDetayRaporu = "/api/Rapor/ProjeDetayRaporu";
     }
 }

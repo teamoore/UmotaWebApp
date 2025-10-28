@@ -10,7 +10,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
     {
         public Task<string> GenerateRowRef(string table, string keyField, string firmaId);
         public Task<int> RefNoAl(string tablename, string firmaId);
-        public Task<IEnumerable<OdemePlaniDto>> GetOdemePlaniList(int logofirmno);
         public Task<IEnumerable<SisSabitlerDetayDto>> GetSabitDetayList(int tip);
         public Task<IEnumerable<SpeCodesDto>> GetCariSektorList(int logofirmno);
         public Task<string> FisNoAlLogo(string table, string keyField, int firmaId, int logofirmaId);

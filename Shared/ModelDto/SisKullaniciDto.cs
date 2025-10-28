@@ -3,6 +3,7 @@ namespace UmotaWebApp.Shared.ModelDto
 {
     public class SisKullaniciDto
     {
+        public int ID { get; set; }
         public string KullaniciKodu { get; set; }
         public string KullaniciAdi { get; set; }
         public string KullaniciSifre { get; set; }
@@ -19,7 +20,6 @@ namespace UmotaWebApp.Shared.ModelDto
         public string MailImza { get; set; }
         public string LogoUsername { get; set; }
         public string LogoPassword { get; set; }
-        public string WebSifre { get; set; }
         public string KullaniciMenuProfilAdi { get; set; }
         public string KullaniciYetkiAdi
         {

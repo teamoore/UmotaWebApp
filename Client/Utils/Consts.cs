@@ -279,23 +279,27 @@ namespace UmotaWebApp.Client.Utils
         public const string GASTROMOREFirmaNo = "200";
 
         public const string TeklifSozlesmesi = @"1.Fiyatlarımıza KDV dahil değildir. Teklifteki fiyatlarımız iskonto yapılmış net fiyatlardır. 
-2.Döviz kuru ödemenin gerçekleştiği veya faturanın kesildiği günden hesaplanacaktır. GARANTİ bankası döviz satış kuru esas alınacaktır.   
-3.Her türlü tesisat işleri (Elektrik, Sıcak-Soğuk Su, Sifon ve Sübab, LG,NG veya Havagazı ,Havalandırma vs….)teklif dışıdır. 
-4.Teslim Süresi: Sipariş onayı ile stokta olan ürünler hemen, olmayanlar 4-6 haftadır. 
-5.Ödeme Şekli: Sipariş onayı ile %50 peşin kalanı mal tesliminden önce. 
-6.Nakliye: Nakliye dahil değildir. Ürünlerin mahallere taşınması alıcıya aittir. 
+2.eklif geçerlilik süresi  3 gündür. Siparişlerinizi Kaşe ve İmzalı bir şekilde tarafımıza göndermenizi rica ederiz.   
+3.Dövizli yapılan satışlarda, tahsilat günü * Garanti Bankası satış kuru geçerli olacaktır veya aşağıda bulunan euro yada dolar hesabına döviz olarak kabul edilecektir. 
+4.Her türlü tesisat işleri (Elektrik, Sıcak-Soğuk Su, Sifon ve Sübab, LG,NG veya Havagazı ,Havalandırma vs….)teklif dışıdır. 
+5.Teslim Süresi: Sipariş onayı ile stokta olan ürünler hemen, olmayanlar 4-6 haftadır. 
+6.Ödeme Şekli: Sipariş onayı ile %50 peşin kalanı mal tesliminden önce. 
+7.Nakliye: Nakliye dahil değildir. Ürünlerin mahallere taşınması alıcıya aittir.
 Ürünlerin mahaller taşınması için gerekli her türlü vinç, forklift vb. taşıma aletlerinin temini alıcıya aittir. 
-7.Montaj: Türkiye içi montaj hizmeti verilebilir. Ücreti anlaşmaya bağlıdır. 
-8.Proje kapsamında yapılan özel imalat ürünler kesinlikle iade alınmaz. 
-9.Montaj: Proje montajı esnasında ALICI imza yetkilisinin şantiyede bulunması ve 'Proje Montaj Tutanağı' nı kaşeli olarak imzalaması zorunludur. 
-10.Remote soğutmalı bütün üniteler için, ( soğuk oda, derin dondurucu, buzdolabı vb.) 10 mt ye kadar borulama fiyat teklife dahildir. 
-Bu mesafe üzeri ayrıca fiyatlandırılacaktır.
-11.Soğuk oda- derin dondurucu  ünitelerin zemin ile ilgili yapılacak her türlü inşai işler (zemin fayans, izolasyon vs.) 
-ve dış ünitelerin koyulacağı yerdeki demir taşıyıcı karkaslar alıcı teminidir.
-12.Teklifin geçerlilik süresi 2 gündür.
+8.Montaj: Türkiye içi montaj hizmeti verilebilir. Ücreti anlaşmaya bağlıdır. 
+9.Sipariş verilen ürünlerde iade ve değişim kabul edilmemektedir. 
+10.Montaj: Proje montajı esnasında ALICI imza yetkilisinin şantiyede bulunması ve 'Proje Montaj Tutanağı' nı kaşeli olarak imzalaması zorunludur.
+11.Remote soğutmalı bütün üniteler için, ( soğuk oda, derin dondurucu, buzdolabı vb.) 10 mt ye kadar borulama fiyat teklife dahildir. Bu mesafe üzeri ayrıca fiyatlandırılacaktır.
 
 BANKA HESAP BİLGİLERİ
-Garanti Bankası	İmes 434/6293378  TR64 0006 2000 4340 0006 2933 78
+TL - Garanti Bankası - İmes Ticari Şubesi - 1616/6293378
+TR59 0006 2001 6160 0006 2933 78
+
+USD - Garanti Bankası - İmes Ticari Şubesi – BIC/SWIFT KOD – TGBATRISXXX
+TR88 0006 2001 6160 0009 0828 67
+
+EURO - Garanti Bankası - İmes Ticari Şubesi – BIC/SWIFT KOD – TGBATRISXXX
+TR18 0006 2001 6160 0009 0828 66
 ";
 
         public const string TeklifSozlesmesiMakpa = @"1.Fiyatlarımıza KDV dahil değildir. Teklifteki fiyatlarımız iskonto yapılmış net fiyatlardır. 

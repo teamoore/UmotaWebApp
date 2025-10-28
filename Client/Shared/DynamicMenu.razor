@@ -1,0 +1,123 @@
+﻿@using MudBlazor
+
+
+<MudNavMenu>
+    @if (menuItems == null)
+    {
+        <MudText Typo="Typo.body2">Yükleniyor...</MudText>
+    }
+    else
+    {
+       @*  @foreach (var rootItem in menuItems.Where(x => x.ParentID == null).OrderBy(x => x.SiraNo))
+        {
+            @RenderMenuItem(rootItem)
+        } *@
+
+        @foreach (var parent in menuItems.Where(x => x.ParentID == null).OrderBy(x => x.SiraNo))
+        {
+            <MudNavGroup Title="@parent.Tanimi" Icon="@GetIcon(parent)">
+                @foreach (var child in menuItems.Where(x => x.ParentID == parent.ID).OrderBy(x => x.SiraNo))
+                {
+                    <MudNavLink Href="@child.Secenek" Match="NavLinkMatch.Prefix">@child.Tanimi</MudNavLink>
+                }
+            </MudNavGroup>
+        }
+    }
+</MudNavMenu>
+
+
+@code {
+    [Inject]
+    HttpClient client { get; set; }
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    private List<MenuItemDto> menuItems = null;
+    private string kullaniciKodu;
+
+    private List<int> readyMenuIds = new List<int> { 9, 14, 15, 4, 5, 1, 8 };
+
+    protected override async Task OnInitializedAsync()
+    {
+        kullaniciKodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+        menuItems = await client.GetServiceResponseAsync<List<MenuItemDto>>(UrlHelper.GetMenuList + "?kullanicikodu=" + kullaniciKodu);
+
+        // Tüm menüler blazora aktarılmadığı için sadece aktarılanları aldık. Hepsi aktarılınca kaldıracağız.
+        menuItems = menuItems.Where(i => readyMenuIds.Contains(i.ID)).ToList();
+    }
+
+    private static readonly Dictionary<string, string> IconMap = new()
+    {
+        { "CoPresent", Icons.Material.Outlined.CoPresent },
+        { "List", Icons.Material.Outlined.List },
+        { "FileUpload", Icons.Material.Outlined.FileUpload },
+        { "AccountBalance", Icons.Material.Outlined.AccountBalance },
+        { "Settings", Icons.Material.Outlined.Settings },
+        { "SettingsApplications", Icons.Material.Outlined.SettingsApplications },
+        { "ListAlt", Icons.Material.Outlined.ListAlt },
+        { "Analytics", Icons.Material.Outlined.Analytics },
+        { "CreditCard", Icons.Material.Outlined.CreditCard }
+    };
+
+    private string GetIcon(MenuItemDto item)
+    {
+        if (string.IsNullOrEmpty(item.imageName))
+            return Icons.Material.Filled.Menu;
+
+        return IconMap.TryGetValue(item.imageName, out var icon)
+            ? icon
+            : Icons.Material.Filled.Menu;
+    }
+
+    // private string GetIcon(MenuItemDto item)
+    // {
+    //     // imageName doluysa özel ikon kullan, yoksa varsayılan
+    //     if (string.IsNullOrEmpty(item.imageName))
+    //         return Icons.Material.Filled.Menu;
+
+    //     // kısa ad -> gerçek ikon string’i
+    //     return typeof(Icons.Material.Outlined)
+    //         .GetProperty(item.imageName)?
+    //         .GetValue(null, null)?
+    //         .ToString() ?? Icons.Material.Filled.Menu;
+    // }
+
+    // private RenderFragment RenderMenuItem(MenuItemDto item) => builder =>
+    //     {
+    //         var children = menuItems!
+    //             .Where(x => x.ParentID == item.ID)
+    //             .OrderBy(x => x.SiraNo)
+    //             .ToList();
+
+    //         if (children.Any())
+    //         {
+    //             // Grup (Parent Menü)
+    //             builder.OpenComponent<MudNavGroup>(0);
+    //             builder.AddAttribute(1, "Title", item.Tanimi);
+    //             builder.AddAttribute(2, "Icon", GetIcon(item));
+    //             builder.AddAttribute(3, "ChildContent", (RenderFragment)(childBuilder =>
+    //             {
+    //                 foreach (var child in children)
+    //                 {
+    //                     childBuilder.AddContent(4, RenderMenuItem(child));
+    //                 }
+    //             }));
+    //             builder.CloseComponent();
+    //         }
+    //         else
+    //         {
+    //             // Link (Son seviye)
+    //             builder.OpenComponent<MudNavLink>(5);
+    //             builder.AddAttribute(6, "Href", item.Secenek);
+    //             builder.AddAttribute(7, "Match", NavLinkMatch.Prefix);
+    //             builder.AddAttribute(8, "ChildContent", (RenderFragment)(linkBuilder =>
+    //             {
+    //                 linkBuilder.AddContent(9, item.Tanimi);
+    //             }));
+    //             builder.CloseComponent();
+    //         }
+    //     };
+
+
+}

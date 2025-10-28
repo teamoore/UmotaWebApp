@@ -1,0 +1,208 @@
+﻿@page "/urunliste2"
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="false"
+                 onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick" ShowSearchSection="true"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+<MudPaper Class="pa-4">
+
+    <MudDataGrid Items="@mainDataList" T="MalzemeKartDto" Height="400px" Filterable="true" Hideable="true" RowsPerPage="100" FixedHeader="true" FixedFooter="true"
+                 ColumnResizeMode="ResizeMode.Container" DragDropColumnReordering="true" ColumnsPanelReordering="true" ShowMenuIcon="true">
+@*         <ToolBarContent>
+            <MudText Typo="Typo.h6">Ürünler</MudText>
+            <MudSpacer />
+            <MudTextField T="string" Placeholder="Search" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+ *@        <Columns>
+            <PropertyColumn Property="x => x.Logref" Title="Nr" />
+            <PropertyColumn Property="x => x.Kodu" Title="Kodu" />
+            <PropertyColumn Property="x => x.Adi" Title="Adı" />
+            <PropertyColumn Property="x => x.Baslik" Title="Başlık" />
+            <PropertyColumn Property="x => x.Ozellik" Title="Özellikler" />
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="MalzemeKartDto" PageSizeOptions=@(new int[] { 10, 50, 100, 500, 1000 }) />
+        </PagerContent>
+    </MudDataGrid>
+
+</MudPaper>
+
+
+@code
+{
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public IEnumerable<MalzemeKartDto> mainDataList = new List<MalzemeKartDto>();
+    private bool loadingCompleted = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Ürün Listesi";
+
+        await LoadList();
+        loadingCompleted = true;
+    }
+
+    private async Task LoadList()
+    {
+        try
+        {
+            // var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            // if (selectedFirmaDonem == null)
+            //     throw new Exception("Firma dönem seçilmedi");
+
+            loadingCompleted = false;
+            mainDataList = await httpClient.GetServiceResponseAsync<List<MalzemeKartDto>>(UrlHelper.MalzemeKartListesi + "?firmaId=0");
+            loadingCompleted = true;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public async Task BtnAraClick()
+    {
+        try
+        {
+            // var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            // if (selectedFirmaDonem == null)
+            //     throw new Exception("Firma dönem seçilmedi");
+
+            // if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
+            // {
+            //     var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            //     if (ondegerFirmaDonem != null)
+            //         selectedFirmaDonem = ondegerFirmaDonem;
+            // }
+
+            loadingCompleted = false;
+            this.StateHasChanged();
+            var request = new MalzemeKartRequestDto();
+            request.FirmaId = 0;
+            if (!string.IsNullOrWhiteSpace(header.SearchText))
+                request.SearchText = header.SearchText;
+
+            mainDataList = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+            if (mainDataList == null || mainDataList.Count() == 0)
+                Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı", severity: Severity.Warning);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            loadingCompleted = true;
+        }
+    }
+
+    public async Task BtnDetayliAraClick()
+    {
+        // try
+        // {
+        //     var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        //     if (selectedFirmaDonem == null)
+        //         throw new Exception("Firma dönem seçilmedi");
+
+        //     // if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
+        //     // {
+        //     //     var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+        //     //     if (ondegerFirmaDonem != null)
+        //     //         selectedFirmaDonem = ondegerFirmaDonem;
+        //     // }
+
+        //     var opt = new ModalOptions();
+        //     opt.ContentScrollable = true;
+
+        //     var filterForm = modal.Show<Pages.Malzeme.Stok_Liste_Filters>("Arama Seçenekleri", opt);
+        //     var result = await filterForm.Result;
+
+        //     if (!result.Cancelled)
+        //     {
+        //         if (result.Data != null)
+        //         {
+        //             loadingCompleted = false;
+        //             this.StateHasChanged();
+
+        //             var mrequest = (MalzemeStokRequestDto)result.Data;
+
+        //             var request = new MalzemeKartRequestDto();
+        //             request.FirmaId = selectedFirmaDonem.firma_no.Value;
+        //             if (!string.IsNullOrWhiteSpace(header.SearchText))
+        //                 request.SearchText = header.SearchText;
+
+        //             if (!string.IsNullOrWhiteSpace(mrequest.MalzemeMarka))
+        //                 request.Marka = mrequest.MalzemeMarka;
+        //             if (!string.IsNullOrWhiteSpace(mrequest.MalzemeAdi))
+        //                 request.MalzemeAdi = mrequest.MalzemeAdi;
+        //             if (!string.IsNullOrWhiteSpace(mrequest.MalzemeKodu))
+        //                 request.MalzemeKodu = mrequest.MalzemeKodu;
+
+        //             mainDataList = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+        //             if (mainDataList == null || mainDataList.Count == 0)
+        //                 Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı", severity: Severity.Warning);
+        //         }
+        //     }
+
+        // }
+        // catch (Exception ex)
+        // {
+        //     Snackbar.Add(ex.Message, severity: Severity.Error);
+        // }
+        // finally
+        // {
+        //     loadingCompleted = true;
+        // }
+    }
+
+    public void UrunDetayaGit(int urunref)
+    {
+        //navigation.NavigateTo("/urundetay/" + urunref);
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("UrunId", urunref);
+
+        var form = modal.Show<Pages.Urun.UrunDetay>("Ürün Detay", parameters: parameters, options: opt);
+    }
+
+    public void SepeteEkle(int urunref)
+    {
+        //navigation.NavigateTo("/sepetekle/" + urunref);
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("UrunId", urunref);
+
+        var form = modal.Show<Pages.Urun.UrunSepeteEkle>("Sepete Ekle", parameters: parameters, options: opt);
+    }
+
+}

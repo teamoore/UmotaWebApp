@@ -344,7 +344,7 @@ namespace UmotaWebApp.Server.Data.Models
             {
                 entity.HasNoKey();
 
-                entity.ToTable("sis_menuler");
+                entity.ToTable("Menuler");
 
                 entity.Property(e => e.ImageIndex).HasColumnName("image_index");
 
@@ -355,7 +355,7 @@ namespace UmotaWebApp.Server.Data.Models
                     .IsUnicode(false)
                     .HasColumnName("menu_dfm");
 
-                entity.Property(e => e.MenuGirismi).HasColumnName("menu_girismi");
+                entity.Property(e => e.MenuGirismi).HasColumnName("GirisEkrani");
 
                 entity.Property(e => e.MenuId).HasColumnName("menu_id");
 

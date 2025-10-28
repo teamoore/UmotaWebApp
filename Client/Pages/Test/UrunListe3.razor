@@ -1,0 +1,233 @@
+﻿@page "/urunliste3"
+@inject Radzen.DialogService DialogService
+
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="false"
+                 onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick" ShowSearchSection="true"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+
+    <RadzenDataGrid Data="@mainDataList" TItem="MalzemeKartDto" @ref="grid" AllowAlternatingRows="false" Style="height:550px;"
+                    AllowFiltering="true" AllowSorting="true" AllowColumnResize="true" AllowColumnReorder="true"
+                    FilterMode="FilterMode.CheckBoxList" 
+                    PageSize="100" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true" PageSizeOptions="@pageSizeOptions"
+                    ColumnWidth="100px" 
+                    LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedItems
+                    AllowColumnPicking="true" GridLines="DataGridGridLines.Both">
+        <PagingSummaryTemplate>
+            <RadzenIcon Icon="database" Style="color: var(--rz-primary); font-size: var(--rz-pager-summary-font-size);" />
+            Displaying page @context.CurrentPage of @context.NumberOfPages <b>(total @context.TotalCount records)</b>
+        </PagingSummaryTemplate>
+
+        <Columns>
+            <RadzenDataGridColumn Width="80px" Title="" Filterable="false" Sortable="false" ColumnPickerTitle="İşlemler" Pickable="false" Reorderable="false" Frozen="true">
+                <Template Context="data">
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="add_shopping_cart" class="rz-m-1" Click=@(() => SepeteEkle(data.Logref)) />
+                    <RadzenButton ButtonStyle="ButtonStyle.Info" Variant="Radzen.Variant.Flat" Shade="Shade.Lighter" Icon="info" class="rz-m-1" Click=@(() => UrunDetayaGit(data.Logref)) />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Title="" ColumnPickerTitle="Fotoğraf" Sortable="false" Filterable="false" Width="100px" TextAlign="TextAlign.Center" Frozen="true">
+                <Template Context="data">
+                    <RadzenImage Path="@data.ResimYolu" Style="width:100px; height:100px; object-fit:contain; border-radius:6px;" AlternateText="@(data.Kodu + " " + data.Adi)" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(MalzemeKartDto.Kodu)" Title="Kodu" Width="80px" Frozen="true" />
+            <RadzenDataGridColumn Title="Başlık" Width="200px" Filterable="false" Frozen="true">
+                <Template Context="data">
+                    <div style="white-space: normal; word-break: break-word;">
+                        @data.Baslik
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(MalzemeKartDto.Grupkodu)" Title="Kategori" Width="100px" />
+            <RadzenDataGridColumn Property="@nameof(MalzemeKartDto.Adi)" Title="Adı" Width="160px" />
+            <RadzenDataGridColumn Title="Özellik" Width="300px" Filterable="false" Sortable="true">
+                <Template Context="data">
+                    <div style="white-space: normal; word-break: break-word;">
+                        @data.Ozellik
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(MalzemeKartDto.Satfiyat)" Title="Fiyat" TextAlign="TextAlign.Right">
+                <Template Context="order">
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Satfiyat)
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(MalzemeKartDto.HesaplananAdet)" Title="Hesaplanan Adet" TextAlign="TextAlign.Right" FormatString="{0:N0}">
+               @*  <Template Context="order">
+                    @String.Format("{0:N0}", order.HesaplananAdet)
+                </Template> *@
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(MalzemeKartDto.Logref)" Filterable="false" Title="ID" Width="80px" TextAlign="TextAlign.Center" Visible="false" />
+
+        </Columns>
+    </RadzenDataGrid>
+
+
+
+
+@code
+{
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public RadzenDataGrid<MalzemeKartDto> grid = null;
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 50, 100, 200, 500, 1000 };
+    IList<MalzemeKartDto> selectedItems;
+
+    public IEnumerable<MalzemeKartDto> mainDataList = new List<MalzemeKartDto>();
+    private bool loadingCompleted = false;
+    private bool isTableView = true; // Varsayılan tablo görünümü
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Ürün Listesi";
+
+        await LoadList();
+        loadingCompleted = true;
+    }
+
+    private async Task LoadList()
+    {
+        try
+        {
+            // var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            // if (selectedFirmaDonem == null)
+            //     throw new Exception("Firma dönem seçilmedi");
+
+            loadingCompleted = false;
+            mainDataList = await httpClient.GetServiceResponseAsync<List<MalzemeKartDto>>(UrlHelper.MalzemeKartListesi + "?firmaId=0");
+            loadingCompleted = true;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public async Task BtnAraClick()
+    {
+        try
+        {
+            // var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            // if (selectedFirmaDonem == null)
+            //     throw new Exception("Firma dönem seçilmedi");
+
+            // if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
+            // {
+            //     var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            //     if (ondegerFirmaDonem != null)
+            //         selectedFirmaDonem = ondegerFirmaDonem;
+            // }
+
+            loadingCompleted = false;
+            this.StateHasChanged();
+            var request = new MalzemeKartRequestDto();
+            request.FirmaId = 0;
+            if (!string.IsNullOrWhiteSpace(header.SearchText))
+                request.SearchText = header.SearchText;
+
+            mainDataList = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+            if (mainDataList == null || mainDataList.Count() == 0)
+                Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı", severity: Severity.Warning);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            loadingCompleted = true;
+        }
+    }
+
+    public async Task BtnDetayliAraClick()
+    {
+        // try
+        // {
+        //     var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        //     if (selectedFirmaDonem == null)
+        //         throw new Exception("Firma dönem seçilmedi");
+
+        //     // if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
+        //     // {
+        //     //     var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+        //     //     if (ondegerFirmaDonem != null)
+        //     //         selectedFirmaDonem = ondegerFirmaDonem;
+        //     // }
+
+        //     var opt = new ModalOptions();
+        //     opt.ContentScrollable = true;
+
+        //     var filterForm = modal.Show<Pages.Malzeme.Stok_Liste_Filters>("Arama Seçenekleri", opt);
+        //     var result = await filterForm.Result;
+
+        //     if (!result.Cancelled)
+        //     {
+        //         if (result.Data != null)
+        //         {
+        //             loadingCompleted = false;
+        //             this.StateHasChanged();
+
+        //             var mrequest = (MalzemeStokRequestDto)result.Data;
+
+        //             var request = new MalzemeKartRequestDto();
+        //             request.FirmaId = selectedFirmaDonem.firma_no.Value;
+        //             if (!string.IsNullOrWhiteSpace(header.SearchText))
+        //                 request.SearchText = header.SearchText;
+
+        //             if (!string.IsNullOrWhiteSpace(mrequest.MalzemeMarka))
+        //                 request.Marka = mrequest.MalzemeMarka;
+        //             if (!string.IsNullOrWhiteSpace(mrequest.MalzemeAdi))
+        //                 request.MalzemeAdi = mrequest.MalzemeAdi;
+        //             if (!string.IsNullOrWhiteSpace(mrequest.MalzemeKodu))
+        //                 request.MalzemeKodu = mrequest.MalzemeKodu;
+
+        //             mainDataList = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+        //             if (mainDataList == null || mainDataList.Count == 0)
+        //                 Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı", severity: Severity.Warning);
+        //         }
+        //     }
+
+        // }
+        // catch (Exception ex)
+        // {
+        //     Snackbar.Add(ex.Message, severity: Severity.Error);
+        // }
+        // finally
+        // {
+        //     loadingCompleted = true;
+        // }
+    }
+
+    async Task UrunDetayaGit(int urunref)
+    {
+        await DialogService.OpenAsync<Urun.UrunDetay>("Ürün Detayı",
+                       new Dictionary<string, object>() { { "UrunId", urunref } },
+                       new Radzen.DialogOptions() { Width = "700px", Height = "520px" });
+    }
+
+    async Task SepeteEkle(int urunref)
+    {
+        await DialogService.OpenAsync<Urun.UrunSepeteEkle>("Sepete Ekle",
+                       new Dictionary<string, object>() { { "UrunId", urunref } },
+                       new Radzen.DialogOptions() { Width = "700px", Height = "520px" });
+    }
+
+}

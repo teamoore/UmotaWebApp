@@ -38,7 +38,7 @@ namespace UmotaWebApp.Server.Services.Infrastructure
         public async Task<FileUploadDto> Upload(IBrowserFile file, CancellationToken cancellationToken)
         {
             var dosyaAdi = string.Format("{0}-{1}", DateTime.Now.ToString("yyyyMMdd-hhmmss"), file.Name);
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/dosyalar", dosyaAdi);
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Uploads/Excel", dosyaAdi);
 
             var result = new FileUploadDto();
             
@@ -62,7 +62,8 @@ namespace UmotaWebApp.Server.Services.Infrastructure
 
         public async Task<FileUploadDto> Upload(FileDataDto file)
         {
-            var dosyaAdi = string.Format("{0}-{1}", DateTime.Now.ToString("yyyyMMdd-hhmmss"), file.FileName);
+            //var dosyaAdi = string.Format("{0}-{1}", DateTime.Now.ToString("yyyyMMdd-hhmmss"), file.FileName);
+            var dosyaAdi = file.FileName;
             var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/dosyalar", dosyaAdi);
 
             var result = new FileUploadDto();

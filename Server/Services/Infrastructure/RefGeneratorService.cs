@@ -62,22 +62,6 @@ namespace UmotaWebApp.Server.Services.Infrastructure
             }
 
         }
-        public async Task<IEnumerable<OdemePlaniDto>> GetOdemePlaniList(int logofirmno)
-        {
-            using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))
-            {
-
-                string LogoDbName = Configuration["LogoDbName"];
-                string LogoFirmaNo = logofirmno.ToString("000");
-                string sqlstring = "SELECT  LOGICALREF,  CODE,  DEFINITION_ from " + LogoDbName + ".[dbo].[LG_" + LogoFirmaNo + "_PAYPLANS] with(nolock) where ACTIVE=0";
-
-                IEnumerable<OdemePlaniDto> dbResponse;
-                dbResponse = await db.QueryAsync<OdemePlaniDto>(sqlstring, commandType: CommandType.Text);
-                return dbResponse;
-            }
-
-
-        }
         public async Task<IEnumerable<SisSabitlerDetayDto>> GetSabitDetayList(int tip)
         {
             using (SqlConnection db = new SqlConnection(Configuration.GetUmotaConnectionString(null)))

@@ -1,0 +1,215 @@
+﻿@using System.Linq
+@using System.Linq.Dynamic.Core
+
+@if (loading)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+
+<MudTabs>
+    <MudTabPanel Text="Detay Liste">
+        <RadzenDataGrid Data="@Items" TItem="ProjeDetayRaporuDto" @ref="grid" AllowAlternatingRows="false" Style="height:calc(100vh - 150px); width:100%;"
+                        AllowFiltering="true" AllowSorting="true" AllowColumnResize="true" AllowColumnReorder="true"
+                        FilterMode="FilterMode.CheckBoxList"
+                        AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true" PageSizeOptions="@pageSizeOptions"
+                        PageSize="100"
+                        ColumnWidth="120px"
+                        LogicalFilterOperator="LogicalFilterOperator.And"
+                        SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedItems
+                        AllowColumnPicking="true" GridLines="DataGridGridLines.Both"
+                        @bind-Settings="@Settings" Filter="@(args => ResetIndex(true))">
+            <PagingSummaryTemplate>
+                <RadzenIcon Icon="database" Style="color: var(--rz-primary); font-size: var(--rz-pager-summary-font-size);" />
+                Displaying page @context.CurrentPage of @context.NumberOfPages <b>(total @context.TotalCount records)</b>
+            </PagingSummaryTemplate>
+
+            <Columns>
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.Firma)" Title="Firma" Width="50px" />
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.Yil)" Title="Yıl" Width="50px" />
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.Ay)" Title="Ay" Width="50px" />
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.Tarih)" Title="Tarih" Width="80px" FormatString="{0:dd.MM.yyyy}" />
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.FaturaTuru)" Title="Fiş Türü" Width="80px" />
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.FaturaNo)" Title="Fatura No" Width="100px" />
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.ProjeKodu)" Title="Proje Kodu" Width="80px" />
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.ProjeAdi)" Title="Proje Adı" Width="100px" />
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.ProjeOzelKod)" Title="Proje Türü" Width="100px" />
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.CariAdi)" Title="Cari Adı" Width="120px" />
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.MalzemeHizmet)" Title="Satır Türü" Width="80px" />
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.MalzemeHizmetAdi)" Title="Açıklama" Width="150px" />
+                <RadzenDataGridColumn Title="Satır Açıklaması" Width="200px" Filterable="false">
+                    <Template Context="data">
+                        <div style="white-space: normal; word-break: break-word;">
+                            @data.SatirAciklamasi
+                        </div>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.Miktar)" Title="Fatura Miktar" TextAlign="TextAlign.Right" FormatString="{0:N0}"> </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.Fiyat)" Title="Birim Fiyat" TextAlign="TextAlign.Right" FormatString="{0:N2}"> </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.Doviz)" Title="Döviz"> </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.KdvliFiyat)" Title="KDV.li Birim Fiyat" TextAlign="TextAlign.Right" FormatString="{0:N2}"> </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.Tutar)" Title="Tutar" TextAlign="TextAlign.Right" FormatString="{0:N2}"> </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.KdvTutar)" Title="KDV Tutarı" TextAlign="TextAlign.Right" FormatString="{0:N2}"> </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.KdvliTutar)" Title="KDV.li Tutar" TextAlign="TextAlign.Right" FormatString="{0:N2}"> </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.Kur)" Title="Kur" TextAlign="TextAlign.Right"> </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.TutarTL)" Title="TL Tutar" TextAlign="TextAlign.Right" FormatString="{0:N2}">
+                    <FooterTemplate>
+                        <b>@String.Format(new System.Globalization.CultureInfo("tr-TR"), "{0:C}", Items.AsQueryable().Where(grid.Query.Filter).Sum(o => o.TutarTL))</b>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(ProjeDetayRaporuDto.TutarUSD)" Title="USD Tutar" TextAlign="TextAlign.Right" FormatString="{0:N2}">
+                    <FooterTemplate>
+                        <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", Items.AsQueryable().Where(grid.Query.Filter).Sum(o => o.TutarUSD))</b>
+                    </FooterTemplate>
+                </RadzenDataGridColumn>
+
+            </Columns>
+        </RadzenDataGrid>
+    </MudTabPanel>
+
+    <MudTabPanel Text="Yıl / Ay Bazlı Özet">
+        <MudPaper Class="pa-4 d-flex justify-center">
+            <div style="width: 600px;">
+                <RadzenDataGrid Data="@summaryItems"
+                                TItem="ProjeOzetDto"
+                                AllowPaging="false"
+                                AllowSorting="true"
+                                ShowPagingSummary="false"
+                                Style="border: 1px solid #e0e0e0; border-radius:8px;">
+                    <Columns>
+                        <RadzenDataGridColumn Property="@nameof(ProjeOzetDto.Yil)" Title="Yıl" Width="80px" TextAlign="TextAlign.Center" />
+                        <RadzenDataGridColumn Property="@nameof(ProjeOzetDto.Ay)" Title="Ay" Width="80px" TextAlign="TextAlign.Center" />
+                        <RadzenDataGridColumn Property="@nameof(ProjeOzetDto.ToplamTutarTL)" Title="Toplam TL" Width="180px" TextAlign="TextAlign.Right" FormatString="{0:N2}" />
+                        <RadzenDataGridColumn Property="@nameof(ProjeOzetDto.ToplamTutarUSD)" Title="Toplam USD" Width="180px" TextAlign="TextAlign.Right" FormatString="{0:N2}" />
+                    </Columns>
+                </RadzenDataGrid>
+            </div>
+        </MudPaper>
+    </MudTabPanel>
+</MudTabs>
+
+@* <MudPaper Class="pa-4" Style="display:flex; flex-direction:column; height:calc(100vh - 90px); overflow:hidden;">
+    <div style="flex:1; overflow-y:auto;">
+    </div>
+</MudPaper>
+ *@
+@code {
+    [Parameter]
+    public int FirmNr { get; set; }
+    [Parameter]
+    public int FirmNr2 { get; set; }
+    [Parameter]
+    public string ProjeKodu { get; set; }
+    [Parameter]
+    public string ProjeOzelKod { get; set; }
+    [Parameter]
+    public int GelirGider { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    public List<ProjeDetayRaporuDto> Items = new List<ProjeDetayRaporuDto>();
+    private IList<ProjeDetayRaporuDto> selectedItems;
+    public RadzenDataGrid<ProjeDetayRaporuDto> grid;
+    IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 50, 100, 200, 500, 1000 };
+    private bool loading = true;
+
+    DataGridSettings _settings;
+    public DataGridSettings Settings
+    {
+        get
+        {
+            return _settings;
+        }
+        set
+        {
+            if (_settings != value)
+            {
+                _settings = value;
+                InvokeAsync(SaveStateAsync);
+            }
+        }
+    }
+
+    public List<ProjeOzetDto> summaryItems = new();
+    public class ProjeOzetDto
+    {
+        public int Yil { get; set; }
+        public int Ay { get; set; }
+        public double ToplamTutarTL { get; set; }
+        public double ToplamTutarUSD { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        await LoadList();
+    }
+
+    private async Task LoadList()
+    {
+        try
+        {
+            // var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            // if (selectedFirmaDonem == null)
+            //     throw new Exception("Firma dönem seçilmedi");
+            ProjeDetayRaporuReq request = new ProjeDetayRaporuReq { FirmNr = FirmNr, FirmNr2 = FirmNr2, GelirGider = GelirGider, ProjeKodu = ProjeKodu, ProjeOzelKod = ProjeOzelKod };
+
+            loading = true;
+            Items = await httpClient.PostGetServiceResponseAsync<List<ProjeDetayRaporuDto>, ProjeDetayRaporuReq>(UrlHelper.ProjeDetayRaporu, request);
+            
+            // 🎯 Özet hesapla
+            summaryItems = Items
+                .GroupBy(x => new { x.Yil, x.Ay })
+                .Select(g => new ProjeOzetDto
+                {
+                    Yil = g.Key.Yil,
+                    Ay = g.Key.Ay,
+                    ToplamTutarTL = g.Sum(x => x.TutarTL),
+                    ToplamTutarUSD = g.Sum(x => x.TutarUSD)
+                })
+                .OrderByDescending(x => x.Yil).ThenByDescending(x => x.Ay)
+                .ToList();
+
+            loading = false;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    private async Task LoadStateAsync()
+    {
+        await Task.CompletedTask;
+
+        _settings = await LocalStorageService.GetItemAsync<DataGridSettings>("RadzenDataGridSettingsProjeDetayRaporu");
+    }
+
+    private async Task SaveStateAsync()
+    {
+        await Task.CompletedTask;
+
+        await LocalStorageService.SetItemAsync("RadzenDataGridSettingsProjeDetayRaporu", Settings);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadStateAsync();
+        }
+    }
+
+    int index;
+    void ResetIndex(bool shouldReset)
+    {
+        if (shouldReset)
+        {
+            index = 0;
+        }
+    }
+
+}

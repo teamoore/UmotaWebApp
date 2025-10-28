@@ -19,14 +19,11 @@ namespace UmotaWebApp.Server.Controllers
     {
         private readonly IRefGenerator RefService;
         private readonly ILogger<HelperController> Logger;
-        private readonly IPersonelService PersonelService;
-        
 
-        public HelperController(IRefGenerator refGenerator, ILogger<HelperController> logger, IPersonelService personelService)
+        public HelperController(IRefGenerator refGenerator, ILogger<HelperController> logger)
         {
             RefService = refGenerator;
             Logger = logger;
-            PersonelService = personelService;
         }
 
         [HttpGet("GenerateRef")]
@@ -80,46 +77,6 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
-
-        [HttpGet("GetPersonelList")]
-        public async Task<ServiceResponse<IEnumerable<PersonelDto>>> GetPersonelList(int logofirmno)
-        {
-            try
-            {
-                return new ServiceResponse<IEnumerable<PersonelDto>>()
-                {
-                    Value = await PersonelService.GetPersonelList(logofirmno)
-                };
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<IEnumerable<PersonelDto>>();
-                e.SetException(ex);
-                return e;
-            }
-        }
-
-        [HttpGet("GetOdemePlaniList")]
-        public async Task<ServiceResponse<IEnumerable<OdemePlaniDto>>> GetOdemePlaniList(int logofirmno)
-        {
-            try
-            {
-                return new ServiceResponse<IEnumerable<OdemePlaniDto>>()
-                {
-                    Value = await RefService.GetOdemePlaniList(logofirmno)
-                };
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<IEnumerable<OdemePlaniDto>>();
-                e.SetException(ex);
-                return e;
-            }
-        }
 
         [HttpGet("GetSabitDetayList")]
         public async Task<ServiceResponse<IEnumerable<SisSabitlerDetayDto>>> GetSabitDetayList(int tip)

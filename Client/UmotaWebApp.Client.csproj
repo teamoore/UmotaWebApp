@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
     <DockerComposeProjectPath>../../docker-compose.dcproj</DockerComposeProjectPath>
     <UserSecretsId>b2e6a51d-8eb5-4bed-8d2b-553262e4986f</UserSecretsId>
@@ -11,15 +13,14 @@
     <ExternalConsole>true</ExternalConsole>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="5.0.13" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.13" PrivateAssets="all" />
-    <PackageReference Include="MudBlazor" Version="5.2.4" />
-    <PackageReference Include="Radzen.Blazor" Version="3.18.4" />
-    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="19.4.0.56" />
-    <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
     <PackageReference Include="Blazored.Modal" Version="6.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="8.0.20" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.20" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
+    <PackageReference Include="MudBlazor" Version="8.13.0" />
+    <PackageReference Include="Radzen.Blazor" Version="8.0.4" />
+    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="19.4.0.56" />
     <PackageReference Include="Blazored.LocalStorage" Version="4.1.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" Version="5.0.13" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,5 +37,11 @@
     <None Remove="Microsoft.AspNetCore.Authorization" />
     <None Remove="Microsoft.AspNetCore.Components.Authorization" />
     <None Remove="Utils\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\icons\" />
+    <Folder Include="wwwroot\Uploads\Excel\" />
+    <Folder Include="wwwroot\Uploads\Products\" />
   </ItemGroup>
 </Project>

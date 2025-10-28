@@ -1,19 +1,21 @@
-﻿using System;
-using System.Net.Http;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Text;
+﻿using Blazored.LocalStorage;
+using Blazored.Modal;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Blazored.Modal;
-using Blazored.LocalStorage;
-using UmotaWebApp.Client.Utils;
-using Microsoft.AspNetCore.Components.Authorization;
-using MudBlazor.Services;
 using MudBlazor;
+using MudBlazor.Services;
+using Radzen;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
 using UmotaWebApp.Client.ServiceHelpers;
+using UmotaWebApp.Client.Services;
+using UmotaWebApp.Client.Utils;
 
 namespace UmotaWebApp.Client
 {
@@ -30,19 +32,17 @@ namespace UmotaWebApp.Client
 
             builder.Services.AddBlazoredModal();
             builder.Services.AddBlazoredLocalStorage();
-            builder.Services.AddScoped<ModalManager>();
-            builder.Services.AddScoped<TakvimHelper>();
-            builder.Services.AddScoped<YetkiHelper>();
-            builder.Services.AddScoped<FaaliyetHelper>();
-            builder.Services.AddScoped<TeklifHelper>();
-            builder.Services.AddScoped<VazifeHelper>();
-            builder.Services.AddScoped<KullaniciHelper>();
+            builder.Services.AddRadzenComponents();
             builder.Services.AddScoped<Radzen.DialogService>();
+
+            builder.Services.AddScoped<ModalManager>();
+            builder.Services.AddScoped<YetkiHelper>();
+            builder.Services.AddScoped<KullaniciHelper>();
             builder.Services.AddScoped<Helper>();
             builder.Services.AddScoped<DownloadHelper>();
-            builder.Services.AddScoped<KisiHelper>();
-            builder.Services.AddScoped<ServisHelper>();
             builder.Services.AddScoped<UploadHelper>();
+            builder.Services.AddSingleton<CartState>();
+
             builder.Services.AddAuthorizationCore();
 
             builder.Services.AddScoped<AuthenticationStateProvider, AuthStateProvider>();
@@ -53,10 +53,10 @@ namespace UmotaWebApp.Client
                 config.SnackbarConfiguration.PreventDuplicates = false;
                 config.SnackbarConfiguration.NewestOnTop = false;
                 config.SnackbarConfiguration.ShowCloseIcon = true;
-                config.SnackbarConfiguration.VisibleStateDuration = 10000;
+                config.SnackbarConfiguration.VisibleStateDuration = 2000;
                 config.SnackbarConfiguration.HideTransitionDuration = 500;
                 config.SnackbarConfiguration.ShowTransitionDuration = 500;
-                config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+                config.SnackbarConfiguration.SnackbarVariant = MudBlazor.Variant.Filled;
             });
 
             await builder.Build().RunAsync();

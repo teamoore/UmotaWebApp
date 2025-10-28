@@ -1,0 +1,33 @@
+﻿@page "/ProjeDurumRaporu3/{text?}"
+
+<HeaderSearchBar header="header" ShowSearchSection="false" ShowFilterButton="true" ></HeaderSearchBar>
+
+<ProjeDetayRaporu FirmNr="@FirmNr" FirmNr2="@FirmNr2" GelirGider="2" ProjeOzelKod="DIGERXX" ProjeKodu=""></ProjeDetayRaporu>
+
+
+@code {
+    [Parameter]
+    public string? text { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    // Eğer request içindeki FirmNr veya FirmNr2 boş ya da 0 ise
+    // Configuration'daki varsayılan değerleri alır
+    private int FirmNr = 0;
+    private int FirmNr2 = 0;
+
+    protected override Task OnInitializedAsync()
+    {
+        header.HeaderText = "Masraf Merkezleri";
+        return Task.CompletedTask;
+    }
+
+    public void goBackList()
+    {
+        navigation.NavigateTo("/kullanici_liste");
+    }
+
+}

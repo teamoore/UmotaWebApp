@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UmotaWebApp.Shared.ModelDto;
+using UmotaWebApp.Shared.ModelDto.Request;
 
 namespace UmotaWebApp.Server.Services.Infrastructure
 {
     public interface IMalzemeKartService
     {
-        public Task<List<MalzemeKartDto>> GetMalzemeKarts(string firmaId);
-        public Task<MalzemeKartDto> GetMalzemeKart(int logref, string firmaId);
-        public Task<List<MalzemeKartDto>> SearchMalzemeKarts(MalzemeKartRequestDto request);
-        public Task<MalzemeFiyatDto> MalzemeFiyatGetir(MalzemeFiyatRequestDto request);
-        public Task<MalzemeFiyatDto> MalzemeMaliyetGetir(MalzemeFiyatRequestDto request);
-        public Task<List<MalzemeStokDto>> SearchMalzemeKartStoklu(MalzemeStokRequestDto request);
+        public Task<List<UrunDto>> GetMalzemeKarts(string firmaId);
+        public Task<UrunDto> GetMalzemeKart(int logref, string firmaId);
+        public Task<List<UrunDto>> SearchMalzemeKarts(MalzemeKartRequestDto request);
         public Task<MalzemeKartDto> SaveMalzemeKart(MalzemeKartRequestDto request);
         public Task<MalzemeKartDto> UpdateMalzemeKart(MalzemeKartRequestDto request);
-        public Task<IEnumerable<MalzemeBirimSetDto>> GetMalzemeBirimSetList(int logofirmno);
-        public Task<IEnumerable<SpeCodesDto>> GetMalzemeGrupList(int logofirmno);
-        public Task<IEnumerable<SpeCodesDto>> GetMalzemeMarkaList(int logofirmno);
-        public Task<SpeCodesDto> SaveMalzemeMarka(SpeCodesDto request);
+        public Task<List<string>> GetFotoList(int urunId);
+        public Task<List<SepetDto>> GetUserSepetList(string kullaniciKodu);
+        public Task<List<SepetUrunDto>> GetSepetUrunList(string kullaniciKodu, string sepetAdi);
+        public Task<int> DeleteUserSepet(string kullaniciKodu, string sepetAdi);
+        public Task<int> DeleteSepetUrun(int urunId);
+        public Task<int> SepetPost(SepetPostDto request);
+        public Task<int> GetUserSepetCount(string kullaniciKodu);
+        public Task<int> ExceldenUrunleriAktar(string excelFileName, string kullaniciKodu);
     }
 }

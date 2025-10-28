@@ -1,0 +1,269 @@
+﻿@page "/urunlistexx"
+
+<HeaderSearchBar header="header"
+                 ShowButtons="false" ShowFilterButton="false"
+                 onDoneButtonClicked="BtnAraClick" onFilterButtonClicked="BtnDetayliAraClick" ShowSearchSection="true"></HeaderSearchBar>
+
+@if (loadingCompleted == false)
+{
+    <MudProgressLinear Color="Color.Primary" Striped="true" Size="Size.Large" Indeterminate="true" Class="my-7" />
+}
+
+<MudPaper Class="pa-4">
+
+    <!-- Görünüm Seçici -->
+    <MudIconButton Icon="@Icons.Material.Filled.TableRows"
+                   Color="@(isTableView ? Color.Primary : Color.Default)"
+                   OnClick="@(()=>isTableView=true)" />
+    <MudIconButton Icon="@Icons.Material.Filled.GridView"
+                   Color="@(isTableView ? Color.Default : Color.Primary)"
+                   OnClick="@(()=>isTableView=false)" />
+
+    @if (isTableView)
+    {
+        <!-- TABLO GÖRÜNÜMÜ -->
+
+        <MudTable Items="@mainDataList" RowsPerPage="100" FixedHeader="true" FixedFooter="true" Height="500px" Dense="true" Hover="true" Bordered="true" Striped="true" SortLabel="Sırala">
+            <HeaderContent>
+                <MudTh>#</MudTh>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<MalzemeKartDto, object>(x => x.Grupkodu)">Kategori</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<MalzemeKartDto, object>(x => x.Kodu)">Kodu</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<MalzemeKartDto, object>(x => x.Adi)">Adı</MudTableSortLabel></MudTh>
+                <MudTh><MudTableSortLabel InitialDirection="SortDirection.Ascending" SortBy="new Func<MalzemeKartDto, object>(x => x.Baslik)">Başlık</MudTableSortLabel></MudTh>
+                <MudTh>Fotoğraf</MudTh>
+                <MudTh>Özellik</MudTh>
+                <MudTh>$Fiyat</MudTh>
+                <MudTh>Hesaplanan Adet</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.TwoTone.ShoppingCart" Variant="MudBlazor.Variant.Outlined" Color="Color.Primary" OnClick="(() => SepeteEkle(context.Logref))" Size="Size.Medium" Title="Sepete Ekle" />
+                    <MudIconButton Icon="@Icons.Material.TwoTone.Pageview" Variant="MudBlazor.Variant.Outlined" Color="Color.Primary" OnClick="(() => UrunDetayaGit(context.Logref))" Size="Size.Medium" Title="Ürün Detay" />
+                </MudTd>
+                <MudTd DataLabel="Kategori">@context.Grupkodu</MudTd>
+                <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
+                <MudTd DataLabel="Adı">@context.Adi</MudTd>
+                <MudTd DataLabel="Başlık">@context.Baslik</MudTd>
+                <MudTd>
+                    @if (!string.IsNullOrEmpty(context.ResimYolu))
+                    {
+                        <img src="@context.ResimYolu"
+                             alt="@context.Adi"
+                             style="width:100px; height:100px; object-fit:contain; border-radius:6px;" />
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.ImageNotSupported" Color="Color.Error" Size="Size.Large" />
+                    }
+                </MudTd>
+                <MudTd DataLabel="Özellik">@context.Ozellik</MudTd>
+                <MudTd DataLabel="Satış Fiyatı">$@context.Satfiyat</MudTd>
+                <MudTd DataLabel="Hesaplanan Adet">@context.HesaplananAdet</MudTd>
+            </RowTemplate>
+            <PagerContent>
+                <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
+            </PagerContent>
+        </MudTable>
+    }
+    else
+    {
+        <!-- KART GÖRÜNÜMÜ -->
+        <MudGrid>
+            @foreach (var urun in mainDataList)
+            {
+                <MudItem xs="12" sm="6" md="4" lg="3">
+                    <MudCard Class="ma-2" Style="height:100%">
+                        <img src="@urun.ResimYolu"
+                             alt="@urun.Adi"
+                             style="width:300px; height:200px; object-fit:contain; border-radius:6px;" />
+                        <MudCardContent>
+                            <MudText Typo="Typo.subtitle1" Bold="true">@urun.Baslik</MudText>
+                            <MudText Typo="Typo.body2" Color="Color.Secondary">@urun.Kodu</MudText>
+                            <MudText Typo="Typo.h6" Color="Color.Primary">$@string.Format("{0:N2}", urun.Satfiyat)</MudText>
+                        </MudCardContent>
+                        <MudCardActions>
+                            <MudButton Variant="MudBlazor.Variant.Filled" Color="Color.Primary" OnClick="(() => SepeteEkle(urun.Logref))">Sepete Ekle</MudButton>
+                            <MudButton Variant="MudBlazor.Variant.Filled" Color="Color.Secondary" OnClick="(() => UrunDetayaGit(urun.Logref))">Ürün Detay</MudButton>
+                        </MudCardActions>
+                    </MudCard>
+                </MudItem>
+            }
+        </MudGrid>
+    }
+
+</MudPaper>
+
+
+@code
+{
+    [Inject]
+    ModalManager ModalManager { get; set; }
+
+    [Inject]
+    NavigationManager navigation { get; set; }
+
+    [Inject]
+    HttpClient httpClient { get; set; }
+
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+
+    [CascadingParameter] IModalService modal { get; set; }
+
+    public HeaderBarSearch header = new HeaderBarSearch();
+
+    public List<MalzemeKartDto> mainDataList = new List<MalzemeKartDto>();
+    private bool loadingCompleted = false;
+    private bool isTableView = true; // Varsayılan tablo görünümü
+
+    protected override async Task OnInitializedAsync()
+    {
+        header.HeaderText = "Ürün Listesi";
+
+        await LoadList();
+        loadingCompleted = true;
+    }
+
+    private async Task LoadList()
+    {
+        try
+        {
+            // var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            // if (selectedFirmaDonem == null)
+            //     throw new Exception("Firma dönem seçilmedi");
+
+            loadingCompleted = false;
+            mainDataList = await httpClient.GetServiceResponseAsync<List<MalzemeKartDto>>(UrlHelper.MalzemeKartListesi + "?firmaId=0");
+            loadingCompleted = true;
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public async Task BtnAraClick()
+    {
+        try
+        {
+            // var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            // if (selectedFirmaDonem == null)
+            //     throw new Exception("Firma dönem seçilmedi");
+
+            // if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
+            // {
+            //     var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+            //     if (ondegerFirmaDonem != null)
+            //         selectedFirmaDonem = ondegerFirmaDonem;
+            // }
+
+            loadingCompleted = false;
+            this.StateHasChanged();
+            var request = new MalzemeKartRequestDto();
+            request.FirmaId = 0;
+            if (!string.IsNullOrWhiteSpace(header.SearchText))
+                request.SearchText = header.SearchText;
+
+            mainDataList = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+            if (mainDataList == null || mainDataList.Count == 0)
+                Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı", severity: Severity.Warning);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+        finally
+        {
+            loadingCompleted = true;
+        }
+    }
+
+    public async Task BtnDetayliAraClick()
+    {
+        // try
+        // {
+        //     var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+        //     if (selectedFirmaDonem == null)
+        //         throw new Exception("Firma dönem seçilmedi");
+
+        //     // if (selectedFirmaDonem.firma_no.Value.ToString() == Consts.MakpaFirmaNo || selectedFirmaDonem.firma_no.Value.ToString() == Consts.GASTROMOREFirmaNo)
+        //     // {
+        //     //     var ondegerFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem);
+        //     //     if (ondegerFirmaDonem != null)
+        //     //         selectedFirmaDonem = ondegerFirmaDonem;
+        //     // }
+
+        //     var opt = new ModalOptions();
+        //     opt.ContentScrollable = true;
+
+        //     var filterForm = modal.Show<Pages.Malzeme.Stok_Liste_Filters>("Arama Seçenekleri", opt);
+        //     var result = await filterForm.Result;
+
+        //     if (!result.Cancelled)
+        //     {
+        //         if (result.Data != null)
+        //         {
+        //             loadingCompleted = false;
+        //             this.StateHasChanged();
+
+        //             var mrequest = (MalzemeStokRequestDto)result.Data;
+
+        //             var request = new MalzemeKartRequestDto();
+        //             request.FirmaId = selectedFirmaDonem.firma_no.Value;
+        //             if (!string.IsNullOrWhiteSpace(header.SearchText))
+        //                 request.SearchText = header.SearchText;
+
+        //             if (!string.IsNullOrWhiteSpace(mrequest.MalzemeMarka))
+        //                 request.Marka = mrequest.MalzemeMarka;
+        //             if (!string.IsNullOrWhiteSpace(mrequest.MalzemeAdi))
+        //                 request.MalzemeAdi = mrequest.MalzemeAdi;
+        //             if (!string.IsNullOrWhiteSpace(mrequest.MalzemeKodu))
+        //                 request.MalzemeKodu = mrequest.MalzemeKodu;
+
+        //             mainDataList = await httpClient.PostGetServiceResponseAsync<List<MalzemeKartDto>, MalzemeKartRequestDto>(UrlHelper.MalzemeKartAra, request);
+        //             if (mainDataList == null || mainDataList.Count == 0)
+        //                 Snackbar.Add("Aradığınız kriterlere uygun kayıt bulunamadı", severity: Severity.Warning);
+        //         }
+        //     }
+
+        // }
+        // catch (Exception ex)
+        // {
+        //     Snackbar.Add(ex.Message, severity: Severity.Error);
+        // }
+        // finally
+        // {
+        //     loadingCompleted = true;
+        // }
+    }
+
+    public void UrunDetayaGit(int urunref)
+    {
+        //navigation.NavigateTo("/urundetay/" + urunref);
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("UrunId", urunref);
+
+        var form = modal.Show<Pages.Urun.UrunDetay>("Ürün Detay", parameters: parameters, options: opt);
+    }
+
+    public void SepeteEkle(int urunref)
+    {
+        //navigation.NavigateTo("/sepetekle/" + urunref);
+
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+
+        var parameters = new ModalParameters();
+        parameters.Add("UrunId", urunref);
+
+        var form = modal.Show<Pages.Urun.UrunSepeteEkle>("Sepete Ekle", parameters: parameters, options: opt);
+    }
+
+}

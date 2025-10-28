@@ -25,9 +25,9 @@ namespace UmotaWebApp.Client.ServiceHelpers
 
         public async Task<FileUploadDto> Upload(FileDataDto file)
         {
-            var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
-            if (selectedFirmaDonem == null)
-                throw new Exception("Firma Dönem Seçili değil");
+            //var selectedFirmaDonem = await LocalStorageService.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            //if (selectedFirmaDonem == null)
+            //    throw new Exception("Firma Dönem Seçili değil");
 
             var result = await httpClient.PostGetServiceResponseAsync<FileUploadDto, FileDataDto>(UrlHelper.FileUpload2, file);
 

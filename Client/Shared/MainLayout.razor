@@ -1,26 +1,37 @@
 ﻿@inherits LayoutComponentBase
+@inject CartState CartState
 
 <MudThemeProvider />
 <MudSnackbarProvider />
 <MudDialogProvider />
+<MudPopoverProvider />
+<RadzenComponents/>
 
 <MudLayout>
     <MudAppBar Elevation="1">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3">Unopazar</MudText>
+        <MudText Typo="Typo.h5" Class="ml-3">Flyport CRM</MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="ShowDonemFirmalar">@_selectedFirma</MudButton>
+        @* <MudButton Variant="Variant.Filled" Color="Color.Tertiary" OnClick="ShowDonemFirmalar">@_selectedFirma</MudButton> *@
 
-        <MudIconButton OnClick="GoToVazifeler">
-            <MudBadge Content="_vazifeSayisi" Color="Color.Error" Overlap="true">
-                <MudIcon Icon="@Icons.Material.Filled.Task" Color="Color.Warning" />
-            </MudBadge>
-        </MudIconButton>
-            
+        @if (CartState.SepetUrunSayisi > 0)
+        {
+            <MudIconButton Color="Color.Inherit" OnClick="GoToSepet">
+                <MudBadge Content="@CartState.SepetUrunSayisi" Color="Color.Warning" Overlap="true">
+                    <MudIcon Icon="@Icons.Material.Filled.ShoppingCart" Color="Color.Inherit" />
+                </MudBadge>
+            </MudIconButton>
+        } else
+        {
+            <MudIconButton Color="Color.Inherit" Icon="@Icons.Material.Filled.ShoppingCart">
+            </MudIconButton>
+        }
+
+
         <MudText Typo="Typo.h5" Class="ml-3">&nbsp;</MudText>
         <MudMenu FullWidth="true">
             <ActivatorContent>
-                <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary" Variant="Variant.Filled">@_avatarName</MudChip>
+                <MudChip T="string" Icon="@Icons.Material.Filled.Person" Color="Color.Primary" Variant="MudBlazor.Variant.Filled">@_avatarName</MudChip>
             </ActivatorContent>
 
             <ChildContent>
@@ -30,7 +41,7 @@
         </MudMenu>
     </MudAppBar>
     <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2" Variant="DrawerVariant.Temporary">
-        <NavMenu2 />
+        <DynamicMenu />
     </MudDrawer>
     <MudMainContent>
         <div class="content px-4">
@@ -41,7 +52,6 @@
 </MudLayout>
 
 @code {
-
     [CascadingParameter]
     public Task<AuthenticationState> AuthState { get; set; }
 
@@ -59,15 +69,10 @@
     [Inject]
     HttpClient httpClient { get; set; }
 
-    [Inject]
-    VazifeHelper vazifeHelper { get; set; }
-
     bool _drawerOpen = true;
 
     string _avatarName = "";
     string _selectedFirma = "";
-
-    int _vazifeSayisi = 0;
 
     void DrawerToggle()
     {
@@ -86,14 +91,11 @@
 
             _avatarName = loginStr.ToUpper().ClearCharacters();
 
-            var selectedFirmaDonem = await localStorage.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
+            // var selectedFirmaDonem = await localStorage.GetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem);
 
-            _selectedFirma = selectedFirmaDonem.aciklama;
+            // _selectedFirma = selectedFirmaDonem.aciklama;
 
-            _vazifeSayisi = await vazifeHelper.CountRecords(new VazifeRequestDto()
-            {
-                User = loginStr
-            });
+            CartState.SepetUrunSayisi = await httpClient.GetServiceResponseAsync<int>(UrlHelper.GetUserSepetCount + "?kullaniciKodu=" + loginStr);
         }
         else
         {
@@ -146,5 +148,20 @@
     private void GoToVazifeler()
     {
         NavigationManager.NavigateTo("/vazife_listef");
+    }
+
+    private void GoToSepet()
+    {
+        NavigationManager.NavigateTo("/sepetlerim");
+    }
+
+    protected override void OnInitialized()
+    {
+        CartState.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        CartState.OnChange -= StateHasChanged;
     }
 }

@@ -195,5 +195,47 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
+        [HttpGet("GetKullaniciYetkiList")]
+        public async Task<ServiceResponse<List<KullaniciYetkiDto>>> GetKullaniciYetkiList(string kullanicikodu)
+        {
+            try
+            {
+                return new ServiceResponse<List<KullaniciYetkiDto>>()
+                {
+                    Value = await SisKullaniciService.GetKullaniciYetkiList(kullanicikodu)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<KullaniciYetkiDto>>();
+                e.SetException(ex);
+                return e;
+            }
+
+        }
+
+        [HttpPost("PostKullaniciYetkiList")]
+        public async Task<ServiceResponse<bool>> PostKullaniciYetkiList(KullaniciYetkiPostDto request)
+        {
+            try
+            {
+                return new ServiceResponse<bool>()
+                {
+                    Value = await SisKullaniciService.PostKullaniciYetkiList(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<bool>();
+                e.SetException(ex);
+                return e;
+            }
+
+        }
+
     }
 }

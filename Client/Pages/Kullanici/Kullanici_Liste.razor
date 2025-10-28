@@ -1,4 +1,4 @@
-﻿@page "/kullanici_liste"
+﻿@page "/KullaniciListe"
 
 @if (loadingCompleted == false)
 {
@@ -7,32 +7,36 @@
 
 @if (isAdmin == false)
 {
-    <MudAlert Severity="Severity.Error" Variant="Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
+    <MudAlert Severity="Severity.Error" Variant="MudBlazor.Variant.Filled">Bu sayfayı görüntüleme yetkiniz yok</MudAlert>
 }
 
-<MudTable Items="@kullanicilar" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true" Filter="new Func<SisKullaniciDto,bool>(FilterFunc1)">
+
+<MudTable Items="@FilteredKullanicilar" Dense="true" Hover="true" RowsPerPage="100" Bordered="true" Striped="true" Filter="new Func<SisKullaniciDto, bool>(FilterFunc1)">
     <ToolBarContent>
         @if (isAdmin)
         {
-            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="Ekle" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" />
+            <MudIconButton Icon="@Icons.Material.Filled.NoteAdd" OnClick="Ekle" Variant="MudBlazor.Variant.Filled" Color="Color.Primary" Size="Size.Medium" Class="me-2" />
         }
+        <MudIconButton Icon="@Icons.Material.Filled.FilterList" OnClick="@(() => OpenDrawer(Anchor.End))" Variant="MudBlazor.Variant.Filled" Color="Color.Primary" Size="Size.Medium" Class="me-2" />
+
         <MudSpacer />
-        <MudTextField @bind-Value="_searchString" Placeholder="Kullanıcı Ara" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        <MudTextField @bind-Value="_searchString" Placeholder="Aranacak..." Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <HeaderContent>
-        <MudTh>#</MudTh>
-        <MudTh>Kullanıcı Kodu</MudTh>
-        <MudTh>Kullanıcı Adı</MudTh>
-        <MudTh>Yetki</MudTh>
-        <MudTh>Grubu</MudTh>
-        <MudTh>E-posta Adresi</MudTh>
-        <MudTh>Logo Kullanıcı Adı</MudTh>
+        <MudTh></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<SisKullaniciDto, object>(x => x.KullaniciKodu)">Kullanıcı Kodu</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<SisKullaniciDto, object>(x => x.KullaniciAdi)">Kullanıcı Adı</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<SisKullaniciDto, object>(x => x.KullaniciYetkiAdi)">Yetki</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<SisKullaniciDto, object>(x => x.KullaniciMenuProfilAdi)">Grubu</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<SisKullaniciDto, object>(x => x.MailAdres)">E-posta Adresi</MudTableSortLabel></MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd>
             @if (isAdmin)
             {
-                <MudIconButton Icon="@Icons.TwoTone.Edit" Variant="Variant.Outlined" Color="Color.Primary" OnClick="(() => Guncelle(context.KullaniciKodu))" Size="Size.Medium" />
+                <MudIconButton Icon="@Icons.Material.TwoTone.Edit" Variant="MudBlazor.Variant.Outlined" Color="Color.Primary" OnClick="(() => Guncelle(context.KullaniciKodu))" Size="Size.Medium" />
+                <MudIconButton Icon="@Icons.Material.TwoTone.AccountTree" Variant="MudBlazor.Variant.Outlined" Color="Color.Primary" OnClick="(() => MenuYetkileri(context.KullaniciKodu))" Size="Size.Medium" />
+                <MudIconButton Icon="@Icons.Material.TwoTone.Apps" Variant="MudBlazor.Variant.Outlined" Color="Color.Primary" OnClick="(() => YetkiKodlari(context.KullaniciKodu))" Size="Size.Medium" />
             }
         </MudTd>
         <MudTd DataLabel="Kodu">@context.KullaniciKodu</MudTd>
@@ -40,17 +44,65 @@
         <MudTd DataLabel="Yetki">@context.KullaniciYetkiAdi</MudTd>
         <MudTd DataLabel="Grup">@context.KullaniciMenuProfilAdi</MudTd>
         <MudTd DataLabel="e-Posta">@context.MailAdres</MudTd>
-        <MudTd DataLabel="Logo Kullanıcı">@context.LogoUsername</MudTd>
     </RowTemplate>
     <PagerContent>
         <MudTablePager RowsPerPageString="Sayfa başına kayıt sayısı" />
     </PagerContent>
 </MudTable>
 
+<MudDrawer @bind-Open="@_open"
+           Anchor="@_anchor"
+           Width="300px"
+           Elevation="1"
+           Variant="@DrawerVariant.Temporary"
+           OverlayAutoClose="@_overlayAutoClose">
+
+    <MudDrawerHeader>
+        <MudText Typo="Typo.h6">Filtre Seçenekleri</MudText>
+    </MudDrawerHeader>
+
+    <MudDrawerContent>
+        <MudStack Spacing="2" Class="pa-4">
+
+            <!-- Kullanıcı Yetki Türü -->
+            <MudSelect T="string" Label="Yetki Türü" @bind-Value="_selectedYetkiTuru" Dense="true" FullWidth="true">
+                <MudSelectItem Value='"*"'>Hepsi</MudSelectItem>
+                <MudSelectItem Value='"ADM"'>Admin</MudSelectItem>
+                <MudSelectItem Value='"STD"'>Standart</MudSelectItem>
+            </MudSelect>
+
+            <!-- Kullanıcı Grubu -->
+            <MudSelect T="string" Label="Kullanıcı Grubu" @bind-Value="_selectedGrup" Dense="true" FullWidth="true">
+                <MudSelectItem Value='"*"'>Hepsi</MudSelectItem>
+                @foreach (var grup in KullaniciGruplari)
+                {
+                    <MudSelectItem Value="@grup">@grup</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudButton Color="Color.Primary"
+                       Variant="MudBlazor.Variant.Filled"
+                       OnClick="FiltreUygula"
+                       FullWidth="true">
+                Uygula
+            </MudButton>
+
+            <MudButton Variant="MudBlazor.Variant.Outlined"
+                       Color="Color.Secondary"
+                       OnClick="@(() => _open = false)">
+                Kapat
+            </MudButton>
+
+        </MudStack>
+    </MudDrawerContent>
+</MudDrawer>
+
+
+
 @code {
 
     [Inject]
-    IModalService modalService { get; set; }
+    ModalManager ModalManager { get; set; }
 
     [Inject]
     NavigationManager navigation { get; set; }
@@ -64,11 +116,24 @@
     [Inject]
     ISnackbar Snackbar { get; set; }
 
-    public List<SisKullaniciDto> kullanicilar { get; set; }
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+
+    public List<SisKullaniciDto> kullanicilar { get; set; } = new();
     private bool loadingCompleted = false;
     private bool isAdmin = true;
     private string _searchString;
     private bool _sortNameByLength;
+    private string kullanicikodu;
+
+    private bool _open;
+    private Anchor _anchor;
+    private bool _overlayAutoClose = true;
+
+    private string _selectedYetkiTuru;
+    private string _selectedGrup;
+    private List<string> KullaniciGruplari = new List<string>();
 
     private bool FilterFunc1(SisKullaniciDto element) => FilterFunc(element, _searchString);
 
@@ -83,8 +148,17 @@
         return false;
     }
 
+    // Filtered liste: arama ve seçimler uygulanacak
+    private IEnumerable<SisKullaniciDto> FilteredKullanicilar =>
+        kullanicilar
+            .Where(k => string.IsNullOrEmpty(_searchString) || k.KullaniciAdi.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            .Where(k => string.IsNullOrEmpty(_selectedYetkiTuru) || _selectedYetkiTuru == "*" || k.KullaniciYetkiKodu == _selectedYetkiTuru)
+            .Where(k => string.IsNullOrEmpty(_selectedGrup) || _selectedGrup == "*" || k.KullaniciMenuProfilAdi == _selectedGrup);
+
     protected override async Task OnInitializedAsync()
     {
+        kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
         await KullaniciYetkileriGetir();
         await LoadKullanicilar();
         loadingCompleted = true;
@@ -96,6 +170,8 @@
             return;
 
         kullanicilar = await httpClient.GetServiceResponseAsync<List<SisKullaniciDto>>("/api/kullanici/list");
+
+        KullaniciGruplari = kullanicilar.Where(x => !string.IsNullOrWhiteSpace(x.KullaniciMenuProfilAdi)).Select(u => u.KullaniciMenuProfilAdi).Distinct().ToList();
     }
 
     public void Guncelle(string kullanicikodu)
@@ -108,16 +184,34 @@
         navigation.NavigateTo("/kullanici_ekle");
     }
 
+    public void MenuYetkileri(string kullanicikodu)
+    {
+        var opt = new ModalOptions();
+        opt.ContentScrollable = true;
+        opt.HideHeader = true;
+        modalParameters = new ModalParameters();
+        modalParameters.Add("KullaniciKodu", kullanicikodu);
+        modal.Show<Components.Kullanici.MenuYetki>("Kullanıcı Menü Yetkileri", modalParameters, opt);
+        //navigation.NavigateTo("/kullanici-menu/" + kullanicikodu);
+    }
+
+    public void YetkiKodlari(string kullanicikodu)
+    {
+        modalParameters = new ModalParameters();
+        modalParameters.Add("KullaniciKodu", kullanicikodu);
+        modalParameters.Add("isModalForm", 1);
+        modal.Show<Pages.Kullanici.Kullanici_YetkiKodlari>("Kullanıcı Yetki Kodları", modalParameters);
+        //navigation.NavigateTo("/kullanici-yetkileri/" + kullanicikodu);
+    }
+
     public async Task KullaniciYetkileriGetir()
     {
         try
         {
-            var kullanicikodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
-
             var resultkul = await httpClient.GetServiceResponseAsync<SisKullaniciDto>(UrlHelper.KullaniciGetByKod + "?kod=" + kullanicikodu);
 
             if (resultkul != null)
-                isAdmin = resultkul.KullaniciYetkiKodu.Equals("ADM");
+                isAdmin = resultkul.isAdmin;
             else
                 isAdmin = false;
 
@@ -126,6 +220,21 @@
         {
             Snackbar.Add(ex.Message, severity: Severity.Warning);
         }
+    }
+
+
+    private void OpenDrawer(Anchor anchor)
+    {
+        _open = true;
+        _anchor = anchor;
+    }
+
+    private void FiltreUygula()
+    {
+        _open = false;
+        StateHasChanged();   // tabloyu güncelle
+        // Burada filtreleme mantığını uygula
+        // Örn: MudTable.Filter veya LINQ sorgusu
     }
 
 }

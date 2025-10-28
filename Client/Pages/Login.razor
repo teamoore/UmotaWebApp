@@ -4,68 +4,68 @@
 
 <div class="container-fluid h-100">
     <div class="row justify-content-center align-items-center h-100">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-4 col-xl-3">
 
-        <div class="col col-sm-6 col-md-6 col-lg-4 col-xl-3">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-body p-4">
 
-
-            <img src="/img/logo.png" />
-
-            <EditForm Model="@request" OnValidSubmit="LoginProcess">
-                <DataAnnotationsValidator />
-
-                @if (_firstStep)
-                {
-
-                    <div class="form-group">
-                        <input @bind-value="request.Kod" class="form-control form-control-lg" type="text" placeholder="Kullanıcı Kodu" />
+                    <!-- Logo -->
+                    <div class="text-center mb-4">
+                        <img src="/img/logo.png" class="img-fluid" style="max-height: 80px;" />
                     </div>
 
-                    <div class="form-group">
-                        <input @bind-value="request.Sifre" class="form-control form-control-lg" type="password" placeholder="Şifre" />
-                    </div>
+                    <!-- Form -->
+                    <EditForm Model="@request" OnValidSubmit="LoginProcess">
+                        <DataAnnotationsValidator />
 
-                    <div class="form-group">
-                        <button class="btn btn-info btn-block">Giriş</button>
-                    </div>
+                        @if (_firstStep)
+                        {
+                            <div class="mb-3">
+                                <input @bind-value="request.Kod" class="form-control form-control-lg" type="text" placeholder="Kullanıcı Kodu" />
+                                <ValidationMessage For="@(() => request.Kod)" />
+                            </div>
 
-                }
+                            <div class="mb-3">
+                                <input @bind-value="request.Sifre" class="form-control form-control-lg" type="password" placeholder="Şifre" />
+                                @* <ValidationMessage For="@(() => request.Sifre)" /> *@
+                            </div>
 
-                @if (_showProgress)
-                {
-                    <div class="form-group">
-                        <div class="row">
-                            <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
-                        </div>
-                    </div>
+                            <div class="d-grid">
+                                <button class="btn btn-primary btn-lg w-100">Giriş</button>
+                            </div>
+                        }
 
-                }
+                        @if (_showProgress)
+                        {
+                            <div class="text-center my-4">
+                                <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+                            </div>
+                        }
 
-                @if (_secondStep)
-                {
-                    <div class="form-group">
-                        <select class="form-control" @bind="selectedFirmaDonem">
-                            @if (firmalar != null)
-                            {
-                                @foreach (var item in firmalar)
-                                {
-                                    <option value="@item.logref">@item.aciklama</option>
-                                }
-                            }
+                        @if (_secondStep)
+                        {
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Firma - Dönem</label>
+                                <select class="form-control" @bind="selectedFirmaDonem">
+                                    @if (firmalar != null)
+                                    {
+                                        @foreach (var item in firmalar)
+                                        {
+                                            <option value="@item.logref">@item.aciklama</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
 
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <button class="btn btn-info btn-block" @onclick="SaveRedirect">Devam Et</button>
-                    </div>
-
-                }
-
-
-            </EditForm>
+                            <div class="d-grid">
+                                <button class="btn btn-secondary btn-lg w-100" @onclick="SaveRedirect">Devam Et</button>
+                            </div>
+                        }
+                    </EditForm>
+                </div>
+            </div>
 
         </div>
-
     </div>
 </div>
 
@@ -127,19 +127,19 @@
     {
         try
         {
-            if (selectedFirmaDonem == -1)
-            {
-                await modalManager.ShowMessageAsync("Hata", "Firma Seçmeniz Gerekmektedir.");
-                return;
-            }
+            // if (selectedFirmaDonem == -1)
+            // {
+            //     await modalManager.ShowMessageAsync("Hata", "Firma Seçmeniz Gerekmektedir.");
+            //     return;
+            // }
 
             await LocalStorage.SetItemAsync(Consts.Token, response.ApiToken);
             await LocalStorage.SetItemAsync<string>(Consts.KullaniciKodu, response.KullaniciDto.KullaniciKodu);
 
-            var firma = firmalar.Where(x => x.logref == selectedFirmaDonem).SingleOrDefault();
+            // var firma = firmalar.Where(x => x.logref == selectedFirmaDonem).SingleOrDefault();
 
-            await LocalStorage.SetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem, firma);
-            await LocalStorage.SetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem, onDegerfirma);
+            // await LocalStorage.SetItemAsync<SisFirmaDonemDto>(Consts.FirmaDonem, firma);
+            // await LocalStorage.SetItemAsync<SisFirmaDonemDto>(Consts.OndegerFirmaDonem, onDegerfirma);
 
             (AuthenticationStateProvider as AuthStateProvider).NotifyUserLogin(response.KullaniciDto.KullaniciKodu);
 
@@ -175,17 +175,19 @@
 
                     response = res.Value;
 
-                    await LoadFirmaDonem();
+                    // await LoadFirmaDonem();
 
-                    if (firmalar == null)
-                    {
-                        await modalManager.ShowMessageAsync("Hata", "Giriş yetkiniz bulunmamaktadır");
-                        return;
-                    }
+                    // if (firmalar == null)
+                    // {
+                    //     await modalManager.ShowMessageAsync("Hata", "Firma Giriş yetkiniz bulunmamaktadır");
+                    //     return;
+                    // }
 
-                    _showProgress = false;
-                    _firstStep = false;
-                    _secondStep = true;
+
+                    // Şimdilik Firma seçimini atlıyoruz
+                    //_firstStep = false;
+                    //_secondStep = true;
+                    await SaveRedirect();
                 }
                 else
                 {
@@ -195,11 +197,13 @@
         }
         catch (Exception ex)
         {
-            _showProgress = false;
             await modalManager.ShowMessageAsync("Hata", ex.Message);
 
         }
-
+        finally
+        {
+            _showProgress = false;
+        }
     }
 
 

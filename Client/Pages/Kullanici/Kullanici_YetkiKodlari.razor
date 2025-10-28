@@ -1,0 +1,74 @@
+﻿@page "/kullanici-yetkileri/{KullaniciKodu}"
+@using MudBlazor
+@inject NavigationManager Nav
+
+<MudPaper Class="pa-4" Elevation="2">
+
+    @if (!isModalForm.HasValue)
+    {
+        <MudText Typo="Typo.h5">Kullanıcı Yetkileri</MudText>
+    }
+
+    <MudTable Items="@yetkiler" MultiSelection="true" T="KullaniciYetkiDto" @bind-SelectedItems="selectedItems" Hover="true">
+        <HeaderContent>
+            <MudTh>Kodu</MudTh>
+            <MudTh>Adı</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Kodu">@context.Kodu</MudTd>
+            <MudTd DataLabel="Adi">@context.Adi</MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    <div class="mt-4">
+        <MudButton Color="Color.Primary" Variant="MudBlazor.Variant.Filled" OnClick="Kaydet">Kaydet</MudButton>
+        <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Outlined" OnClick="goBackList">İptal</MudButton>
+    </div>
+
+</MudPaper>
+
+@code {
+    [Parameter] public string KullaniciKodu { get; set; } = string.Empty;
+    [Parameter] public int? isModalForm { get; set; }
+
+    [Inject]
+    HttpClient client { get; set; }
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    private List<KullaniciYetkiDto> yetkiler = new();
+    private HashSet<KullaniciYetkiDto> selectedItems = new HashSet<KullaniciYetkiDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        yetkiler = await client.GetServiceResponseAsync<List<KullaniciYetkiDto>>(UrlHelper.GetKullaniciYetkiList + "?kullaniciKodu=" + KullaniciKodu);
+        selectedItems = yetkiler.Where(x => x.Secili).ToHashSet();
+    }
+
+    private async Task Kaydet()
+    {
+        var request = new KullaniciYetkiPostDto
+        {
+            KullaniciKodu = KullaniciKodu,
+            YetkiKodlari = selectedItems.ToList()
+        };
+
+        var bln = await client.PostGetServiceResponseAsync<bool, KullaniciYetkiPostDto>(UrlHelper.PostKullaniciYetkiList, request);
+
+
+        Snackbar.Add("Yetkiler başarıyla kaydedildi", Severity.Success);
+
+        await goBackList();
+    }
+
+    public async Task goBackList()
+    {
+        if (isModalForm.HasValue)
+            await ModalInstance.CloseAsync();
+        else
+            Nav.NavigateTo("/KullaniciListe");
+    }
+
+}

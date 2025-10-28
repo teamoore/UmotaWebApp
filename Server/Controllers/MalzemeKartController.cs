@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using UmotaWebApp.Server.Services.Infrastructure;
 using UmotaWebApp.Shared.CustomException;
 using UmotaWebApp.Shared.ModelDto;
+using UmotaWebApp.Shared.ModelDto.Request;
 using UmotaWebApp.Shared.ServiceResponses;
 
 namespace UmotaWebApp.Server.Controllers
@@ -27,11 +28,11 @@ namespace UmotaWebApp.Server.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<ServiceResponse<List<MalzemeKartDto>>> MalzemeKartListele(string firmaId)
+        public async Task<ServiceResponse<List<UrunDto>>> MalzemeKartListele(string firmaId)
         {
             try
             {
-                return new ServiceResponse<List<MalzemeKartDto>>()
+                return new ServiceResponse<List<UrunDto>>()
                 {
                     Value = await MalzemeKartService.GetMalzemeKarts(firmaId)
                 };
@@ -40,18 +41,18 @@ namespace UmotaWebApp.Server.Controllers
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
-                var e = new ServiceResponse<List<MalzemeKartDto>>();
+                var e = new ServiceResponse<List<UrunDto>>();
                 e.SetException(ex);
                 return e;
             }
         }
 
         [HttpPost("search")]
-        public async Task<ServiceResponse<List<MalzemeKartDto>>> GetMalzemeKartSearchList(MalzemeKartRequestDto request)
+        public async Task<ServiceResponse<List<UrunDto>>> GetMalzemeKartSearchList(MalzemeKartRequestDto request)
         {
             try
             {
-                return new ServiceResponse<List<MalzemeKartDto>>()
+                return new ServiceResponse<List<UrunDto>>()
                 {
                     Value = await MalzemeKartService.SearchMalzemeKarts(request)
                 };
@@ -60,18 +61,18 @@ namespace UmotaWebApp.Server.Controllers
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
-                var e = new ServiceResponse<List<MalzemeKartDto>>();
+                var e = new ServiceResponse<List<UrunDto>>();
                 e.SetException(ex);
                 return e;
             }
         }
 
         [HttpGet("get")]
-        public async Task<ServiceResponse<MalzemeKartDto>> GetTeklifDetay(int logref, string firmaId)
+        public async Task<ServiceResponse<UrunDto>> GetMalzemeKart(int logref, string firmaId)
         {
             try
             {
-                return new ServiceResponse<MalzemeKartDto>()
+                return new ServiceResponse<UrunDto>()
                 {
                     Value = await MalzemeKartService.GetMalzemeKart(logref,firmaId)
                 };
@@ -80,68 +81,7 @@ namespace UmotaWebApp.Server.Controllers
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
-                var e = new ServiceResponse<MalzemeKartDto>();
-                e.SetException(ex);
-                return e;
-            }
-        }
-
-        [HttpPost("fiyatgetir")]
-        public async Task<ServiceResponse<MalzemeFiyatDto>> MalzemeFiyatiGetir(MalzemeFiyatRequestDto request)
-        {
-            try
-            {
-                return new ServiceResponse<MalzemeFiyatDto>()
-                {
-                    Value = await MalzemeKartService.MalzemeFiyatGetir(request)
-                };
-            }
-            catch (ApiException ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<MalzemeFiyatDto>();
-                e.SetException(ex);
-                return e;
-            }
-        }
-
-        [HttpPost("maliyetgetir")]
-        public async Task<ServiceResponse<MalzemeFiyatDto>> MalzemeMaliyetiGetir(MalzemeFiyatRequestDto request)
-        {
-            try
-            {
-                return new ServiceResponse<MalzemeFiyatDto>()
-                {
-                    Value = await MalzemeKartService.MalzemeMaliyetGetir(request)
-                };
-            }
-            catch (ApiException ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<MalzemeFiyatDto>();
-                e.SetException(ex);
-                return e;
-            }
-
-        }
-
-        [HttpPost("stokgetir")]
-        public async Task<ServiceResponse<List<MalzemeStokDto>>> GetMalzemeKartSearchListStoklu(MalzemeStokRequestDto request)
-        {
-            try
-            {
-                return new ServiceResponse<List<MalzemeStokDto>>()
-                {
-                    Value = await MalzemeKartService.SearchMalzemeKartStoklu(request)
-                };
-            }
-            catch (ApiException ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<List<MalzemeStokDto>>();
+                var e = new ServiceResponse<UrunDto>();
                 e.SetException(ex);
                 return e;
             }
@@ -187,81 +127,161 @@ namespace UmotaWebApp.Server.Controllers
             }
         }
 
-        [HttpGet("GetBirimSetList")]
-        public async Task<ServiceResponse<IEnumerable<MalzemeBirimSetDto>>> GetBirimSetList(int logofirmno)
+        [HttpGet("GetFotoList")]
+        public async Task<ServiceResponse<List<string>>> GetFotoList(int urunID)
         {
             try
             {
-                return new ServiceResponse<IEnumerable<MalzemeBirimSetDto>>()
+                return new ServiceResponse<List<string>>()
                 {
-                    Value = await MalzemeKartService.GetMalzemeBirimSetList(logofirmno)
-                };
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<IEnumerable<MalzemeBirimSetDto>>();
-                e.SetException(ex);
-                return e;
-            }
-        }
-
-        [HttpGet("GetGrupList")]
-        public async Task<ServiceResponse<IEnumerable<SpeCodesDto>>> GetGrupList(int logofirmno)
-        {
-            try
-            {
-                return new ServiceResponse<IEnumerable<SpeCodesDto>>()
-                {
-                    Value = await MalzemeKartService.GetMalzemeGrupList(logofirmno)
-                };
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<IEnumerable<SpeCodesDto>>();
-                e.SetException(ex);
-                return e;
-            }
-        }
-
-        [HttpGet("GetMarkaList")]
-        public async Task<ServiceResponse<IEnumerable<SpeCodesDto>>> GetMarkaist(int logofirmno)
-        {
-            try
-            {
-                return new ServiceResponse<IEnumerable<SpeCodesDto>>()
-                {
-                    Value = await MalzemeKartService.GetMalzemeMarkaList(logofirmno)
-                };
-            }
-            catch (Exception ex)
-            {
-                Logger.Log(LogLevel.Error, ex.Message);
-
-                var e = new ServiceResponse<IEnumerable<SpeCodesDto>>();
-                e.SetException(ex);
-                return e;
-            }
-        }
-
-        [HttpPost("savemarka")]
-        public async Task<ServiceResponse<SpeCodesDto>> InsertMalzemeMarka(SpeCodesDto request)
-        {
-            try
-            {
-                return new ServiceResponse<SpeCodesDto>()
-                {
-                    Value = await MalzemeKartService.SaveMalzemeMarka(request)
+                    Value = await MalzemeKartService.GetFotoList(urunID)
                 };
             }
             catch (ApiException ex)
             {
                 Logger.Log(LogLevel.Error, ex.Message);
 
-                var e = new ServiceResponse<SpeCodesDto>();
+                var e = new ServiceResponse<List<string>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("GetUserSepetList")]
+        public async Task<ServiceResponse<List<SepetDto>>> GetUserSepetList(string kullaniciKodu)
+        {
+            try
+            {
+                return new ServiceResponse<List<SepetDto>>()
+                {
+                    Value = await MalzemeKartService.GetUserSepetList(kullaniciKodu)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<SepetDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("GetSepetUrunList")]
+        public async Task<ServiceResponse<List<SepetUrunDto>>> GetSepetUrunList(string kullaniciKodu, string sepetAdi)
+        {
+            try
+                {
+                return new ServiceResponse<List<SepetUrunDto>>()
+                {
+                    Value = await MalzemeKartService.GetSepetUrunList(kullaniciKodu, sepetAdi)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<List<SepetUrunDto>>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("DeleteUserSepet")]
+        public async Task<ServiceResponse<int>> DeleteUserSepet(string kullaniciKodu, string sepetAdi)
+        {
+            try
+            {
+                return new ServiceResponse<int>()
+                {
+                    Value = await MalzemeKartService.DeleteUserSepet(kullaniciKodu, sepetAdi)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("DeleteSepetUrun")]
+        public async Task<ServiceResponse<int>> DeleteSepetUrun(int urunId)
+        {
+            try
+            {
+                return new ServiceResponse<int>()
+                {
+                    Value = await MalzemeKartService.DeleteSepetUrun(urunId)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpPost("postsepet")]
+        public async Task<ServiceResponse<int>> PostSepet(SepetPostDto request)
+        {
+            try
+            {
+                return new ServiceResponse<int>()
+                {
+                    Value = await MalzemeKartService.SepetPost(request)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("getusersepetcount")]
+        public async Task<ServiceResponse<int>> GetUserSepetCount(string kullaniciKodu)
+        {
+            try
+            {
+                return new ServiceResponse<int>()
+                {
+                    Value = await MalzemeKartService.GetUserSepetCount(kullaniciKodu)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<int>();
+                e.SetException(ex);
+                return e;
+            }
+        }
+
+        [HttpGet("UrunExcelAktar")]
+        public async Task<ServiceResponse<int>> UrunExcelAktar(string excelFileName, string kullaniciKodu)
+        {
+            try
+            {
+                return new ServiceResponse<int>()
+                {
+                    Value = await MalzemeKartService.ExceldenUrunleriAktar(excelFileName, kullaniciKodu)
+                };
+            }
+            catch (ApiException ex)
+            {
+                Logger.Log(LogLevel.Error, ex.Message);
+
+                var e = new ServiceResponse<int>();
                 e.SetException(ex);
                 return e;
             }

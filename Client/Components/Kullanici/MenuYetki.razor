@@ -1,0 +1,196 @@
+﻿<MudPaper Width="600px" Elevation="1" Class="pa-4" Style="display:flex; flex-direction:column; height:600px;">
+    <!-- Başlık -->
+    <MudText Typo="Typo.h5" Class="mb-3">Kullanıcı Menü Yetkileri</MudText>
+
+    <!-- Scrollable Tree Container -->
+    <MudPaper Style="flex:1 1 auto; overflow-y:auto; border:1px solid #e0e0e0; padding:8px;" Elevation="0">
+        <MudTreeView T="string"
+                     Items="@_treeItems"
+                     @ref="_treeView"
+                     CheckBoxColor="Color.Tertiary"
+                     TriState="true"
+                     AutoSelectParent="true"
+                     @bind-SelectedValues="SelectedValues"
+                     SelectionMode="SelectionMode.MultiSelection">
+            <ItemTemplate>
+                <MudTreeViewItem @bind-Expanded="@context.Expanded"
+                                 Items="@context.Children"
+                                 Value="@context.Value"
+                                 Icon="@context.Icon"
+                                 Text="@context.Text"
+                                 Visible="@context.Visible" />
+            </ItemTemplate>
+        </MudTreeView>
+    </MudPaper>
+
+    <!-- Sabitlenen Butonlar -->
+    <MudStack Row Justify="Justify.Center" Class="mt-3" Wrap="Wrap.Wrap" Style="flex-shrink:0;">
+        <MudButton Color="Color.Primary" Variant="MudBlazor.Variant.Filled" OnClick="Kaydet">Kaydet</MudButton>
+        <MudButton Color="Color.Secondary" Variant="MudBlazor.Variant.Filled" OnClick="@(() => _treeView.ExpandAllAsync())">Genişlet</MudButton>
+        <MudButton Color="Color.Dark" Variant="MudBlazor.Variant.Filled" OnClick="@(() => _treeView.CollapseAllAsync())">Daralt</MudButton>
+        <MudButton Color="Color.Error" Variant="MudBlazor.Variant.Outlined" OnClick="goBackList">İptal</MudButton>
+    </MudStack>
+</MudPaper>
+
+
+@code {
+    [Parameter] public string KullaniciKodu { get; set; } = string.Empty;
+
+    [Inject] HttpClient client { get; set; } = default!;
+    [Inject] ISnackbar Snackbar { get; set; } = default!;
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; } = default!;
+
+    private List<TreeItemData<string>> _treeItems = new();
+    private MudTreeView<string> _treeView;
+    public IReadOnlyCollection<string> SelectedValues { get; set; } = new List<string>();
+    private HashSet<string> selectedKeys = new();
+    private List<MenuItemDto> _menuList = new();
+    private bool _firstRender = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _menuList = await client.GetServiceResponseAsync<List<MenuItemDto>>(UrlHelper.GetAllMenusAsync);
+        var haklar = await client.GetServiceResponseAsync<List<KullaniciMenuYetkiDto>>(UrlHelper.GetUserPermissionsAsync + "?kullaniciKodu=" + KullaniciKodu);
+
+        // seçili yetkileri "ID@YetkiTuru" olarak kaydet
+        selectedKeys = haklar.Select(h => $"{h.MenuID}@{h.YetkiTuru}").ToHashSet();
+
+        _treeItems = BuildTree(_menuList);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _treeView is not null)
+        {
+            _firstRender = false;
+            await Task.Delay(100); // kısa gecikme
+
+            SelectedValues = selectedKeys.ToList();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private List<TreeItemData<string>> BuildTree(List<MenuItemDto> items)
+    {
+        var lookup = items.ToLookup(i => i.ParentID);
+
+        List<TreeItemData<string>> BuildNodes(int? parentId)
+        {
+            return lookup[parentId]
+                .Select(m =>
+                {
+                    var node = new TreeItemData<string>
+                    {
+                        Value = $"{m.ID}@sel", // varsayılan görme yetkisi
+                        Text = $"{m.Tanimi}",
+                        // Icon = Icons.Material.Filled.Folder,
+                        Children = BuildNodes(m.ID)
+                    };
+
+                    // Eğer bu menü bir giriş ekranı ise altına CRUD aksiyonlarını ekle
+                    if (m.GirisEkrani == true)
+                    {
+                        var actions = new List<(string Kod, string Text, string Icon)>
+                        {
+                            ("prv", "İzle", Icons.Material.Filled.Preview),
+                            ("ins", "Ekle", Icons.Material.Filled.AddCircle),
+                            ("upd", "Değiştir", Icons.Material.Filled.Edit),
+                            ("del", "Sil", Icons.Material.Filled.Delete)
+                        };
+
+                        foreach (var act in actions)
+                        {
+                            node.Children.Add(new TreeItemData<string>
+                            {
+                                Value = $"{m.ID}@{act.Kod}",
+                                Text = $"{act.Text}",
+                                Icon = act.Icon,
+                                Children = new List<TreeItemData<string>>()
+                            });
+                        }
+                    }
+
+                    return node;
+                })
+                .ToList();
+        }
+
+        return BuildNodes(null);
+    }
+
+    private async Task Kaydet()
+    {
+        // Seçili item'lar string tipinde, örneğin "12@sel"
+        var yetkiler = SelectedValues
+            .Select(val =>
+            {
+                var parts = val.Split('@');
+                return new KullaniciMenuYetkiDto
+                {
+                    KullaniciKodu = KullaniciKodu,
+                    MenuID = int.Parse(parts[0]),
+                    YetkiTuru = parts.Length > 1 ? parts[1] : "sel"
+                };
+            })
+            .ToList();
+
+        // 3️⃣ Parent zincirini bulup ekliyoruz (sadece @sel türünde)
+        var parentSet = new HashSet<int>(yetkiler.Where(y => y.YetkiTuru == "sel").Select(s => s.MenuID));
+
+        foreach (var item in yetkiler.ToList()) // iterate safely
+        {
+            if (!parentSet.Contains(item.MenuID))
+            {
+                yetkiler.Add(new KullaniciMenuYetkiDto
+                {
+                    MenuID = item.MenuID,
+                    YetkiTuru = "sel"
+                });
+                parentSet.Add(item.MenuID);
+            }
+
+
+            var currentId = item.MenuID;
+            while (true)
+            {
+                var parent = _menuList.FirstOrDefault(m => m.ID == currentId)?.ParentID;
+                if (parent == null || parent == 0)
+                    break;
+
+                if (!parentSet.Contains(parent.Value))
+                {
+                    yetkiler.Add(new KullaniciMenuYetkiDto
+                    {
+                        MenuID = parent.Value,
+                        YetkiTuru = "sel"
+                    });
+                    parentSet.Add(parent.Value);
+                }
+
+                currentId = parent.Value;
+            }
+        }
+
+
+        var request = new KullaniciMenuYetkiPostDto
+        {
+            KullaniciKodu = KullaniciKodu,
+            Menuler = yetkiler
+        };
+
+        var bln = await client.PostGetServiceResponseAsync<bool, KullaniciMenuYetkiPostDto>(
+            UrlHelper.SavePermissionsAsync, request);
+
+        if (bln)
+            Snackbar.Add("Yetkiler başarıyla kaydedildi", Severity.Success);
+        else
+            Snackbar.Add("Yetki kaydı başarısız!", Severity.Error);
+
+        await goBackList();
+    }
+
+    public async Task goBackList()
+    {
+        await ModalInstance.CloseAsync();
+    }
+}

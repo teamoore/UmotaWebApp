@@ -1,0 +1,297 @@
+﻿@page "/sepetlerim"
+@inject HttpClient Http
+@inject CartState CartState
+
+<MudGrid Class="p-4">
+
+    <!-- Sol: Sepet Listesi -->
+    <MudItem xs="12" sm="4" md="2">
+
+
+        <MudPaper Class="p-3">
+            <MudText Typo="Typo.h6" Class="mb-2">Sepetlerim</MudText>
+
+            @if (sepetLoading)
+            {
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            }
+
+            @if (sepetler?.Any() == true)
+            {
+                <MudList T="string" Dense="true">
+                    @foreach (var sepet in sepetler)
+                    {
+                        bool isSelected = sepet.SepetAdi == seciliSepet;
+
+                        <MudListItem Class="@($"d-flex justify-content-between align-items-center px-2 py-1 {(isSelected ? "bg-primary text-white" : "")}")"
+                                     Style="border-radius:8px; cursor:pointer; transition:background 0.2s;"
+                                     @onclick="() => SeciliSepetiGetir(sepet.SepetAdi)">
+                            <!-- Sol kısım: Sepet bilgileri -->
+                            <div class="d-flex flex-column">
+                                <MudText Typo="Typo.subtitle2" Class="@($"{(isSelected ? "text-white fw-bold" : "fw-bold")}")">
+                                    @sepet.SepetAdi
+                                </MudText>
+                                <MudText Typo="Typo.caption"
+                                         Class="@($"{(isSelected ? "text-white-50" : "text-muted")}")">
+                                    @sepet.UrunSayisi ürün • @($" ${sepet.ToplamTutar:N2}  ₺{sepet.ToplamTutarTL:N2}")
+                                </MudText>
+                            </div>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+            else
+            {
+                <MudText Rtl="false" Color="Color.Error">Henüz sepet bulunmamaktadır.</MudText>
+            }
+
+
+        </MudPaper>
+    </MudItem>
+
+    <!-- Sağ: Seçilen Sepetin Ürünleri -->
+    <MudItem xs="12" sm="8" md="10">
+        <MudPaper Class="p-3">
+
+            @if (urunLoading)
+            {
+                <MudProgressCircular Indeterminate="true" Color="Color.Primary" />
+            }
+
+            @if (seciliSepet == null)
+            {
+                <MudText Typo="Typo.subtitle1" Color="Color.Secondary">Bir sepet seçiniz...</MudText>
+            }
+            else if (urunler == null || !urunler.Any())
+            {
+                <MudText Typo="Typo.subtitle1" Color="Color.Secondary">Bu sepette henüz ürün yok.</MudText>
+            }
+            else
+            {
+                <MudText Typo="Typo.h6" Class="mb-2">@seciliSepet</MudText>
+
+                <MudTable Items="@urunler" Dense="true" Hover="true">
+                    <HeaderContent>
+                        <MudTh>#</MudTh>
+                        <MudTh>Ürün Kodu</MudTh>
+                        <MudTh>Ürün Adı</MudTh>
+                        <MudTh>Hesaplanan Adet</MudTh>
+                        <MudTh>Fiyat USD</MudTh>
+                        <MudTh>Fiyat TL</MudTh>
+                        <MudTh>Sepet Miktarı</MudTh>
+                        <MudTh>Toplam USD</MudTh>
+                        <MudTh>Toplam TL</MudTh>
+                        <MudTh></MudTh>
+                    </HeaderContent>
+
+                    <RowTemplate>
+                        <MudTd>
+                            @if (!string.IsNullOrEmpty(context.Foto))
+                            {
+                                <img src="@context.Foto"
+                                     alt="@context.UrunAdi"
+                                     style="width:100px; height:100px; object-fit:contain; border-radius:6px;"
+                                     @onclick="() =>OpenPhotoDetailModal(context.UrunID)" />
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.ImageNotSupported" Color="Color.Error" Size="Size.Large" />
+                            }
+                        </MudTd>
+                        <MudTd>@context.UrunKodu</MudTd>
+                        <MudTd>@context.UrunBaslik</MudTd>
+                        <MudTd>@context.HesaplananAdet</MudTd>
+                        <!-- Fiyat USD -->
+                        <MudTd>
+                            <MudText Color="Color.Primary" Typo="Typo.body1" Style="font-weight:bold;">
+                                @($"${context.Fiyat:N2}")
+                            </MudText>
+                        </MudTd>
+
+                        <!-- Fiyat TL -->
+                        <MudTd>
+                            <MudText Color="Color.Secondary" Typo="Typo.body1" Style="font-weight:bold;">
+                                @($"₺{context.FiyatTL:N2}")
+                            </MudText>
+                        </MudTd>
+                        <MudTd>@context.Miktar</MudTd>
+                        <MudTd>@($"${context.Fiyat * context.Miktar:N2}")</MudTd>
+                        <MudTd>@($"₺{context.FiyatTL * context.Miktar:N2}")</MudTd>
+                        <MudTd>
+                            <MudIconButton Color="Color.Success" Title="Miktar Değiştir"
+                                           Icon="@Icons.Material.Filled.Edit"
+                                           OnClick="() => UrunMiktarDegistir(context.UrunID, context.ID, context.Miktar)">
+                            </MudIconButton>
+
+                            <MudIconButton Color="Color.Error" Title="Ürünü çıkar"
+                                           Icon="@Icons.Material.Filled.Delete"
+                                           OnClick="() => UrunSil(context.ID)">
+                            </MudIconButton>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+
+                <!-- 🧾 Toplam Tutar Alanı -->
+                <MudPaper Elevation="1"
+                          Class="mt-4 p-3 d-flex justify-content-between align-items-center flex-wrap gap-2"
+                          Style="border-radius:8px; background-color:#f9fafb;">
+
+                    <!-- Sol: Toplam tutar -->
+                    <div class="d-flex align-items-center">
+                        <MudText Typo="Typo.h6" Class="me-2">Toplam Tutar:</MudText>
+                        <MudText Typo="Typo.h5" Color="Color.Primary" Class="fw-bold ml-2">
+                            @($"${urunler.Sum(x => x.Miktar * x.Fiyat):N2}")
+                        </MudText>
+                        <MudText Typo="Typo.h5" Color="Color.Secondary" Class="fw-bold ml-8">
+                            @($"₺{urunler.Sum(x => x.Miktar * x.FiyatTL):N2}")
+                        </MudText>
+                    </div>
+
+                    <!-- Sağ: Sepet Sil Butonu -->
+                    <MudButton Variant="MudBlazor.Variant.Filled"
+                               Color="Color.Error"
+                               StartIcon="@Icons.Material.Filled.Delete"
+                               OnClick="() => SepetSil(seciliSepet)">
+                        Sepeti Sil
+                    </MudButton>
+                </MudPaper>
+            }
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+    [Inject]
+    ModalManager ModalManager { get; set; }
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] ModalParameters modalParameters { get; set; }
+
+    private bool sepetLoading = true;
+    private bool urunLoading = false;
+    private List<SepetDto> sepetler = new();
+    private List<SepetUrunDto> urunler;
+    private string seciliSepet;
+    private string kullaniciKodu;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        kullaniciKodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+
+        await SepetleriGetir();
+    }
+
+    private async Task SepetleriGetir()
+    {
+        sepetLoading = true;
+        sepetler = await Http.GetServiceResponseAsync<List<SepetDto>>(UrlHelper.GetUserSepetList + "?kullanicikodu=" + kullaniciKodu);
+        sepetLoading = false;
+    }
+
+    private async Task SeciliSepetiGetir(string sepetAdi)
+    {
+        urunLoading = true;
+        seciliSepet = sepetAdi;
+        urunler = await Http.GetServiceResponseAsync<List<SepetUrunDto>>(UrlHelper.GetSepetUrunList + "?kullanicikodu=" + kullaniciKodu + "&sepetadi=" + sepetAdi);
+        urunLoading = false;
+    }
+
+    private async Task UrunSil(int urunId)
+    {
+        var res = await Http.GetServiceResponseAsync<int>(UrlHelper.DeleteSepetUrun + "?urunId=" + urunId);
+
+        urunler.RemoveAll(x => x.ID == urunId);
+        if (urunler.Any())
+        {
+            await SeciliSepetiGetir(seciliSepet);
+        } 
+        else
+        {
+            sepetler.RemoveAll(x => x.SepetAdi == seciliSepet);
+            seciliSepet = null;
+        }
+
+        CartState.SepetUrunSayisi = await Http.GetServiceResponseAsync<int>(UrlHelper.GetUserSepetCount + "?kullaniciKodu=" + kullaniciKodu);
+    }
+
+
+    private async Task SepetSil(string sepetAdi)
+    {
+        if (string.IsNullOrEmpty(sepetAdi))
+        {
+            Snackbar.Add("Lütfen silinecek bir sepet seçiniz.", Severity.Warning);
+            return;
+        }
+
+        var modalRes = await ModalManager.ShowConfirmationAsync("Sepet tümüyle silinecek!", $"{sepetAdi} adlı sepeti silmek istediğinizden emin misiniz?", "Evet", "Hayır");
+        if (!modalRes)
+            return;
+
+        try
+        {
+            sepetLoading = true;
+            var res = await Http.GetServiceResponseAsync<int>(UrlHelper.DeleteUserSepet + "?kullanicikodu=" + kullaniciKodu + "&sepetadi=" + sepetAdi);
+            sepetler.RemoveAll(x => x.SepetAdi == sepetAdi);
+
+            if (seciliSepet == sepetAdi)
+            {
+                seciliSepet = null;
+                urunler.Clear();
+            }
+
+            CartState.SepetUrunSayisi = await Http.GetServiceResponseAsync<int>(UrlHelper.GetUserSepetCount + "?kullaniciKodu=" + kullaniciKodu);
+
+            Snackbar.Add($"{sepetAdi} adlı sepet silindi.", Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Sepet silinemedi: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            sepetLoading = false;
+        }
+    }
+
+    private async Task UrunMiktarDegistir(int urunId, int satirId, double oldMiktar)
+    {
+        modalParameters = new ModalParameters();
+        modalParameters.Add("UrunId", urunId);
+        modalParameters.Add("isModalForm", 2);
+        modalParameters.Add("modalMiktar", oldMiktar);
+
+        var sepetForm = modal.Show<Urun.UrunSepeteEkle>("Sepet Miktar Değiştir", modalParameters);
+        var result = await sepetForm.Result;
+
+        if (!result.Cancelled)
+        {
+            if(result.Data != null)
+            {
+                var yeniMiktar = (double)result.Data;
+
+                var urun = urunler.FirstOrDefault(u => u.ID == satirId);
+                if (urun != null)
+                {
+                    urun.Miktar = yeniMiktar;
+                }
+            }
+        }
+
+    }
+
+    private async Task OpenPhotoDetailModal(int UrunId)
+    {
+        if (modal != null)
+        {
+            var parameters = new ModalParameters();
+            parameters.Add("UrunId", UrunId);
+            parameters.Add("isModalForm", 1);
+            modal.Show<UrunDetay>($"Ürün Detay", parameters);
+        }
+    }
+
+}

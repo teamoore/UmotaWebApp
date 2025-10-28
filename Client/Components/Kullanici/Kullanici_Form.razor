@@ -88,7 +88,7 @@
         </div>
 
         <div class="form-group">
-            <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="Variant.Filled" Color="Color.Primary">
+            <MudButton Disabled="@_processing" OnClick="ValidSubmit" Variant="MudBlazor.Variant.Filled" Color="Color.Primary">
                 @if (_processing)
                 {
                     <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
@@ -222,7 +222,7 @@
         if (modalForm.HasValue)
             await ModalInstance.CloseAsync();
         else
-            navigation.NavigateTo("/kullanici_liste");
+            navigation.NavigateTo("/KullaniciListe");
     }
 
     public Task Close()

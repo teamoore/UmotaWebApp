@@ -1,0 +1,99 @@
+﻿@page "/urundetay/{UrunId:int}"
+
+<MudPaper Class="p-4 mx-auto"
+          MaxWidth="800px"
+          Style="max-height:90vh; overflow-y:auto;">
+
+    <MudGrid GutterSize="16px">
+        <!-- Sol taraf: Ürün fotoğrafı -->
+        <MudItem xs="12" md="6" Class="d-flex flex-column justify-center">
+            <img src="@selectedPhoto"
+                 alt="@product?.Adi"
+                 style="width:100%; max-height:60vh; object-fit:contain; cursor:pointer;"
+                  />
+        </MudItem>
+
+        <!-- Sağ taraf: Ürün bilgileri -->
+        <MudItem xs="12" md="6" Class="d-flex flex-column justify-between">
+            <div style="overflow:hidden;">
+                <MudText Typo="Typo.h5" FontWeight="FontWeight.Bold" Class="mb-1">
+                    @product?.Baslik
+                </MudText>
+                <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="mb-2">
+                    Kod: @product?.Kodu
+                </MudText>
+
+                <!-- Ürün Özellikleri scrollable -->
+                <MudText Typo="Typo.body1"
+                         Style="white-space:pre-line; max-height:40vh; overflow-y:auto; padding-right:4px; margin-bottom:8px;">
+                    @product?.Ozellik
+                </MudText>
+
+                <!-- Fiyat Bilgileri -->
+                <div style="display:flex; flex-direction:column; align-items:flex-start; margin-top:4px;">
+                    <MudText Typo="Typo.h6" Color="Color.Primary" Bold="true">
+                        @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", @product?.Fiyat2)
+                    </MudText>
+                    <MudText Typo="Typo.h6" Color="Color.Secondary">
+                        @String.Format(new System.Globalization.CultureInfo("tr-TR"), "{0:C}", @product?.Fiyat3)
+                    </MudText>
+                </div>
+            </div>
+
+            <MudButton Color="Color.Secondary"
+                       Variant="MudBlazor.Variant.Outlined"
+                       StartIcon="@Icons.Material.Filled.Close"
+                       OnClick="goBackList"
+                       Class="mt-3">
+                Kapat
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+
+    <!-- Alt fotoğraflar -->
+    @if (product?.Fotolar != null && product.Fotolar.Any(f => !string.IsNullOrWhiteSpace(f)))
+    {
+        <div class="d-flex flex-row flex-wrap mt-3">
+            @foreach (var foto in product.Fotolar.Where(f => !string.IsNullOrWhiteSpace(f)))
+            {
+                <img src="@foto"
+                     style="width:80px; height:80px; margin-right:8px; margin-bottom:8px; object-fit:cover; border:2px solid @(foto == selectedPhoto ? "blue" : "lightgray"); cursor:pointer; border-radius:6px;"
+                     @onclick="() => selectedPhoto = foto" />
+            }
+        </div>
+    }
+</MudPaper>
+
+@code {
+    [Parameter] public int UrunId { get; set; }
+    [Parameter] public int? isModalForm { get; set; }
+
+    [Inject] HttpClient httpClient { get; set; }
+    [Inject] NavigationManager navigation { get; set; }
+    [CascadingParameter] IModalService modal { get; set; }
+    [CascadingParameter] BlazoredModalInstance ModalInstance { get; set; }
+
+    private UrunDto product;
+    private string selectedPhoto;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProduct(UrunId);
+    }
+
+    private async Task LoadProduct(int urunId)
+    {
+        product = await httpClient.GetServiceResponseAsync<UrunDto>(UrlHelper.MalzemeKartGetir + "?logref=" + urunId + "&firmaId=0");
+        product.Fotolar = await httpClient.GetServiceResponseAsync<List<string>>(UrlHelper.MalzemeFotoGetir + "?urunID=" + urunId);
+        selectedPhoto = product.Fotolar.FirstOrDefault();
+    }
+
+    public async Task goBackList()
+    {
+        if (isModalForm.HasValue)
+            await ModalInstance.CloseAsync();
+        else
+            navigation.NavigateTo("/urunliste");
+    }
+
+}

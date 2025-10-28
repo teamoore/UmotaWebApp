@@ -1,0 +1,223 @@
+﻿@page "/urunaktar"
+@inject HttpClient Http
+
+<RadzenCard Variant="Radzen.Variant.Outlined">
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Aktarılacak dosyayı seçin</RadzenText>
+    <RadzenUpload Url="/api/FileUpload/single" ChooseText="Seç" Accept=".xlsx,.xls" MaxFileSize="2147483648"
+        Progress=@OnProgress Complete=@OnComplete Error=@OnError Style="width: 100%" 
+        InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "select file" } })" />
+    <RadzenProgressBar Value=@progress class="rz-mt-6" Visible=@showProgress />
+    <RadzenButton Text="Vazgeç" Click=@OnCancel class="rz-mt-4" Visible=@showProgress />
+    <RadzenLabel Visible=@showComplete class="rz-mt-6" Text=@completionMessage />
+    <RadzenLabel Text="@errorMessage" class="text-danger rz-mt-2" />
+</RadzenCard>
+
+<div class="mt-lg-5">
+    <div class="form">
+        <div class="form-group">
+
+           @*  <InputFile id="fileInput" OnChange="UploadFiles" hidden />
+
+            <MudButton HtmlTag="label"
+                       Variant="MudBlazor.Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.CloudUpload"
+                       for="fileInput">
+                Dosya yükle
+            </MudButton> *@
+
+            @if (showComplete)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <MudButton HtmlTag="label"
+                                   Variant="MudBlazor.Variant.Filled"
+                                   Color="Color.Primary"
+                                   StartIcon="@Icons.Material.Filled.CloudUpload"
+                                   OnClick="@ExcelProcess">
+                            Ürünleri Güncelle
+                        </MudButton>
+                    </div>
+                </div>
+            }
+
+            <div class="row mt-3">
+                @if (onProgress)
+                {
+                    <div class="text-center my-4">
+                        <MudProgressCircular Color="Color.Primary" Size="Size.Large" Indeterminate="true" />
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(message))
+                {
+                    <MudAlert Severity="@alertSeverity" Variant="MudBlazor.Variant.Filled" Dense="true">
+                        @message
+                    </MudAlert>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@code {
+
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+    [Inject]
+    ISnackbar Snackbar { get; set; }
+    [Inject]
+    UploadHelper uploadHelper { get; set; }
+    [Inject]
+    ILocalStorageService LocalStorageService { get; set; }
+
+    private string kullaniciKodu;
+    private bool onProgress = false;
+    private string? message;
+    private Severity alertSeverity = Severity.Info;
+
+
+    int progress;
+    bool showProgress;
+    bool showComplete;
+    string completionMessage;
+    bool cancelUpload = false;
+    string errorMessage;
+    string fileName;
+
+
+    void OnComplete(UploadCompleteEventArgs args)
+    {
+        completionMessage = args.Cancelled ? "Aktarım iptal edildi" : "Aktarım tamamlandı. Ürün Güncelleme işlemini yapabilirsiniz.";
+        showProgress = false;
+        showComplete = true;
+    }
+
+    void OnProgress(UploadProgressArgs args)
+    {
+        errorMessage = "";
+        message = "";
+        completionMessage = "";
+
+        showProgress = true;
+        showComplete = false;
+        progress = args.Progress;
+        fileName = args.Files.First().Name;
+
+        // cancel upload
+        args.Cancel = cancelUpload;
+
+        // reset cancel flag
+        cancelUpload = false;
+    }
+
+    void OnCancel()
+    {
+        cancelUpload = true;
+    }
+
+    void OnError(UploadErrorEventArgs args)
+    {
+        showProgress = false;
+
+        // API'den gelen hata mesajını JSON olarak parse etmeye çalış
+        try
+        {
+            var errorJson = System.Text.Json.JsonDocument.Parse(args.Message);
+            errorMessage = errorJson.RootElement.GetProperty("message").GetString();
+        }
+        catch
+        {
+            // Eğer JSON değilse ham mesajı göster
+            errorMessage = args.Message;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        kullaniciKodu = await LocalStorageService.GetItemAsync<string>(Consts.KullaniciKodu);
+    }
+
+    private async Task ExcelProcess()
+    {
+        onProgress = true;
+        try
+        {
+            await Http.GetServiceResponseAsync<int>(UrlHelper.UrunExelAktar + "?excelFileName=" + fileName + "&kullaniciKodu=" + kullaniciKodu);
+
+            onProgress = false;
+            alertSeverity = Severity.Success;
+            message = "Ürün aktarımı başarıyla tamamlandı.";
+            Snackbar.Add("Ürün aktarımı tamamlandı", severity: Severity.Success);
+        }
+        catch (Exception ex)
+        {
+            onProgress = false;
+            alertSeverity = Severity.Error;
+            message = $"Hata: {ex.Message}";
+            Snackbar.Add(ex.Message, severity: Severity.Error);
+        }
+    }
+
+    // private async Task UploadFiles(InputFileChangeEventArgs e)
+    // {
+    //     onProgress = true;
+    //     try
+    //     {
+    //         foreach (var file in e.GetMultipleFiles(1))
+    //         {
+    //             files = new List<IBrowserFile>();
+    //             files.Add(file);
+    //         }
+
+    //         foreach (var file in files)
+    //         {
+    //             var buffers = new byte[file.Size];
+    //             var maxSize = 1024 * 1024 * 1024; //100 Mb
+    //             await file.OpenReadStream(maxAllowedSize: maxSize).ReadAsync(buffers);
+
+    //             var myfile = new FileDataDto();
+    //             myfile.Data = buffers;
+    //             myfile.FileName = file.Name;
+    //             myfile.FileType = file.ContentType;
+
+    //             var uploadedFile = await uploadHelper.Upload(myfile);
+
+    //             await Http.GetServiceResponseAsync<int>(UrlHelper.UrunExelAktar + "?excelFileName=" + file.Name + "&kullaniciKodu=" + kullaniciKodu);
+
+
+    //             //files = null;
+
+    //             // await uploadHelper.Save(new FileUploadRequestDto()
+    //             // {
+    //             //     File = new FileUploadDto()
+    //             //     {
+    //             //         FileName = uploadedFile.FileName,
+    //             //         Image = uploadedFile.Image,
+    //             //         ImageFilePath = uploadedFile.ImageFilePath,
+    //             //         ImageType = uploadedFile.ImageType,
+    //             //         TableLogRef = record.Logref,
+    //             //         TableName = "servis"
+    //             //     }
+    //             // });
+
+    //             // await DosyalariGetir();
+
+    //         }
+
+    //         onProgress = false;
+    //         alertSeverity = Severity.Success;
+    //         message = "Dosya başarıyla yüklendi.";
+    //         Snackbar.Add("Dosya yüklendi", severity: Severity.Success);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         onProgress = false;
+    //         alertSeverity = Severity.Error;
+    //         message = $"Hata: {ex.Message}";
+    //         Snackbar.Add(ex.Message, severity: Severity.Error);
+    //     }
+    // }
+       
+
+}
